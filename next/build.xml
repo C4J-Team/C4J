@@ -1,0 +1,22 @@
+<project default="build-javaassist-jar">
+	<target name="build-javaassist-jar">
+		<delete dir="target"/>
+		<mkdir dir="target"/>
+		
+		<javac srcdir="src/main" destdir="target" debug="true">
+			<classpath>
+				<fileset dir="lib"/>
+			</classpath>
+		</javac>
+		
+		<jar basedir="target" destfile="lib/next.jar">
+			<manifest>
+				<attribute name="Premain-Class" value="next.internal.Agent"/>
+				<attribute name="Boot-Class-Path" value="javassist.jar log4j-1.2.16.jar"/>
+			</manifest>
+		</jar>
+		
+		<eclipse.incrementalBuild project="next" kind="clean"/>
+		<eclipse.incrementalBuild project="next-systemtest" kind="clean"/>
+	</target>
+</project>
