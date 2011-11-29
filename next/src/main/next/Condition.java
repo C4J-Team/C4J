@@ -9,18 +9,12 @@ import org.apache.log4j.Logger;
 public class Condition implements ConditionProvider {
 	private static Logger logger = Logger.getLogger(Condition.class);
 
-	public static void pre(boolean condition) {
-		logger.info("pre called");
-		if (!condition) {
-			throw new AssertionError();
-		}
+	public static boolean pre() {
+		return Evaluator.isBefore();
 	}
 
-	public static void post(boolean condition) {
-		logger.info("post called");
-		if (!condition) {
-			throw new AssertionError();
-		}
+	public static boolean post() {
+		return Evaluator.isAfter();
 	}
 
 	@SuppressWarnings("unchecked")

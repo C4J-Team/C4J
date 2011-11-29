@@ -1,9 +1,10 @@
 package next.systemtest.pre;
 
-import static next.Condition.pre;
 import next.Contract;
 
 import org.junit.Test;
+
+import static next.Condition.pre;
 
 public class PreConditionSystemTest {
 
@@ -27,7 +28,9 @@ public class PreConditionSystemTest {
 	public static class DummyContract extends DummyClass {
 		@Override
 		public void method(int arg) {
-			pre(arg > 0);
+			if (pre()) {
+				assert arg > 0;
+			}
 		}
 	}
 }

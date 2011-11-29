@@ -34,6 +34,11 @@ public class PostConditionSystemTest {
 		new DummyClass().returnValue(4);
 	}
 
+	@Test
+	public void testPostConditionWithReturnValueAndVoid() {
+		new DummyClass().returnValueVoid();
+	}
+
 	@Contract(DummyContract.class)
 	public static class DummyClass {
 		protected static int staticValue;
@@ -50,26 +55,40 @@ public class PostConditionSystemTest {
 		public int returnValue(int value) {
 			return value;
 		}
+
+		public void returnValueVoid() {
+		}
 	}
 
 	public static class DummyContract extends DummyClass {
 		@Override
 		public void setStaticValue(int value) {
-			post(DummyClass.staticValue == 5);
+			if (post()) {
+				assert DummyClass.staticValue == 5;
+			}
 		}
 
 		@Override
 		public int noArgs() {
-			post(DummyClass.staticValue == 5);
+			if (post()) {
+				assert DummyClass.staticValue == 5;
+			}
 			return 0;
 		}
 
 		@Override
 		public int returnValue(int value) {
-			System.out.println("before post");
-			post(result(int.class) == 5);
-			System.out.println("after post");
+			if (post()) {
+				assert result(int.class) == 5;
+			}
 			return 0;
+		}
+
+		@Override
+		public void returnValueVoid() {
+			if (post()) {
+				assert result() == null;
+			}
 		}
 	}
 }

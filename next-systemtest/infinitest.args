@@ -1,1 +1,1 @@
--javaagent:../next/lib/next.jar
+-ea -javaagent:../next/lib/next.jar
