@@ -26,4 +26,8 @@ public class Condition {
 		return null;
 	}
 
+	public static <T> T old(T obj) {
+		return obj;
+	}
+
 }

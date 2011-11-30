@@ -3,6 +3,8 @@ package next.internal;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 import next.internal.compiler.StaticCall;
 
@@ -16,6 +18,10 @@ public class Evaluator {
 	public static StaticCall getReturnValue = new StaticCall(Evaluator.class, "getReturnValue");
 	public static StaticCall fieldAccess = new StaticCall(Evaluator.class, "fieldAccess");
 	public static StaticCall methodCall = new StaticCall(Evaluator.class, "methodCall");
+	public static StaticCall oldFieldAccess = new StaticCall(Evaluator.class, "oldFieldAccess");
+	public static StaticCall oldMethodCall = new StaticCall(Evaluator.class, "oldMethodCall");
+	public static StaticCall storeFieldAccess = new StaticCall(Evaluator.class, "storeFieldAccess");
+	public static StaticCall storeMethodCall = new StaticCall(Evaluator.class, "storeMethodCall");
 
 	private static Logger logger = Logger.getLogger(Evaluator.class);
 
@@ -29,6 +35,13 @@ public class Evaluator {
 	private static ThreadLocal<Object> returnValue = new ThreadLocal<Object>();
 	private static ThreadLocal<Object> currentTarget = new ThreadLocal<Object>();
 
+	private static ThreadLocal<Map<String, Object>> oldStore = new ThreadLocal<Map<String, Object>>() {
+		@Override
+		protected Map<String, Object> initialValue() {
+			return new HashMap<String, Object>();
+		}
+	};
+
 	private static enum EvaluationPhase {
 		BEFORE, AFTER;
 	}
@@ -41,6 +54,22 @@ public class Evaluator {
 	public static boolean isAfter() {
 		logger.info("isAfter returning " + (Evaluator.evaluationPhase.get() == EvaluationPhase.AFTER));
 		return Evaluator.evaluationPhase.get() == EvaluationPhase.AFTER;
+	}
+
+	public static Object oldFieldAccess(String fieldName) {
+		return oldStore.get().get(fieldName);
+	}
+
+	public static Object oldMethodCall(String methodName) {
+		return oldStore.get().get(methodName);
+	}
+
+	public static void storeFieldAccess(String fieldName) {
+		oldStore.get().put(fieldName, fieldAccess(fieldName));
+	}
+
+	public static void storeMethodCall(String methodName, Class<?>[] argTypes, Object[] args) {
+		oldStore.get().put(methodName, methodCall(methodName, argTypes, args));
 	}
 
 	public static Object fieldAccess(String fieldName) {
