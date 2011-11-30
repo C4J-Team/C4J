@@ -6,11 +6,19 @@ public class CastExp extends NestedExp {
 	private String code;
 
 	public CastExp(Class<?> castClass, NestedExp exp) {
-		this.code = "((" + castClass.getCanonicalName() + ") " + exp.getCode() + ")";
+		code = "((" + castClass.getCanonicalName() + ") " + exp.getCode() + ")";
 	}
 
 	public CastExp(CtClass castClass, NestedExp exp) {
-		this.code = "((" + castClass.getName() + ") " + exp.getCode() + ")";
+		code = "((" + castClass.getName() + ") " + exp.getCode() + ")";
+	}
+
+	private CastExp(String code) {
+		this.code = code;
+	}
+
+	public static CastExp forReturnType(NestedExp exp) {
+		return new CastExp("(($r)" + exp.getCode() + ")");
 	}
 
 	@Override

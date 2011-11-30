@@ -1,20 +1,16 @@
 package next;
 
-import next.customize.ConditionInfo;
-import next.customize.ConditionProvider;
 import next.internal.Evaluator;
 
 import org.apache.log4j.Logger;
 
-public class Condition implements ConditionProvider {
+public class Condition {
 	private static Logger logger = Logger.getLogger(Condition.class);
 
-	public static boolean pre() {
-		return Evaluator.isBefore();
+	public static void pre() {
 	}
 
-	public static boolean post() {
-		return Evaluator.isAfter();
+	public static void post() {
 	}
 
 	@SuppressWarnings("unchecked")
@@ -26,9 +22,8 @@ public class Condition implements ConditionProvider {
 		return Evaluator.getReturnValue();
 	}
 
-	@Override
-	public ConditionInfo getConditionInfo(String methodName) {
-		// TODO Auto-generated method stub
+	public static <T> T ignored() {
 		return null;
 	}
+
 }

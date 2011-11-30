@@ -1,6 +1,8 @@
 package next.internal;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import next.internal.compiler.StaticCall;
 
@@ -12,6 +14,8 @@ public class Evaluator {
 	public static StaticCall after = new StaticCall(Evaluator.class, "after");
 	public static StaticCall isAfter = new StaticCall(Evaluator.class, "isAfter");
 	public static StaticCall getReturnValue = new StaticCall(Evaluator.class, "getReturnValue");
+	public static StaticCall fieldAccess = new StaticCall(Evaluator.class, "fieldAccess");
+	public static StaticCall methodCall = new StaticCall(Evaluator.class, "methodCall");
 
 	private static Logger logger = Logger.getLogger(Evaluator.class);
 
@@ -22,12 +26,8 @@ public class Evaluator {
 		}
 	};
 
-	private static ThreadLocal<Object> returnValue = new ThreadLocal<Object>() {
-		@Override
-		protected Object initialValue() {
-			return null;
-		}
-	};
+	private static ThreadLocal<Object> returnValue = new ThreadLocal<Object>();
+	private static ThreadLocal<Object> currentTarget = new ThreadLocal<Object>();
 
 	private static enum EvaluationPhase {
 		BEFORE, AFTER;
@@ -43,13 +43,52 @@ public class Evaluator {
 		return Evaluator.evaluationPhase.get() == EvaluationPhase.AFTER;
 	}
 
+	public static Object fieldAccess(String fieldName) {
+		try {
+			Object target = Evaluator.currentTarget.get();
+			System.out.println(target.getClass());
+			Field field = target.getClass().getDeclaredField(fieldName);
+			field.setAccessible(true);
+			return field.get(target);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public static Object methodCall(String methodName, Class<?>[] argTypes, Object[] args) {
+		try {
+			Object target = Evaluator.currentTarget.get();
+			Method method = target.getClass().getDeclaredMethod(methodName, argTypes);
+			method.setAccessible(true);
+			return method.invoke(target, args);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	public static Object getReturnValue() {
 		return Evaluator.returnValue.get();
 	}
 
-	public static void before(Class<?> contractClass, String methodName, Class<?>[] argTypes, Object[] args) {
+	public static void before(Object target, Class<?> contractClass, String methodName, Class<?>[] argTypes,
+			Object[] args) {
 		Evaluator.evaluationPhase.set(EvaluationPhase.BEFORE);
+		Evaluator.currentTarget.set(target);
 		logger.info("before " + methodName);
+		callContractMethod(contractClass, methodName, argTypes, args);
+	}
+
+	public static void after(Object target, Class<?> contractClass, String methodName, Class<?>[] argTypes,
+			Object[] args, Object returnValue) {
+		Evaluator.evaluationPhase.set(EvaluationPhase.AFTER);
+		Evaluator.currentTarget.set(target);
+		logger.info("setting return value to " + returnValue);
+		Evaluator.returnValue.set(returnValue);
+		logger.info("after " + methodName);
 		callContractMethod(contractClass, methodName, argTypes, args);
 	}
 
@@ -68,14 +107,5 @@ public class Evaluator {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-
-	public static void after(Class<?> contractClass, String methodName, Class<?>[] argTypes, Object[] args,
-			Object returnValue) {
-		Evaluator.evaluationPhase.set(EvaluationPhase.AFTER);
-		logger.info("setting return value to " + returnValue);
-		Evaluator.returnValue.set(returnValue);
-		logger.info("after " + methodName);
-		callContractMethod(contractClass, methodName, argTypes, args);
 	}
 }

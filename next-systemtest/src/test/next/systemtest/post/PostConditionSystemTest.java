@@ -4,6 +4,7 @@ import next.Contract;
 
 import org.junit.Test;
 
+import static next.Condition.ignored;
 import static next.Condition.post;
 import static next.Condition.result;
 
@@ -63,32 +64,28 @@ public class PostConditionSystemTest {
 	public static class DummyContract extends DummyClass {
 		@Override
 		public void setStaticValue(int value) {
-			if (post()) {
-				assert DummyClass.staticValue == 5;
-			}
+			post();
+			assert DummyClass.staticValue == 5;
 		}
 
 		@Override
 		public int noArgs() {
-			if (post()) {
-				assert DummyClass.staticValue == 5;
-			}
-			return 0;
+			post();
+			assert DummyClass.staticValue == 5;
+			return ignored();
 		}
 
 		@Override
 		public int returnValue(int value) {
-			if (post()) {
-				assert result(int.class) == 5;
-			}
-			return 0;
+			post();
+			assert result(int.class) == 5;
+			return ignored();
 		}
 
 		@Override
 		public void returnValueVoid() {
-			if (post()) {
-				assert result() == null;
-			}
+			post();
+			assert result() == null;
 		}
 	}
 }
