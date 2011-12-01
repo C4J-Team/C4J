@@ -68,8 +68,8 @@ public class Evaluator {
 		oldStore.get().put(fieldName, fieldAccess(fieldName));
 	}
 
-	public static void storeMethodCall(String methodName, Class<?>[] argTypes, Object[] args) {
-		oldStore.get().put(methodName, methodCall(methodName, argTypes, args));
+	public static void storeMethodCall(String methodName) {
+		oldStore.get().put(methodName, methodCall(methodName, new Class<?>[0], new Object[0]));
 	}
 
 	public static Object fieldAccess(String fieldName) {
