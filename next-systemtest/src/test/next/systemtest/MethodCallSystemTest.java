@@ -8,7 +8,7 @@ import org.junit.Test;
 import static next.Condition.ignored;
 import static next.Condition.pre;
 
-public class MethodCallSystemTest {
+public class MethodCallSystemTest extends TransformerAwareTest {
 	private DummyClass dummy;
 
 	@Before

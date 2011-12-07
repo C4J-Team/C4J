@@ -23,7 +23,7 @@ public class Condition {
 	}
 
 	public static <T> T ignored() {
-		return null;
+		return Evaluator.getConditionReturnValue();
 	}
 
 	public static <T> T old(T obj) {

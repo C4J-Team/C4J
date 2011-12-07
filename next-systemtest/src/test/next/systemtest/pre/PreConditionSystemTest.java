@@ -1,13 +1,14 @@
 package next.systemtest.pre;
 
 import next.Contract;
+import next.systemtest.TransformerAwareTest;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import static next.Condition.pre;
 
-public class PreConditionSystemTest {
+public class PreConditionSystemTest extends TransformerAwareTest {
 
 	private DummyClass dummy;
 

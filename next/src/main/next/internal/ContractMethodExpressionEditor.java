@@ -5,9 +5,11 @@ import java.util.List;
 
 import javassist.CtClass;
 import javassist.CtMethod;
+import javassist.NotFoundException;
 import javassist.expr.ExprEditor;
 import javassist.expr.FieldAccess;
 import javassist.expr.MethodCall;
+import next.Condition;
 import next.internal.compiler.ArrayExp;
 import next.internal.compiler.AssignmentExp;
 import next.internal.compiler.CastExp;
@@ -23,13 +25,15 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 	private String lastMethodCall;
 	private String lastFieldAccess;
 	private List<StaticCallExp> storeExpressions = new ArrayList<StaticCallExp>();
+	private CtClass contractClass;
 
 	public List<StaticCallExp> getStoreExpressions() {
 		return storeExpressions;
 	}
 
-	public ContractMethodExpressionEditor(CtClass targetClass) {
-		this.targetClass = targetClass;
+	public ContractMethodExpressionEditor(CtClass contractClass) throws NotFoundException {
+		this.contractClass = contractClass;
+		this.targetClass = contractClass.getSuperclass();
 	}
 
 	@Override
@@ -58,7 +62,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 	public void edit(MethodCall methodCall) {
 		try {
 			CtMethod method = methodCall.getMethod();
-			if (method.getDeclaringClass().equals(targetClass)) {
+			if (method.getDeclaringClass().equals(targetClass) || method.getDeclaringClass().equals(contractClass)) {
 				lastMethodCall = methodCall.getMethodName();
 				lastFieldAccess = null;
 				logger.info("last method call: " + lastMethodCall);
@@ -66,8 +70,11 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 				CastExp replacementCall = CastExp.forReturnType(new StaticCallExp(Evaluator.methodCall, new ValueExp(
 						methodCall.getMethodName()), ArrayExp.forParamTypes(method), ArrayExp.forArgs(method)));
 				AssignmentExp assignment = new AssignmentExp(NestedExp.RETURN_VALUE, replacementCall);
-				methodCall.replace(assignment.toStandalone().getCode());
-			} else if (method.getDeclaringClass().getName().equals("next.Condition") && method.getName().equals("old")) {
+				String code = assignment.toStandalone().getCode();
+				logger.info("replacement code: " + code);
+				methodCall.replace(code);
+			} else if (method.getDeclaringClass().getName().equals(Condition.class.getName())
+					&& method.getName().equals("old")) {
 				if (lastFieldAccess != null) {
 					logger.info("storing field access to " + lastFieldAccess);
 					storeExpressions.add(new StaticCallExp(Evaluator.storeFieldAccess, new ValueExp(lastFieldAccess)));

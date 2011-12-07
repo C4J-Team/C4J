@@ -34,6 +34,7 @@ public class Evaluator {
 
 	private static ThreadLocal<Object> returnValue = new ThreadLocal<Object>();
 	private static ThreadLocal<Object> currentTarget = new ThreadLocal<Object>();
+	private static ThreadLocal<Class<?>> contractReturnType = new ThreadLocal<Class<?>>();
 
 	private static ThreadLocal<Map<String, Object>> oldStore = new ThreadLocal<Map<String, Object>>() {
 		@Override
@@ -80,10 +81,8 @@ public class Evaluator {
 			field.setAccessible(true);
 			return field.get(target);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new EvaluationException("could not access field " + fieldName, e);
 		}
-		return null;
 	}
 
 	public static Object methodCall(String methodName, Class<?>[] argTypes, Object[] args) {
@@ -93,10 +92,8 @@ public class Evaluator {
 			method.setAccessible(true);
 			return method.invoke(target, args);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new EvaluationException("could not call method " + methodName, e);
 		}
-		return null;
 	}
 
 	public static Object getReturnValue() {
@@ -125,16 +122,29 @@ public class Evaluator {
 			throws AssertionError {
 		try {
 			Object contract = contractClass.newInstance();
-			contractClass.getMethod(methodName, argTypes).invoke(contract, args);
+			Method method = contractClass.getDeclaredMethod(methodName, argTypes);
+			method.setAccessible(true);
+			logger.info("setting return type for " + method.getName() + " to " + method.getReturnType());
+			contractReturnType.set(method.getReturnType());
+			method.invoke(contract, args);
 		} catch (InvocationTargetException e) {
 			if (e.getTargetException().getClass().equals(AssertionError.class)) {
 				throw (AssertionError) e.getTargetException();
 			} else {
-				e.printStackTrace();
+				throw new EvaluationException("exception while calling contract method " + methodName + " of class "
+						+ contractClass.getName(), e.getTargetException());
 			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new EvaluationException("could not call contract method " + methodName + " of class "
+					+ contractClass.getName(), e);
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> T getConditionReturnValue() {
+		if (contractReturnType.get().equals(int.class)) {
+			return (T) Integer.valueOf(0);
+		}
+		return null;
 	}
 }

@@ -1,6 +1,7 @@
 package next.systemtest.post;
 
 import next.Contract;
+import next.systemtest.TransformerAwareTest;
 
 import org.junit.Test;
 
@@ -8,7 +9,7 @@ import static next.Condition.ignored;
 import static next.Condition.post;
 import static next.Condition.result;
 
-public class PostConditionSystemTest {
+public class PostConditionSystemTest extends TransformerAwareTest {
 
 	@Test
 	public void testPostCondition() {

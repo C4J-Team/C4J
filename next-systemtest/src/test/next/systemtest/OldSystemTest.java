@@ -8,7 +8,7 @@ import org.junit.Test;
 import static next.Condition.old;
 import static next.Condition.post;
 
-public class OldSystemTest {
+public class OldSystemTest extends TransformerAwareTest {
 
 	private DummyClass dummy;
 
