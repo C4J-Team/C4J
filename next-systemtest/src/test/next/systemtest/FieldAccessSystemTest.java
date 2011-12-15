@@ -1,11 +1,10 @@
 package next.systemtest;
 
+import static next.Condition.pre;
 import next.Contract;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import static next.Condition.pre;
 
 public class FieldAccessSystemTest extends TransformerAwareTest {
 	private DummyClass dummy;
@@ -36,8 +35,9 @@ public class FieldAccessSystemTest extends TransformerAwareTest {
 	public static class DummyContract extends DummyClass {
 		@Override
 		public void methodContractHasFieldAccess() {
-			pre();
-			assert value == 5;
+			if (pre()) {
+				assert value == 5;
+			}
 		}
 	}
 

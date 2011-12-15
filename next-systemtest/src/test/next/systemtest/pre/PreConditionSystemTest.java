@@ -1,12 +1,11 @@
 package next.systemtest.pre;
 
+import static next.Condition.pre;
 import next.Contract;
 import next.systemtest.TransformerAwareTest;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import static next.Condition.pre;
 
 public class PreConditionSystemTest extends TransformerAwareTest {
 
@@ -36,8 +35,9 @@ public class PreConditionSystemTest extends TransformerAwareTest {
 	public static class DummyContract extends DummyClass {
 		@Override
 		public void method(int arg) {
-			pre();
-			assert arg > 0;
+			if (pre()) {
+				assert arg > 0;
+			}
 		}
 	}
 }

@@ -1,15 +1,22 @@
 package next.internal;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import javassist.CannotCompileException;
+import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 import javassist.expr.ExprEditor;
 import javassist.expr.FieldAccess;
 import javassist.expr.MethodCall;
+import javassist.expr.NewExpr;
 import next.Condition;
+import next.Condition.PostCondition;
+import next.Condition.PreCondition;
 import next.internal.compiler.ArrayExp;
 import next.internal.compiler.AssignmentExp;
 import next.internal.compiler.CastExp;
@@ -26,14 +33,21 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 	private String lastFieldAccess;
 	private List<StaticCallExp> storeExpressions = new ArrayList<StaticCallExp>();
 	private CtClass contractClass;
+	private ClassPool pool;
+	private Set<CtClass> additionalContractClasses = new HashSet<CtClass>();
+
+	public Set<CtClass> getAdditionalContractClasses() {
+		return additionalContractClasses;
+	}
 
 	public List<StaticCallExp> getStoreExpressions() {
 		return storeExpressions;
 	}
 
-	public ContractMethodExpressionEditor(CtClass contractClass) throws NotFoundException {
+	public ContractMethodExpressionEditor(CtClass contractClass, ClassPool pool) throws NotFoundException {
 		this.contractClass = contractClass;
 		this.targetClass = contractClass.getSuperclass();
+		this.pool = pool;
 	}
 
 	@Override
@@ -53,6 +67,31 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 				fieldAccess.replace(assignment.toStandalone().getCode());
 			}
 		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void edit(NewExpr newExpr) throws CannotCompileException {
+		logger.info("NewExpr2 found: " + newExpr.getClassName());
+		try {
+			CtClass exprClass = pool.get(newExpr.getClassName());
+			if (exprClass.getInterfaces().length != 1) {
+				return;
+			}
+			if (exprClass.getInterfaces()[0].getName().equals(PreCondition.class.getName())) {
+				RootTransformer.contractClasses.add(exprClass.getName());
+				additionalContractClasses.add(exprClass);
+				logger.info("PreCondition found, replacing...");
+				newExpr.replace("{if (next.Condition#pre()) { $_ = $proceed($$); }}");
+			} else if (exprClass.getInterfaces()[0].getName().equals(PostCondition.class.getName())) {
+				RootTransformer.contractClasses.add(exprClass.getName());
+				additionalContractClasses.add(exprClass);
+				logger.info("PostCondition found, replacing...");
+				newExpr.replace("{if (next.Condition#post()) { $_ = $proceed($$); }}");
+			}
+		} catch (NotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

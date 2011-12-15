@@ -1,12 +1,14 @@
 package next.systemtest;
 
+import static next.Condition.old;
+import static next.Condition.post;
+
+import java.io.InputStream;
+
 import next.Contract;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import static next.Condition.old;
-import static next.Condition.post;
 
 public class OldSystemTest extends TransformerAwareTest {
 
@@ -32,6 +34,7 @@ public class OldSystemTest extends TransformerAwareTest {
 	@Contract(DummyContract.class)
 	public static class DummyClass {
 		protected int value;
+		protected OtherClass otherValue;
 
 		public void setValue(int value) {
 			this.value = value;
@@ -50,17 +53,28 @@ public class OldSystemTest extends TransformerAwareTest {
 		}
 	}
 
+	public static class OtherClass {
+		public InputStream stream;
+
+		public int otherMethod() {
+			return 0;
+		}
+	}
+
 	public static class DummyContract extends DummyClass {
+
 		@Override
 		public void incrementValueCheckField() {
-			post();
-			assert value == old(value) + 1;
+			if (post()) {
+				assert value == old(value) + 1;
+			}
 		}
 
 		@Override
 		public void incrementValueCheckMethod() {
-			post();
-			assert getValue() == old(getValue()) + 1;
+			if (post()) {
+				assert getValue() == old(getValue()) + 1;
+			}
 		}
 	}
 }

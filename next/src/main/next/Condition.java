@@ -25,11 +25,17 @@ public class Condition {
 	}
 
 	public static <T> T ignored() {
-		return Evaluator.getConditionReturnValue();
+		return Evaluator.<T> getConditionReturnValue();
 	}
 
 	public static <T> T old(T obj) {
 		return obj;
+	}
+
+	public interface PreCondition {
+	}
+
+	public interface PostCondition {
 	}
 
 }

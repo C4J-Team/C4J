@@ -20,7 +20,7 @@ public abstract class StandaloneExp extends Exp {
 	public abstract String getCode();
 
 	public void insertBefore(CtBehavior behavior) throws CannotCompileException {
-		if (behavior instanceof CtConstructor) {
+		if (behavior instanceof CtConstructor && !((CtConstructor) behavior).isClassInitializer()) {
 			((CtConstructor) behavior).insertBeforeBody("{ " + getCode() + " }");
 		} else {
 			behavior.insertBefore("{ " + getCode() + " }");

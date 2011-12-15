@@ -1,12 +1,11 @@
 package next.systemtest;
 
+import static next.Condition.ignored;
+import static next.Condition.pre;
 import next.Contract;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import static next.Condition.ignored;
-import static next.Condition.pre;
 
 public class MethodCallSystemTest extends TransformerAwareTest {
 	private DummyClass dummy;
@@ -55,14 +54,16 @@ public class MethodCallSystemTest extends TransformerAwareTest {
 	public static class DummyContract extends DummyClass {
 		@Override
 		public void methodContractHasMethodAccess() {
-			pre();
-			assert getValue() == 5;
+			if (pre()) {
+				assert getValue() == 5;
+			}
 		}
 
 		@Override
 		public void methodContractHasMethodAccessAndMethodAlsoInContract() {
-			pre();
-			assert getValueAlsoInContract() == 5;
+			if (pre()) {
+				assert getValueAlsoInContract() == 5;
+			}
 		}
 
 		@Override

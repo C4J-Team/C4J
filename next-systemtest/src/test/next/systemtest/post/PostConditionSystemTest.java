@@ -1,13 +1,13 @@
 package next.systemtest.post;
 
+import static next.Condition.ignored;
+import static next.Condition.post;
+import static next.Condition.result;
+import next.Condition.PostCondition;
 import next.Contract;
 import next.systemtest.TransformerAwareTest;
 
 import org.junit.Test;
-
-import static next.Condition.ignored;
-import static next.Condition.post;
-import static next.Condition.result;
 
 public class PostConditionSystemTest extends TransformerAwareTest {
 
@@ -58,35 +58,40 @@ public class PostConditionSystemTest extends TransformerAwareTest {
 			return value;
 		}
 
-		public void returnValueVoid() {
-		}
+		public void returnValueVoid() {}
 	}
 
 	public static class DummyContract extends DummyClass {
 		@Override
 		public void setStaticValue(int value) {
-			post();
-			assert DummyClass.staticValue == 5;
+			new PostCondition() {
+				{
+					assert DummyClass.staticValue == 5;
+				}
+			};
 		}
 
 		@Override
 		public int noArgs() {
-			post();
-			assert DummyClass.staticValue == 5;
+			if (post()) {
+				assert DummyClass.staticValue == 5;
+			}
 			return ignored();
 		}
 
 		@Override
 		public int returnValue(int value) {
-			post();
-			assert result(int.class) == 5;
+			if (post()) {
+				assert result(int.class) == 5;
+			}
 			return ignored();
 		}
 
 		@Override
 		public void returnValueVoid() {
-			post();
-			assert result() == null;
+			if (post()) {
+				assert result() == null;
+			}
 		}
 	}
 }

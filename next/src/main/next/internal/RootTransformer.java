@@ -2,6 +2,8 @@ package next.internal;
 
 import java.lang.instrument.ClassFileTransformer;
 import java.security.ProtectionDomain;
+import java.util.HashSet;
+import java.util.Set;
 
 import javassist.ByteArrayClassPath;
 import javassist.ClassPool;
@@ -26,7 +28,9 @@ public class RootTransformer implements ClassFileTransformer {
 	private ClassPool pool = ClassPool.getDefault();
 
 	private TargetClassTransformer targetClassTransformer = new TargetClassTransformer();
-	private ContractClassTransformer contractClassTransformer = new ContractClassTransformer();
+	private ContractClassTransformer contractClassTransformer = new ContractClassTransformer(pool);
+
+	public static Set<String> contractClasses = new HashSet<String>();
 
 	private static Throwable lastException;
 
@@ -63,8 +67,9 @@ public class RootTransformer implements ClassFileTransformer {
 			String contractClassString = new BackdoorAnnotationLoader(currentClass).getClassValue(Contract.class,
 					"value");
 			targetClassTransformer.transform(currentClass, pool.get(contractClassString));
+			contractClasses.add(contractClassString);
 			return currentClass.toBytecode();
-		} else if (currentClass.getSuperclass() != null && currentClass.getSuperclass().hasAnnotation(Contract.class)) {
+		} else if (contractClasses.contains(currentClass.getName())) {
 			logger.info("transforming contract " + className);
 			contractClassTransformer.transform(currentClass.getSuperclass(), currentClass);
 			return currentClass.toBytecode();
