@@ -2,7 +2,7 @@ package next.internal.transformer;
 
 public class ContractClassTransformer extends DelegateTransformer {
 
-	private ClassTransformer[] transformers = new ClassTransformer[] { new PreAndPostExpressionTransformer(),
+	private ClassTransformer[] transformers = new ClassTransformer[] {
 			new ContractExpressionTransformer() };
 
 	@Override

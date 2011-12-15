@@ -7,10 +7,12 @@ import org.apache.log4j.Logger;
 public class Condition {
 	private static Logger logger = Logger.getLogger(Condition.class);
 
-	public static void pre() {
+	public static boolean pre() {
+		return Evaluator.isBefore();
 	}
 
-	public static void post() {
+	public static boolean post() {
+		return Evaluator.isAfter();
 	}
 
 	@SuppressWarnings("unchecked")
