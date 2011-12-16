@@ -11,7 +11,7 @@
 		
 		<jar basedir="target" destfile="lib/next.jar">
 			<manifest>
-				<attribute name="Premain-Class" value="next.internal.Agent"/>
+				<attribute name="Premain-Class" value="de.andrena.next.internal.Agent"/>
 				<attribute name="Boot-Class-Path" value="javassist.jar log4j-1.2.16.jar"/>
 			</manifest>
 		</jar>

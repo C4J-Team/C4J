@@ -90,7 +90,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 				RootTransformer.contractClasses.add(exprClass.getName());
 				additionalContractClasses.add(exprClass);
 				logger.info("PostCondition found, replacing...");
-				newExpr.replace("{if (next.Condition#post()) { $_ = $proceed($$); }}");
+				newExpr.replace("{if (de.andrena.next.Condition#post()) { $_ = $proceed($$); }}");
 			}
 		} catch (NotFoundException e) {
 			// TODO Auto-generated catch block
