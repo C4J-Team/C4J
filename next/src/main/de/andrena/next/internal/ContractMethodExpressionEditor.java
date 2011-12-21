@@ -29,26 +29,24 @@ import de.andrena.next.internal.compiler.ValueExp;
 
 public class ContractMethodExpressionEditor extends ExprEditor {
 	private Logger logger = Logger.getLogger(getClass());
-	private CtClass targetClass;
 	private String lastMethodCall;
 	private String lastFieldAccess;
 	private List<StaticCallExp> storeExpressions = new ArrayList<StaticCallExp>();
-	private CtClass contractClass;
+	private Set<CtClass> nestedInnerClasses = new HashSet<CtClass>();
 	private ClassPool pool;
-	private Set<CtClass> additionalContractClasses = new HashSet<CtClass>();
-
-	public Set<CtClass> getAdditionalContractClasses() {
-		return additionalContractClasses;
-	}
+	private ContractInfo contract;
 
 	public List<StaticCallExp> getStoreExpressions() {
 		return storeExpressions;
 	}
 
-	public ContractMethodExpressionEditor(CtClass contractClass, ClassPool pool) throws NotFoundException {
-		this.contractClass = contractClass;
-		this.targetClass = contractClass.getSuperclass();
+	public ContractMethodExpressionEditor(ContractInfo contract, ClassPool pool) throws NotFoundException {
+		this.contract = contract;
 		this.pool = pool;
+	}
+
+	public Set<CtClass> getNestedInnerClasses() {
+		return nestedInnerClasses;
 	}
 
 	@Override
@@ -57,7 +55,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 			lastFieldAccess = fieldAccess.getFieldName();
 			lastMethodCall = null;
 			logger.info("last field access: " + fieldAccess.getFieldName());
-			if (!fieldAccess.isStatic() && fieldAccess.getField().getDeclaringClass().equals(targetClass)) {
+			if (!fieldAccess.isStatic() && fieldAccess.getField().getDeclaringClass().equals(contract.getTargetClass())) {
 				if (fieldAccess.isWriter()) {
 					throw new TransformationException("illegal write access on field '" + fieldAccess.getFieldName()
 							+ "'.");
@@ -82,13 +80,13 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 				return;
 			}
 			if (exprClass.getInterfaces()[0].getName().equals(PreCondition.class.getName())) {
-				RootTransformer.contractClasses.add(exprClass.getName());
-				additionalContractClasses.add(exprClass);
+				contract.addInnerContractClass(exprClass);
+				nestedInnerClasses.add(exprClass);
 				logger.info("PreCondition found, replacing...");
 				newExpr.replace("{if (de.andrena.next.Condition#pre()) { $_ = $proceed($$); }}");
 			} else if (exprClass.getInterfaces()[0].getName().equals(PostCondition.class.getName())) {
-				RootTransformer.contractClasses.add(exprClass.getName());
-				additionalContractClasses.add(exprClass);
+				contract.addInnerContractClass(exprClass);
+				nestedInnerClasses.add(exprClass);
 				logger.info("PostCondition found, replacing...");
 				newExpr.replace("{if (de.andrena.next.Condition#post()) { $_ = $proceed($$); }}");
 			}
@@ -102,7 +100,8 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 	public void edit(MethodCall methodCall) {
 		try {
 			CtMethod method = methodCall.getMethod();
-			if (method.getDeclaringClass().equals(targetClass) || method.getDeclaringClass().equals(contractClass)) {
+			if (method.getDeclaringClass().equals(contract.getTargetClass())
+					|| method.getDeclaringClass().equals(contract.getContractClass())) {
 				lastMethodCall = methodCall.getMethodName();
 				lastFieldAccess = null;
 				logger.info("last method call: " + lastMethodCall);

@@ -1,13 +1,13 @@
 package de.andrena.next.internal.transformer;
 
-import javassist.CtClass;
+import de.andrena.next.internal.ContractInfo;
 
 public abstract class DelegateTransformer extends ClassTransformer {
 
 	@Override
-	public void transform(CtClass targetClass, CtClass contractClass) throws Exception {
+	public void transform(ContractInfo contractInfo) throws Exception {
 		for (ClassTransformer transformer : getTransformers()) {
-			transformer.transform(targetClass, contractClass);
+			transformer.transform(contractInfo);
 		}
 	}
 

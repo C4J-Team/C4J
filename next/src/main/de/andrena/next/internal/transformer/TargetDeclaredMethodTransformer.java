@@ -1,17 +1,17 @@
 package de.andrena.next.internal.transformer;
 
-import javassist.CtClass;
 import javassist.CtMethod;
+import de.andrena.next.internal.ContractInfo;
 
 public abstract class TargetDeclaredMethodTransformer extends ClassTransformer {
 
 	@Override
-	public void transform(CtClass targetClass, CtClass contractClass) throws Exception {
-		for (CtMethod targetMethod : targetClass.getDeclaredMethods()) {
-			transform(targetMethod, contractClass);
+	public void transform(ContractInfo contractInfo) throws Exception {
+		for (CtMethod targetMethod : contractInfo.getTargetClass().getDeclaredMethods()) {
+			transform(contractInfo, targetMethod);
 		}
 	}
 
-	public abstract void transform(CtMethod targetMethod, CtClass contractClass) throws Exception;
+	public abstract void transform(ContractInfo contractInfo, CtMethod targetMethod) throws Exception;
 
 }

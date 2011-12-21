@@ -1,11 +1,11 @@
-package de.andrena.next.systemtest.post;
+package de.andrena.next.systemtest.dbi;
 
 import static de.andrena.next.Condition.ignored;
-import static de.andrena.next.Condition.post;
 import static de.andrena.next.Condition.result;
 
 import org.junit.Test;
 
+import de.andrena.next.Condition.PostCondition;
 import de.andrena.next.Contract;
 import de.andrena.next.systemtest.TransformerAwareTest;
 
@@ -64,32 +64,40 @@ public class PostConditionSystemTest extends TransformerAwareTest {
 	public static class DummyContract extends DummyClass {
 		@Override
 		public void setStaticValue(int value) {
-			if (post()) {
-				assert DummyClass.staticValue == 5;
-			}
+			new PostCondition() {
+				{
+					assert DummyClass.staticValue == 5;
+				}
+			};
 		}
 
 		@Override
 		public int noArgs() {
-			if (post()) {
-				assert DummyClass.staticValue == 5;
-			}
+			new PostCondition() {
+				{
+					assert DummyClass.staticValue == 5;
+				}
+			};
 			return ignored();
 		}
 
 		@Override
 		public int returnValue(int value) {
-			if (post()) {
-				assert result(int.class) == 5;
-			}
+			new PostCondition() {
+				{
+					assert result(int.class) == 5;
+				}
+			};
 			return ignored();
 		}
 
 		@Override
 		public void returnValueVoid() {
-			if (post()) {
-				assert result() == null;
-			}
+			new PostCondition() {
+				{
+					assert result() == null;
+				}
+			};
 		}
 	}
 }

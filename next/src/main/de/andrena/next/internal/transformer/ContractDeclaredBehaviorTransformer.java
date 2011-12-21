@@ -1,18 +1,18 @@
 package de.andrena.next.internal.transformer;
 
 import javassist.CtBehavior;
-import javassist.CtClass;
+import de.andrena.next.internal.ContractInfo;
 
 public abstract class ContractDeclaredBehaviorTransformer extends ClassTransformer {
 
 	@Override
-	public void transform(CtClass targetClass, CtClass contractClass) throws Exception {
-		for (CtBehavior contractBehavior : contractClass.getDeclaredBehaviors()) {
+	public void transform(ContractInfo contractInfo) throws Exception {
+		for (CtBehavior contractBehavior : contractInfo.getContractClass().getDeclaredBehaviors()) {
 			logger.info("transforming behavior " + contractBehavior.getLongName());
-			transform(contractBehavior, targetClass);
+			transform(contractInfo, contractBehavior);
 		}
 	}
 
-	public abstract void transform(CtBehavior contractBehavior, CtClass targetClass) throws Exception;
+	public abstract void transform(ContractInfo contractInfo, CtBehavior contractBehavior) throws Exception;
 
 }

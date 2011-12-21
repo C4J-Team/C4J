@@ -2,8 +2,6 @@ package de.andrena.next.internal;
 
 import java.lang.instrument.ClassFileTransformer;
 import java.security.ProtectionDomain;
-import java.util.HashSet;
-import java.util.Set;
 
 import javassist.ByteArrayClassPath;
 import javassist.ClassPool;
@@ -31,7 +29,7 @@ public class RootTransformer implements ClassFileTransformer {
 	private TargetClassTransformer targetClassTransformer = new TargetClassTransformer();
 	private ContractClassTransformer contractClassTransformer = new ContractClassTransformer(pool);
 
-	public static Set<String> contractClasses = new HashSet<String>();
+	private static ContractRegistry contractRegistry = new ContractRegistry();
 
 	private static Throwable lastException;
 
@@ -67,12 +65,15 @@ public class RootTransformer implements ClassFileTransformer {
 			logger.info("transforming class " + className);
 			String contractClassString = new BackdoorAnnotationLoader(currentClass).getClassValue(Contract.class,
 					"value");
-			targetClassTransformer.transform(currentClass, pool.get(contractClassString));
-			contractClasses.add(contractClassString);
+			CtClass contractClass = pool.get(contractClassString);
+			ContractInfo contractInfo = new ContractInfo(currentClass, contractClass);
+			contractRegistry.registerContract(contractInfo);
+			targetClassTransformer.transform(contractInfo);
 			return currentClass.toBytecode();
-		} else if (contractClasses.contains(currentClass.getName())) {
+		} else if (contractRegistry.isContractClass(currentClass)) {
+			ContractInfo contractInfo = contractRegistry.getContract(currentClass);
 			logger.info("transforming contract " + className);
-			contractClassTransformer.transform(currentClass.getSuperclass(), currentClass);
+			contractClassTransformer.transform(contractInfo);
 			return currentClass.toBytecode();
 		}
 		return null;
