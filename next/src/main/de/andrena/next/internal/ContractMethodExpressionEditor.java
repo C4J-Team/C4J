@@ -24,7 +24,9 @@ import de.andrena.next.internal.ContractRegistry.ContractInfo;
 import de.andrena.next.internal.compiler.ArrayExp;
 import de.andrena.next.internal.compiler.AssignmentExp;
 import de.andrena.next.internal.compiler.CastExp;
+import de.andrena.next.internal.compiler.IfExp;
 import de.andrena.next.internal.compiler.NestedExp;
+import de.andrena.next.internal.compiler.StandaloneExp;
 import de.andrena.next.internal.compiler.StaticCallExp;
 import de.andrena.next.internal.compiler.ValueExp;
 
@@ -51,87 +53,100 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 	}
 
 	@Override
-	public void edit(FieldAccess fieldAccess) {
+	public void edit(FieldAccess fieldAccess) throws CannotCompileException {
 		try {
-			lastFieldAccess = fieldAccess.getFieldName();
-			lastMethodCall = null;
-			logger.info("last field access: " + fieldAccess.getFieldName());
-			if (!fieldAccess.isStatic() && fieldAccess.getField().getDeclaringClass().equals(contract.getTargetClass())) {
-				if (fieldAccess.isWriter()) {
-					throw new TransformationException("illegal write access on field '" + fieldAccess.getFieldName()
-							+ "'.");
-				}
-				CastExp replacementCall = CastExp.forReturnType(new StaticCallExp(Evaluator.fieldAccess, new ValueExp(
-						fieldAccess.getFieldName())));
-				AssignmentExp assignment = new AssignmentExp(NestedExp.RETURN_VALUE, replacementCall);
-				fieldAccess.replace(assignment.toStandalone().getCode());
+			editFieldAccess(fieldAccess);
+		} catch (NotFoundException e) {
+			throw new CannotCompileException(e);
+		}
+	}
+
+	private void editFieldAccess(FieldAccess fieldAccess) throws NotFoundException, CannotCompileException {
+		lastFieldAccess = fieldAccess.getFieldName();
+		lastMethodCall = null;
+		logger.info("last field access: " + fieldAccess.getFieldName());
+		if (!fieldAccess.isStatic() && fieldAccess.getField().getDeclaringClass().equals(contract.getTargetClass())) {
+			if (fieldAccess.isWriter()) {
+				throw new TransformationException("illegal write access on field '" + fieldAccess.getFieldName() + "'.");
 			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			CastExp replacementCall = CastExp.forReturnType(new StaticCallExp(Evaluator.fieldAccess, new ValueExp(
+					fieldAccess.getFieldName())));
+			AssignmentExp assignment = new AssignmentExp(NestedExp.RETURN_VALUE, replacementCall);
+			fieldAccess.replace(assignment.toStandalone().getCode());
 		}
 	}
 
 	@Override
 	public void edit(NewExpr newExpr) throws CannotCompileException {
-		logger.info("NewExpr2 found: " + newExpr.getClassName());
 		try {
-			CtClass exprClass = pool.get(newExpr.getClassName());
-			if (exprClass.getInterfaces().length != 1) {
-				return;
-			}
-			if (exprClass.getInterfaces()[0].getName().equals(PreCondition.class.getName())) {
-				contract.addInnerContractClass(exprClass);
-				nestedInnerClasses.add(exprClass);
-				logger.info("PreCondition found, replacing...");
-				newExpr.replace("{if (de.andrena.next.Condition#pre()) { $_ = $proceed($$); }}");
-			} else if (exprClass.getInterfaces()[0].getName().equals(PostCondition.class.getName())) {
-				contract.addInnerContractClass(exprClass);
-				nestedInnerClasses.add(exprClass);
-				logger.info("PostCondition found, replacing...");
-				newExpr.replace("{if (de.andrena.next.Condition#post()) { $_ = $proceed($$); }}");
-			}
+			editNewExpression(newExpr);
 		} catch (NotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new CannotCompileException(e);
+		}
+	}
+
+	private void editNewExpression(NewExpr newExpr) throws NotFoundException, CannotCompileException {
+		logger.info("NewExpr2 found: " + newExpr.getClassName());
+		CtClass exprClass = pool.get(newExpr.getClassName());
+		if (exprClass.getInterfaces().length != 1) {
+			return;
+		}
+		CtClass interfaze = exprClass.getInterfaces()[0];
+		IfExp replacementExp = null;
+		if (interfaze.getName().equals(PreCondition.class.getName())) {
+			logger.info("PreCondition found, replacing...");
+			replacementExp = new IfExp(new StaticCallExp(Evaluator.isBefore));
+		} else if (interfaze.getName().equals(PostCondition.class.getName())) {
+			logger.info("PostCondition found, replacing...");
+			replacementExp = new IfExp(new StaticCallExp(Evaluator.isAfter));
+		}
+		if (replacementExp != null) {
+			contract.addInnerContractClass(exprClass);
+			nestedInnerClasses.add(exprClass);
+			replacementExp.addIfBody(StandaloneExp.proceed);
+			newExpr.replace(replacementExp.getCode());
 		}
 	}
 
 	@Override
-	public void edit(MethodCall methodCall) {
+	public void edit(MethodCall methodCall) throws CannotCompileException {
 		try {
-			CtMethod method = methodCall.getMethod();
-			if (method.getDeclaringClass().equals(contract.getTargetClass())
-					|| method.getDeclaringClass().equals(contract.getContractClass())) {
-				lastMethodCall = methodCall.getMethodName();
-				lastFieldAccess = null;
-				logger.info("last method call: " + lastMethodCall);
-				logger.info("replacing call to " + methodCall.getClassName() + "." + methodCall.getMethodName());
-				CastExp replacementCall = CastExp.forReturnType(new StaticCallExp(Evaluator.methodCall, new ValueExp(
-						methodCall.getMethodName()), ArrayExp.forParamTypes(method), ArrayExp.forArgs(method)));
-				AssignmentExp assignment = new AssignmentExp(NestedExp.RETURN_VALUE, replacementCall);
-				String code = assignment.toStandalone().getCode();
-				logger.info("replacement code: " + code);
-				methodCall.replace(code);
-			} else if (method.getDeclaringClass().getName().equals(Condition.class.getName())
-					&& method.getName().equals("old")) {
-				if (lastFieldAccess != null) {
-					logger.info("storing field access to " + lastFieldAccess);
-					storeExpressions.add(new StaticCallExp(Evaluator.storeFieldAccess, new ValueExp(lastFieldAccess)));
-					StaticCallExp oldCall = new StaticCallExp(Evaluator.oldFieldAccess, new ValueExp(lastFieldAccess));
-					AssignmentExp assignmentExp = new AssignmentExp(NestedExp.RETURN_VALUE, oldCall);
-					methodCall.replace(assignmentExp.toStandalone().getCode());
-				} else if (lastMethodCall != null) {
-					logger.info("storing method call to " + lastMethodCall);
-					storeExpressions.add(new StaticCallExp(Evaluator.storeMethodCall, new ValueExp(lastMethodCall)));
-					StaticCallExp oldCall = new StaticCallExp(Evaluator.oldMethodCall, new ValueExp(lastMethodCall));
-					AssignmentExp assignmentExp = new AssignmentExp(NestedExp.RETURN_VALUE, oldCall);
-					methodCall.replace(assignmentExp.toStandalone().getCode());
-				}
+			editMethodCall(methodCall);
+		} catch (NotFoundException e) {
+			throw new CannotCompileException(e);
+		}
+	}
+
+	private void editMethodCall(MethodCall methodCall) throws NotFoundException, CannotCompileException {
+		CtMethod method = methodCall.getMethod();
+		if (method.getDeclaringClass().equals(contract.getTargetClass())
+				|| method.getDeclaringClass().equals(contract.getContractClass())) {
+			lastMethodCall = methodCall.getMethodName();
+			lastFieldAccess = null;
+			logger.info("last method call: " + lastMethodCall);
+			logger.info("replacing call to " + methodCall.getClassName() + "." + methodCall.getMethodName());
+			CastExp replacementCall = CastExp.forReturnType(new StaticCallExp(Evaluator.methodCall, new ValueExp(
+					methodCall.getMethodName()), ArrayExp.forParamTypes(method), ArrayExp.forArgs(method)));
+			AssignmentExp assignment = new AssignmentExp(NestedExp.RETURN_VALUE, replacementCall);
+			String code = assignment.toStandalone().getCode();
+			logger.info("replacement code: " + code);
+			methodCall.replace(code);
+		} else if (method.getDeclaringClass().getName().equals(Condition.class.getName())
+				&& method.getName().equals("old")) {
+			StaticCallExp oldCall = null;
+			if (lastFieldAccess != null) {
+				logger.info("storing field access to " + lastFieldAccess);
+				storeExpressions.add(new StaticCallExp(Evaluator.storeFieldAccess, new ValueExp(lastFieldAccess)));
+				oldCall = new StaticCallExp(Evaluator.oldFieldAccess, new ValueExp(lastFieldAccess));
+			} else if (lastMethodCall != null) {
+				logger.info("storing method call to " + lastMethodCall);
+				storeExpressions.add(new StaticCallExp(Evaluator.storeMethodCall, new ValueExp(lastMethodCall)));
+				oldCall = new StaticCallExp(Evaluator.oldMethodCall, new ValueExp(lastMethodCall));
 			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			if (oldCall != null) {
+				AssignmentExp assignmentExp = new AssignmentExp(NestedExp.RETURN_VALUE, oldCall);
+				methodCall.replace(assignmentExp.toStandalone().getCode());
+			}
 		}
 	}
 }

@@ -1,6 +1,6 @@
 package de.andrena.next.internal;
 
-public class TransformationException extends Exception {
+public class TransformationException extends RuntimeException {
 
 	private static final long serialVersionUID = 3700006949340498687L;
 
