@@ -6,7 +6,6 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-
 import org.apache.log4j.Logger;
 
 import de.andrena.next.internal.compiler.StaticCall;
@@ -89,6 +88,7 @@ public class Evaluator {
 	public static Object methodCall(String methodName, Class<?>[] argTypes, Object[] args) {
 		try {
 			Object target = Evaluator.currentTarget.get();
+			System.out.println(target);
 			Method method = target.getClass().getDeclaredMethod(methodName, argTypes);
 			method.setAccessible(true);
 			return method.invoke(target, args);

@@ -17,6 +17,7 @@ import javassist.bytecode.Opcode;
 import org.apache.log4j.Logger;
 
 import de.andrena.next.Contract;
+import de.andrena.next.internal.ContractRegistry.ContractInfo;
 import de.andrena.next.internal.transformer.ContractClassTransformer;
 import de.andrena.next.internal.transformer.TargetClassTransformer;
 import de.andrena.next.internal.util.BackdoorAnnotationLoader;
@@ -66,14 +67,13 @@ public class RootTransformer implements ClassFileTransformer {
 			String contractClassString = new BackdoorAnnotationLoader(currentClass).getClassValue(Contract.class,
 					"value");
 			CtClass contractClass = pool.get(contractClassString);
-			ContractInfo contractInfo = new ContractInfo(currentClass, contractClass);
-			contractRegistry.registerContract(contractInfo);
+			ContractInfo contractInfo = contractRegistry.registerContract(currentClass, contractClass);
 			targetClassTransformer.transform(contractInfo);
 			return currentClass.toBytecode();
 		} else if (contractRegistry.isContractClass(currentClass)) {
-			ContractInfo contractInfo = contractRegistry.getContract(currentClass);
+			ContractInfo contractInfo = contractRegistry.getContractInfo(currentClass);
 			logger.info("transforming contract " + className);
-			contractClassTransformer.transform(contractInfo);
+			contractClassTransformer.transform(contractInfo, currentClass);
 			return currentClass.toBytecode();
 		}
 		return null;

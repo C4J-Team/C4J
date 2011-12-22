@@ -20,6 +20,7 @@ import org.apache.log4j.Logger;
 import de.andrena.next.Condition;
 import de.andrena.next.Condition.PostCondition;
 import de.andrena.next.Condition.PreCondition;
+import de.andrena.next.internal.ContractRegistry.ContractInfo;
 import de.andrena.next.internal.compiler.ArrayExp;
 import de.andrena.next.internal.compiler.AssignmentExp;
 import de.andrena.next.internal.compiler.CastExp;

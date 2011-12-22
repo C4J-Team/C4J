@@ -7,8 +7,8 @@ import java.util.Set;
 import javassist.ClassPool;
 import javassist.CtBehavior;
 import javassist.CtClass;
-import de.andrena.next.internal.ContractInfo;
 import de.andrena.next.internal.ContractMethodExpressionEditor;
+import de.andrena.next.internal.ContractRegistry.ContractInfo;
 import de.andrena.next.internal.Evaluator;
 import de.andrena.next.internal.compiler.IfExp;
 import de.andrena.next.internal.compiler.StaticCallExp;
@@ -24,6 +24,7 @@ public class ContractExpressionTransformer extends ContractDeclaredBehaviorTrans
 	@Override
 	public void transform(ContractInfo contractInfo, CtBehavior contractBehavior) throws Exception {
 		ContractMethodExpressionEditor expressionEditor = new ContractMethodExpressionEditor(contractInfo, pool);
+		logger.info("transforming class " + contractBehavior.getLongName());
 		contractBehavior.instrument(expressionEditor);
 		List<StaticCallExp> storeExpressions = expressionEditor.getStoreExpressions();
 		storeExpressions.addAll(additionalStoreExpressions(expressionEditor.getNestedInnerClasses(), contractInfo));

@@ -3,7 +3,7 @@ package de.andrena.next.internal.transformer;
 import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.NotFoundException;
-import de.andrena.next.internal.ContractInfo;
+import de.andrena.next.internal.ContractRegistry.ContractInfo;
 import de.andrena.next.internal.Evaluator;
 import de.andrena.next.internal.compiler.ArrayExp;
 import de.andrena.next.internal.compiler.NestedExp;
