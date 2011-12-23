@@ -32,8 +32,8 @@ import de.andrena.next.internal.compiler.ValueExp;
 
 public class ContractMethodExpressionEditor extends ExprEditor {
 	private Logger logger = Logger.getLogger(getClass());
-	private String lastMethodCall;
-	private String lastFieldAccess;
+	String lastMethodCall;
+	String lastFieldAccess;
 	private List<StaticCallExp> storeExpressions = new ArrayList<StaticCallExp>();
 	private Set<CtClass> nestedInnerClasses = new HashSet<CtClass>();
 	private ClassPool pool;
@@ -61,7 +61,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		}
 	}
 
-	private void editFieldAccess(FieldAccess fieldAccess) throws NotFoundException, CannotCompileException {
+	void editFieldAccess(FieldAccess fieldAccess) throws NotFoundException, CannotCompileException {
 		lastFieldAccess = fieldAccess.getFieldName();
 		lastMethodCall = null;
 		logger.info("last field access: " + fieldAccess.getFieldName());
@@ -85,7 +85,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		}
 	}
 
-	private void editNewExpression(NewExpr newExpr) throws NotFoundException, CannotCompileException {
+	void editNewExpression(NewExpr newExpr) throws NotFoundException, CannotCompileException {
 		logger.info("NewExpr2 found: " + newExpr.getClassName());
 		CtClass exprClass = pool.get(newExpr.getClassName());
 		if (exprClass.getInterfaces().length != 1) {
@@ -117,36 +117,45 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		}
 	}
 
-	private void editMethodCall(MethodCall methodCall) throws NotFoundException, CannotCompileException {
+	void editMethodCall(MethodCall methodCall) throws NotFoundException, CannotCompileException {
 		CtMethod method = methodCall.getMethod();
 		if (method.getDeclaringClass().equals(contract.getTargetClass())
 				|| method.getDeclaringClass().equals(contract.getContractClass())) {
-			lastMethodCall = methodCall.getMethodName();
-			lastFieldAccess = null;
-			logger.info("last method call: " + lastMethodCall);
-			logger.info("replacing call to " + methodCall.getClassName() + "." + methodCall.getMethodName());
-			CastExp replacementCall = CastExp.forReturnType(new StaticCallExp(Evaluator.methodCall, new ValueExp(
-					methodCall.getMethodName()), ArrayExp.forParamTypes(method), ArrayExp.forArgs(method)));
-			AssignmentExp assignment = new AssignmentExp(NestedExp.RETURN_VALUE, replacementCall);
-			String code = assignment.toStandalone().getCode();
-			logger.info("replacement code: " + code);
-			methodCall.replace(code);
+			handleTargetMethodCall(methodCall);
 		} else if (method.getDeclaringClass().getName().equals(Condition.class.getName())
 				&& method.getName().equals("old")) {
-			StaticCallExp oldCall = null;
-			if (lastFieldAccess != null) {
-				logger.info("storing field access to " + lastFieldAccess);
-				storeExpressions.add(new StaticCallExp(Evaluator.storeFieldAccess, new ValueExp(lastFieldAccess)));
-				oldCall = new StaticCallExp(Evaluator.oldFieldAccess, new ValueExp(lastFieldAccess));
-			} else if (lastMethodCall != null) {
-				logger.info("storing method call to " + lastMethodCall);
-				storeExpressions.add(new StaticCallExp(Evaluator.storeMethodCall, new ValueExp(lastMethodCall)));
-				oldCall = new StaticCallExp(Evaluator.oldMethodCall, new ValueExp(lastMethodCall));
-			}
-			if (oldCall != null) {
-				AssignmentExp assignmentExp = new AssignmentExp(NestedExp.RETURN_VALUE, oldCall);
-				methodCall.replace(assignmentExp.toStandalone().getCode());
-			}
+			handleOldMethodCall(methodCall);
 		}
+	}
+
+	void handleOldMethodCall(MethodCall methodCall) throws CannotCompileException {
+		StaticCallExp oldCall = null;
+		if (lastFieldAccess != null) {
+			logger.info("storing field access to " + lastFieldAccess);
+			storeExpressions.add(new StaticCallExp(Evaluator.storeFieldAccess, new ValueExp(lastFieldAccess)));
+			oldCall = new StaticCallExp(Evaluator.oldFieldAccess, new ValueExp(lastFieldAccess));
+		} else if (lastMethodCall != null) {
+			logger.info("storing method call to " + lastMethodCall);
+			storeExpressions.add(new StaticCallExp(Evaluator.storeMethodCall, new ValueExp(lastMethodCall)));
+			oldCall = new StaticCallExp(Evaluator.oldMethodCall, new ValueExp(lastMethodCall));
+		}
+		if (oldCall != null) {
+			AssignmentExp assignmentExp = new AssignmentExp(NestedExp.RETURN_VALUE, oldCall);
+			methodCall.replace(assignmentExp.toStandalone().getCode());
+		}
+	}
+
+	void handleTargetMethodCall(MethodCall methodCall) throws NotFoundException, CannotCompileException {
+		CtMethod method = methodCall.getMethod();
+		lastMethodCall = methodCall.getMethodName();
+		lastFieldAccess = null;
+		logger.info("last method call: " + lastMethodCall);
+		logger.info("replacing call to " + methodCall.getClassName() + "." + methodCall.getMethodName());
+		CastExp replacementCall = CastExp.forReturnType(new StaticCallExp(Evaluator.methodCall, new ValueExp(methodCall
+				.getMethodName()), ArrayExp.forParamTypes(method), ArrayExp.forArgs(method)));
+		AssignmentExp assignment = new AssignmentExp(NestedExp.RETURN_VALUE, replacementCall);
+		String code = assignment.toStandalone().getCode();
+		logger.info("replacement code: " + code);
+		methodCall.replace(code);
 	}
 }
