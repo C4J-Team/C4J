@@ -1,5 +1,6 @@
 package de.andrena.next.internal;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -48,7 +49,13 @@ public class ContractRegistry {
 		}
 
 		public Set<CtClass> getInnerContractClasses() {
-			return innerContractClasses;
+			return Collections.unmodifiableSet(innerContractClasses);
+		}
+
+		public Set<CtClass> getAllContractClasses() {
+			Set<CtClass> allContractClasses = new HashSet<CtClass>(innerContractClasses);
+			allContractClasses.add(contractClass);
+			return Collections.unmodifiableSet(allContractClasses);
 		}
 
 	}

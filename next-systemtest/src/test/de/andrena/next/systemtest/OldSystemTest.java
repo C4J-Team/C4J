@@ -1,13 +1,14 @@
 package de.andrena.next.systemtest;
 
+import static de.andrena.next.Condition.old;
+import static de.andrena.next.Condition.post;
+
 import java.io.InputStream;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import de.andrena.next.Contract;
-import static de.andrena.next.Condition.old;
-import static de.andrena.next.Condition.post;
 
 public class OldSystemTest extends TransformerAwareTest {
 
@@ -30,6 +31,15 @@ public class OldSystemTest extends TransformerAwareTest {
 		dummy.incrementValueCheckMethod();
 	}
 
+	@Test
+	public void testOldWithOverriddenMethod() {
+		System.out.println("11");
+		dummy.setValue(5);
+		System.out.println("22");
+		dummy.incrementValueCheckOverriddenMethod();
+		System.out.println("33");
+	}
+
 	@Contract(DummyContract.class)
 	public static class DummyClass {
 		protected int value;
@@ -43,12 +53,23 @@ public class OldSystemTest extends TransformerAwareTest {
 			return value;
 		}
 
+		public int getValueOverridden() {
+			System.out.println("value is: " + value);
+			return value;
+		}
+
 		public void incrementValueCheckField() {
 			value++;
 		}
 
 		public void incrementValueCheckMethod() {
 			value++;
+		}
+
+		public void incrementValueCheckOverriddenMethod() {
+			System.out.println("before: " + value);
+			value++;
+			System.out.println("after: " + value);
 		}
 	}
 
@@ -72,8 +93,23 @@ public class OldSystemTest extends TransformerAwareTest {
 		@Override
 		public void incrementValueCheckMethod() {
 			if (post()) {
+				System.out.println("new: " + getValue() + " old: " + old(getValue()));
 				assert getValue() == old(getValue()) + 1;
 			}
+		}
+
+		@Override
+		public void incrementValueCheckOverriddenMethod() {
+			if (post()) {
+				System.out.println("new: " + getValueOverridden() + " old: " + old(getValueOverridden()));
+				assert getValueOverridden() == old(getValueOverridden()) + 1;
+			}
+		}
+
+		@Override
+		public int getValueOverridden() {
+			System.out.println("3");
+			return 0;
 		}
 	}
 }

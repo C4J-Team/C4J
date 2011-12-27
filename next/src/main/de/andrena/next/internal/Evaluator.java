@@ -28,7 +28,7 @@ public class Evaluator {
 	private static ThreadLocal<EvaluationPhase> evaluationPhase = new ThreadLocal<EvaluationPhase>() {
 		@Override
 		protected EvaluationPhase initialValue() {
-			return EvaluationPhase.BEFORE;
+			return EvaluationPhase.NONE;
 		}
 	};
 
@@ -44,7 +44,7 @@ public class Evaluator {
 	};
 
 	private static enum EvaluationPhase {
-		BEFORE, AFTER;
+		BEFORE, AFTER, NONE;
 	}
 
 	public static boolean isBefore() {
@@ -103,20 +103,24 @@ public class Evaluator {
 
 	public static void before(Object target, Class<?> contractClass, String methodName, Class<?>[] argTypes,
 			Object[] args) {
-		Evaluator.evaluationPhase.set(EvaluationPhase.BEFORE);
-		Evaluator.currentTarget.set(target);
-		logger.info("before " + methodName);
-		callContractMethod(contractClass, methodName, argTypes, args);
+		if (Evaluator.evaluationPhase.get() == EvaluationPhase.NONE) {
+			Evaluator.evaluationPhase.set(EvaluationPhase.BEFORE);
+			Evaluator.currentTarget.set(target);
+			logger.info("before " + methodName);
+			callContractMethod(contractClass, methodName, argTypes, args);
+		}
 	}
 
 	public static void after(Object target, Class<?> contractClass, String methodName, Class<?>[] argTypes,
 			Object[] args, Object returnValue) {
-		Evaluator.evaluationPhase.set(EvaluationPhase.AFTER);
-		Evaluator.currentTarget.set(target);
-		logger.info("setting return value to " + returnValue);
-		Evaluator.returnValue.set(returnValue);
-		logger.info("after " + methodName);
-		callContractMethod(contractClass, methodName, argTypes, args);
+		if (Evaluator.evaluationPhase.get() == EvaluationPhase.NONE) {
+			Evaluator.evaluationPhase.set(EvaluationPhase.AFTER);
+			Evaluator.currentTarget.set(target);
+			logger.info("setting return value to " + returnValue);
+			Evaluator.returnValue.set(returnValue);
+			logger.info("after " + methodName);
+			callContractMethod(contractClass, methodName, argTypes, args);
+		}
 	}
 
 	private static void callContractMethod(Class<?> contractClass, String methodName, Class<?>[] argTypes, Object[] args)
@@ -138,6 +142,8 @@ public class Evaluator {
 		} catch (Exception e) {
 			throw new EvaluationException("could not call contract method " + methodName + " of class "
 					+ contractClass.getName(), e);
+		} finally {
+			Evaluator.evaluationPhase.set(EvaluationPhase.NONE);
 		}
 	}
 

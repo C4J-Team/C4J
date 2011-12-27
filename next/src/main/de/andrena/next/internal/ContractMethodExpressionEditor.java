@@ -8,6 +8,7 @@ import java.util.Set;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
+import javassist.CtField;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 import javassist.expr.ExprEditor;
@@ -32,8 +33,8 @@ import de.andrena.next.internal.compiler.ValueExp;
 
 public class ContractMethodExpressionEditor extends ExprEditor {
 	private Logger logger = Logger.getLogger(getClass());
-	String lastMethodCall;
-	String lastFieldAccess;
+	CtMethod lastMethodCall;
+	CtField lastFieldAccess;
 	private List<StaticCallExp> storeExpressions = new ArrayList<StaticCallExp>();
 	private Set<CtClass> nestedInnerClasses = new HashSet<CtClass>();
 	private ClassPool pool;
@@ -62,15 +63,16 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 	}
 
 	void editFieldAccess(FieldAccess fieldAccess) throws NotFoundException, CannotCompileException {
-		lastFieldAccess = fieldAccess.getFieldName();
+		CtField field = fieldAccess.getField();
+		lastFieldAccess = field;
 		lastMethodCall = null;
-		logger.info("last field access: " + fieldAccess.getFieldName());
-		if (!fieldAccess.isStatic() && fieldAccess.getField().getDeclaringClass().equals(contract.getTargetClass())) {
-			if (fieldAccess.isWriter()) {
-				throw new TransformationException("illegal write access on field '" + fieldAccess.getFieldName() + "'.");
-			}
-			CastExp replacementCall = CastExp.forReturnType(new StaticCallExp(Evaluator.fieldAccess, new ValueExp(
-					fieldAccess.getFieldName())));
+		logger.info("last field access: " + field.getName());
+		if (fieldAccess.isWriter() && !contract.getAllContractClasses().contains(field.getDeclaringClass())) {
+			throw new TransformationException("illegal write access on field '" + field.getName() + "'.");
+		}
+		if (!fieldAccess.isStatic() && field.getDeclaringClass().equals(contract.getTargetClass())) {
+			CastExp replacementCall = CastExp.forReturnType(new StaticCallExp(Evaluator.fieldAccess, new ValueExp(field
+					.getName())));
 			AssignmentExp assignment = new AssignmentExp(NestedExp.RETURN_VALUE, replacementCall);
 			fieldAccess.replace(assignment.toStandalone().getCode());
 		}
@@ -128,26 +130,9 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		}
 	}
 
-	void handleOldMethodCall(MethodCall methodCall) throws CannotCompileException {
-		StaticCallExp oldCall = null;
-		if (lastFieldAccess != null) {
-			logger.info("storing field access to " + lastFieldAccess);
-			storeExpressions.add(new StaticCallExp(Evaluator.storeFieldAccess, new ValueExp(lastFieldAccess)));
-			oldCall = new StaticCallExp(Evaluator.oldFieldAccess, new ValueExp(lastFieldAccess));
-		} else if (lastMethodCall != null) {
-			logger.info("storing method call to " + lastMethodCall);
-			storeExpressions.add(new StaticCallExp(Evaluator.storeMethodCall, new ValueExp(lastMethodCall)));
-			oldCall = new StaticCallExp(Evaluator.oldMethodCall, new ValueExp(lastMethodCall));
-		}
-		if (oldCall != null) {
-			AssignmentExp assignmentExp = new AssignmentExp(NestedExp.RETURN_VALUE, oldCall);
-			methodCall.replace(assignmentExp.toStandalone().getCode());
-		}
-	}
-
-	void handleTargetMethodCall(MethodCall methodCall) throws NotFoundException, CannotCompileException {
+	private void handleTargetMethodCall(MethodCall methodCall) throws NotFoundException, CannotCompileException {
 		CtMethod method = methodCall.getMethod();
-		lastMethodCall = methodCall.getMethodName();
+		lastMethodCall = method;
 		lastFieldAccess = null;
 		logger.info("last method call: " + lastMethodCall);
 		logger.info("replacing call to " + methodCall.getClassName() + "." + methodCall.getMethodName());
@@ -157,5 +142,26 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		String code = assignment.toStandalone().getCode();
 		logger.info("replacement code: " + code);
 		methodCall.replace(code);
+	}
+
+	private void handleOldMethodCall(MethodCall methodCall) throws NotFoundException, CannotCompileException {
+		StaticCallExp oldCall = null;
+		if (lastFieldAccess != null) {
+			logger.info("storing field access to " + lastFieldAccess);
+			storeExpressions
+					.add(new StaticCallExp(Evaluator.storeFieldAccess, new ValueExp(lastFieldAccess.getName())));
+			oldCall = new StaticCallExp(Evaluator.oldFieldAccess, new ValueExp(lastFieldAccess.getName()));
+		} else if (lastMethodCall != null) {
+			if (lastMethodCall.getParameterTypes().length > 0) {
+				throw new TransformationException("cannot use methods with parameters in old()");
+			}
+			logger.info("storing method call to " + lastMethodCall);
+			storeExpressions.add(new StaticCallExp(Evaluator.storeMethodCall, new ValueExp(lastMethodCall.getName())));
+			oldCall = new StaticCallExp(Evaluator.oldMethodCall, new ValueExp(lastMethodCall.getName()));
+		}
+		if (oldCall != null) {
+			AssignmentExp assignmentExp = new AssignmentExp(NestedExp.RETURN_VALUE, oldCall);
+			methodCall.replace(assignmentExp.toStandalone().getCode());
+		}
 	}
 }
