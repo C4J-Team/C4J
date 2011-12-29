@@ -17,6 +17,10 @@ public class ValueExp extends NestedExp {
 		code = getValueAsString(value);
 	}
 
+	public ValueExp(int value) {
+		code = Integer.toString(value);
+	}
+
 	public ValueExp(Enum<?> value) {
 		code = getValueAsString(value);
 	}
@@ -67,16 +71,16 @@ public class ValueExp extends NestedExp {
 		if (values.length == 0) {
 			return "new " + targetClass.getComponentType().getCanonicalName() + "[0]";
 		}
-		StringBuilder result = new StringBuilder("new " + targetClass.getComponentType().getCanonicalName() + "[] {");
+		StringBuilder result = new StringBuilder("new " + targetClass.getComponentType().getCanonicalName() + "[] { ");
 		boolean first = true;
 		for (Object value : values) {
 			if (!first) {
-				result.append(",");
+				result.append(", ");
 			}
 			result.append(getValueAsString(value, targetClass.getComponentType()));
 			first = false;
 		}
-		result.append("}");
+		result.append(" }");
 		return result.toString();
 	}
 

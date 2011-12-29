@@ -18,7 +18,7 @@ public class CastExp extends NestedExp {
 	}
 
 	public static CastExp forReturnType(NestedExp exp) {
-		return new CastExp("(($r)" + exp.getCode() + ")");
+		return new CastExp("(($r) " + exp.getCode() + ")");
 	}
 
 	@Override

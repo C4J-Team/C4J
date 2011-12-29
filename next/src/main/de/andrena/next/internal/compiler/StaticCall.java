@@ -18,4 +18,8 @@ public class StaticCall {
 		return callMethod;
 	}
 
+	String getCode() {
+		return callClass.getName() + "#" + callMethod;
+	}
+
 }

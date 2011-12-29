@@ -4,7 +4,6 @@ import java.util.List;
 
 import de.andrena.next.internal.compiler.StandaloneExp.CodeStandaloneExp;
 
-
 public abstract class NestedExp extends Exp {
 	public static NestedExp THIS = new CodeNestedExp("this");
 	public static NestedExp NULL = new CodeNestedExp("null");
@@ -19,7 +18,7 @@ public abstract class NestedExp extends Exp {
 	}
 
 	public StandaloneExp toStandalone() {
-		return new CodeStandaloneExp(getCode());
+		return CodeStandaloneExp.fromNested(getCode());
 	}
 
 	protected String getCodeForParams(NestedExp... params) {

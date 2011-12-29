@@ -25,16 +25,34 @@ public class Evaluator {
 
 	private static Logger logger = Logger.getLogger(Evaluator.class);
 
-	private static ThreadLocal<EvaluationPhase> evaluationPhase = new ThreadLocal<EvaluationPhase>() {
+	private static Map<Class<?>, Object> primitiveReturnValues = new HashMap<Class<?>, Object>() {
+		private static final long serialVersionUID = 5365905181961089260L;
+		{
+			put(long.class, Long.valueOf(0));
+			put(int.class, Integer.valueOf(0));
+			put(short.class, Short.valueOf((short) 0));
+			put(char.class, Character.valueOf((char) 0));
+			put(byte.class, Byte.valueOf((byte) 0));
+			put(double.class, Double.valueOf(0));
+			put(float.class, Float.valueOf(0));
+			put(boolean.class, Boolean.FALSE);
+		}
+	};
+
+	static ThreadLocal<EvaluationPhase> evaluationPhase = new ThreadLocal<EvaluationPhase>() {
 		@Override
 		protected EvaluationPhase initialValue() {
 			return EvaluationPhase.NONE;
 		}
 	};
 
-	private static ThreadLocal<Object> returnValue = new ThreadLocal<Object>();
-	private static ThreadLocal<Object> currentTarget = new ThreadLocal<Object>();
-	private static ThreadLocal<Class<?>> contractReturnType = new ThreadLocal<Class<?>>();
+	static enum EvaluationPhase {
+		BEFORE, AFTER, NONE;
+	}
+
+	static ThreadLocal<Object> returnValue = new ThreadLocal<Object>();
+	static ThreadLocal<Object> currentTarget = new ThreadLocal<Object>();
+	static ThreadLocal<Class<?>> contractReturnType = new ThreadLocal<Class<?>>();
 
 	private static ThreadLocal<Map<String, Object>> oldStore = new ThreadLocal<Map<String, Object>>() {
 		@Override
@@ -42,10 +60,6 @@ public class Evaluator {
 			return new HashMap<String, Object>();
 		}
 	};
-
-	private static enum EvaluationPhase {
-		BEFORE, AFTER, NONE;
-	}
 
 	public static boolean isBefore() {
 		logger.info("isBefore returning " + (Evaluator.evaluationPhase.get() == EvaluationPhase.BEFORE));
@@ -123,7 +137,7 @@ public class Evaluator {
 		}
 	}
 
-	private static void callContractMethod(Class<?> contractClass, String methodName, Class<?>[] argTypes, Object[] args)
+	static void callContractMethod(Class<?> contractClass, String methodName, Class<?>[] argTypes, Object[] args)
 			throws AssertionError {
 		try {
 			Object contract = contractClass.newInstance();
@@ -149,9 +163,9 @@ public class Evaluator {
 
 	@SuppressWarnings("unchecked")
 	public static <T> T getConditionReturnValue() {
-		if (contractReturnType.get().equals(int.class)) {
-			return (T) Integer.valueOf(0);
+		if (!contractReturnType.get().isPrimitive()) {
+			return null;
 		}
-		return null;
+		return (T) primitiveReturnValues.get(contractReturnType.get());
 	}
 }

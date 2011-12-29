@@ -6,15 +6,15 @@ public class ConstructorExp extends NestedExp {
 	private String code;
 
 	public ConstructorExp(Class<?> clazz, NestedExp... params) {
-		code = "\n" + "new " + clazz.getName() + getCodeForParams(params);
+		code = "new " + clazz.getName() + getCodeForParams(params);
 	}
 
 	public ConstructorExp(CtClass clazz, NestedExp... params) {
-		code = "\n" + "new " + clazz.getName() + getCodeForParams(params);
+		code = "new " + clazz.getName() + getCodeForParams(params);
 	}
 
 	public ConstructorExp(String className, NestedExp... params) {
-		code = "\n" + "new " + className + getCodeForParams(params);
+		code = "new " + className + getCodeForParams(params);
 	}
 
 	@Override

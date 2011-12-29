@@ -6,10 +6,10 @@ import javassist.CtConstructor;
 
 public abstract class StandaloneExp extends Exp {
 
-	public static StandaloneExp proceed = new CodeStandaloneExp("$_ = $proceed($$)");
+	public static StandaloneExp proceed = CodeStandaloneExp.fromNested("$_ = $proceed($$)");
 
 	public StandaloneExp append(StandaloneExp other) {
-		return new CodeStandaloneExp(getCode() + other.getCode());
+		return CodeStandaloneExp.fromStandalone(getCode() + other.getCode());
 	}
 
 	public StandaloneExp append(NestedExp other) {
@@ -21,21 +21,33 @@ public abstract class StandaloneExp extends Exp {
 
 	public void insertBefore(CtBehavior behavior) throws CannotCompileException {
 		if (behavior instanceof CtConstructor && !((CtConstructor) behavior).isClassInitializer()) {
-			((CtConstructor) behavior).insertBeforeBody("{ " + getCode() + " }");
+			((CtConstructor) behavior).insertBeforeBody(getInsertCode(getCode()));
 		} else {
-			behavior.insertBefore("{ " + getCode() + " }");
+			behavior.insertBefore(getInsertCode(getCode()));
 		}
 	}
 
 	public void insertAfter(CtBehavior behavior) throws CannotCompileException {
-		behavior.insertAfter("{" + getCode() + "}");
+		behavior.insertAfter(getInsertCode(getCode()));
+	}
+
+	private String getInsertCode(String code) {
+		return "{ " + code + " }";
 	}
 
 	public static class CodeStandaloneExp extends StandaloneExp {
 		private String code;
 
-		protected CodeStandaloneExp(String code) {
-			this.code = code + ";";
+		private CodeStandaloneExp(String code) {
+			this.code = code;
+		}
+
+		protected static StandaloneExp fromStandalone(String code) {
+			return new CodeStandaloneExp(code);
+		}
+
+		protected static StandaloneExp fromNested(String code) {
+			return new CodeStandaloneExp("\n" + code + ";");
 		}
 
 		@Override

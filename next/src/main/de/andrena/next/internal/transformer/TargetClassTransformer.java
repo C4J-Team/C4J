@@ -2,7 +2,7 @@ package de.andrena.next.internal.transformer;
 
 import de.andrena.next.internal.ContractRegistry.ContractInfo;
 
-public final class TargetClassTransformer extends AbstractTargetClassTransformer {
+public class TargetClassTransformer extends AbstractTargetClassTransformer {
 	private AbstractTargetClassTransformer[] transformers = new AbstractTargetClassTransformer[] { new BeforeAndAfterTriggerTransformer() };
 
 	protected AbstractTargetClassTransformer[] getTransformers() {

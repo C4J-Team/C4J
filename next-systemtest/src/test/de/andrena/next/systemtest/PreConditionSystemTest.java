@@ -1,4 +1,4 @@
-package de.andrena.next.systemtest.pre;
+package de.andrena.next.systemtest;
 
 import static de.andrena.next.Condition.pre;
 
@@ -6,7 +6,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.andrena.next.Contract;
-import de.andrena.next.systemtest.TransformerAwareTest;
 
 public class PreConditionSystemTest extends TransformerAwareTest {
 

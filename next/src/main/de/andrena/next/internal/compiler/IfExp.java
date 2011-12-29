@@ -31,10 +31,11 @@ public class IfExp extends StandaloneExp {
 		if (ifBody != null) {
 			code += ifBody.getCode();
 		}
-		code += "\n" + "}";
+		code += "\n}";
 		if (elseBody != null) {
 			code += " else {";
 			code += elseBody.getCode();
+			code += "\n}";
 		}
 		return code;
 	}

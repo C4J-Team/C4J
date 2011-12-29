@@ -6,13 +6,7 @@ import java.security.ProtectionDomain;
 import javassist.ByteArrayClassPath;
 import javassist.ClassPool;
 import javassist.CtClass;
-import javassist.CtMethod;
 import javassist.LoaderClassPath;
-import javassist.bytecode.BadBytecode;
-import javassist.bytecode.CodeAttribute;
-import javassist.bytecode.CodeIterator;
-import javassist.bytecode.Mnemonic;
-import javassist.bytecode.Opcode;
 
 import org.apache.log4j.Logger;
 
@@ -25,12 +19,12 @@ import de.andrena.next.internal.util.BackdoorAnnotationLoader;
 public class RootTransformer implements ClassFileTransformer {
 
 	private Logger logger = Logger.getLogger(getClass());
-	private ClassPool pool = ClassPool.getDefault();
+	ClassPool pool = ClassPool.getDefault();
 
-	private TargetClassTransformer targetClassTransformer = new TargetClassTransformer();
-	private ContractClassTransformer contractClassTransformer = new ContractClassTransformer(pool);
+	TargetClassTransformer targetClassTransformer = new TargetClassTransformer();
+	ContractClassTransformer contractClassTransformer = new ContractClassTransformer(pool);
 
-	private static ContractRegistry contractRegistry = new ContractRegistry();
+	ContractRegistry contractRegistry = new ContractRegistry();
 
 	private static Throwable lastException;
 
@@ -56,7 +50,7 @@ public class RootTransformer implements ClassFileTransformer {
 		return null;
 	}
 
-	private byte[] transformClass(String className) throws Exception {
+	byte[] transformClass(String className) throws Exception {
 		CtClass currentClass = pool.get(className);
 		if (currentClass.isInterface()) {
 			logger.debug("transformation aborted, as class is an interface");
@@ -79,38 +73,12 @@ public class RootTransformer implements ClassFileTransformer {
 		return null;
 	}
 
-	private void updateClassPath(ClassLoader loader, byte[] classfileBuffer, String className) {
+	void updateClassPath(ClassLoader loader, byte[] classfileBuffer, String className) {
 		if (loader != null) {
 			pool.insertClassPath(new LoaderClassPath(loader));
 		}
 		if (classfileBuffer != null) {
 			pool.insertClassPath(new ByteArrayClassPath(className, classfileBuffer));
-		}
-	}
-
-	private void printCurrentByteCode(CtMethod contractMethod, CodeAttribute ca) throws BadBytecode {
-		CodeIterator ci = ca.iterator();
-		while (ci.hasNext()) {
-			int index = ci.next();
-			int op = ci.byteAt(index);
-			System.out.println(index + ": " + op + ", " + Mnemonic.OPCODE[op]);
-			if (op == Opcode.INVOKESTATIC || op == Opcode.IFEQ || op == Opcode.IFNE || op == Opcode.GETSTATIC) {
-				int constPoolIndex = ci.s16bitAt(index + 1);
-				System.out.println("param: " + constPoolIndex);
-				if (op == Opcode.INVOKESTATIC) {
-					String className = contractMethod.getMethodInfo().getConstPool()
-							.getMethodrefClassName(constPoolIndex);
-					String methodName = contractMethod.getMethodInfo().getConstPool().getMethodrefName(constPoolIndex);
-					System.out.println("class: " + className);
-					System.out.println("method: " + methodName);
-				}
-				if (op == Opcode.GETSTATIC) {
-					System.out.println("class: "
-							+ contractMethod.getMethodInfo().getConstPool().getFieldrefClassName(constPoolIndex));
-					System.out.println("field: "
-							+ contractMethod.getMethodInfo().getConstPool().getFieldrefName(constPoolIndex));
-				}
-			}
 		}
 	}
 

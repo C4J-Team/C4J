@@ -1,4 +1,4 @@
-package de.andrena.next.systemtest.post;
+package de.andrena.next.systemtest;
 
 import static de.andrena.next.Condition.ignored;
 import static de.andrena.next.Condition.post;
@@ -7,7 +7,6 @@ import static de.andrena.next.Condition.result;
 import org.junit.Test;
 
 import de.andrena.next.Contract;
-import de.andrena.next.systemtest.TransformerAwareTest;
 
 public class PostConditionSystemTest extends TransformerAwareTest {
 	@Test
