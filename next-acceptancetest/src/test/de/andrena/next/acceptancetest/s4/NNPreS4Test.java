@@ -1,4 +1,4 @@
-package de.andrena.next.acceptancetest;
+package de.andrena.next.acceptancetest.s4;
 
 import static de.andrena.next.Condition.ignored;
 import static org.junit.matchers.JUnitMatchers.containsString;
