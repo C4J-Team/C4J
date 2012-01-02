@@ -6,11 +6,14 @@ import static de.andrena.next.Condition.post;
 import java.io.InputStream;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.next.Contract;
 
-public class OldSystemTest extends TransformerAwareTest {
+public class OldSystemTest {
+	@Rule
+	public TransformerAwareRule transformerAware = new TransformerAwareRule();
 
 	private DummyClass dummy;
 

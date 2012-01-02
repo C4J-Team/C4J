@@ -5,13 +5,17 @@ import static de.andrena.next.Condition.old;
 import java.io.InputStream;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.next.Condition.PostCondition;
 import de.andrena.next.Contract;
-import de.andrena.next.systemtest.TransformerAwareTest;
+import de.andrena.next.systemtest.TransformerAwareRule;
 
-public class OldSystemTest extends TransformerAwareTest {
+public class OldSystemTest {
+	@Rule
+	public TransformerAwareRule transformerAware = new TransformerAwareRule();
+
 	private DummyClass dummy;
 
 	@Before

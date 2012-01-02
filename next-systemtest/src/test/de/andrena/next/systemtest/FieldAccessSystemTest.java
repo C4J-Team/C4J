@@ -1,12 +1,17 @@
 package de.andrena.next.systemtest;
 
+import static de.andrena.next.Condition.pre;
+
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.next.Contract;
-import static de.andrena.next.Condition.pre;
 
-public class FieldAccessSystemTest extends TransformerAwareTest {
+public class FieldAccessSystemTest {
+	@Rule
+	public TransformerAwareRule transformerAware = new TransformerAwareRule();
+
 	private DummyClass dummy;
 
 	@Before

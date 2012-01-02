@@ -3,13 +3,17 @@ package de.andrena.next.systemtest.dbi;
 import static de.andrena.next.Condition.ignored;
 import static de.andrena.next.Condition.result;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.next.Condition.PostCondition;
 import de.andrena.next.Contract;
-import de.andrena.next.systemtest.TransformerAwareTest;
+import de.andrena.next.systemtest.TransformerAwareRule;
 
-public class PostConditionSystemTest extends TransformerAwareTest {
+public class PostConditionSystemTest {
+	@Rule
+	public TransformerAwareRule transformerAware = new TransformerAwareRule();
+
 	@Test
 	public void testPostCondition() {
 		new DummyClass().setStaticValue(5);

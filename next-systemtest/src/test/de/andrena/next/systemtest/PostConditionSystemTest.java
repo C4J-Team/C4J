@@ -4,11 +4,15 @@ import static de.andrena.next.Condition.ignored;
 import static de.andrena.next.Condition.post;
 import static de.andrena.next.Condition.result;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.next.Contract;
 
-public class PostConditionSystemTest extends TransformerAwareTest {
+public class PostConditionSystemTest {
+	@Rule
+	public TransformerAwareRule transformerAware = new TransformerAwareRule();
+
 	@Test
 	public void testPostCondition() {
 		new DummyClass().setStaticValue(5);
