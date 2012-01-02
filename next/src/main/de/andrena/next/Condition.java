@@ -3,14 +3,6 @@ package de.andrena.next;
 import de.andrena.next.internal.Evaluator;
 
 public class Condition {
-	public static boolean pre() {
-		return Evaluator.isBefore();
-	}
-
-	public static boolean post() {
-		return Evaluator.isAfter();
-	}
-
 	@SuppressWarnings("unchecked")
 	public static <T> T result(Class<T> returnType) {
 		return (T) Evaluator.getReturnValue();
