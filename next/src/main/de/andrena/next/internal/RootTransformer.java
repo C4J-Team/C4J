@@ -2,18 +2,21 @@ package de.andrena.next.internal;
 
 import java.lang.instrument.ClassFileTransformer;
 import java.security.ProtectionDomain;
+import java.util.ArrayList;
+import java.util.List;
 
 import javassist.ByteArrayClassPath;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.LoaderClassPath;
+import javassist.NotFoundException;
 
 import org.apache.log4j.Logger;
 
 import de.andrena.next.Contract;
 import de.andrena.next.internal.ContractRegistry.ContractInfo;
+import de.andrena.next.internal.transformer.AffectedClassTransformer;
 import de.andrena.next.internal.transformer.ContractClassTransformer;
-import de.andrena.next.internal.transformer.TargetClassTransformer;
 import de.andrena.next.internal.util.BackdoorAnnotationLoader;
 
 public class RootTransformer implements ClassFileTransformer {
@@ -21,7 +24,7 @@ public class RootTransformer implements ClassFileTransformer {
 	private Logger logger = Logger.getLogger(getClass());
 	ClassPool pool = ClassPool.getDefault();
 
-	TargetClassTransformer targetClassTransformer = new TargetClassTransformer();
+	AffectedClassTransformer targetClassTransformer = new AffectedClassTransformer();
 	ContractClassTransformer contractClassTransformer = new ContractClassTransformer(pool);
 
 	ContractRegistry contractRegistry = new ContractRegistry();
@@ -51,26 +54,56 @@ public class RootTransformer implements ClassFileTransformer {
 	}
 
 	byte[] transformClass(String className) throws Exception {
-		CtClass currentClass = pool.get(className);
-		if (currentClass.isInterface()) {
+		CtClass affectedClass = pool.get(className);
+		if (affectedClass.isInterface()) {
 			logger.debug("transformation aborted, as class is an interface");
 			return null;
 		}
-		if (currentClass.hasAnnotation(Contract.class)) {
-			logger.info("transforming class " + className);
-			String contractClassString = new BackdoorAnnotationLoader(currentClass).getClassValue(Contract.class,
-					"value");
-			CtClass contractClass = pool.get(contractClassString);
-			ContractInfo contractInfo = contractRegistry.registerContract(currentClass, contractClass);
-			targetClassTransformer.transform(contractInfo);
-			return currentClass.toBytecode();
-		} else if (contractRegistry.isContractClass(currentClass)) {
-			ContractInfo contractInfo = contractRegistry.getContractInfo(currentClass);
+		List<ContractInfo> contractInfos = getContractsForClass(affectedClass);
+		if (contractRegistry.isContractClass(affectedClass)) {
+			ContractInfo contractInfo = contractRegistry.getContractInfo(affectedClass);
 			logger.info("transforming contract " + className);
-			contractClassTransformer.transform(contractInfo, currentClass);
-			return currentClass.toBytecode();
+			contractClassTransformer.transform(contractInfo, affectedClass);
+			return affectedClass.toBytecode();
+		}
+		if (!contractInfos.isEmpty()) {
+			for (ContractInfo contractInfo : contractInfos) {
+				targetClassTransformer.transform(contractInfo, affectedClass);
+			}
+			return affectedClass.toBytecode();
 		}
 		return null;
+	}
+
+	List<ContractInfo> getContractsForClass(CtClass affectedClass) throws NotFoundException {
+		List<ContractInfo> contractsForClass = new ArrayList<ContractInfo>();
+		addContractsFromType(contractsForClass, affectedClass);
+		CtClass superClass = affectedClass;
+		while (!superClass.getSuperclass().getName().equals(Object.class.getName())) {
+			superClass = superClass.getSuperclass();
+			addContractsFromType(contractsForClass, superClass);
+		}
+		return contractsForClass;
+	}
+
+	private void addContractsFromType(List<ContractInfo> contractsForClass, CtClass type) throws NotFoundException {
+		if (type.hasAnnotation(Contract.class)) {
+			if (contractRegistry.hasRegisteredContract(type)) {
+				contractsForClass.add(contractRegistry.getContractInfoForTargetClass(type));
+			} else {
+				String contractClassString = new BackdoorAnnotationLoader(type).getClassValue(Contract.class, "value");
+				CtClass contractClass = pool.get(contractClassString);
+				contractsForClass.add(contractRegistry.registerContract(type, contractClass));
+			}
+		}
+		addContractsFromInterfaces(contractsForClass, type.getInterfaces());
+	}
+
+	private void addContractsFromInterfaces(List<ContractInfo> contractsForClass, CtClass[] interfaces)
+			throws NotFoundException {
+		for (CtClass interfaze : interfaces) {
+			addContractsFromType(contractsForClass, interfaze);
+		}
 	}
 
 	void updateClassPath(ClassLoader loader, byte[] classfileBuffer, String className) {

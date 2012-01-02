@@ -19,13 +19,13 @@ import org.mockito.ArgumentMatcher;
 
 import de.andrena.next.Contract;
 import de.andrena.next.internal.ContractRegistry.ContractInfo;
+import de.andrena.next.internal.transformer.AffectedClassTransformer;
 import de.andrena.next.internal.transformer.ContractClassTransformer;
-import de.andrena.next.internal.transformer.TargetClassTransformer;
 
 public class RootTransformerTest {
 
 	private RootTransformer transformer;
-	private TargetClassTransformer targetClassTransformer;
+	private AffectedClassTransformer targetClassTransformer;
 	private ContractClassTransformer contractClassTransformer;
 	private ClassPool pool;
 	private CtClass targetClass;
@@ -34,7 +34,7 @@ public class RootTransformerTest {
 	@Before
 	public void before() throws Exception {
 		transformer = new RootTransformer();
-		targetClassTransformer = mock(TargetClassTransformer.class);
+		targetClassTransformer = mock(AffectedClassTransformer.class);
 		transformer.targetClassTransformer = targetClassTransformer;
 		contractClassTransformer = mock(ContractClassTransformer.class);
 		transformer.contractClassTransformer = contractClassTransformer;
@@ -60,7 +60,7 @@ public class RootTransformerTest {
 				return contractInfo != null && contractInfo.getTargetClass().equals(targetClass)
 						&& contractInfo.getContractClass().equals(contractClass);
 			}
-		}));
+		}), eq(targetClass));
 	}
 
 	@Test
@@ -112,4 +112,55 @@ public class RootTransformerTest {
 
 	public static class UninvolvedClass {
 	}
+
+	@Test
+	public void testGetContractsForClass() throws Exception {
+		CtClass noSuperClass = pool.get(NoSuperClass.class.getName());
+		assertEquals(1, transformer.getContractsForClass(noSuperClass).size());
+		CtClass subClass = pool.get(SubClass.class.getName());
+		assertEquals(5, transformer.getContractsForClass(subClass).size());
+	}
+
+	@Contract(NoSuperClassContract.class)
+	public static class NoSuperClass {
+	}
+
+	public static class NoSuperClassContract {
+	}
+
+	@Contract(SubClassContract.class)
+	public static class SubClass extends SuperClass {
+	}
+
+	public static class SubClassContract extends SubClass {
+	}
+
+	@Contract(SuperClassContract.class)
+	public static class SuperClass implements HasContract {
+	}
+
+	public static class SuperClassContract extends SuperClass {
+	}
+
+	@Contract(HasContractContract.class)
+	public interface HasContract extends SuperInterface1, SuperInterface2 {
+	}
+
+	public static class HasContractContract implements HasContract {
+	}
+
+	@Contract(SuperInterface1Contract.class)
+	public interface SuperInterface1 {
+	}
+
+	public static class SuperInterface1Contract implements SuperInterface1 {
+	}
+
+	@Contract(SuperInterface2Contract.class)
+	public interface SuperInterface2 {
+	}
+
+	public interface SuperInterface2Contract {
+	}
+
 }

@@ -40,7 +40,7 @@ public class ClassInvariantTransformerTest {
 	@Test
 	public void testClassInvariant() throws Exception {
 		when(targetMethod.hasAnnotation(ClassInvariant.class)).thenReturn(Boolean.TRUE);
-		transformer.transform(contractInfo);
+		transformer.transform(contractInfo, targetClass);
 		verify(targetMethod).insertAfter(anyString());
 	}
 

@@ -10,10 +10,15 @@ import javassist.CtClass;
 
 public class ContractRegistry {
 	private Map<CtClass, ContractInfo> contractMap = new HashMap<CtClass, ContractInfo>();
+	private Map<CtClass, ContractInfo> targetMap = new HashMap<CtClass, ContractInfo>();
 
 	public ContractInfo registerContract(CtClass targetClass, CtClass contractClass) {
+		if (isContractClass(contractClass)) {
+			return getContractInfo(contractClass);
+		}
 		ContractInfo contractInfo = new ContractInfo(targetClass, contractClass);
-		contractMap.put(contractInfo.getContractClass(), contractInfo);
+		contractMap.put(contractClass, contractInfo);
+		targetMap.put(targetClass, contractInfo);
 		return contractInfo;
 	}
 
@@ -23,6 +28,14 @@ public class ContractRegistry {
 
 	public boolean isContractClass(CtClass clazz) {
 		return contractMap.containsKey(clazz);
+	}
+
+	public boolean hasRegisteredContract(CtClass targetClass) {
+		return targetMap.containsKey(targetClass);
+	}
+
+	public ContractInfo getContractInfoForTargetClass(CtClass targetClass) {
+		return targetMap.get(targetClass);
 	}
 
 	public class ContractInfo {

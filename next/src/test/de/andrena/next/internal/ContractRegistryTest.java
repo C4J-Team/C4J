@@ -2,6 +2,7 @@ package de.andrena.next.internal;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -39,10 +40,37 @@ public class ContractRegistryTest {
 	}
 
 	@Test
+	public void testRegisterContractForAlreadyRegisteredContract() {
+		ContractInfo contractInfo = contractRegistry.registerContract(targetClass, contractClass);
+		assertEquals(contractInfo, contractRegistry.registerContract(targetClass, contractClass));
+	}
+
+	@Test
 	public void testIsContractClass() {
 		assertFalse(contractRegistry.isContractClass(contractClass));
 		contractRegistry.registerContract(targetClass, contractClass);
 		assertTrue(contractRegistry.isContractClass(contractClass));
+	}
+
+	@Test
+	public void testGetContractInfo() {
+		assertNull(contractRegistry.getContractInfo(contractClass));
+		ContractInfo contractInfo = contractRegistry.registerContract(targetClass, contractClass);
+		assertEquals(contractInfo, contractRegistry.getContractInfo(contractClass));
+	}
+
+	@Test
+	public void testHasRegisteredContract() {
+		assertFalse(contractRegistry.hasRegisteredContract(targetClass));
+		contractRegistry.registerContract(targetClass, contractClass);
+		assertTrue(contractRegistry.hasRegisteredContract(targetClass));
+	}
+
+	@Test
+	public void testGetContractInfoForTargetClass() {
+		assertNull(contractRegistry.getContractInfoForTargetClass(targetClass));
+		ContractInfo contractInfo = contractRegistry.registerContract(targetClass, contractClass);
+		assertEquals(contractInfo, contractRegistry.getContractInfoForTargetClass(targetClass));
 	}
 
 	@Test

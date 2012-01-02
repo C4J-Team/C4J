@@ -13,18 +13,18 @@ import de.andrena.next.internal.compiler.StaticCallExp;
 import de.andrena.next.internal.compiler.ValueExp;
 import de.andrena.next.internal.util.ObjectConverter;
 
-public class BeforeAndAfterTriggerTransformer extends TargetDeclaredBehaviorTransformer {
+public class BeforeAndAfterTriggerTransformer extends AffectedDeclaredBehaviorTransformer {
 
 	@Override
-	public void transform(ContractInfo contractInfo, CtBehavior targetBehavior) throws Exception {
+	public void transform(ContractInfo contractInfo, CtBehavior affectedBehavior) throws Exception {
 		String contractBehaviorName;
 		try {
-			if (targetBehavior instanceof CtMethod) {
-				contractInfo.getContractClass().getDeclaredMethod(targetBehavior.getName(),
-						targetBehavior.getParameterTypes());
-				contractBehaviorName = targetBehavior.getName();
-			} else if (targetBehavior instanceof CtConstructor) {
-				contractInfo.getContractClass().getDeclaredConstructor(targetBehavior.getParameterTypes());
+			if (affectedBehavior instanceof CtMethod) {
+				contractInfo.getContractClass().getDeclaredMethod(affectedBehavior.getName(),
+						affectedBehavior.getParameterTypes());
+				contractBehaviorName = affectedBehavior.getName();
+			} else if (affectedBehavior instanceof CtConstructor) {
+				contractInfo.getContractClass().getDeclaredConstructor(affectedBehavior.getParameterTypes());
 				contractBehaviorName = ConstructorTransformer.CONSTRUCTOR_REPLACEMENT_NAME;
 			} else {
 				return;
@@ -32,20 +32,20 @@ public class BeforeAndAfterTriggerTransformer extends TargetDeclaredBehaviorTran
 		} catch (NotFoundException e) {
 			return;
 		}
-		logger.info("transforming method " + targetBehavior.getLongName());
-		ArrayExp paramTypesArray = ArrayExp.forParamTypes(targetBehavior);
-		ArrayExp argsArray = ArrayExp.forArgs(targetBehavior);
+		logger.info("transforming method " + affectedBehavior.getLongName());
+		ArrayExp paramTypesArray = ArrayExp.forParamTypes(affectedBehavior);
+		ArrayExp argsArray = ArrayExp.forArgs(affectedBehavior);
 		StaticCallExp callBefore = new StaticCallExp(Evaluator.before, NestedExp.THIS, new ValueExp(
 				contractInfo.getContractClass()), new ValueExp(contractBehaviorName), paramTypesArray, argsArray);
 		NestedExp returnValue = new StaticCallExp(ObjectConverter.toObject, NestedExp.RETURN_VALUE);
-		if (!(targetBehavior instanceof CtMethod)
-				|| ((CtMethod) targetBehavior).getReturnType().equals(CtClass.voidType)) {
+		if (!(affectedBehavior instanceof CtMethod)
+				|| ((CtMethod) affectedBehavior).getReturnType().equals(CtClass.voidType)) {
 			returnValue = NestedExp.NULL;
 		}
 		StaticCallExp callAfter = new StaticCallExp(Evaluator.after, NestedExp.THIS, new ValueExp(
 				contractInfo.getContractClass()), new ValueExp(contractBehaviorName), paramTypesArray, argsArray,
 				returnValue);
-		callBefore.toStandalone().insertBefore(targetBehavior);
-		callAfter.toStandalone().insertAfter(targetBehavior);
+		callBefore.toStandalone().insertBefore(affectedBehavior);
+		callAfter.toStandalone().insertAfter(affectedBehavior);
 	}
 }
