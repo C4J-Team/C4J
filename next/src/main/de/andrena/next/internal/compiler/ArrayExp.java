@@ -3,11 +3,10 @@ package de.andrena.next.internal.compiler;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.andrena.next.internal.util.ObjectConverter;
-
+import javassist.CtBehavior;
 import javassist.CtClass;
-import javassist.CtMethod;
 import javassist.NotFoundException;
+import de.andrena.next.internal.util.ObjectConverter;
 
 public class ArrayExp extends NestedExp {
 
@@ -25,17 +24,17 @@ public class ArrayExp extends NestedExp {
 		}
 	}
 
-	public static ArrayExp forParamTypes(CtMethod method) throws NotFoundException {
+	public static ArrayExp forParamTypes(CtBehavior behavior) throws NotFoundException {
 		List<NestedExp> paramTypes = new ArrayList<NestedExp>();
-		for (CtClass paramClass : method.getParameterTypes()) {
+		for (CtClass paramClass : behavior.getParameterTypes()) {
 			paramTypes.add(new ValueExp(paramClass));
 		}
 		return new ArrayExp(Class.class, paramTypes);
 	}
 
-	public static ArrayExp forArgs(CtMethod method) throws NotFoundException {
+	public static ArrayExp forArgs(CtBehavior behavior) throws NotFoundException {
 		List<NestedExp> args = new ArrayList<NestedExp>();
-		for (int i = 0; i < method.getParameterTypes().length; i++) {
+		for (int i = 0; i < behavior.getParameterTypes().length; i++) {
 			args.add(new StaticCallExp(ObjectConverter.toObject, NestedExp.arg(i + 1)));
 		}
 		return new ArrayExp(Object.class, args);

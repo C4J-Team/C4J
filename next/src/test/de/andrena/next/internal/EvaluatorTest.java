@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import de.andrena.next.ClassInvariant;
 import de.andrena.next.internal.Evaluator.EvaluationPhase;
 
 public class EvaluatorTest {
@@ -100,6 +101,20 @@ public class EvaluatorTest {
 			assertEquals(currentTarget, Evaluator.currentTarget.get());
 			assertEquals(Integer.valueOf(4), Evaluator.returnValue.get());
 			return 0;
+		}
+	}
+
+	@Test
+	public void testCallInvariant() {
+		Evaluator.callInvariant(currentTarget, ContractClassForInvariant.class, "invariant");
+		assertEquals(EvaluationPhase.NONE, Evaluator.evaluationPhase.get());
+	}
+
+	public static class ContractClassForInvariant {
+		@ClassInvariant
+		public void invariant() {
+			assertEquals(EvaluationPhase.INVARIANT, Evaluator.evaluationPhase.get());
+			assertEquals(currentTarget, Evaluator.currentTarget.get());
 		}
 	}
 

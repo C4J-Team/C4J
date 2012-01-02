@@ -15,6 +15,7 @@ public class Evaluator {
 	public static StaticCall isBefore = new StaticCall(Evaluator.class, "isBefore");
 	public static StaticCall after = new StaticCall(Evaluator.class, "after");
 	public static StaticCall isAfter = new StaticCall(Evaluator.class, "isAfter");
+	public static StaticCall callInvariant = new StaticCall(Evaluator.class, "callInvariant");
 	public static StaticCall getReturnValue = new StaticCall(Evaluator.class, "getReturnValue");
 	public static StaticCall fieldAccess = new StaticCall(Evaluator.class, "fieldAccess");
 	public static StaticCall methodCall = new StaticCall(Evaluator.class, "methodCall");
@@ -47,7 +48,7 @@ public class Evaluator {
 	};
 
 	static enum EvaluationPhase {
-		BEFORE, AFTER, NONE;
+		BEFORE, AFTER, NONE, INVARIANT;
 	}
 
 	static ThreadLocal<Object> returnValue = new ThreadLocal<Object>();
@@ -134,6 +135,15 @@ public class Evaluator {
 			Evaluator.returnValue.set(returnValue);
 			logger.info("after " + methodName);
 			callContractMethod(contractClass, methodName, argTypes, args);
+		}
+	}
+
+	public static void callInvariant(Object target, Class<?> contractClass, String methodName) {
+		if (Evaluator.evaluationPhase.get() == EvaluationPhase.NONE) {
+			Evaluator.evaluationPhase.set(EvaluationPhase.INVARIANT);
+			Evaluator.currentTarget.set(target);
+			logger.info("calling invariant " + methodName);
+			callContractMethod(contractClass, methodName, new Class<?>[0], new Object[0]);
 		}
 	}
 

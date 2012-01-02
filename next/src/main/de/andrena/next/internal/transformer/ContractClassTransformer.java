@@ -9,7 +9,8 @@ public class ContractClassTransformer extends AbstractContractClassTransformer {
 	private AbstractContractClassTransformer[] transformers;
 
 	public ContractClassTransformer(ClassPool pool) {
-		this.transformers = new AbstractContractClassTransformer[] { new ContractExpressionTransformer(pool) };
+		this.transformers = new AbstractContractClassTransformer[] { new ContractExpressionTransformer(pool),
+				new ConstructorTransformer() };
 	}
 
 	@Override
