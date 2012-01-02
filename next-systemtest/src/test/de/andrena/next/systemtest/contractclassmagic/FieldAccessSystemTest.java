@@ -1,12 +1,12 @@
-package de.andrena.next.systemtest;
-
-import static de.andrena.next.Condition.pre;
+package de.andrena.next.systemtest.contractclassmagic;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import de.andrena.next.Condition.PreCondition;
 import de.andrena.next.Contract;
+import de.andrena.next.systemtest.TransformerAwareRule;
 
 public class FieldAccessSystemTest {
 	@Rule
@@ -40,10 +40,11 @@ public class FieldAccessSystemTest {
 	public static class DummyContract extends DummyClass {
 		@Override
 		public void methodContractHasFieldAccess() {
-			if (pre()) {
-				assert value == 5;
-			}
+			new PreCondition() {
+				{
+					assert value == 5;
+				}
+			};
 		}
 	}
-
 }

@@ -1,4 +1,4 @@
-package de.andrena.next.systemtest.dbi;
+package de.andrena.next.systemtest.old;
 
 import static de.andrena.next.Condition.old;
 

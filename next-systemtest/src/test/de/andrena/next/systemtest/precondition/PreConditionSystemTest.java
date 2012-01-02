@@ -1,4 +1,4 @@
-package de.andrena.next.systemtest.dbi;
+package de.andrena.next.systemtest.precondition;
 
 import org.junit.Before;
 import org.junit.Rule;

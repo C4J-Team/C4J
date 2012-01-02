@@ -1,4 +1,4 @@
-package de.andrena.next.systemtest.dbi;
+package de.andrena.next.systemtest.classinvariant;
 
 import org.junit.Rule;
 import org.junit.Test;

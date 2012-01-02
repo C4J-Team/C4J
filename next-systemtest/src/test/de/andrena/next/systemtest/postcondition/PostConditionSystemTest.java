@@ -1,4 +1,4 @@
-package de.andrena.next.systemtest.dbi;
+package de.andrena.next.systemtest.postcondition;
 
 import static de.andrena.next.Condition.ignored;
 import static de.andrena.next.Condition.result;
