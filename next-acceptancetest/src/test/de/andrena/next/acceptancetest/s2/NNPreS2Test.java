@@ -1,4 +1,4 @@
-package de.andrena.next.acceptancetest;
+package de.andrena.next.acceptancetest.s2;
 
 import static de.andrena.next.Condition.PreCondition;
 import static de.andrena.next.Condition.ignored;
