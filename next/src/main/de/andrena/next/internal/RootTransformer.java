@@ -48,7 +48,7 @@ public class RootTransformer implements ClassFileTransformer {
 			logger.error(e.getMessage(), e);
 		} catch (Exception e) {
 			lastException = e;
-			logger.error("transformation failed for class '" + className + "'", e);
+			logger.fatal("transformation failed for class '" + className + "'", e);
 		}
 		return null;
 	}

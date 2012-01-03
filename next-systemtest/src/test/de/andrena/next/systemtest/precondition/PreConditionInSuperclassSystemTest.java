@@ -1,7 +1,6 @@
 package de.andrena.next.systemtest.precondition;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -31,8 +30,10 @@ public class PreConditionInSuperclassSystemTest {
 	}
 
 	@Test(expected = AssertionError.class)
-	@Ignore("not yet implemented")
 	public void testPreConditionFailsInDummyClass() {
+		transformerAware
+				.expectLogWarning("could not find method method in affected class de.andrena.next.systemtest.precondition.PreConditionInSuperclassSystemTest$DummyClass"
+						+ " for contract class de.andrena.next.systemtest.precondition.PreConditionInSuperclassSystemTest$DummyContract - inserting an empty method");
 		dummy.method(5);
 	}
 

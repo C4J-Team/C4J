@@ -5,5 +5,6 @@
 	<classpathentry kind="lib" path="/next/lib/junit-4.10.jar"/>
 	<classpathentry kind="lib" path="/next/lib/mockito-all-1.8.5.jar"/>
 	<classpathentry kind="lib" path="/next/lib/next.jar" sourcepath="/next"/>
+	<classpathentry kind="lib" path="/next/lib/log4j-1.2.16.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

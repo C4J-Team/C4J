@@ -1,88 +1,152 @@
 package de.andrena.next.internal.transformer;
 
-import static org.mockito.Matchers.anyString;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import javassist.ClassPool;
 import javassist.CtBehavior;
 import javassist.CtClass;
-import javassist.CtConstructor;
 import javassist.CtMethod;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import de.andrena.next.ClassInvariant;
 import de.andrena.next.internal.ContractRegistry;
 import de.andrena.next.internal.ContractRegistry.ContractInfo;
+import de.andrena.next.internal.TransformationException;
 
 public class BeforeAndAfterTriggerTransformerTest {
 
 	private BeforeAndAfterTriggerTransformer transformer;
-	private CtClass targetClass;
 	private CtClass contractClass;
+	private CtClass targetClass;
 	private ContractInfo contractInfo;
-	private CtBehavior targetBehavior;
+	private CtClass indirectClass;
 
 	@Before
 	public void before() throws Exception {
 		transformer = new BeforeAndAfterTriggerTransformer();
 		ClassPool pool = ClassPool.getDefault();
-		targetClass = pool.get(TargetClass.class.getName());
 		contractClass = pool.get(ContractClass.class.getName());
+		targetClass = pool.get(TargetClass.class.getName());
+		indirectClass = pool.get(IndirectClass.class.getName());
 		contractInfo = new ContractRegistry().registerContract(targetClass, contractClass);
 	}
 
 	@Test
-	public void testTransformNothing() throws Exception {
-		targetBehavior = mock(CtMethod.class);
-		when(targetBehavior.getName()).thenReturn("methodWithoutContract");
-		when(targetBehavior.getParameterTypes()).thenReturn(new CtClass[0]);
-		transformer.transform(contractInfo, targetBehavior);
-		verify(targetBehavior, never()).insertBefore(anyString());
-		verify(targetBehavior, never()).insertAfter(anyString());
+	public void testGetContractBehaviorNameForMethod() throws Exception {
+		assertEquals(transformer.getContractBehaviorName(contractClass.getDeclaredMethod("contractMethod")),
+				"contractMethod");
 	}
 
 	@Test
-	public void testTransformSomething() throws Exception {
-		targetBehavior = mock(CtMethod.class);
-		when(targetBehavior.getName()).thenReturn("methodWithContract");
-		when(targetBehavior.getParameterTypes()).thenReturn(new CtClass[0]);
-		when(((CtMethod) targetBehavior).getReturnType()).thenReturn(CtClass.voidType);
-		transformer.transform(contractInfo, targetBehavior);
-		verify(targetBehavior).insertBefore(anyString());
-		verify(targetBehavior).insertAfter(anyString());
+	public void testGetContractBehaviorNameForConstructor() throws Exception {
+		assertEquals(transformer.getContractBehaviorName(contractClass.getDeclaredConstructor(new CtClass[0])),
+				ConstructorTransformer.CONSTRUCTOR_REPLACEMENT_NAME);
 	}
 
 	@Test
-	public void testTransformConstructor() throws Exception {
-		targetBehavior = mock(CtConstructor.class);
-		when(targetBehavior.getName()).thenReturn("BeforeAndAfterTriggerTransformerTest$ContractClass");
-		when(targetBehavior.getParameterTypes()).thenReturn(new CtClass[] { CtClass.intType });
-		transformer.transform(contractInfo, targetBehavior);
-		verify(((CtConstructor) targetBehavior)).insertBeforeBody(anyString());
-		verify(targetBehavior).insertAfter(anyString());
+	public void testGetContractBehaviorNameForTransformedConstructor() throws Exception {
+		assertEquals(transformer.getContractBehaviorName(contractClass
+				.getDeclaredMethod(ConstructorTransformer.CONSTRUCTOR_REPLACEMENT_NAME)),
+				ConstructorTransformer.CONSTRUCTOR_REPLACEMENT_NAME);
+	}
+
+	public static class IndirectClass extends TargetClass {
 	}
 
 	public static class TargetClass {
-		public TargetClass(int value) {
-		}
-
-		public void methodWithoutContract() {
-		}
-
-		public void methodWithContract() {
+		public void contractMethod() {
 		}
 	}
 
 	public static class ContractClass extends TargetClass {
+		public ContractClass() {
+		}
+
 		public ContractClass(int value) {
-			super(value);
+		}
+
+		@ClassInvariant
+		public void invariant() {
+		}
+
+		public void constructor$() {
 		}
 
 		@Override
-		public void methodWithContract() {
+		public void contractMethod() {
+		}
+
+		public void otherMethod() {
 		}
 	}
+
+	@Test
+	public void testGetAffectedBehaviorForClassInvariant() throws Exception {
+		assertNull(transformer.getAffectedBehavior(null, null, contractClass.getDeclaredMethod("invariant")));
+	}
+
+	@Test(expected = TransformationException.class)
+	public void testGetAffectedBehaviorForNonMethodOrConstructor() throws Exception {
+		CtBehavior contractBehavior = mock(CtBehavior.class);
+		when(contractBehavior.getName()).thenReturn("contractBehavior");
+		transformer.getAffectedBehavior(null, null, contractBehavior);
+	}
+
+	@Test
+	public void testGetAffectedMethodForOtherMethod() throws Exception {
+		assertNull(transformer.getAffectedMethod(contractInfo, targetClass,
+				contractClass.getDeclaredMethod("otherMethod")));
+	}
+
+	@Test
+	public void testGetAffectedMethodForContractMethod() throws Exception {
+		assertEquals(
+				targetClass.getDeclaredMethod("contractMethod"),
+				transformer.getAffectedMethod(contractInfo, targetClass,
+						contractClass.getDeclaredMethod("contractMethod")));
+	}
+
+	@Test
+	public void testGetAffectedMethodForIndirectContractMethod() throws Exception {
+		CtMethod affectedMethod = transformer.getAffectedMethod(contractInfo, indirectClass,
+				contractClass.getDeclaredMethod("contractMethod"));
+		assertEquals(indirectClass.getDeclaredMethod("contractMethod"), affectedMethod);
+	}
+
+	@Test
+	public void testGetAffectedConstructor() throws Exception {
+		assertEquals(
+				targetClass.getDeclaredConstructor(new CtClass[0]),
+				transformer.getAffectedConstructor(contractInfo, targetClass,
+						contractClass.getDeclaredConstructor(new CtClass[0])));
+	}
+
+	@Test
+	public void testGetAffectedConstructorNotFound() throws Exception {
+		assertNull(transformer.getAffectedConstructor(contractInfo, targetClass,
+				contractClass.getDeclaredConstructor(new CtClass[] { CtClass.intType })));
+	}
+
+	@Test
+	public void testIsConstructorForMethod() throws Exception {
+		assertFalse(transformer.isConstructor(contractClass.getDeclaredMethod("contractMethod")));
+	}
+
+	@Test
+	public void testIsConstructorForConstructor() throws Exception {
+		assertTrue(transformer.isConstructor(contractClass.getDeclaredConstructor(new CtClass[0])));
+	}
+
+	@Test
+	public void testIsConstructorForTransformedConstructor() throws Exception {
+		assertTrue(transformer.isConstructor(contractClass
+				.getDeclaredMethod(ConstructorTransformer.CONSTRUCTOR_REPLACEMENT_NAME)));
+	}
+
 }
