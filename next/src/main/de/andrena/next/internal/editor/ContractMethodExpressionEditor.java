@@ -44,8 +44,8 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 	CtMethod lastMethodCall;
 	CtField lastFieldAccess;
 	List<CtMember> arrayMembers = new ArrayList<CtMember>();
+	Set<CtClass> nestedInnerClasses = new HashSet<CtClass>();
 	private List<StaticCallExp> storeExpressions = new ArrayList<StaticCallExp>();
-	private Set<CtClass> nestedInnerClasses = new HashSet<CtClass>();
 	private ClassPool pool;
 	private ContractInfo contract;
 	private CtBehavior contractBehavior;
@@ -61,8 +61,10 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		this.contractBehavior = contractBehavior;
 	}
 
-	public Set<CtClass> getNestedInnerClasses() {
-		return nestedInnerClasses;
+	public Set<CtClass> getAndClearNestedInnerClasses() {
+		HashSet<CtClass> cachedInnerClasses = new HashSet<CtClass>(nestedInnerClasses);
+		nestedInnerClasses.clear();
+		return cachedInnerClasses;
 	}
 
 	@Override

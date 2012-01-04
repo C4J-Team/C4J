@@ -1,9 +1,5 @@
 package de.andrena.next.internal.transformer;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import javassist.ClassPool;
 import javassist.CtBehavior;
 import javassist.CtClass;
@@ -27,9 +23,7 @@ public class ContractExpressionTransformer extends ContractDeclaredBehaviorTrans
 				contractBehavior);
 		logger.info("transforming class " + contractBehavior.getLongName());
 		contractBehavior.instrument(expressionEditor);
-		List<StaticCallExp> storeExpressions = expressionEditor.getStoreExpressions();
-		storeExpressions.addAll(additionalStoreExpressions(expressionEditor.getNestedInnerClasses(), contractInfo,
-				contractBehavior));
+		additionalStoreExpressions(expressionEditor);
 		IfExp storeConditionalExp = new IfExp(new StaticCallExp(Evaluator.isBefore));
 		for (StaticCallExp storeExp : expressionEditor.getStoreExpressions()) {
 			storeConditionalExp.addIfBody(storeExp.toStandalone());
@@ -37,20 +31,13 @@ public class ContractExpressionTransformer extends ContractDeclaredBehaviorTrans
 		storeConditionalExp.insertBefore(contractBehavior);
 	}
 
-	private List<StaticCallExp> additionalStoreExpressions(Set<CtClass> nestedInnerClasses, ContractInfo contractInfo,
-			CtBehavior contractBehavior) throws Exception {
-		List<StaticCallExp> storeExpressions = new ArrayList<StaticCallExp>();
-		for (CtClass nestedContractClass : nestedInnerClasses) {
-			ContractMethodExpressionEditor expressionEditor = new ContractMethodExpressionEditor(contractInfo, pool,
-					contractBehavior);
+	private void additionalStoreExpressions(ContractMethodExpressionEditor expressionEditor) throws Exception {
+		for (CtClass nestedContractClass : expressionEditor.getAndClearNestedInnerClasses()) {
 			for (CtBehavior nestedBehavior : nestedContractClass.getDeclaredBehaviors()) {
 				nestedBehavior.instrument(expressionEditor);
 			}
-			storeExpressions.addAll(expressionEditor.getStoreExpressions());
-			storeExpressions.addAll(additionalStoreExpressions(expressionEditor.getNestedInnerClasses(), contractInfo,
-					contractBehavior));
+			additionalStoreExpressions(expressionEditor);
 		}
-		return storeExpressions;
 	}
 
 }

@@ -9,6 +9,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.util.Set;
+
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -59,6 +62,19 @@ public class ContractMethodExpressionEditorTest {
 		CtClass conditionClass = pool.get(Condition.class.getName());
 		oldMethod = conditionClass.getDeclaredMethod("old");
 		unchangedMethod = conditionClass.getDeclaredMethod("unchanged");
+	}
+
+	@Test
+	public void testGetAndClearNestedInnerClasses() {
+		editor.nestedInnerClasses.add(targetClass);
+		assertEquals(1, editor.getAndClearNestedInnerClasses().size());
+	}
+
+	@Test
+	public void testGetNestedInnerClassesWhileClearing() {
+		editor.nestedInnerClasses.add(targetClass);
+		Set<CtClass> nestedInnerClasses = editor.getAndClearNestedInnerClasses();
+		assertEquals(1, nestedInnerClasses.size());
 	}
 
 	@Test
@@ -121,7 +137,7 @@ public class ContractMethodExpressionEditorTest {
 		editor.editNewExpression(newExpr);
 		verify(newExpr).replace(anyString());
 		assertTrue(contract.getInnerContractClasses().contains(preConditionClass));
-		assertTrue(editor.getNestedInnerClasses().contains(preConditionClass));
+		assertTrue(editor.getAndClearNestedInnerClasses().contains(preConditionClass));
 	}
 
 	@Test
@@ -131,7 +147,7 @@ public class ContractMethodExpressionEditorTest {
 		editor.editNewExpression(newExpr);
 		verify(newExpr).replace(anyString());
 		assertTrue(contract.getInnerContractClasses().contains(postConditionClass));
-		assertTrue(editor.getNestedInnerClasses().contains(postConditionClass));
+		assertTrue(editor.getAndClearNestedInnerClasses().contains(postConditionClass));
 	}
 
 	@Test
