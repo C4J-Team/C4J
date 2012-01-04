@@ -1,4 +1,4 @@
-package de.andrena.next.internal;
+package de.andrena.next.internal.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -10,7 +10,8 @@ import javassist.CtClass;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.andrena.next.internal.ContractRegistry.ContractInfo;
+import de.andrena.next.internal.util.ContractRegistry;
+import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 
 public class ContractRegistryTest {
 

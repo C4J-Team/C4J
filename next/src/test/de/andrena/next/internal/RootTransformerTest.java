@@ -18,9 +18,9 @@ import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 
 import de.andrena.next.Contract;
-import de.andrena.next.internal.ContractRegistry.ContractInfo;
 import de.andrena.next.internal.transformer.AffectedClassTransformer;
 import de.andrena.next.internal.transformer.ContractClassTransformer;
+import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 
 public class RootTransformerTest {
 

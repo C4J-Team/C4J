@@ -15,9 +15,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.andrena.next.ClassInvariant;
-import de.andrena.next.internal.ContractRegistry;
-import de.andrena.next.internal.ContractRegistry.ContractInfo;
-import de.andrena.next.internal.TransformationException;
+import de.andrena.next.internal.util.ContractRegistry;
+import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 
 public class BeforeAndAfterTriggerTransformerTest {
 

@@ -6,9 +6,9 @@ import javassist.CtClass;
 import de.andrena.next.internal.compiler.StandaloneExp.CodeStandaloneExp;
 
 public abstract class NestedExp extends Exp {
-	public static NestedExp THIS = new CodeNestedExp("this");
-	public static NestedExp NULL = new CodeNestedExp("null");
-	public static NestedExp RETURN_VALUE = new CodeNestedExp("$_");
+	public static final NestedExp THIS = new CodeNestedExp("this");
+	public static final NestedExp NULL = new CodeNestedExp("null");
+	public static final NestedExp RETURN_VALUE = new CodeNestedExp("$_");
 
 	public static NestedExp arg(int num) {
 		return new CodeNestedExp("$" + num);

@@ -6,7 +6,7 @@ import javassist.CtConstructor;
 
 public abstract class StandaloneExp extends Exp {
 
-	public static StandaloneExp proceed = CodeStandaloneExp.fromNested("$_ = $proceed($$)");
+	public static final StandaloneExp proceed = CodeStandaloneExp.fromNested("$_ = $proceed($$)");
 
 	public StandaloneExp append(StandaloneExp other) {
 		return CodeStandaloneExp.fromStandalone(getCode() + other.getCode());

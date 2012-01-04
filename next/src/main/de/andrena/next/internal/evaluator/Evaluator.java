@@ -1,4 +1,4 @@
-package de.andrena.next.internal;
+package de.andrena.next.internal.evaluator;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -12,24 +12,24 @@ import de.andrena.next.internal.compiler.StaticCall;
 import de.andrena.next.internal.util.ObjectMapper;
 
 public class Evaluator {
-	public static StaticCall before = new StaticCall(Evaluator.class, "before");
-	public static StaticCall isBefore = new StaticCall(Evaluator.class, "isBefore");
-	public static StaticCall after = new StaticCall(Evaluator.class, "after");
-	public static StaticCall isAfter = new StaticCall(Evaluator.class, "isAfter");
-	public static StaticCall callInvariant = new StaticCall(Evaluator.class, "callInvariant");
-	public static StaticCall getReturnValue = new StaticCall(Evaluator.class, "getReturnValue");
-	public static StaticCall fieldAccess = new StaticCall(Evaluator.class, "fieldAccess");
-	public static StaticCall methodCall = new StaticCall(Evaluator.class, "methodCall");
-	public static StaticCall oldFieldAccess = new StaticCall(Evaluator.class, "oldFieldAccess");
-	public static StaticCall oldMethodCall = new StaticCall(Evaluator.class, "oldMethodCall");
-	public static StaticCall storeFieldAccess = new StaticCall(Evaluator.class, "storeFieldAccess");
-	public static StaticCall storeMethodCall = new StaticCall(Evaluator.class, "storeMethodCall");
+	public static final StaticCall before = new StaticCall(Evaluator.class, "before");
+	public static final StaticCall isBefore = new StaticCall(Evaluator.class, "isBefore");
+	public static final StaticCall after = new StaticCall(Evaluator.class, "after");
+	public static final StaticCall isAfter = new StaticCall(Evaluator.class, "isAfter");
+	public static final StaticCall callInvariant = new StaticCall(Evaluator.class, "callInvariant");
+	public static final StaticCall getReturnValue = new StaticCall(Evaluator.class, "getReturnValue");
+	public static final StaticCall fieldAccess = new StaticCall(Evaluator.class, "fieldAccess");
+	public static final StaticCall methodCall = new StaticCall(Evaluator.class, "methodCall");
+	public static final StaticCall oldFieldAccess = new StaticCall(Evaluator.class, "oldFieldAccess");
+	public static final StaticCall oldMethodCall = new StaticCall(Evaluator.class, "oldMethodCall");
+	public static final StaticCall storeFieldAccess = new StaticCall(Evaluator.class, "storeFieldAccess");
+	public static final StaticCall storeMethodCall = new StaticCall(Evaluator.class, "storeMethodCall");
 
-	private static Logger logger = Logger.getLogger(Evaluator.class);
+	private static final Logger logger = Logger.getLogger(Evaluator.class);
 
-	private static ObjectMapper<Class<?>, Object> contractCache = new ObjectMapper<Class<?>, Object>();
+	private static final ObjectMapper<Class<?>, Object> contractCache = new ObjectMapper<Class<?>, Object>();
 
-	private static Map<Class<?>, Object> primitiveReturnValues = new HashMap<Class<?>, Object>() {
+	private static final Map<Class<?>, Object> primitiveReturnValues = new HashMap<Class<?>, Object>() {
 		private static final long serialVersionUID = 5365905181961089260L;
 		{
 			put(long.class, Long.valueOf(0));
@@ -54,11 +54,11 @@ public class Evaluator {
 		BEFORE, AFTER, NONE, INVARIANT;
 	}
 
-	static ThreadLocal<Object> returnValue = new ThreadLocal<Object>();
-	static ThreadLocal<Object> currentTarget = new ThreadLocal<Object>();
-	static ThreadLocal<Class<?>> contractReturnType = new ThreadLocal<Class<?>>();
+	final static ThreadLocal<Object> returnValue = new ThreadLocal<Object>();
+	final static ThreadLocal<Object> currentTarget = new ThreadLocal<Object>();
+	final static ThreadLocal<Class<?>> contractReturnType = new ThreadLocal<Class<?>>();
 
-	private static ThreadLocal<Map<String, Object>> oldStore = new ThreadLocal<Map<String, Object>>() {
+	private static final ThreadLocal<Map<String, Object>> oldStore = new ThreadLocal<Map<String, Object>>() {
 		@Override
 		protected Map<String, Object> initialValue() {
 			return new HashMap<String, Object>();

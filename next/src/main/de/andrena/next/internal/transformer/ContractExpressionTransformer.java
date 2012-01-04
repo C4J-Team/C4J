@@ -7,11 +7,11 @@ import java.util.Set;
 import javassist.ClassPool;
 import javassist.CtBehavior;
 import javassist.CtClass;
-import de.andrena.next.internal.ContractMethodExpressionEditor;
-import de.andrena.next.internal.ContractRegistry.ContractInfo;
-import de.andrena.next.internal.Evaluator;
 import de.andrena.next.internal.compiler.IfExp;
 import de.andrena.next.internal.compiler.StaticCallExp;
+import de.andrena.next.internal.editor.ContractMethodExpressionEditor;
+import de.andrena.next.internal.evaluator.Evaluator;
+import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 
 public class ContractExpressionTransformer extends ContractDeclaredBehaviorTransformer {
 

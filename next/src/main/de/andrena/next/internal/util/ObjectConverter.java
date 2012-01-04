@@ -3,7 +3,7 @@ package de.andrena.next.internal.util;
 import de.andrena.next.internal.compiler.StaticCall;
 
 public class ObjectConverter {
-	public static StaticCall toObject = new StaticCall(ObjectConverter.class, "toObject");
+	public static final StaticCall toObject = new StaticCall(ObjectConverter.class, "toObject");
 
 	public static Boolean toObject(boolean value) {
 		return Boolean.valueOf(value);

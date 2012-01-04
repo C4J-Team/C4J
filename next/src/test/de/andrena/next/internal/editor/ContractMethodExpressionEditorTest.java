@@ -1,4 +1,4 @@
-package de.andrena.next.internal;
+package de.andrena.next.internal.editor;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -9,6 +9,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
@@ -22,7 +23,8 @@ import org.junit.Test;
 import de.andrena.next.Condition;
 import de.andrena.next.Condition.PostCondition;
 import de.andrena.next.Condition.PreCondition;
-import de.andrena.next.internal.ContractRegistry.ContractInfo;
+import de.andrena.next.internal.util.ContractRegistry;
+import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 
 public class ContractMethodExpressionEditorTest {
 
@@ -82,7 +84,7 @@ public class ContractMethodExpressionEditorTest {
 		verify(fieldAccess, never()).replace(anyString());
 	}
 
-	@Test(expected = TransformationException.class)
+	@Test(expected = CannotCompileException.class)
 	public void testEditFieldAccessOnWrittenTargetField() throws Exception {
 		when(fieldAccess.isStatic()).thenReturn(Boolean.FALSE);
 		when(fieldAccess.isWriter()).thenReturn(Boolean.TRUE);
@@ -105,7 +107,7 @@ public class ContractMethodExpressionEditorTest {
 		editor.editFieldAccess(fieldAccess);
 	}
 
-	@Test(expected = TransformationException.class)
+	@Test(expected = CannotCompileException.class)
 	public void testEditFieldAccessOnWrittenStaticTargetField() throws Exception {
 		when(fieldAccess.isStatic()).thenReturn(Boolean.TRUE);
 		when(fieldAccess.isWriter()).thenReturn(Boolean.TRUE);
@@ -186,7 +188,7 @@ public class ContractMethodExpressionEditorTest {
 		assertEquals(1, editor.getStoreExpressions().size());
 	}
 
-	@Test(expected = TransformationException.class)
+	@Test(expected = CannotCompileException.class)
 	public void testEditMethodCallToOldWithMethodAndParameters() throws Exception {
 		when(methodCall.getMethod()).thenReturn(oldMethod);
 		editor.lastMethodCall = targetClass.getDeclaredMethod("someMethodWithParameters");

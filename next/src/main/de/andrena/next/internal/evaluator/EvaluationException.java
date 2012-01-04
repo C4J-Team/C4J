@@ -1,4 +1,4 @@
-package de.andrena.next.internal;
+package de.andrena.next.internal.evaluator;
 
 public class EvaluationException extends RuntimeException {
 

@@ -3,7 +3,7 @@ package de.andrena.next.internal.transformer;
 import javassist.CtClass;
 import javassist.CtConstructor;
 import javassist.CtNewConstructor;
-import de.andrena.next.internal.ContractRegistry.ContractInfo;
+import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 
 public class ConstructorTransformer extends AbstractContractClassTransformer {
 	public static final String CONSTRUCTOR_REPLACEMENT_NAME = "constructor$";

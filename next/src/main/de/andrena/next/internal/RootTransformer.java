@@ -14,10 +14,12 @@ import javassist.NotFoundException;
 import org.apache.log4j.Logger;
 
 import de.andrena.next.Contract;
-import de.andrena.next.internal.ContractRegistry.ContractInfo;
 import de.andrena.next.internal.transformer.AffectedClassTransformer;
 import de.andrena.next.internal.transformer.ContractClassTransformer;
+import de.andrena.next.internal.transformer.TransformationException;
 import de.andrena.next.internal.util.BackdoorAnnotationLoader;
+import de.andrena.next.internal.util.ContractRegistry;
+import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 
 public class RootTransformer implements ClassFileTransformer {
 

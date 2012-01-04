@@ -7,7 +7,7 @@ import javassist.CtClass;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 
-import de.andrena.next.internal.ContractRegistry.ContractInfo;
+import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 import static org.mockito.Mockito.mock;
 
 public class ContractDeclaredBehaviorTransformerTest {

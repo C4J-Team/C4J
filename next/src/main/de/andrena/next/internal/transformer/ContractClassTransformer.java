@@ -2,7 +2,7 @@ package de.andrena.next.internal.transformer;
 
 import javassist.ClassPool;
 import javassist.CtClass;
-import de.andrena.next.internal.ContractRegistry.ContractInfo;
+import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 
 public class ContractClassTransformer extends AbstractContractClassTransformer {
 

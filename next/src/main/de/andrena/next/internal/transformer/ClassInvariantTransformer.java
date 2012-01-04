@@ -8,13 +8,13 @@ import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.CtMethod;
 import de.andrena.next.ClassInvariant;
-import de.andrena.next.internal.ContractRegistry.ContractInfo;
-import de.andrena.next.internal.Evaluator;
 import de.andrena.next.internal.compiler.EmptyExp;
 import de.andrena.next.internal.compiler.NestedExp;
 import de.andrena.next.internal.compiler.StandaloneExp;
 import de.andrena.next.internal.compiler.StaticCallExp;
 import de.andrena.next.internal.compiler.ValueExp;
+import de.andrena.next.internal.evaluator.Evaluator;
+import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 
 public class ClassInvariantTransformer extends AbstractAffectedClassTransformer {
 

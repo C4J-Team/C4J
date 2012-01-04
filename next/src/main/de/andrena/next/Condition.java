@@ -1,6 +1,6 @@
 package de.andrena.next;
 
-import de.andrena.next.internal.Evaluator;
+import de.andrena.next.internal.evaluator.Evaluator;
 
 public class Condition {
 	@SuppressWarnings("unchecked")

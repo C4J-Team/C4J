@@ -1,4 +1,4 @@
-package de.andrena.next.internal;
+package de.andrena.next.internal.evaluator;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -11,7 +11,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.andrena.next.ClassInvariant;
-import de.andrena.next.internal.Evaluator.EvaluationPhase;
+import de.andrena.next.internal.evaluator.Evaluator;
+import de.andrena.next.internal.evaluator.Evaluator.EvaluationPhase;
 
 public class EvaluatorTest {
 

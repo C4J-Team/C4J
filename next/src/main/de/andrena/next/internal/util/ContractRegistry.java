@@ -1,4 +1,4 @@
-package de.andrena.next.internal;
+package de.andrena.next.internal.util;
 
 import java.util.Collections;
 import java.util.HashMap;

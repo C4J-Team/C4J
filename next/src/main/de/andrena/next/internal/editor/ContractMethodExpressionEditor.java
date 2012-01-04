@@ -1,4 +1,4 @@
-package de.andrena.next.internal;
+package de.andrena.next.internal.editor;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -24,7 +24,6 @@ import org.apache.log4j.Logger;
 import de.andrena.next.Condition;
 import de.andrena.next.Condition.PostCondition;
 import de.andrena.next.Condition.PreCondition;
-import de.andrena.next.internal.ContractRegistry.ContractInfo;
 import de.andrena.next.internal.compiler.ArrayExp;
 import de.andrena.next.internal.compiler.AssignmentExp;
 import de.andrena.next.internal.compiler.CastExp;
@@ -37,6 +36,8 @@ import de.andrena.next.internal.compiler.StandaloneExp;
 import de.andrena.next.internal.compiler.StaticCallExp;
 import de.andrena.next.internal.compiler.ThrowExp;
 import de.andrena.next.internal.compiler.ValueExp;
+import de.andrena.next.internal.evaluator.Evaluator;
+import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 
 public class ContractMethodExpressionEditor extends ExprEditor {
 	private Logger logger = Logger.getLogger(getClass());
@@ -65,17 +66,17 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 	}
 
 	@Override
+	public void edit(NewArray newArray) throws CannotCompileException {
+		arrayMembers.clear();
+	}
+
+	@Override
 	public void edit(FieldAccess fieldAccess) throws CannotCompileException {
 		try {
 			editFieldAccess(fieldAccess);
 		} catch (NotFoundException e) {
 			throw new CannotCompileException(e);
 		}
-	}
-
-	@Override
-	public void edit(NewArray newArray) throws CannotCompileException {
-		arrayMembers.clear();
 	}
 
 	void editFieldAccess(FieldAccess fieldAccess) throws NotFoundException, CannotCompileException {
@@ -85,7 +86,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		lastMethodCall = null;
 		logger.info("last field access: " + field.getName());
 		if (fieldAccess.isWriter() && !contract.getAllContractClasses().contains(field.getDeclaringClass())) {
-			throw new TransformationException("illegal write access on field '" + field.getName() + "'.");
+			throw new CannotCompileException("illegal write access on field '" + field.getName() + "'.");
 		}
 		if (!fieldAccess.isStatic() && field.getDeclaringClass().equals(contract.getTargetClass())) {
 			CastExp replacementCall = CastExp.forReturnType(new StaticCallExp(Evaluator.fieldAccess, new ValueExp(field
@@ -177,7 +178,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 			oldCall = new StaticCallExp(Evaluator.oldFieldAccess, new ValueExp(lastFieldAccess.getName()));
 		} else if (lastMethodCall != null) {
 			if (lastMethodCall.getParameterTypes().length > 0) {
-				throw new TransformationException("cannot use methods with parameters in old()");
+				throw new CannotCompileException("cannot use methods with parameters in old()");
 			}
 			storeLastMethodCall(lastMethodCall);
 			oldCall = new StaticCallExp(Evaluator.oldMethodCall, new ValueExp(lastMethodCall.getName()));
