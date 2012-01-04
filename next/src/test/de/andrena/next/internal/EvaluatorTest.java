@@ -168,6 +168,27 @@ public class EvaluatorTest {
 	}
 
 	@Test
+	public void testCallContractMethodRetainingState() {
+		Evaluator.evaluationPhase.set(EvaluationPhase.AFTER);
+		Evaluator.currentTarget.set(currentTarget);
+		Evaluator.callContractMethod(ContractClassRetainingState.class, "contractMethod", new Class<?>[0],
+				new Object[0]);
+		Evaluator.callContractMethod(ContractClassRetainingState.class, "contractMethod", new Class<?>[0],
+				new Object[0]);
+	}
+
+	public static class ContractClassRetainingState {
+		private static ContractClassRetainingState instance;
+
+		public void contractMethod() {
+			if (instance != null) {
+				assertTrue(this == instance);
+			}
+			instance = this;
+		}
+	}
+
+	@Test
 	public void testGetConditionReturnValue() {
 		Evaluator.contractReturnType.set(String.class);
 		assertNull(Evaluator.getConditionReturnValue());

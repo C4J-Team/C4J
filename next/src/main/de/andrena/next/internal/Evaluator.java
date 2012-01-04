@@ -9,6 +9,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import de.andrena.next.internal.compiler.StaticCall;
+import de.andrena.next.internal.util.ObjectMapper;
 
 public class Evaluator {
 	public static StaticCall before = new StaticCall(Evaluator.class, "before");
@@ -25,6 +26,8 @@ public class Evaluator {
 	public static StaticCall storeMethodCall = new StaticCall(Evaluator.class, "storeMethodCall");
 
 	private static Logger logger = Logger.getLogger(Evaluator.class);
+
+	private static ObjectMapper<Class<?>, Object> contractCache = new ObjectMapper<Class<?>, Object>();
 
 	private static Map<Class<?>, Object> primitiveReturnValues = new HashMap<Class<?>, Object>() {
 		private static final long serialVersionUID = 5365905181961089260L;
@@ -91,7 +94,6 @@ public class Evaluator {
 	public static Object fieldAccess(String fieldName) {
 		try {
 			Object target = Evaluator.currentTarget.get();
-			System.out.println(target.getClass());
 			Field field = target.getClass().getDeclaredField(fieldName);
 			field.setAccessible(true);
 			return field.get(target);
@@ -103,7 +105,6 @@ public class Evaluator {
 	public static Object methodCall(String methodName, Class<?>[] argTypes, Object[] args) {
 		try {
 			Object target = Evaluator.currentTarget.get();
-			System.out.println(target);
 			Method method = target.getClass().getDeclaredMethod(methodName, argTypes);
 			method.setAccessible(true);
 			return method.invoke(target, args);
@@ -150,7 +151,13 @@ public class Evaluator {
 	static void callContractMethod(Class<?> contractClass, String methodName, Class<?>[] argTypes, Object[] args)
 			throws AssertionError {
 		try {
-			Object contract = contractClass.newInstance();
+			Object contract;
+			if (contractCache.contains(Evaluator.currentTarget, contractClass)) {
+				contract = contractCache.get(Evaluator.currentTarget, contractClass);
+			} else {
+				contract = contractClass.newInstance();
+				contractCache.put(Evaluator.currentTarget, contractClass, contract);
+			}
 			Method method = contractClass.getDeclaredMethod(methodName, argTypes);
 			method.setAccessible(true);
 			logger.info("setting return type for " + method.getName() + " to " + method.getReturnType());
