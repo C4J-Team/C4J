@@ -202,28 +202,29 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		logger.info("beginning to store fields and methods for unchanged");
 		StandaloneExp replacementCall = new EmptyExp();
 		for (CtMember arrayMember : arrayMembers) {
-			NestedExp equalExpLeft;
-			NestedExp equalExpRight;
-			if (arrayMember instanceof CtField) {
-				storeLastFieldAccess((CtField) arrayMember);
-				equalExpLeft = new StaticCallExp(Evaluator.fieldAccess, new ValueExp(arrayMember.getName()));
-				equalExpRight = new StaticCallExp(Evaluator.oldFieldAccess, new ValueExp(arrayMember.getName()));
-			} else {
-				storeLastMethodCall((CtMethod) arrayMember);
-				// equalExpLeft = NestedExp.method(arrayMember.getName());
-				equalExpLeft = new StaticCallExp(Evaluator.methodCall, new ValueExp(arrayMember.getName()),
-						new ArrayExp(Class.class), new ArrayExp(Object.class));
-				equalExpRight = new StaticCallExp(Evaluator.oldMethodCall, new ValueExp(arrayMember.getName()));
-			}
-			IfExp condition = new IfExp(new CompareExp(equalExpLeft).isNotEqual(equalExpRight));
-			condition
-					.addIfBody(new ThrowExp(new ConstructorExp(AssertionError.class, new CastExp(Object.class,
-							new ValueExp("the value from member " + arrayMember.getName()
-									+ " was changed although being declared unchanged in "
-									+ contractBehavior.getLongName())))));
-			replacementCall = replacementCall.append(condition);
+			replacementCall = replacementCall.append(getReplacementCallForArrayMember(arrayMember));
 		}
 		logger.info("replacement code for unchanged: " + replacementCall.getCode());
 		methodCall.replace(replacementCall.getCode());
+	}
+
+	private StandaloneExp getReplacementCallForArrayMember(CtMember arrayMember) {
+		NestedExp equalExpLeft;
+		NestedExp equalExpRight;
+		if (arrayMember instanceof CtField) {
+			storeLastFieldAccess((CtField) arrayMember);
+			equalExpLeft = new StaticCallExp(Evaluator.fieldAccess, new ValueExp(arrayMember.getName()));
+			equalExpRight = new StaticCallExp(Evaluator.oldFieldAccess, new ValueExp(arrayMember.getName()));
+		} else {
+			storeLastMethodCall((CtMethod) arrayMember);
+			equalExpLeft = new StaticCallExp(Evaluator.methodCall, new ValueExp(arrayMember.getName()), new ArrayExp(
+					Class.class), new ArrayExp(Object.class));
+			equalExpRight = new StaticCallExp(Evaluator.oldMethodCall, new ValueExp(arrayMember.getName()));
+		}
+		IfExp condition = new IfExp(new CompareExp(equalExpLeft).isNotEqual(equalExpRight));
+		condition.addIfBody(new ThrowExp(new ConstructorExp(AssertionError.class, new CastExp(Object.class,
+				new ValueExp("the value from member " + arrayMember.getName()
+						+ " was changed although being declared unchanged in " + contractBehavior.getLongName())))));
+		return condition;
 	}
 }
