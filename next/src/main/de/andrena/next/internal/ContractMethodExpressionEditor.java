@@ -123,6 +123,11 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		CtMethod method = methodCall.getMethod();
 		if (method.getDeclaringClass().equals(contract.getTargetClass())
 				|| method.getDeclaringClass().equals(contract.getContractClass())) {
+			try {
+				contract.getTargetClass().getMethod(method.getName(), method.getSignature());
+			} catch (NotFoundException e) {
+				return;
+			}
 			handleTargetMethodCall(methodCall);
 		} else if (method.getDeclaringClass().getName().equals(Condition.class.getName())
 				&& method.getName().equals("old")) {

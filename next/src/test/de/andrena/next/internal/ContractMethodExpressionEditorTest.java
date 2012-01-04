@@ -139,6 +139,15 @@ public class ContractMethodExpressionEditorTest {
 	}
 
 	@Test
+	public void testEditMethodCallToContractOnlyMethod() throws Exception {
+		when(methodCall.getMethod()).thenReturn(contractClass.getDeclaredMethod("contractOnlyMethod"));
+		editor.editMethodCall(methodCall);
+		verify(methodCall, never()).replace(anyString());
+		assertNull(editor.lastMethodCall);
+		assertNull(editor.lastFieldAccess);
+	}
+
+	@Test
 	public void testEditMethodCallToOverriddenContractMethod() throws Exception {
 		when(methodCall.getMethod()).thenReturn(contractClass.getDeclaredMethod("someMethod"));
 		editor.editMethodCall(methodCall);
@@ -196,6 +205,9 @@ public class ContractMethodExpressionEditorTest {
 
 		@Override
 		public void someMethod() {
+		}
+
+		public void contractOnlyMethod() {
 		}
 	}
 

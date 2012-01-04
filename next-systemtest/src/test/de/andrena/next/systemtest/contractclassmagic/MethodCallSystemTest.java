@@ -14,27 +14,33 @@ public class MethodCallSystemTest {
 	@Rule
 	public TransformerAwareRule transformerAware = new TransformerAwareRule();
 
-	private DummyClass dummy;
+	private TargetClass target;
 
 	@Before
 	public void before() {
-		dummy = new DummyClass();
+		target = new TargetClass();
 	}
 
 	@Test
 	public void testPreConditionWithMethodAccess() {
-		dummy.setValue(5);
-		dummy.methodContractHasMethodAccess();
+		target.setValue(5);
+		target.methodContractHasMethodAccess();
 	}
 
 	@Test
 	public void testPreConditionWithMethodAccessAndMethodAlsoInContract() {
-		dummy.setValue(5);
-		dummy.methodContractHasMethodAccessAndMethodAlsoInContract();
+		target.setValue(5);
+		target.methodContractHasMethodAccessAndMethodAlsoInContract();
 	}
 
-	@Contract(DummyContract.class)
-	public static class DummyClass {
+	@Test
+	public void testPreConditionWithMethodAccessOnContractOnly() {
+		target.setValue(5);
+		target.methodContractHasMethodAccessOnContractOnly();
+	}
+
+	@Contract(ContractClass.class)
+	public static class TargetClass {
 		protected int value;
 
 		public void setValue(int value) {
@@ -54,9 +60,12 @@ public class MethodCallSystemTest {
 
 		public void methodContractHasMethodAccessAndMethodAlsoInContract() {
 		}
+
+		public void methodContractHasMethodAccessOnContractOnly() {
+		}
 	}
 
-	public static class DummyContract extends DummyClass {
+	public static class ContractClass extends TargetClass {
 		@Override
 		public void methodContractHasMethodAccess() {
 			new PreCondition() {
@@ -78,6 +87,19 @@ public class MethodCallSystemTest {
 		@Override
 		protected int getValueAlsoInContract() {
 			return ignored();
+		}
+
+		@Override
+		public void methodContractHasMethodAccessOnContractOnly() {
+			new PreCondition() {
+				{
+					assert getValue() == getFive();
+				}
+			};
+		}
+
+		public int getFive() {
+			return 5;
 		}
 	}
 }
