@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 
+import javassist.ClassPool;
+
 import org.junit.Test;
 
 import de.andrena.next.internal.compiler.NestedExp.CodeNestedExp;
@@ -33,6 +35,27 @@ public class NestedExpTest {
 	@Test
 	public void testField() {
 		assertEquals("this.someField", NestedExp.field("someField").getCode());
+	}
+
+	@Test
+	public void testFieldForParentClass() throws Exception {
+		assertEquals("de.andrena.next.internal.compiler.NestedExpTest.this.someField",
+				NestedExp.field("someField", ClassPool.getDefault().get(getClass().getName())).getCode());
+	}
+
+	@Test
+	public void testFieldForParentNestedClass() throws Exception {
+		assertEquals("de.andrena.next.internal.compiler.NestedExpTest.NestedClass.this.someField",
+				NestedExp.field("someField", ClassPool.getDefault().get(NestedClass.class.getName())).getCode());
+	}
+
+	public static class NestedClass {
+	}
+
+	@Test
+	public void testMethod() {
+		assertEquals("someMethod(\"firstValue\", \"secondValue\")",
+				NestedExp.method("someMethod", new ValueExp("firstValue"), new ValueExp("secondValue")).getCode());
 	}
 
 	@Test

@@ -7,13 +7,16 @@ import java.util.Set;
 
 import javassist.CannotCompileException;
 import javassist.ClassPool;
+import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.CtField;
+import javassist.CtMember;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 import javassist.expr.ExprEditor;
 import javassist.expr.FieldAccess;
 import javassist.expr.MethodCall;
+import javassist.expr.NewArray;
 import javassist.expr.NewExpr;
 
 import org.apache.log4j.Logger;
@@ -25,28 +28,36 @@ import de.andrena.next.internal.ContractRegistry.ContractInfo;
 import de.andrena.next.internal.compiler.ArrayExp;
 import de.andrena.next.internal.compiler.AssignmentExp;
 import de.andrena.next.internal.compiler.CastExp;
+import de.andrena.next.internal.compiler.CompareExp;
+import de.andrena.next.internal.compiler.ConstructorExp;
+import de.andrena.next.internal.compiler.EmptyExp;
 import de.andrena.next.internal.compiler.IfExp;
 import de.andrena.next.internal.compiler.NestedExp;
 import de.andrena.next.internal.compiler.StandaloneExp;
 import de.andrena.next.internal.compiler.StaticCallExp;
+import de.andrena.next.internal.compiler.ThrowExp;
 import de.andrena.next.internal.compiler.ValueExp;
 
 public class ContractMethodExpressionEditor extends ExprEditor {
 	private Logger logger = Logger.getLogger(getClass());
 	CtMethod lastMethodCall;
 	CtField lastFieldAccess;
+	List<CtMember> arrayMembers = new ArrayList<CtMember>();
 	private List<StaticCallExp> storeExpressions = new ArrayList<StaticCallExp>();
 	private Set<CtClass> nestedInnerClasses = new HashSet<CtClass>();
 	private ClassPool pool;
 	private ContractInfo contract;
+	private CtBehavior contractBehavior;
 
 	public List<StaticCallExp> getStoreExpressions() {
 		return storeExpressions;
 	}
 
-	public ContractMethodExpressionEditor(ContractInfo contract, ClassPool pool) throws NotFoundException {
+	public ContractMethodExpressionEditor(ContractInfo contract, ClassPool pool, CtBehavior contractBehavior)
+			throws NotFoundException {
 		this.contract = contract;
 		this.pool = pool;
+		this.contractBehavior = contractBehavior;
 	}
 
 	public Set<CtClass> getNestedInnerClasses() {
@@ -62,9 +73,15 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		}
 	}
 
+	@Override
+	public void edit(NewArray newArray) throws CannotCompileException {
+		arrayMembers.clear();
+	}
+
 	void editFieldAccess(FieldAccess fieldAccess) throws NotFoundException, CannotCompileException {
 		CtField field = fieldAccess.getField();
 		lastFieldAccess = field;
+		arrayMembers.add(field);
 		lastMethodCall = null;
 		logger.info("last field access: " + field.getName());
 		if (fieldAccess.isWriter() && !contract.getAllContractClasses().contains(field.getDeclaringClass())) {
@@ -129,15 +146,19 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 				return;
 			}
 			handleTargetMethodCall(methodCall);
-		} else if (method.getDeclaringClass().getName().equals(Condition.class.getName())
-				&& method.getName().equals("old")) {
-			handleOldMethodCall(methodCall);
+		} else if (method.getDeclaringClass().getName().equals(Condition.class.getName())) {
+			if (method.getName().equals("old")) {
+				handleOldMethodCall(methodCall);
+			} else if (method.getName().equals("unchanged")) {
+				handleUnchangedMethodCall(methodCall);
+			}
 		}
 	}
 
 	private void handleTargetMethodCall(MethodCall methodCall) throws NotFoundException, CannotCompileException {
 		CtMethod method = methodCall.getMethod();
 		lastMethodCall = method;
+		arrayMembers.add(method);
 		lastFieldAccess = null;
 		logger.info("last method call: " + lastMethodCall);
 		logger.info("replacing call to " + methodCall.getClassName() + "." + methodCall.getMethodName());
@@ -152,21 +173,57 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 	private void handleOldMethodCall(MethodCall methodCall) throws NotFoundException, CannotCompileException {
 		StaticCallExp oldCall = null;
 		if (lastFieldAccess != null) {
-			logger.info("storing field access to " + lastFieldAccess);
-			storeExpressions
-					.add(new StaticCallExp(Evaluator.storeFieldAccess, new ValueExp(lastFieldAccess.getName())));
+			storeLastFieldAccess(lastFieldAccess);
 			oldCall = new StaticCallExp(Evaluator.oldFieldAccess, new ValueExp(lastFieldAccess.getName()));
 		} else if (lastMethodCall != null) {
 			if (lastMethodCall.getParameterTypes().length > 0) {
 				throw new TransformationException("cannot use methods with parameters in old()");
 			}
-			logger.info("storing method call to " + lastMethodCall);
-			storeExpressions.add(new StaticCallExp(Evaluator.storeMethodCall, new ValueExp(lastMethodCall.getName())));
+			storeLastMethodCall(lastMethodCall);
 			oldCall = new StaticCallExp(Evaluator.oldMethodCall, new ValueExp(lastMethodCall.getName()));
 		}
 		if (oldCall != null) {
 			AssignmentExp assignmentExp = new AssignmentExp(NestedExp.RETURN_VALUE, oldCall);
 			methodCall.replace(assignmentExp.toStandalone().getCode());
 		}
+	}
+
+	private void storeLastMethodCall(CtMethod method) {
+		logger.info("storing method call to " + method);
+		storeExpressions.add(new StaticCallExp(Evaluator.storeMethodCall, new ValueExp(method.getName())));
+	}
+
+	private void storeLastFieldAccess(CtField field) {
+		logger.info("storing field access to " + field);
+		storeExpressions.add(new StaticCallExp(Evaluator.storeFieldAccess, new ValueExp(field.getName())));
+	}
+
+	private void handleUnchangedMethodCall(MethodCall methodCall) throws CannotCompileException, NotFoundException {
+		logger.info("beginning to store fields and methods for unchanged");
+		StandaloneExp replacementCall = new EmptyExp();
+		for (CtMember arrayMember : arrayMembers) {
+			NestedExp equalExpLeft;
+			NestedExp equalExpRight;
+			if (arrayMember instanceof CtField) {
+				storeLastFieldAccess((CtField) arrayMember);
+				equalExpLeft = new StaticCallExp(Evaluator.fieldAccess, new ValueExp(arrayMember.getName()));
+				equalExpRight = new StaticCallExp(Evaluator.oldFieldAccess, new ValueExp(arrayMember.getName()));
+			} else {
+				storeLastMethodCall((CtMethod) arrayMember);
+				// equalExpLeft = NestedExp.method(arrayMember.getName());
+				equalExpLeft = new StaticCallExp(Evaluator.methodCall, new ValueExp(arrayMember.getName()),
+						new ArrayExp(Class.class), new ArrayExp(Object.class));
+				equalExpRight = new StaticCallExp(Evaluator.oldMethodCall, new ValueExp(arrayMember.getName()));
+			}
+			IfExp condition = new IfExp(new CompareExp(equalExpLeft).isNotEqual(equalExpRight));
+			condition
+					.addIfBody(new ThrowExp(new ConstructorExp(AssertionError.class, new CastExp(Object.class,
+							new ValueExp("the value from member " + arrayMember.getName()
+									+ " was changed although being declared unchanged in "
+									+ contractBehavior.getLongName())))));
+			replacementCall = replacementCall.append(condition);
+		}
+		logger.info("replacement code for unchanged: " + replacementCall.getCode());
+		methodCall.replace(replacementCall.getCode());
 	}
 }

@@ -10,7 +10,7 @@ public class BooleanExp extends NestedExp {
 		this(exp.getCode());
 	}
 
-	private BooleanExp(String code) {
+	protected BooleanExp(String code) {
 		this.code = code;
 	}
 

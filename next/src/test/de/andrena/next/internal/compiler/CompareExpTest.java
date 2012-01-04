@@ -17,6 +17,11 @@ public class CompareExpTest {
 	}
 
 	@Test
+	public void testNe() {
+		assertEquals("(4 != 5)", new CompareExp(new ValueExp(4)).ne(new ValueExp(5)).getCode());
+	}
+
+	@Test
 	public void testGt() {
 		assertEquals("(4 > 5)", new CompareExp(new ValueExp(4)).gt(new ValueExp(5)).getCode());
 	}
@@ -34,5 +39,17 @@ public class CompareExpTest {
 	@Test
 	public void testLe() {
 		assertEquals("(4 <= 5)", new CompareExp(new ValueExp(4)).le(new ValueExp(5)).getCode());
+	}
+
+	@Test
+	public void testIsEqual() {
+		assertEquals("\"firstString\".equals(\"secondString\")",
+				new CompareExp(new ValueExp("firstString")).isEqual(new ValueExp("secondString")).getCode());
+	}
+
+	@Test
+	public void testIsNotEqual() {
+		assertEquals("!\"firstString\".equals(\"secondString\")", new CompareExp(new ValueExp("firstString"))
+				.isNotEqual(new ValueExp("secondString")).getCode());
 	}
 }

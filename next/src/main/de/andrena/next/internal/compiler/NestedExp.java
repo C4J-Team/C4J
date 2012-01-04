@@ -2,6 +2,7 @@ package de.andrena.next.internal.compiler;
 
 import java.util.List;
 
+import javassist.CtClass;
 import de.andrena.next.internal.compiler.StandaloneExp.CodeStandaloneExp;
 
 public abstract class NestedExp extends Exp {
@@ -15,6 +16,19 @@ public abstract class NestedExp extends Exp {
 
 	public static NestedExp field(String name) {
 		return new CodeNestedExp("this." + name);
+	}
+
+	/**
+	 * Not supported by Javassist yet.
+	 */
+	public static NestedExp field(String name, CtClass parentClass) {
+		return new CodeNestedExp(parentClass.getName().replace('$', '.') + ".this." + name);
+	}
+
+	public static NestedExp method(String name, NestedExp... params) {
+		CodeNestedExp exp = new CodeNestedExp(name);
+		exp.append(exp.getCodeForParams(params));
+		return exp;
 	}
 
 	public StandaloneExp toStandalone() {
@@ -51,6 +65,10 @@ public abstract class NestedExp extends Exp {
 
 		public CodeNestedExp(String code) {
 			this.code = code;
+		}
+
+		public void append(String code) {
+			this.code += code;
 		}
 
 		@Override

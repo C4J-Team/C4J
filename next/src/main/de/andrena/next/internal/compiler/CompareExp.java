@@ -1,6 +1,6 @@
 package de.andrena.next.internal.compiler;
 
-public class CompareExp extends NestedExp {
+public class CompareExp extends BooleanExp {
 	private String code;
 
 	public CompareExp(NestedExp exp) {
@@ -8,11 +8,16 @@ public class CompareExp extends NestedExp {
 	}
 
 	private CompareExp(String code) {
+		super(code);
 		this.code = code;
 	}
 
 	public CompareExp eq(NestedExp exp) {
 		return new CompareExp("(" + code + " == " + exp.getCode() + ")");
+	}
+
+	public CompareExp ne(NestedExp exp) {
+		return new CompareExp("(" + code + " != " + exp.getCode() + ")");
 	}
 
 	public CompareExp gt(NestedExp exp) {
@@ -29,6 +34,14 @@ public class CompareExp extends NestedExp {
 
 	public CompareExp le(NestedExp exp) {
 		return new CompareExp("(" + code + " <= " + exp.getCode() + ")");
+	}
+
+	public CompareExp isEqual(NestedExp exp) {
+		return new CompareExp(code + ".equals(" + exp.getCode() + ")");
+	}
+
+	public CompareExp isNotEqual(NestedExp exp) {
+		return new CompareExp("!" + code + ".equals(" + exp.getCode() + ")");
 	}
 
 	@Override

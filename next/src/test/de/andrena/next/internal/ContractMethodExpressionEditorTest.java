@@ -37,6 +37,7 @@ public class ContractMethodExpressionEditorTest {
 	private CtMethod oldMethod;
 	private CtClass innerPreConditionClass;
 	private CtClass innerPostConditionClass;
+	private CtMethod unchangedMethod;
 
 	@Before
 	public void before() throws Exception {
@@ -48,12 +49,14 @@ public class ContractMethodExpressionEditorTest {
 		contract.addInnerContractClass(innerPreConditionClass);
 		innerPostConditionClass = pool.get(DummyPostCondition.class.getName());
 		contract.addInnerContractClass(innerPostConditionClass);
-		editor = new ContractMethodExpressionEditor(contract, pool);
+		editor = new ContractMethodExpressionEditor(contract, pool, contractClass.getDeclaredMethod("someMethod"));
 		fieldAccess = mock(FieldAccess.class);
 		when(fieldAccess.getField()).thenReturn(targetClass.getDeclaredField("someField"));
 		newExpr = mock(NewExpr.class);
 		methodCall = mock(MethodCall.class);
-		oldMethod = pool.get(Condition.class.getName()).getDeclaredMethod("old");
+		CtClass conditionClass = pool.get(Condition.class.getName());
+		oldMethod = conditionClass.getDeclaredMethod("old");
+		unchangedMethod = conditionClass.getDeclaredMethod("unchanged");
 	}
 
 	@Test
@@ -188,6 +191,34 @@ public class ContractMethodExpressionEditorTest {
 		when(methodCall.getMethod()).thenReturn(oldMethod);
 		editor.lastMethodCall = targetClass.getDeclaredMethod("someMethodWithParameters");
 		editor.editMethodCall(methodCall);
+	}
+
+	@Test
+	public void testEditMethodCallToUnchangedWithField() throws Exception {
+		when(methodCall.getMethod()).thenReturn(unchangedMethod);
+		editor.arrayMembers.add(targetClass.getDeclaredField("someField"));
+		editor.editMethodCall(methodCall);
+		verify(methodCall).replace(anyString());
+		assertEquals(1, editor.getStoreExpressions().size());
+	}
+
+	@Test
+	public void testEditMethodCallToUnchangedWithMethod() throws Exception {
+		when(methodCall.getMethod()).thenReturn(unchangedMethod);
+		editor.arrayMembers.add(targetClass.getDeclaredMethod("someMethod"));
+		editor.editMethodCall(methodCall);
+		verify(methodCall).replace(anyString());
+		assertEquals(1, editor.getStoreExpressions().size());
+	}
+
+	@Test
+	public void testEditMethodCallToUnchangedWithFieldAndMethod() throws Exception {
+		when(methodCall.getMethod()).thenReturn(unchangedMethod);
+		editor.arrayMembers.add(targetClass.getDeclaredField("someField"));
+		editor.arrayMembers.add(targetClass.getDeclaredMethod("someMethod"));
+		editor.editMethodCall(methodCall);
+		verify(methodCall).replace(anyString());
+		assertEquals(2, editor.getStoreExpressions().size());
 	}
 
 	public static class TargetClass {

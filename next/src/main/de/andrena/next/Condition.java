@@ -16,8 +16,11 @@ public class Condition {
 		return Evaluator.<T> getConditionReturnValue();
 	}
 
-	public static <T> T old(T obj) {
-		return obj;
+	public static <T> T old(T fieldOrMethodWithoutParameters) {
+		return fieldOrMethodWithoutParameters;
+	}
+
+	public static void unchanged(Object... fieldOrMethodWithoutParameters) {
 	}
 
 	public interface PreCondition {
