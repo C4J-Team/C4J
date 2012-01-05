@@ -11,9 +11,8 @@ public class Condition {
 		return Evaluator.isAfter();
 	}
 
-	@SuppressWarnings("unchecked")
 	public static <T> T result(Class<T> returnType) {
-		return (T) Evaluator.getReturnValue();
+		return Evaluator.<T> getReturnValue();
 	}
 
 	public static Object result() {

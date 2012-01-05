@@ -113,8 +113,9 @@ public class Evaluator {
 		}
 	}
 
-	public static Object getReturnValue() {
-		return Evaluator.returnValue.get();
+	@SuppressWarnings("unchecked")
+	public static <T> T getReturnValue() {
+		return (T) Evaluator.returnValue.get();
 	}
 
 	public static void before(Object target, Class<?> contractClass, String methodName, Class<?>[] argTypes,
