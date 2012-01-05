@@ -1,7 +1,7 @@
 package de.andrena.next.acceptancetest.s2;
 
-import static de.andrena.next.Condition.PreCondition;
 import static de.andrena.next.Condition.ignored;
+import static de.andrena.next.Condition.pre;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -18,7 +18,7 @@ public class NNPreS2Test {
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
-	
+
 	private MiniStack<String> dummy;
 
 	@Before
@@ -41,7 +41,7 @@ public class NNPreS2Test {
 	public static interface MiniStack<T> {
 		public T get(int index);
 	}
-	
+
 	public static class MiniStringStack implements MiniStack<String> {
 		@Override
 		public String get(int index) {
@@ -52,11 +52,9 @@ public class NNPreS2Test {
 	public static class MiniStackContract<T> implements MiniStack<T> {
 		@Override
 		public T get(final int index) {
-			new PreCondition() {
-				{
-					assert index > 0 : "index greater 0";
-				}
-			};
+			if (pre()) {
+				assert index > 0 : "index greater 0";
+			}
 			return ignored();
 		}
 	}

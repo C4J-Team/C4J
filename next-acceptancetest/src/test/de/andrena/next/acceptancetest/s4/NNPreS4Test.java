@@ -1,6 +1,7 @@
 package de.andrena.next.acceptancetest.s4;
 
 import static de.andrena.next.Condition.ignored;
+import static de.andrena.next.Condition.pre;
 import static org.junit.matchers.JUnitMatchers.containsString;
 
 import org.junit.Before;
@@ -8,7 +9,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import de.andrena.next.Condition.PreCondition;
 import de.andrena.next.Contract;
 import de.andrena.next.systemtest.TransformerAwareRule;
 
@@ -81,33 +81,29 @@ public class NNPreS4Test {
 	public static class MiniCollectionContract<T> extends MiniCollection<T> {
 		@Override
 		public T get(final int index) {
-			new PreCondition() {
-				{
-					assert index > 0 : "index greater 0";
-				}
-			};
+			if (pre()) {
+				assert index > 0 : "index greater 0";
+			}
 			return ignored();
 		}
 
+		@Override
 		public void insertAt(final int index, final T value) {
-			new PreCondition() {
-				{
-					assert index > 0 : "index greater 0";
-					assert value != null : "value must not be null";
-				}
-			};
+			if (pre()) {
+				assert index > 0 : "index greater 0";
+				assert value != null : "value must not be null";
+			}
 		};
 
+		@Override
 		public void append(final T... values) {
-			new PreCondition() {
-				{
-					assert values != null : "values must not be null";
-					assert values.length > 0 : "values must at least contain one element";
-					for (T value : values) {
-						assert value != null : "values must not contain null elements";
-					}
+			if (pre()) {
+				assert values != null : "values must not be null";
+				assert values.length > 0 : "values must at least contain one element";
+				for (T value : values) {
+					assert value != null : "values must not contain null elements";
 				}
-			};
+			}
 		};
 	}
 
