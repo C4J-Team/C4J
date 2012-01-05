@@ -1,12 +1,12 @@
 package de.andrena.next.systemtest.contractclassmagic;
 
 import static de.andrena.next.Condition.ignored;
+import static de.andrena.next.Condition.pre;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import de.andrena.next.Condition.PreCondition;
 import de.andrena.next.Contract;
 import de.andrena.next.systemtest.TransformerAwareRule;
 
@@ -68,20 +68,16 @@ public class MethodCallSystemTest {
 	public static class ContractClass extends TargetClass {
 		@Override
 		public void methodContractHasMethodAccess() {
-			new PreCondition() {
-				{
-					assert getValue() == 5;
-				}
-			};
+			if (pre()) {
+				assert getValue() == 5;
+			}
 		}
 
 		@Override
 		public void methodContractHasMethodAccessAndMethodAlsoInContract() {
-			new PreCondition() {
-				{
-					assert getValueAlsoInContract() == 5;
-				}
-			};
+			if (pre()) {
+				assert getValueAlsoInContract() == 5;
+			}
 		}
 
 		@Override
@@ -91,11 +87,9 @@ public class MethodCallSystemTest {
 
 		@Override
 		public void methodContractHasMethodAccessOnContractOnly() {
-			new PreCondition() {
-				{
-					assert getValue() == getFive();
-				}
-			};
+			if (pre()) {
+				assert getValue() == getFive();
+			}
 		}
 
 		public int getFive() {

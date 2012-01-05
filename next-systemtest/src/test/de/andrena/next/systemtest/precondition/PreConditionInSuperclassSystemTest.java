@@ -1,10 +1,11 @@
 package de.andrena.next.systemtest.precondition;
 
+import static de.andrena.next.Condition.pre;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import de.andrena.next.Condition.PreCondition;
 import de.andrena.next.Contract;
 import de.andrena.next.systemtest.TransformerAwareRule;
 
@@ -49,11 +50,9 @@ public class PreConditionInSuperclassSystemTest {
 	public static class DummyContract extends DummyClass {
 		@Override
 		public void method(final int arg) {
-			new PreCondition() {
-				{
-					assert arg < 5;
-				}
-			};
+			if (pre()) {
+				assert arg < 5;
+			}
 		}
 	}
 
@@ -67,11 +66,9 @@ public class PreConditionInSuperclassSystemTest {
 	public static class DummyContractDeclaringMethod extends DummyClassDeclaringMethod {
 		@Override
 		public void method(final int arg) {
-			new PreCondition() {
-				{
-					assert arg < 5;
-				}
-			};
+			if (pre()) {
+				assert arg < 5;
+			}
 		}
 	}
 
@@ -84,11 +81,9 @@ public class PreConditionInSuperclassSystemTest {
 	public static class SuperContract extends SuperClass {
 		@Override
 		public void method(final int arg) {
-			new PreCondition() {
-				{
-					assert arg > 0;
-				}
-			};
+			if (pre()) {
+				assert arg > 0;
+			}
 		}
 	}
 }

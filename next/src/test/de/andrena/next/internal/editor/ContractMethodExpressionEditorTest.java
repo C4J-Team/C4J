@@ -2,7 +2,6 @@ package de.andrena.next.internal.editor;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.contains;
 import static org.mockito.Mockito.mock;
@@ -18,14 +17,11 @@ import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.expr.FieldAccess;
 import javassist.expr.MethodCall;
-import javassist.expr.NewExpr;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import de.andrena.next.Condition;
-import de.andrena.next.Condition.PostCondition;
-import de.andrena.next.Condition.PreCondition;
 import de.andrena.next.internal.util.ContractRegistry;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 
@@ -35,13 +31,11 @@ public class ContractMethodExpressionEditorTest {
 	private ContractInfo contract;
 	private ContractMethodExpressionEditor editor;
 	private FieldAccess fieldAccess;
-	private NewExpr newExpr;
 	private MethodCall methodCall;
 	private CtClass targetClass;
 	private CtClass contractClass;
 	private CtMethod oldMethod;
-	private CtClass innerPreConditionClass;
-	private CtClass innerPostConditionClass;
+	private CtClass innerContractClass;
 	private CtMethod unchangedMethod;
 
 	@Before
@@ -50,14 +44,11 @@ public class ContractMethodExpressionEditorTest {
 		targetClass = pool.get(TargetClass.class.getName());
 		contractClass = pool.get(ContractClass.class.getName());
 		contract = new ContractRegistry().registerContract(targetClass, contractClass);
-		innerPreConditionClass = pool.get(DummyPreCondition.class.getName());
-		contract.addInnerContractClass(innerPreConditionClass);
-		innerPostConditionClass = pool.get(DummyPostCondition.class.getName());
-		contract.addInnerContractClass(innerPostConditionClass);
-		editor = new ContractMethodExpressionEditor(contract, pool, contractClass.getDeclaredMethod("someMethod"));
+		innerContractClass = pool.get(DummyInnerContractClass.class.getName());
+		contract.addInnerContractClass(innerContractClass);
+		editor = new ContractMethodExpressionEditor(contract, contractClass.getDeclaredMethod("someMethod"));
 		fieldAccess = mock(FieldAccess.class);
 		when(fieldAccess.getField()).thenReturn(targetClass.getDeclaredField("someField"));
-		newExpr = mock(NewExpr.class);
 		methodCall = mock(MethodCall.class);
 		CtClass conditionClass = pool.get(Condition.class.getName());
 		oldMethod = conditionClass.getDeclaredMethod("old");
@@ -117,7 +108,7 @@ public class ContractMethodExpressionEditorTest {
 
 	@Test
 	public void testEditFieldAccessOnWrittenInnerContractField() throws Exception {
-		when(fieldAccess.getField()).thenReturn(innerPreConditionClass.getDeclaredField("innerContractField"));
+		when(fieldAccess.getField()).thenReturn(innerContractClass.getDeclaredField("innerContractField"));
 		when(fieldAccess.isStatic()).thenReturn(Boolean.FALSE);
 		when(fieldAccess.isWriter()).thenReturn(Boolean.TRUE);
 		editor.editFieldAccess(fieldAccess);
@@ -128,26 +119,6 @@ public class ContractMethodExpressionEditorTest {
 		when(fieldAccess.isStatic()).thenReturn(Boolean.TRUE);
 		when(fieldAccess.isWriter()).thenReturn(Boolean.TRUE);
 		editor.editFieldAccess(fieldAccess);
-	}
-
-	@Test
-	public void testEditNewExpressionPreCondition() throws Exception {
-		CtClass preConditionClass = pool.get(DummyPreCondition.class.getName());
-		when(newExpr.getClassName()).thenReturn(DummyPreCondition.class.getName());
-		editor.editNewExpression(newExpr);
-		verify(newExpr).replace(anyString());
-		assertTrue(contract.getInnerContractClasses().contains(preConditionClass));
-		assertTrue(editor.getAndClearNestedInnerClasses().contains(preConditionClass));
-	}
-
-	@Test
-	public void testEditNewExpressionPostCondition() throws Exception {
-		CtClass postConditionClass = pool.get(DummyPostCondition.class.getName());
-		when(newExpr.getClassName()).thenReturn(DummyPostCondition.class.getName());
-		editor.editNewExpression(newExpr);
-		verify(newExpr).replace(anyString());
-		assertTrue(contract.getInnerContractClasses().contains(postConditionClass));
-		assertTrue(editor.getAndClearNestedInnerClasses().contains(postConditionClass));
 	}
 
 	@Test
@@ -260,11 +231,8 @@ public class ContractMethodExpressionEditorTest {
 		}
 	}
 
-	public static class DummyPreCondition implements PreCondition {
+	public static class DummyInnerContractClass {
 		protected String innerContractField;
-	}
-
-	public static class DummyPostCondition implements PostCondition {
 	}
 
 }

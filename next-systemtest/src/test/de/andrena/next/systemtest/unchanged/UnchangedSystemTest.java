@@ -1,11 +1,11 @@
 package de.andrena.next.systemtest.unchanged;
 
+import static de.andrena.next.Condition.post;
 import static de.andrena.next.Condition.unchanged;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import de.andrena.next.Condition.PostCondition;
 import de.andrena.next.Contract;
 
 public class UnchangedSystemTest {
@@ -62,30 +62,24 @@ public class UnchangedSystemTest {
 	public static class ContractClass extends TargetClass {
 		@Override
 		public void setHour(int hour) {
-			new PostCondition() {
-				{
-					unchanged(minute);
-					unchanged(getMinute());
-				}
-			};
+			if (post()) {
+				unchanged(minute);
+				unchanged(getMinute());
+			}
 		}
 
 		@Override
 		public void setHourWrongForField(int hour) {
-			new PostCondition() {
-				{
-					unchanged(minute);
-				}
-			};
+			if (post()) {
+				unchanged(minute);
+			}
 		}
 
 		@Override
 		public void setHourWrongForMethod(int hour) {
-			new PostCondition() {
-				{
-					unchanged(getMinute());
-				}
-			};
+			if (post()) {
+				unchanged(getMinute());
+			}
 		}
 	}
 }

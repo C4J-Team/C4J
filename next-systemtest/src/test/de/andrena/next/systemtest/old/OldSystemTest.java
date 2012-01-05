@@ -1,6 +1,7 @@
 package de.andrena.next.systemtest.old;
 
 import static de.andrena.next.Condition.old;
+import static de.andrena.next.Condition.post;
 
 import java.io.InputStream;
 
@@ -8,7 +9,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import de.andrena.next.Condition.PostCondition;
 import de.andrena.next.Contract;
 import de.andrena.next.systemtest.TransformerAwareRule;
 
@@ -68,20 +68,16 @@ public class OldSystemTest {
 	public static class DummyContract extends DummyClass {
 		@Override
 		public void incrementValueCheckField() {
-			new PostCondition() {
-				{
-					assert value == old(value) + 1;
-				}
-			};
+			if (post()) {
+				assert value == old(value) + 1;
+			}
 		}
 
 		@Override
 		public void incrementValueCheckMethod() {
-			new PostCondition() {
-				{
-					assert getValue() == old(getValue()) + 1;
-				}
-			};
+			if (post()) {
+				assert getValue() == old(getValue()) + 1;
+			}
 		}
 	}
 }

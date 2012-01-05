@@ -1,9 +1,10 @@
 package de.andrena.next.systemtest.contractclassmagic;
 
+import static de.andrena.next.Condition.pre;
+
 import org.junit.Before;
 import org.junit.Test;
 
-import de.andrena.next.Condition.PreCondition;
 import de.andrena.next.Contract;
 
 public class RetainingStateSystemTest {
@@ -44,13 +45,10 @@ public class RetainingStateSystemTest {
 
 		@Override
 		public void method(final int expectedNumCall) {
-			new PreCondition() {
-				{
-					System.out.println(expectedNumCall + " " + numCall);
-					assert expectedNumCall == numCall;
-					numCall++;
-				}
-			};
+			if (pre()) {
+				assert expectedNumCall == numCall;
+				numCall++;
+			}
 		}
 	}
 }

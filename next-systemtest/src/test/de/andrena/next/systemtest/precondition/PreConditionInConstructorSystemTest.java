@@ -1,9 +1,10 @@
 package de.andrena.next.systemtest.precondition;
 
+import static de.andrena.next.Condition.pre;
+
 import org.junit.Rule;
 import org.junit.Test;
 
-import de.andrena.next.Condition.PreCondition;
 import de.andrena.next.Contract;
 import de.andrena.next.systemtest.TransformerAwareRule;
 
@@ -30,11 +31,9 @@ public class PreConditionInConstructorSystemTest {
 	public static class DummyContract extends DummyClass {
 		public DummyContract(final int arg) {
 			super(arg);
-			new PreCondition() {
-				{
-					assert arg > 0;
-				}
-			};
+			if (pre()) {
+				assert arg > 0;
+			}
 		}
 	}
 }

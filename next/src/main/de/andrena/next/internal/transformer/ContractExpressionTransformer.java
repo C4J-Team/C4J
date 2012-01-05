@@ -1,6 +1,5 @@
 package de.andrena.next.internal.transformer;
 
-import javassist.ClassPool;
 import javassist.CtBehavior;
 import javassist.CtClass;
 import de.andrena.next.internal.compiler.IfExp;
@@ -11,15 +10,9 @@ import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 
 public class ContractExpressionTransformer extends ContractDeclaredBehaviorTransformer {
 
-	private ClassPool pool;
-
-	public ContractExpressionTransformer(ClassPool pool) {
-		this.pool = pool;
-	}
-
 	@Override
 	public void transform(ContractInfo contractInfo, CtBehavior contractBehavior) throws Exception {
-		ContractMethodExpressionEditor expressionEditor = new ContractMethodExpressionEditor(contractInfo, pool,
+		ContractMethodExpressionEditor expressionEditor = new ContractMethodExpressionEditor(contractInfo,
 				contractBehavior);
 		logger.info("transforming class " + contractBehavior.getLongName());
 		contractBehavior.instrument(expressionEditor);
