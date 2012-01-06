@@ -55,7 +55,9 @@ public class TimeOfDaySpecContract implements TimeOfDaySpec {
 		if (post()) {
 			assert getHour() == hour : "hour set";
 			// TODO unchanged must return a boolean
+			// TODO assert unchanged(getMinute()) : "minute unchanged";
 			unchanged(getMinute());
+			// TODO assert unchanged(getSecond()) : "second unchanged";
 			unchanged(getSecond());
 		}
 	}
