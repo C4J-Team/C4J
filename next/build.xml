@@ -16,6 +16,7 @@
 			</manifest>
 		</jar>
 		
+		<eclipse.refreshLocal resource="next/lib" depth="infinite"/>
 		<eclipse.incrementalBuild project="next" kind="clean"/>
 		<eclipse.incrementalBuild project="next-systemtest" kind="clean"/>
 	</target>
