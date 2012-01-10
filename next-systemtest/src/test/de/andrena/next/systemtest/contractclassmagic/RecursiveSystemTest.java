@@ -5,6 +5,7 @@ import static de.andrena.next.Condition.post;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import de.andrena.next.Condition;
 import de.andrena.next.Contract;
 
 public class RecursiveSystemTest {
@@ -61,12 +62,14 @@ public class RecursiveSystemTest {
 	}
 
 	public static class ContractClass {
+		private Object target = Condition.target();
+
 		@Override
 		public boolean equals(Object obj) {
 			if (post()) {
 				System.out.println("just before is reflexive");
-				assert this.equals(this) : "is reflexive";
-				assert this.equals(obj) == obj.equals(this) : "is symmetric";
+				assert target.equals(target) : "is reflexive";
+				assert target.equals(obj) == obj.equals(target) : "is symmetric";
 			}
 			return false;
 		}

@@ -6,6 +6,7 @@ import static de.andrena.next.Condition.unchanged;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.andrena.next.Condition;
 import de.andrena.next.Contract;
 
 public class UnchangedSystemTest {
@@ -60,25 +61,27 @@ public class UnchangedSystemTest {
 	}
 
 	public static class ContractClass extends TargetClass {
+		private TargetClass target = Condition.target();
+
 		@Override
 		public void setHour(int hour) {
 			if (post()) {
-				unchanged(minute);
-				unchanged(getMinute());
+				assert unchanged(target.minute);
+				assert unchanged(target.getMinute());
 			}
 		}
 
 		@Override
 		public void setHourWrongForField(int hour) {
 			if (post()) {
-				unchanged(minute);
+				assert unchanged(target.minute);
 			}
 		}
 
 		@Override
 		public void setHourWrongForMethod(int hour) {
 			if (post()) {
-				unchanged(getMinute());
+				assert unchanged(target.getMinute());
 			}
 		}
 	}

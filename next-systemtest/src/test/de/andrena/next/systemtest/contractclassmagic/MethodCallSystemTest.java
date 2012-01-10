@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import de.andrena.next.Condition;
 import de.andrena.next.Contract;
 import de.andrena.next.systemtest.TransformerAwareRule;
 
@@ -66,17 +67,19 @@ public class MethodCallSystemTest {
 	}
 
 	public static class ContractClass extends TargetClass {
+		TargetClass target = Condition.target();
+
 		@Override
 		public void methodContractHasMethodAccess() {
 			if (pre()) {
-				assert getValue() == 5;
+				assert target.getValue() == 5;
 			}
 		}
 
 		@Override
 		public void methodContractHasMethodAccessAndMethodAlsoInContract() {
 			if (pre()) {
-				assert getValueAlsoInContract() == 5;
+				assert target.getValueAlsoInContract() == 5;
 			}
 		}
 
@@ -88,7 +91,7 @@ public class MethodCallSystemTest {
 		@Override
 		public void methodContractHasMethodAccessOnContractOnly() {
 			if (pre()) {
-				assert getValue() == getFive();
+				assert target.getValue() == getFive();
 			}
 		}
 

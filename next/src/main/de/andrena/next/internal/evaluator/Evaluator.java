@@ -65,6 +65,11 @@ public class Evaluator {
 		}
 	};
 
+	@SuppressWarnings("unchecked")
+	public static <T> T getCurrentTarget() {
+		return (T) currentTarget.get();
+	}
+
 	public static boolean isBefore() {
 		logger.info("isBefore returning " + (Evaluator.evaluationPhase.get() == EvaluationPhase.BEFORE));
 		return Evaluator.evaluationPhase.get() == EvaluationPhase.BEFORE;

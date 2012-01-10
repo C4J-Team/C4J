@@ -27,6 +27,11 @@ public class Condition {
 		return fieldOrMethodWithoutParameters;
 	}
 
-	public static void unchanged(Object... fieldOrMethodWithoutParameters) {
+	public static boolean unchanged(Object... fieldOrMethodWithoutParameters) {
+		return false;
+	}
+
+	public static <T> T target() {
+		return Evaluator.<T> getCurrentTarget();
 	}
 }

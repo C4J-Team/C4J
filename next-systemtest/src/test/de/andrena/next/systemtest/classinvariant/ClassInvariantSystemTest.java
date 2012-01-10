@@ -1,5 +1,7 @@
 package de.andrena.next.systemtest.classinvariant;
 
+import static de.andrena.next.Condition.target;
+
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -53,13 +55,15 @@ public class ClassInvariantSystemTest {
 	}
 
 	public static class DummyClassContract extends DummyClass {
+		private DummyClass target = target();
+
 		public DummyClassContract(int hour) {
 			super(hour);
 		}
 
 		@ClassInvariant
 		public void invariant() {
-			assert getHour() >= 0 && getHour() <= 23;
+			assert target.getHour() >= 0 && target.getHour() <= 23;
 		}
 	}
 }

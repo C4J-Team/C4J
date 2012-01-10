@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import de.andrena.next.Condition;
 import de.andrena.next.Contract;
 import de.andrena.next.systemtest.TransformerAwareRule;
 
@@ -66,17 +67,19 @@ public class OldSystemTest {
 	}
 
 	public static class DummyContract extends DummyClass {
+		private DummyClass target = Condition.target();
+
 		@Override
 		public void incrementValueCheckField() {
 			if (post()) {
-				assert value == old(value) + 1;
+				assert target.value == old(target.value) + 1;
 			}
 		}
 
 		@Override
 		public void incrementValueCheckMethod() {
 			if (post()) {
-				assert getValue() == old(getValue()) + 1;
+				assert target.getValue() == old(target.getValue()) + 1;
 			}
 		}
 	}

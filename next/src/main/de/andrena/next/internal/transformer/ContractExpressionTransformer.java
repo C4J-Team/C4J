@@ -12,8 +12,7 @@ public class ContractExpressionTransformer extends ContractDeclaredBehaviorTrans
 
 	@Override
 	public void transform(ContractInfo contractInfo, CtBehavior contractBehavior) throws Exception {
-		ContractMethodExpressionEditor expressionEditor = new ContractMethodExpressionEditor(contractInfo,
-				contractBehavior);
+		ContractMethodExpressionEditor expressionEditor = new ContractMethodExpressionEditor(contractInfo);
 		logger.info("transforming class " + contractBehavior.getLongName());
 		contractBehavior.instrument(expressionEditor);
 		additionalStoreExpressions(expressionEditor);
