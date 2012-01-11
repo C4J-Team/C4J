@@ -158,11 +158,11 @@ public class Evaluator {
 			throws AssertionError {
 		try {
 			Object contract;
-			if (contractCache.contains(Evaluator.currentTarget, contractClass)) {
-				contract = contractCache.get(Evaluator.currentTarget, contractClass);
+			if (contractCache.contains(Evaluator.currentTarget.get(), contractClass)) {
+				contract = contractCache.get(Evaluator.currentTarget.get(), contractClass);
 			} else {
 				contract = contractClass.newInstance();
-				contractCache.put(Evaluator.currentTarget, contractClass, contract);
+				contractCache.put(Evaluator.currentTarget.get(), contractClass, contract);
 			}
 			Method method = contractClass.getDeclaredMethod(methodName, argTypes);
 			method.setAccessible(true);

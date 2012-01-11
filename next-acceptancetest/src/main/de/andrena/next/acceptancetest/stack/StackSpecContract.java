@@ -5,9 +5,12 @@ import static de.andrena.next.Condition.old;
 import static de.andrena.next.Condition.post;
 import static de.andrena.next.Condition.pre;
 import static de.andrena.next.Condition.result;
+import de.andrena.next.Condition;
 import de.andrena.next.ThreadSafe;
 
 public class StackSpecContract<T> implements StackSpec<T> {
+
+	private StackSpec<T> target = Condition.target();
 
 	@ThreadSafe
 	private Object[] old_values;
@@ -32,7 +35,7 @@ public class StackSpecContract<T> implements StackSpec<T> {
 		if (post()) {
 			int result = result(Integer.class);
 			assert result >= 0 : "result >= 0";
-			assert result <= capacity() : "count <= capacity";
+			assert result <= target.capacity() : "count <= capacity";
 		}
 		return ignored();
 	}
@@ -41,30 +44,30 @@ public class StackSpecContract<T> implements StackSpec<T> {
 	public void push(T x) {
 		if (pre()) {
 			assert x != null : "x != null";
-			assert !isFull() : "not isFull";
+			assert !target.isFull() : "not isFull";
 		}
 		if (post()) {
-			assert count() == old(count()) + 1 : "old count increased by 1";
-			assert top() == x : "x set";
+			assert target.count() == old(target.count()) + 1 : "old count increased by 1";
+			assert target.top() == x : "x set";
 		}
 	}
 
 	@Override
 	public void pop() {
 		if (pre()) {
-			assert !isEmpty() : "not isEmpty";
-			if (count() > 1) {
-				old_values = new Object[count() - 1];
+			assert !target.isEmpty() : "not isEmpty";
+			if (target.count() > 1) {
+				old_values = new Object[target.count() - 1];
 				for (int i = 0; i < old_values.length; i = i + 1) {
-					old_values[i] = get(i);
+					old_values[i] = target.get(i);
 				}
 			}
 		}
 		if (post()) {
-			assert count() == old(count()) - 1 : "old count decreased by 1";
-			if (!isEmpty()) {
+			assert target.count() == old(target.count()) - 1 : "old count decreased by 1";
+			if (!target.isEmpty()) {
 				for (int i = 0; i < old_values.length; i = i + 1) {
-					assert old_values[i] == get(i) : "values unchanged";
+					assert old_values[i] == target.get(i) : "values unchanged";
 				}
 			}
 		}
@@ -74,11 +77,11 @@ public class StackSpecContract<T> implements StackSpec<T> {
 	@Override
 	public T top() {
 		if (pre()) {
-			assert !isEmpty() : "not isEmpty";
+			assert !target.isEmpty() : "not isEmpty";
 		}
 		if (post()) {
 			T result = (T) result();
-			assert result == get(count() - 1) : "result == top_item";
+			assert result == target.get(target.count() - 1) : "result == top_item";
 		}
 		return ignored();
 	}
@@ -91,7 +94,7 @@ public class StackSpecContract<T> implements StackSpec<T> {
 		if (post()) {
 			boolean result = result(Boolean.class);
 			if (result) {
-				assert count() == capacity() : "count == capacity";
+				assert target.count() == target.capacity() : "count == capacity";
 			}
 		}
 		return ignored();
@@ -105,7 +108,7 @@ public class StackSpecContract<T> implements StackSpec<T> {
 		if (post()) {
 			boolean result = result(Boolean.class);
 			if (result) {
-				assert count() == 0 : "count == 0";
+				assert target.count() == 0 : "count == 0";
 			}
 		}
 		return ignored();
@@ -115,7 +118,7 @@ public class StackSpecContract<T> implements StackSpec<T> {
 	public T get(int index) {
 		if (pre()) {
 			assert index >= 0 : "index >= 0";
-			assert index < count() : "index < count";
+			assert index < target.count() : "index < count";
 		}
 		if (post()) {
 			// no post-condition identified yet

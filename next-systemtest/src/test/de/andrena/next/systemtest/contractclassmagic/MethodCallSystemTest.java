@@ -67,7 +67,7 @@ public class MethodCallSystemTest {
 	}
 
 	public static class ContractClass extends TargetClass {
-		TargetClass target = Condition.target();
+		private TargetClass target = Condition.target();
 
 		@Override
 		public void methodContractHasMethodAccess() {
