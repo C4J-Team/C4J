@@ -1,7 +1,5 @@
 package de.andrena.next.acceptancetest.s4;
 
-import static de.andrena.next.Condition.ignored;
-import static de.andrena.next.Condition.pre;
 import static org.junit.matchers.JUnitMatchers.containsString;
 
 import org.junit.Before;
@@ -9,11 +7,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import de.andrena.next.Contract;
+import de.andrena.next.acceptancetest.stack.Stack;
+import de.andrena.next.acceptancetest.stack.StackContract;
 import de.andrena.next.systemtest.TransformerAwareRule;
 
 /**
- * Testing preconditions on methods in classes
+ * Testing preconditions of {@link StackContract}
  */
 public class NNPreS4Test {
 
@@ -23,88 +22,97 @@ public class NNPreS4Test {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	private MiniCollection<String> dummy;
+	private Stack<String> stack;
 
 	@Before
 	public void before() {
-		dummy = new MiniCollection<String>();
+		stack = new Stack<String>(2);
 	}
-
+	
 	@Test
-	public void preconditionFulfilled() {
-		dummy.get(3);
+	public void constructorPreconditionFulfilled() throws Exception {
+		new Stack<String>(4711);
 	}
-
+	
 	@Test
-	public void preconditionViolated() {
+	public void constructorPreconditionViolatedForZeroCapacity() throws Exception {
 		thrown.expect(AssertionError.class);
-		dummy.get(0);
+		thrown.expectMessage(containsString("> 0"));
+		new Stack<String>(0);
 	}
 
 	@Test
-	public void preconditionWithTwoParametersFulfilled() {
-		dummy.insertAt(3, "Teststring");
+	public void getPreconditionFulfilled() {
+		stack.push("bottom");
+		stack.get(0);
 	}
-
+	
 	@Test
-	public void preconditionWithTwoParametersSecondParameterViolated() {
+	public void getPreconditionViolatedOnNegativeIndices() {
 		thrown.expect(AssertionError.class);
-		thrown.expectMessage(containsString("must not be null"));
-		dummy.insertAt(3, null);
+		stack.get(-1);
 	}
 
 	@Test
-	public void preconditionWithVarArgsFulfilled() {
-		dummy.append("String 1", "String 2");
-	}
-
-	@Test
-	public void preconditionViolatedByNullElementInVarArg() {
+	public void getPreconditionViolatedOnEmptyStacks() {
 		thrown.expect(AssertionError.class);
-		thrown.expectMessage(containsString("must not contain null elements"));
-		dummy.append("String 1", null, "String 3");
+		stack.get(0);
 	}
 
-	@Contract(MiniCollectionContract.class)
-	public static class MiniCollection<T> {
-		public T get(int index) {
-			return null;
-		}
-
-		public void insertAt(int index, T value) {
-		}
-
-		public void append(T... values) {
-		}
+	@Test
+	public void getPreconditionViolatedOnGetOutOfCount() {
+		stack.push("bottom");
+		thrown.expect(AssertionError.class);
+		thrown.expectMessage(containsString("< count"));
+		stack.get(1);
+	}
+	
+	@Test
+	public void pushPreconditionFulfilled() {
+		stack.push("bottom");
+		stack.push("second");
 	}
 
-	public static class MiniCollectionContract<T> extends MiniCollection<T> {
-		@Override
-		public T get(final int index) {
-			if (pre()) {
-				assert index > 0 : "index greater 0";
-			}
-			return ignored();
-		}
+	@Test
+	public void pushPreconditionVilolatedForNullValues() {
+		thrown.expect(AssertionError.class);
+		thrown.expectMessage(containsString("!= null"));
+		stack.push(null);
+	}
 
-		@Override
-		public void insertAt(final int index, final T value) {
-			if (pre()) {
-				assert index > 0 : "index greater 0";
-				assert value != null : "value must not be null";
-			}
-		};
-
-		@Override
-		public void append(final T... values) {
-			if (pre()) {
-				assert values != null : "values must not be null";
-				assert values.length > 0 : "values must at least contain one element";
-				for (T value : values) {
-					assert value != null : "values must not contain null elements";
-				}
-			}
-		};
+	@Test
+	public void pushPreconditionVilolatedForFullStacks() {
+		stack.push("bottom");
+		stack.push("second");
+		thrown.expect(AssertionError.class);
+		thrown.expectMessage(containsString("not isFull"));
+		stack.push("third");
+	}
+	
+	@Test
+	public void topPreconditionFulfilled() throws Exception {
+		stack.push("bottom");
+		stack.top();
+	}
+	
+	@Test
+	public void topPreconditionViolatedOnEmptyStacks() throws Exception {
+		thrown.expect(AssertionError.class);
+		thrown.expectMessage(containsString("not isEmpty"));
+		stack.top();
+	}
+	
+	@Test
+	public void popPreconditionFulfilled() throws Exception {
+		stack.push("bottom");
+		stack.pop();
+	}
+	
+	@Test
+	public void popPreconditionViolatedOnEmptyStack() throws Exception {
+		thrown.expect(AssertionError.class);
+		thrown.expectMessage(containsString("not isEmpty"));
+		stack.pop();
 	}
 
 }
