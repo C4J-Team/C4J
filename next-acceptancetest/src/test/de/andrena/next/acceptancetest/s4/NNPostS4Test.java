@@ -37,7 +37,7 @@ public class NNPostS4Test {
 	
 	@Test
 	public void capacityPostConditionViolatedWithAnonymousSubclass() throws Exception {
-		stack = new Stack<String>(1) {
+		Stack<String> brokenStack = new Stack<String>(1) {
 			// this marker is necessary because capacity() is already called during the verification of
 			// the postcondition of the constructor of Stack<T>
 			// and we want the constructor call to pass the contract
@@ -53,7 +53,7 @@ public class NNPostS4Test {
 		};
 		thrown.expect(AssertionError.class);
 		thrown.expectMessage(containsString("result > 0"));
-		stack.capacity();
+		brokenStack.capacity();
 	}
 	
 	@Test
@@ -65,8 +65,8 @@ public class NNPostS4Test {
 	}
 	
 	@Test
-	public void capacityPostConditionViolatedWithBrokenStackWithoutStackContract() throws Exception {
-		BrokenStackWithoutStackContract<String> brokenStack = new BrokenStackWithoutStackContract<String>(1);
+	public void capacityPostConditionViolatedWithBrokenStackWithoutClassContract() throws Exception {
+		BrokenStackWithoutClassContract<String> brokenStack = new BrokenStackWithoutClassContract<String>(1);
 		thrown.expect(AssertionError.class);
 		thrown.expectMessage(containsString("result > 0"));
 		brokenStack.capacity();
@@ -87,9 +87,9 @@ public class NNPostS4Test {
 		}
 	}
 	
-	private static class BrokenStackWithoutStackContract<T> implements StackSpec<T> {
+	private static class BrokenStackWithoutClassContract<T> implements StackSpec<T> {
 		private Stack<T> delegatee;
-		public BrokenStackWithoutStackContract(int capacity) {
+		public BrokenStackWithoutClassContract(int capacity) {
 			delegatee = new Stack<T>(capacity);
 		}
 		@Override
