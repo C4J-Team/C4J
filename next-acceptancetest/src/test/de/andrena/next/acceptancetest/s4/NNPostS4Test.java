@@ -1,6 +1,10 @@
 package de.andrena.next.acceptancetest.s4;
 
+import static org.junit.Assert.*;
 import static org.junit.matchers.JUnitMatchers.containsString;
+
+import java.lang.reflect.Field;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -31,12 +35,91 @@ public class NNPostS4Test {
 	}
 	
 	@Test
-	public void capacityPostConditionFulfilled() throws Exception {
+	public void countPostconditionFulfilled() throws Exception {
+		stack.count();
+	}
+	
+	@Test
+	public void countPostconditionViolatedLowerBound() throws Exception {
+		Stack<String> brokenStack = new Stack<String>(10) {
+			@Override
+			public int count() {
+				return -1;
+			}
+		};
+		thrown.expect(AssertionError.class);
+		thrown.expectMessage("result >= 0");
+		brokenStack.count();
+	}
+	
+	@Test
+	public void countPostconditionViolatedUpperBound() throws Exception {
+		Stack<String> brokenStack = new Stack<String>(10) {
+			@Override
+			public int count() {
+				return 11;
+			}
+		};
+		thrown.expect(AssertionError.class);
+		thrown.expectMessage("count <= capacity");
+		brokenStack.count();
+	}
+	
+	@Test
+	public void pushPostconditionFulfilled() throws Exception {
+		stack.push("bottom");
+	}
+	
+	@Test
+	public void pushConditionViolatedByNotPushing() throws Exception {
+		Stack<String> brokenStack = new Stack<String>(10) {
+			@Override
+			public String top() {
+				return null;
+			}
+		};
+		thrown.expect(AssertionError.class);
+		thrown.expectMessage("x set");
+		brokenStack.push("bottom");
+	}
+	
+	@Test
+	public void popPostconditionFulfilled() throws Exception {
+		stack.push("string");
+		stack.pop();
+	}
+	
+	@Test
+	public void popPostconditionViolatedByChangingValues() throws Exception {
+		Stack<String> brokenStack = new Stack<String>(10) {
+			@Override
+			public void pop() {
+				super.pop();
+				try {
+					Field valuesField = this.getClass().getSuperclass().getDeclaredField("values");
+					valuesField.setAccessible(true);
+					@SuppressWarnings("unchecked")
+					List<String> values = (List<String>) valuesField.get(this);
+					values.set(0, "BROKEN");
+				} catch (Exception e) {
+					System.out.println(e);
+				}
+			};
+		};
+		brokenStack.push("string 1");
+		brokenStack.push("string 2");
+		thrown.expect(AssertionError.class);
+		thrown.expectMessage("values unchanged");
+		brokenStack.pop();
+	}	
+	
+	@Test
+	public void capacityPostconditionFulfilled() throws Exception {
 		stack.capacity();
 	}
 	
 	@Test
-	public void capacityPostConditionViolatedWithAnonymousSubclass() throws Exception {
+	public void capacityPostconditionViolatedWithAnonymousSubclass() throws Exception {
 		Stack<String> brokenStack = new Stack<String>(1) {
 			// this marker is necessary because capacity() is already called during the verification of
 			// the postcondition of the constructor of Stack<T>
@@ -57,7 +140,7 @@ public class NNPostS4Test {
 	}
 	
 	@Test
-	public void capacityPostConditionViolatedWithBrokenStack() throws Exception {
+	public void capacityPostconditionViolatedWithBrokenStack() throws Exception {
 		stack = new BrokenStack<String>(1);
 		thrown.expect(AssertionError.class);
 		thrown.expectMessage(containsString("result > 0"));
@@ -65,7 +148,7 @@ public class NNPostS4Test {
 	}
 	
 	@Test
-	public void capacityPostConditionViolatedWithBrokenStackWithoutClassContract() throws Exception {
+	public void capacityPostconditionViolatedWithBrokenStackWithoutClassContract() throws Exception {
 		BrokenStackWithoutClassContract<String> brokenStack = new BrokenStackWithoutClassContract<String>(1);
 		thrown.expect(AssertionError.class);
 		thrown.expectMessage(containsString("result > 0"));
