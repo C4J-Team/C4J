@@ -6,7 +6,7 @@ import javassist.CtNewConstructor;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 
 public class ConstructorTransformer extends AbstractContractClassTransformer {
-	public static final String CONSTRUCTOR_REPLACEMENT_NAME = "SOIFDJSDOIFSDFH$";
+	public static final String CONSTRUCTOR_REPLACEMENT_NAME = "constructor$";
 
 	@Override
 	public void transform(ContractInfo contractInfo, CtClass contractClass) throws Exception {
