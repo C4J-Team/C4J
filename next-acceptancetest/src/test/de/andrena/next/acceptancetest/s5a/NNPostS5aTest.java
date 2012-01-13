@@ -24,7 +24,7 @@ public class NNPostS5aTest {
 	}
 	
 	@Test
-	public void failsWhenPreConditionIsNotMet() {
+	public void failsWhenPostConditionIsNotMet() {
 		thrown.expect(AssertionError.class);
 		thrown.expectMessage("result >= 0");
 		new VeryBottom(-1).a("");
