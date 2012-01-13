@@ -1,6 +1,8 @@
 package de.andrena.next.acceptancetest.s4;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.junit.Assert.assertThat;
 import static org.junit.matchers.JUnitMatchers.containsString;
 
 import java.lang.reflect.Field;
@@ -96,13 +98,10 @@ public class NNPostS4Test {
 			public void pop() {
 				super.pop();
 				try {
-					Field valuesField = this.getClass().getSuperclass().getDeclaredField("values");
-					valuesField.setAccessible(true);
-					@SuppressWarnings("unchecked")
-					List<String> values = (List<String>) valuesField.get(this);
+					List<String> values = getPrivateValuesFieldFromStack(this);
 					values.set(0, "BROKEN");
 				} catch (Exception e) {
-					System.out.println(e);
+					throw new RuntimeException(e);
 				}
 			};
 		};
@@ -111,8 +110,104 @@ public class NNPostS4Test {
 		thrown.expect(AssertionError.class);
 		thrown.expectMessage("values unchanged");
 		brokenStack.pop();
-	}	
+	}
 	
+	@Test
+	public void topPostconditionFulfilled() throws Exception {
+		String x = "teststring";
+		stack.push(x);
+		assertThat(stack.top(), is(sameInstance(x)));
+	}
+	
+	@Test
+	public void topPostconditionViolatedByReturningFifoInsteadOfLifo() throws Exception {
+		Stack<String> brokenStack = new Stack<String>(2) {
+			@Override
+			public String top() {
+				return get(0);
+			}
+		};
+		List<String> values = getPrivateValuesFieldFromStack(brokenStack);
+		values.add("first");
+		values.add("second");
+		thrown.expect(AssertionError.class);
+		thrown.expectMessage(containsString("result == top_item"));
+		brokenStack.top();
+	}
+	
+	@Test
+	public void isFullPostconditionFulfilled() throws Exception {
+		stack.isFull();
+		stack.push("first");
+		stack.isFull();
+		stack.push("last");
+		stack.isFull();
+	}
+	
+	@Test
+	public void isFullPostcondtionViolatedInCaseOfFullStack() throws Exception {
+		Stack<String> brokenStack = new Stack<String>(2) {
+			@Override
+			public boolean isFull() {
+				return count() == 10;
+			};
+		};
+		brokenStack.isFull();
+		brokenStack.push("first");
+		brokenStack.push("second");
+		thrown.expect(AssertionError.class);
+		thrown.expectMessage(containsString("count < capacity"));
+		brokenStack.isFull();
+	}
+	
+	@Test
+	public void isFullPostcondtionViolatedInCaseOfNotFullStack() throws Exception {
+		Stack<String> brokenStack = new Stack<String>(2) {
+			@Override
+			public boolean isFull() {
+				return true;
+			};
+		};
+		thrown.expect(AssertionError.class);
+		thrown.expectMessage(containsString("count == capacity"));
+		brokenStack.isFull();
+	}
+
+	@Test
+	public void isEmptyPostconditionFulfilled() throws Exception {
+		stack.isEmpty();
+		stack.push("first");
+		stack.isEmpty();
+	}
+	
+	@Test
+	public void isEmptyPostcondtionViolatedInCaseOfNotEmptyStack() throws Exception {
+		Stack<String> brokenStack = new Stack<String>(2) {
+			@Override
+			public boolean isEmpty() {
+				return true;
+			};
+		};
+		brokenStack.isEmpty();
+		brokenStack.push("first");
+		thrown.expect(AssertionError.class);
+		thrown.expectMessage(containsString("count == 0"));
+		brokenStack.isEmpty();
+	}
+	
+	@Test
+	public void isEmptyPostcondtionViolatedInCaseOfEmptyStack() throws Exception {
+		Stack<String> brokenStack = new Stack<String>(2) {
+			@Override
+			public boolean isEmpty() {
+				return false;
+			};
+		};
+		thrown.expect(AssertionError.class);
+		thrown.expectMessage(containsString("count > 0"));
+		brokenStack.isEmpty();
+	}
+
 	@Test
 	public void capacityPostconditionFulfilled() throws Exception {
 		stack.capacity();
@@ -154,7 +249,7 @@ public class NNPostS4Test {
 		thrown.expectMessage(containsString("result > 0"));
 		brokenStack.capacity();
 	}
-	
+
 	private static class BrokenStack<T> extends Stack<T> {
 		private boolean capacityCalled = false;
 		public BrokenStack(int capacity) {
@@ -202,6 +297,19 @@ public class NNPostS4Test {
 		}
 		public T get(int index) {
 			return delegatee.get(index);
+		}
+	}
+	
+	private <T> List<T> getPrivateValuesFieldFromStack(Stack<T> stack) {
+		Field valuesField;
+		try {
+			valuesField = Stack.class.getDeclaredField("values");
+			valuesField.setAccessible(true);
+			@SuppressWarnings("unchecked")
+			List<T> values = (List<T>) valuesField.get(stack);
+			return values;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
 	}
 
