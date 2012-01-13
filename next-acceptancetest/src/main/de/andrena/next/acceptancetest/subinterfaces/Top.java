@@ -5,6 +5,12 @@ import de.andrena.next.Contract;
 @Contract(TopContract.class)
 public interface Top {
 	
-	int a(String parameter);
+	int pre(String parameter);
+	
+	int post(String parameter);
+	
+	int preAndPost(String parameter);
+	
+	int invariant(String parameter);
 
 }

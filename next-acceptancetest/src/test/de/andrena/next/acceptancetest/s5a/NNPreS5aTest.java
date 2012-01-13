@@ -20,13 +20,13 @@ public class NNPreS5aTest {
 
 	@Test
 	public void returnsValueWhenPreConditionIsSatisfied() {
-		assertThat(new VeryBottom(42).a(""), is(42));
+		assertThat(new VeryBottom(42).pre(""), is(42));
 	}
 	
 	@Test
 	public void failsWhenPreConditionIsNotMet() {
 		thrown.expect(AssertionError.class);
 		thrown.expectMessage("must not be null");
-		new VeryBottom(42).a(null);
+		new VeryBottom(42).pre(null);
 	}
 }

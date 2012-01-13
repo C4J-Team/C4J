@@ -9,7 +9,22 @@ public class VeryBottom implements Bottom {
 	}
 
 	@Override
-	public int a(String parameter) {
+	public int pre(String parameter) {
+		return value;
+	}
+
+	@Override
+	public int post(String parameter) {
+		return value;
+	}
+
+	@Override
+	public int preAndPost(String parameter) {
+		return value;
+	}
+
+	@Override
+	public int invariant(String parameter) {
 		return value;
 	}
 

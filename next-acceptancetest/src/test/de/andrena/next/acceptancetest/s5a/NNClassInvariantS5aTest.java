@@ -20,13 +20,13 @@ public class NNClassInvariantS5aTest {
 
 	@Test
 	public void returnsValueWhenClassInvariantIsSatisfied() {
-		assertThat(new VeryBottom(0).a(""), is(0));
+		assertThat(new VeryBottom(2).invariant(""), is(2));
 	}
 	
 	@Test
 	public void failsWhenClassInvariantConditionIsNotMet() {
 		thrown.expect(AssertionError.class);
 		thrown.expectMessage("multiple of two");
-		new VeryBottom(3).a("");
+		new VeryBottom(3).invariant("");
 	}
 }
