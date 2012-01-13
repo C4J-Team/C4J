@@ -34,6 +34,11 @@ public class VeryBottom implements Bottom {
 	}
 
 	@Override
+	public int old() {
+		return value;
+	}
+
+	@Override
 	public String b(int p) {
 		return "";
 	}

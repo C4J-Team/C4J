@@ -52,6 +52,14 @@ public class TopContract implements Top {
 		return ignored();
 	}
 
+	@Override
+	public int old() {
+		if (Condition.post()) {
+			assert result().equals(Condition.old(target().old())) : "old value is preserved";
+		}
+		return ignored();
+	}
+
 	private Top target() {
 		return Condition.target();
 	}

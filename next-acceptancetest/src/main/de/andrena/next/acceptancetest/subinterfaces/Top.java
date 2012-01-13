@@ -14,5 +14,7 @@ public interface Top {
 	int invariant(String parameter);
 	
 	int unchanged();
+	
+	int old();
 
 }
