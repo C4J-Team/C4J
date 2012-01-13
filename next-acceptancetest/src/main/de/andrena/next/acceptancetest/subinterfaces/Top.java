@@ -12,5 +12,7 @@ public interface Top {
 	int preAndPost(String parameter);
 	
 	int invariant(String parameter);
+	
+	int unchanged();
 
 }

@@ -2,7 +2,6 @@ package de.andrena.next.acceptancetest.subinterfaces;
 
 import static de.andrena.next.Condition.ignored;
 import static de.andrena.next.Condition.result;
-import static de.andrena.next.Condition.target;
 import de.andrena.next.ClassInvariant;
 import de.andrena.next.Condition;
 
@@ -14,12 +13,6 @@ public class TopContract implements Top {
 			assert parameter != null : "parameter must not be null";
 		}
 		return ignored();
-	}
-
-	@ClassInvariant
-	public void aIsAlwaysAMultipleOfTwo() {
-		Top target = target();
-		assert target.pre("") % 2 == 0 : "a() is a multiple of two";
 	}
 
 	@Override
@@ -44,6 +37,23 @@ public class TopContract implements Top {
 	@Override
 	public int invariant(String parameter) {
 		return ignored();
+	}
+
+	@ClassInvariant
+	public void aIsAlwaysAMultipleOfTwo() {
+		assert target().pre("") % 2 == 0 : "a() is a multiple of two";
+	}
+
+	@Override
+	public int unchanged() {
+		if (Condition.post()) {
+			assert Condition.unchanged(target().unchanged()) : "unchanged never changes";
+		}
+		return ignored();
+	}
+
+	private Top target() {
+		return Condition.target();
 	}
 
 }

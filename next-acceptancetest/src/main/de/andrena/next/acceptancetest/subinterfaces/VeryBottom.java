@@ -2,7 +2,7 @@ package de.andrena.next.acceptancetest.subinterfaces;
 
 public class VeryBottom implements Bottom {
 
-	private final int value;
+	protected int value;
 
 	public VeryBottom(int value) {
 		this.value = value;
@@ -25,6 +25,11 @@ public class VeryBottom implements Bottom {
 
 	@Override
 	public int invariant(String parameter) {
+		return value;
+	}
+
+	@Override
+	public int unchanged() {
 		return value;
 	}
 
