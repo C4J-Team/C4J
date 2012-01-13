@@ -13,13 +13,14 @@ public class ContractExpressionTransformer extends ContractDeclaredBehaviorTrans
 	@Override
 	public void transform(ContractInfo contractInfo, CtBehavior contractBehavior) throws Exception {
 		ContractMethodExpressionEditor expressionEditor = new ContractMethodExpressionEditor(contractInfo);
-		logger.info("transforming class " + contractBehavior.getLongName());
+		logger.info("transforming behavior " + contractBehavior.getLongName());
 		contractBehavior.instrument(expressionEditor);
 		additionalStoreExpressions(expressionEditor);
 		IfExp storeConditionalExp = new IfExp(new StaticCallExp(Evaluator.isBefore));
 		for (StaticCallExp storeExp : expressionEditor.getStoreExpressions()) {
 			storeConditionalExp.addIfBody(storeExp.toStandalone());
 		}
+		logger.info("before: " + storeConditionalExp.getCode());
 		storeConditionalExp.insertBefore(contractBehavior);
 	}
 

@@ -13,8 +13,8 @@ import de.andrena.next.internal.compiler.NestedExp;
 import de.andrena.next.internal.compiler.StaticCallExp;
 import de.andrena.next.internal.compiler.ValueExp;
 import de.andrena.next.internal.evaluator.Evaluator;
-import de.andrena.next.internal.util.ObjectConverter;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
+import de.andrena.next.internal.util.ObjectConverter;
 
 public class BeforeAndAfterTriggerTransformer extends AbstractAffectedClassTransformer {
 
@@ -32,7 +32,8 @@ public class BeforeAndAfterTriggerTransformer extends AbstractAffectedClassTrans
 			return;
 		}
 		String contractBehaviorName = getContractBehaviorName(contractBehavior);
-		logger.info("transforming method " + affectedBehavior.getLongName());
+		logger.info("transforming method " + affectedBehavior.getLongName() + ", triggered by "
+				+ contractBehavior.getLongName());
 		ArrayExp paramTypesArray = ArrayExp.forParamTypes(affectedBehavior);
 		ArrayExp argsArray = ArrayExp.forArgs(affectedBehavior);
 		StaticCallExp callBefore = new StaticCallExp(Evaluator.before, NestedExp.THIS, new ValueExp(
@@ -45,6 +46,8 @@ public class BeforeAndAfterTriggerTransformer extends AbstractAffectedClassTrans
 		StaticCallExp callAfter = new StaticCallExp(Evaluator.after, NestedExp.THIS, new ValueExp(
 				contractInfo.getContractClass()), new ValueExp(contractBehaviorName), paramTypesArray, argsArray,
 				returnValue);
+		logger.info("before: " + callBefore.toStandalone().getCode());
+		logger.info("after: " + callAfter.toStandalone().getCode());
 		callBefore.toStandalone().insertBefore(affectedBehavior);
 		callAfter.toStandalone().insertAfter(affectedBehavior);
 	}

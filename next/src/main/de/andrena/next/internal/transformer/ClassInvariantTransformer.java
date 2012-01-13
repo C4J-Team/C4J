@@ -34,6 +34,7 @@ public class ClassInvariantTransformer extends AbstractAffectedClassTransformer 
 	private void transformTargetMethods(CtClass contractClass, CtClass affectedClass,
 			List<CtMethod> classInvariantMethods) throws CannotCompileException {
 		StandaloneExp callInvariantExpression = callInvariantExpression(contractClass, classInvariantMethods);
+		logger.info("classInvariant after: " + callInvariantExpression.getCode());
 		for (CtBehavior behavior : affectedClass.getDeclaredBehaviors()) {
 			callInvariantExpression.insertAfter(behavior);
 		}
