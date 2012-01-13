@@ -95,6 +95,8 @@ public class StackSpecContract<T> implements StackSpec<T> {
 			boolean result = result(Boolean.class);
 			if (result) {
 				assert target.count() == target.capacity() : "count == capacity";
+			} else {
+				assert target.count() < target.capacity() : "count < capacity";
 			}
 		}
 		return ignored();
@@ -109,6 +111,8 @@ public class StackSpecContract<T> implements StackSpec<T> {
 			boolean result = result(Boolean.class);
 			if (result) {
 				assert target.count() == 0 : "count == 0";
+			} else {
+				assert target.count() > 0 : "count > 0";
 			}
 		}
 		return ignored();
