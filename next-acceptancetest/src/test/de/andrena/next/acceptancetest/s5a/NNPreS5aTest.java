@@ -18,17 +18,15 @@ public class NNPreS5aTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	private VeryBottom implementation = new VeryBottom(42);
-	
 	@Test
 	public void returnsValueWhenPreConditionIsSatisfied() {
-		assertThat(implementation.a(""), is(42));
+		assertThat(new VeryBottom(42).a(""), is(42));
 	}
 	
 	@Test
 	public void failsWhenPreConditionIsNotMet() {
 		thrown.expect(AssertionError.class);
 		thrown.expectMessage("must not be null");
-		implementation.a(null);
+		new VeryBottom(42).a(null);
 	}
 }
