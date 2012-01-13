@@ -10,7 +10,7 @@ import org.junit.rules.ExpectedException;
 import de.andrena.next.acceptancetest.subinterfaces.VeryBottom;
 import de.andrena.next.systemtest.TransformerAwareRule;
 
-public class NNPostS5aTest {
+public class NNClassInvariantS5aTest {
 
 	@Rule
 	public TransformerAwareRule transformerAware = new TransformerAwareRule();
@@ -19,14 +19,14 @@ public class NNPostS5aTest {
 	public ExpectedException thrown = ExpectedException.none();
 
 	@Test
-	public void returnsValueWhenPostConditionIsSatisfied() {
+	public void returnsValueWhenClassInvariantIsSatisfied() {
 		assertThat(new VeryBottom(0).a(""), is(0));
 	}
 	
 	@Test
-	public void failsWhenPostConditionIsNotMet() {
+	public void failsWhenClassInvariantConditionIsNotMet() {
 		thrown.expect(AssertionError.class);
-		thrown.expectMessage("result >= 0");
-		new VeryBottom(-2).a("");
+		thrown.expectMessage("multiple of two");
+		new VeryBottom(3).a("");
 	}
 }
