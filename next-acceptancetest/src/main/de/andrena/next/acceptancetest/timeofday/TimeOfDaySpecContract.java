@@ -5,8 +5,11 @@ import static de.andrena.next.Condition.post;
 import static de.andrena.next.Condition.pre;
 import static de.andrena.next.Condition.result;
 import static de.andrena.next.Condition.unchanged;
+import de.andrena.next.Condition;
 
 public class TimeOfDaySpecContract implements TimeOfDaySpec {
+	private TimeOfDaySpec target = Condition.target();
+
 	@Override
 	public int getHour() {
 		if (pre()) {
@@ -53,12 +56,9 @@ public class TimeOfDaySpecContract implements TimeOfDaySpec {
 			assert hour <= 23 : "hour <= 23";
 		}
 		if (post()) {
-			assert getHour() == hour : "hour set";
-			// TODO unchanged must return a boolean
-			// TODO assert unchanged(getMinute()) : "minute unchanged";
-			unchanged(getMinute());
-			// TODO assert unchanged(getSecond()) : "second unchanged";
-			unchanged(getSecond());
+			assert target.getHour() == hour : "hour set";
+			assert unchanged(target.getMinute());
+			assert unchanged(target.getSecond());
 		}
 	}
 
@@ -69,9 +69,9 @@ public class TimeOfDaySpecContract implements TimeOfDaySpec {
 			assert minute <= 59 : "minute <= 59";
 		}
 		if (post()) {
-			unchanged(getHour());
-			assert getMinute() == minute : "minute set";
-			unchanged(getSecond());
+			assert unchanged(target.getHour());
+			assert target.getMinute() == minute : "minute set";
+			assert unchanged(target.getSecond());
 		}
 	}
 
@@ -82,9 +82,9 @@ public class TimeOfDaySpecContract implements TimeOfDaySpec {
 			assert second <= 59 : "second <= 59";
 		}
 		if (post()) {
-			unchanged(getHour());
-			unchanged(getMinute());
-			assert getSecond() == second : "second set";
+			assert unchanged(target.getHour());
+			assert unchanged(target.getMinute());
+			assert target.getSecond() == second : "second set";
 		}
 	}
 
