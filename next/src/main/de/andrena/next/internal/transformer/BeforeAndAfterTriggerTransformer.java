@@ -113,6 +113,9 @@ public class BeforeAndAfterTriggerTransformer extends AbstractAffectedClassTrans
 	}
 
 	CtConstructor getAffectedConstructor(ContractInfo contractInfo, CtClass affectedClass, CtBehavior contractBehavior) {
+		if (contractInfo.getTargetClass().isInterface()) {
+			return null;
+		}
 		CtConstructor affectedConstructor;
 		try {
 			affectedConstructor = affectedClass.getDeclaredConstructor(getConstructorParameterTypes(affectedClass,

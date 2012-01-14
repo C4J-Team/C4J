@@ -15,6 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.andrena.next.ClassInvariant;
+import de.andrena.next.Contract;
 import de.andrena.next.internal.util.ContractRegistry;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 
@@ -25,6 +26,9 @@ public class BeforeAndAfterTriggerTransformerTest {
 	private CtClass targetClass;
 	private ContractInfo contractInfo;
 	private CtClass indirectClass;
+	private CtClass targetInterface;
+	private CtClass contractClassForTargetInterface;
+	private ContractInfo contractInfoForTargetInterface;
 
 	@Before
 	public void before() throws Exception {
@@ -33,7 +37,12 @@ public class BeforeAndAfterTriggerTransformerTest {
 		contractClass = pool.get(ContractClass.class.getName());
 		targetClass = pool.get(TargetClass.class.getName());
 		indirectClass = pool.get(IndirectClass.class.getName());
-		contractInfo = new ContractRegistry().registerContract(targetClass, contractClass);
+		ContractRegistry contractRegistry = new ContractRegistry();
+		contractInfo = contractRegistry.registerContract(targetClass, contractClass);
+		targetInterface = pool.get(TargetInterface.class.getName());
+		contractClassForTargetInterface = pool.get(TargetInterfaceContract.class.getName());
+		contractInfoForTargetInterface = contractRegistry.registerContract(targetInterface,
+				contractClassForTargetInterface);
 	}
 
 	@Test
@@ -152,6 +161,19 @@ public class BeforeAndAfterTriggerTransformerTest {
 	public void testGetAffectedConstructorNotFound() throws Exception {
 		assertNull(transformer.getAffectedConstructor(contractInfo, targetClass,
 				contractClass.getDeclaredConstructor(new CtClass[] { CtClass.intType })));
+	}
+
+	@Test
+	public void testGetAffectedConstructorForTargetInterface() throws Exception {
+		assertNull(transformer.getAffectedConstructor(contractInfoForTargetInterface, targetInterface,
+				contractClass.getDeclaredConstructor(new CtClass[0])));
+	}
+
+	@Contract(TargetInterfaceContract.class)
+	public interface TargetInterface {
+	}
+
+	public static class TargetInterfaceContract implements TargetInterface {
 	}
 
 	@Test

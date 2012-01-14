@@ -1,4 +1,4 @@
-package de.andrena.next.systemtest.precondition;
+package de.andrena.next.systemtest.inheritance;
 
 import static de.andrena.next.Condition.pre;
 
@@ -9,7 +9,7 @@ import org.junit.Test;
 import de.andrena.next.Contract;
 import de.andrena.next.systemtest.TransformerAwareRule;
 
-public class PreConditionInSuperclassSystemTest {
+public class SuperclassSystemTest {
 	@Rule
 	public TransformerAwareRule transformerAware = new TransformerAwareRule();
 
@@ -33,8 +33,8 @@ public class PreConditionInSuperclassSystemTest {
 	@Test(expected = AssertionError.class)
 	public void testPreConditionFailsInDummyClass() {
 		transformerAware
-				.expectLogWarning("could not find method method in affected class de.andrena.next.systemtest.precondition.PreConditionInSuperclassSystemTest$DummyClass"
-						+ " for contract class de.andrena.next.systemtest.precondition.PreConditionInSuperclassSystemTest$DummyContract - inserting an empty method");
+				.expectLogWarning("could not find method method in affected class de.andrena.next.systemtest.inheritance.SuperclassSystemTest$DummyClass"
+						+ " for contract class de.andrena.next.systemtest.inheritance.SuperclassSystemTest$DummyContract - inserting an empty method");
 		dummy.method(5);
 	}
 
