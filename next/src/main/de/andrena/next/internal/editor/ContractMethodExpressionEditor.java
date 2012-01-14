@@ -72,18 +72,12 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		if (!field.getDeclaringClass().equals(contract.getContractClass())) {
 			lastFieldAccess = field;
 			arrayMembers.add(field);
+			lastMethodCall = null;
+			logger.info("last field access: " + field.getName());
 		}
-		lastMethodCall = null;
-		logger.info("last field access: " + field.getName());
 		if (fieldAccess.isWriter() && !contract.getAllContractClasses().contains(field.getDeclaringClass())) {
 			throw new CannotCompileException("illegal write access on field '" + field.getName() + "'.");
 		}
-		// if (!fieldAccess.isStatic() && field.getDeclaringClass().equals(contract.getTargetClass())) {
-		// CastExp replacementCall = CastExp.forReturnType(new StaticCallExp(Evaluator.fieldAccess, new ValueExp(field
-		// .getName())));
-		// AssignmentExp assignment = new AssignmentExp(NestedExp.RETURN_VALUE, replacementCall);
-		// fieldAccess.replace(assignment.toStandalone().getCode());
-		// }
 	}
 
 	@Override
@@ -98,11 +92,6 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 	void editMethodCall(MethodCall methodCall) throws NotFoundException, CannotCompileException {
 		CtMethod method = methodCall.getMethod();
 		if (method.getDeclaringClass().equals(contract.getTargetClass())) {
-			try {
-				contract.getTargetClass().getMethod(method.getName(), method.getSignature());
-			} catch (NotFoundException e) {
-				return;
-			}
 			handleTargetMethodCall(methodCall);
 		} else if (method.getDeclaringClass().getName().equals(Condition.class.getName())) {
 			if (method.getName().equals("old")) {
@@ -118,15 +107,6 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		lastMethodCall = method;
 		arrayMembers.add(method);
 		lastFieldAccess = null;
-		// logger.info("last method call: " + lastMethodCall);
-		// logger.info("replacing call to " + methodCall.getClassName() + "." + methodCall.getMethodName());
-		// CastExp replacementCall = CastExp.forReturnType(new StaticCallExp(Evaluator.methodCall, new
-		// ValueExp(methodCall
-		// .getMethodName()), ArrayExp.forParamTypes(method), ArrayExp.forArgs(method)));
-		// AssignmentExp assignment = new AssignmentExp(NestedExp.RETURN_VALUE, replacementCall);
-		// String code = assignment.toStandalone().getCode();
-		// logger.info("replacement code: " + code);
-		// methodCall.replace(code);
 	}
 
 	private void handleOldMethodCall(MethodCall methodCall) throws NotFoundException, CannotCompileException {

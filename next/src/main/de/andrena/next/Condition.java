@@ -15,8 +15,8 @@ public class Condition {
 		return Evaluator.<T> getReturnValue();
 	}
 
-	public static Object result() {
-		return Evaluator.getReturnValue();
+	public static <T> T result() {
+		return Evaluator.<T> getReturnValue();
 	}
 
 	public static <T> T ignored() {
@@ -29,6 +29,10 @@ public class Condition {
 
 	public static boolean unchanged(Object... fieldOrMethodWithoutParameters) {
 		return false;
+	}
+
+	public static <T> T target(Class<T> targetType) {
+		return Evaluator.<T> getCurrentTarget();
 	}
 
 	public static <T> T target() {

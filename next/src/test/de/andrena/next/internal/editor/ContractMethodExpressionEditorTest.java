@@ -74,14 +74,6 @@ public class ContractMethodExpressionEditorTest {
 		assertNull(editor.lastMethodCall);
 	}
 
-	// @Test
-	// public void testEditFieldAccessOnTargetField() throws Exception {
-	// when(fieldAccess.isStatic()).thenReturn(Boolean.FALSE);
-	// when(fieldAccess.isWriter()).thenReturn(Boolean.FALSE);
-	// editor.editFieldAccess(fieldAccess);
-	// verify(fieldAccess).replace(contains("someField"));
-	// }
-
 	@Test
 	public void testEditFieldAccessOnStaticTargetField() throws Exception {
 		when(fieldAccess.isStatic()).thenReturn(Boolean.TRUE);
@@ -119,33 +111,6 @@ public class ContractMethodExpressionEditorTest {
 		when(fieldAccess.isWriter()).thenReturn(Boolean.TRUE);
 		editor.editFieldAccess(fieldAccess);
 	}
-
-	// @Test
-	// public void testEditMethodCallToTargetMethod() throws Exception {
-	// when(methodCall.getMethod()).thenReturn(targetClass.getDeclaredMethod("someMethod"));
-	// editor.editMethodCall(methodCall);
-	// verify(methodCall).replace(anyString());
-	// assertEquals(targetClass.getDeclaredMethod("someMethod"), editor.lastMethodCall);
-	// assertNull(editor.lastFieldAccess);
-	// }
-	//
-	// @Test
-	// public void testEditMethodCallToContractOnlyMethod() throws Exception {
-	// when(methodCall.getMethod()).thenReturn(contractClass.getDeclaredMethod("contractOnlyMethod"));
-	// editor.editMethodCall(methodCall);
-	// verify(methodCall, never()).replace(anyString());
-	// assertNull(editor.lastMethodCall);
-	// assertNull(editor.lastFieldAccess);
-	// }
-	//
-	// @Test
-	// public void testEditMethodCallToOverriddenContractMethod() throws Exception {
-	// when(methodCall.getMethod()).thenReturn(contractClass.getDeclaredMethod("someMethod"));
-	// editor.editMethodCall(methodCall);
-	// verify(methodCall).replace(anyString());
-	// assertEquals(targetClass.getDeclaredMethod("someMethod"), editor.lastMethodCall);
-	// assertNull(editor.lastFieldAccess);
-	// }
 
 	@Test
 	public void testEditMethodCallToOldWithField() throws Exception {
