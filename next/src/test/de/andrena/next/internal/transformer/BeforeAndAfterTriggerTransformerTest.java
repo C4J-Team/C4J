@@ -59,6 +59,12 @@ public class BeforeAndAfterTriggerTransformerTest {
 	}
 
 	public static class TargetClass {
+		public TargetClass() {
+		}
+
+		public TargetClass(double value) {
+		}
+
 		public void contractMethod() {
 		}
 	}
@@ -68,6 +74,9 @@ public class BeforeAndAfterTriggerTransformerTest {
 		}
 
 		public ContractClass(int value) {
+		}
+
+		public ContractClass(double value) {
 		}
 
 		@ClassInvariant
@@ -119,11 +128,24 @@ public class BeforeAndAfterTriggerTransformerTest {
 	}
 
 	@Test
+	public void testGetAffectedConstructorDuplicateFound() throws Exception {
+		assertNull(transformer.getAffectedConstructor(contractInfo, targetClass,
+				contractClass.getDeclaredConstructor(new CtClass[0])));
+	}
+
+	@Test
 	public void testGetAffectedConstructor() throws Exception {
 		assertEquals(
-				targetClass.getDeclaredConstructor(new CtClass[0]),
+				targetClass.getDeclaredConstructor(new CtClass[] { CtClass.doubleType }),
 				transformer.getAffectedConstructor(contractInfo, targetClass,
-						contractClass.getDeclaredConstructor(new CtClass[0])));
+						contractClass.getDeclaredConstructor(new CtClass[] { CtClass.doubleType })));
+	}
+
+	@Test
+	public void testGetAffectedConstructorForSynthetic() throws Exception {
+		assertEquals(targetClass.getDeclaredConstructor(new CtClass[0]), transformer.getAffectedConstructor(
+				contractInfo, targetClass,
+				contractClass.getDeclaredMethod(ConstructorTransformer.CONSTRUCTOR_REPLACEMENT_NAME, new CtClass[0])));
 	}
 
 	@Test

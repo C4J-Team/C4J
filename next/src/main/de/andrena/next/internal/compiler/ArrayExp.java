@@ -33,9 +33,13 @@ public class ArrayExp extends NestedExp {
 	}
 
 	public static ArrayExp forArgs(CtBehavior behavior) throws NotFoundException {
+		return ArrayExp.forArgs(behavior, 1);
+	}
+
+	public static ArrayExp forArgs(CtBehavior behavior, int startIndex) throws NotFoundException {
 		List<NestedExp> args = new ArrayList<NestedExp>();
 		for (int i = 0; i < behavior.getParameterTypes().length; i++) {
-			args.add(new StaticCallExp(ObjectConverter.toObject, NestedExp.arg(i + 1)));
+			args.add(new StaticCallExp(ObjectConverter.toObject, NestedExp.arg(i + startIndex)));
 		}
 		return new ArrayExp(Object.class, args);
 	}

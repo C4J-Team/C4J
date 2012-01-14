@@ -1,5 +1,7 @@
 package de.andrena.next.internal.transformer;
 
+import java.lang.reflect.Modifier;
+
 import javassist.CannotCompileException;
 import javassist.CtBehavior;
 import javassist.CtClass;
@@ -34,22 +36,25 @@ public class BeforeAndAfterTriggerTransformer extends AbstractAffectedClassTrans
 		String contractBehaviorName = getContractBehaviorName(contractBehavior);
 		logger.info("transforming method " + affectedBehavior.getLongName() + ", triggered by "
 				+ contractBehavior.getLongName());
-		ArrayExp paramTypesArray = ArrayExp.forParamTypes(affectedBehavior);
-		ArrayExp argsArray = ArrayExp.forArgs(affectedBehavior);
+		ArrayExp paramTypesArray = ArrayExp.forParamTypes(contractBehavior);
+		ArrayExp argsArray = getArgsArray(affectedClass, contractBehavior);
 		StaticCallExp callBefore = new StaticCallExp(Evaluator.before, NestedExp.THIS, new ValueExp(
 				contractInfo.getContractClass()), new ValueExp(contractBehaviorName), paramTypesArray, argsArray);
-		NestedExp returnValue = new StaticCallExp(ObjectConverter.toObject, NestedExp.RETURN_VALUE);
-		if (!(affectedBehavior instanceof CtMethod)
-				|| ((CtMethod) affectedBehavior).getReturnType().equals(CtClass.voidType)) {
-			returnValue = NestedExp.NULL;
-		}
 		StaticCallExp callAfter = new StaticCallExp(Evaluator.after, NestedExp.THIS, new ValueExp(
 				contractInfo.getContractClass()), new ValueExp(contractBehaviorName), paramTypesArray, argsArray,
-				returnValue);
+				getReturnValueExp(affectedBehavior));
 		logger.info("before: " + callBefore.toStandalone().getCode());
 		logger.info("after: " + callAfter.toStandalone().getCode());
 		callBefore.toStandalone().insertBefore(affectedBehavior);
 		callAfter.toStandalone().insertAfter(affectedBehavior);
+	}
+
+	private NestedExp getReturnValueExp(CtBehavior affectedBehavior) throws NotFoundException {
+		if (!(affectedBehavior instanceof CtMethod)
+				|| ((CtMethod) affectedBehavior).getReturnType().equals(CtClass.voidType)) {
+			return NestedExp.NULL;
+		}
+		return new StaticCallExp(ObjectConverter.toObject, NestedExp.RETURN_VALUE);
 	}
 
 	String getContractBehaviorName(CtBehavior contractBehavior) {
@@ -108,13 +113,50 @@ public class BeforeAndAfterTriggerTransformer extends AbstractAffectedClassTrans
 	}
 
 	CtConstructor getAffectedConstructor(ContractInfo contractInfo, CtClass affectedClass, CtBehavior contractBehavior) {
+		CtConstructor affectedConstructor;
 		try {
-			return affectedClass.getDeclaredConstructor(contractBehavior.getParameterTypes());
+			affectedConstructor = affectedClass.getDeclaredConstructor(getConstructorParameterTypes(affectedClass,
+					contractBehavior));
 		} catch (NotFoundException e) {
 			logger.warn("could not find a matching constructor in affected class " + affectedClass.getName()
 					+ " for the constructor defined in contract class " + contractInfo.getContractClass().getName());
 			return null;
 		}
+		if (contractBehavior instanceof CtMethod) {
+			return affectedConstructor;
+		}
+		try {
+			contractInfo.getContractClass().getDeclaredMethod(ConstructorTransformer.CONSTRUCTOR_REPLACEMENT_NAME,
+					contractBehavior.getParameterTypes());
+			return null;
+		} catch (NotFoundException e) {
+			return affectedConstructor;
+		}
+	}
+
+	private CtClass[] getConstructorParameterTypes(CtClass affectedClass, CtBehavior contractBehavior)
+			throws NotFoundException {
+		CtClass[] parameterTypes = contractBehavior.getParameterTypes();
+		if (constructorHasAdditionalParameter(affectedClass)) {
+			CtClass[] initialParameterTypes = parameterTypes;
+			parameterTypes = new CtClass[parameterTypes.length + 1];
+			parameterTypes[0] = affectedClass.getDeclaringClass();
+			for (int i = 0; i < initialParameterTypes.length; i++) {
+				parameterTypes[i + 1] = initialParameterTypes[i];
+			}
+		}
+		return parameterTypes;
+	}
+
+	private boolean constructorHasAdditionalParameter(CtClass affectedClass) throws NotFoundException {
+		return affectedClass.getDeclaringClass() != null && !Modifier.isStatic(affectedClass.getModifiers());
+	}
+
+	private ArrayExp getArgsArray(CtClass affectedClass, CtBehavior contractBehavior) throws NotFoundException {
+		if (isConstructor(contractBehavior) && constructorHasAdditionalParameter(affectedClass)) {
+			return ArrayExp.forArgs(contractBehavior, 2);
+		}
+		return ArrayExp.forArgs(contractBehavior);
 	}
 
 	boolean isConstructor(CtBehavior contractBehavior) {

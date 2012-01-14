@@ -4,5 +4,5 @@ import javassist.CtClass;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 
 public abstract class AbstractAffectedClassTransformer extends ClassTransformer {
-	public abstract void transform(ContractInfo contract, CtClass affectedClass) throws Exception;
+	public abstract void transform(ContractInfo contractInfo, CtClass affectedClass) throws Exception;
 }

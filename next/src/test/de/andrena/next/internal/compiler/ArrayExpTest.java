@@ -57,6 +57,12 @@ public class ArrayExpTest {
 				+ ObjectConverter.toObject.getCode() + "($2) }", ArrayExp.forArgs(dummyMethod).getCode());
 	}
 
+	@Test
+	public void testForArgsWithStartIndex() throws Exception {
+		assertEquals("new java.lang.Object[] { " + ObjectConverter.toObject.getCode() + "($5), "
+				+ ObjectConverter.toObject.getCode() + "($6) }", ArrayExp.forArgs(dummyMethod, 5).getCode());
+	}
+
 	public static class DummyClass {
 		public void dummyMethod(int arg1, String arg2) {
 		}
