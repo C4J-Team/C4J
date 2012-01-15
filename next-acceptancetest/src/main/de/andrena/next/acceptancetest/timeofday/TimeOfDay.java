@@ -16,17 +16,23 @@ public class TimeOfDay implements TimeOfDaySpec {
 
 	@Override
 	public int getHour() {
-		return hour;
+		int result = 0;
+		result = hour;
+		return result;
 	}
 
 	@Override
 	public int getMinute() {
-		return minute;
+		int result = 0;
+		result = minute;
+		return result;
 	}
 
 	@Override
 	public int getSecond() {
-		return second;
+		int result = 0;
+		result = second;
+		return result;
 	}
 
 	@Override

@@ -57,8 +57,8 @@ public class TimeOfDaySpecContract implements TimeOfDaySpec {
 		}
 		if (post()) {
 			assert target.getHour() == hour : "hour set";
-			assert unchanged(target.getMinute());
-			assert unchanged(target.getSecond());
+			assert unchanged(target.getMinute()) : "minute unchanged";
+			assert unchanged(target.getSecond()) : "second unchanged";
 		}
 	}
 
@@ -69,9 +69,9 @@ public class TimeOfDaySpecContract implements TimeOfDaySpec {
 			assert minute <= 59 : "minute <= 59";
 		}
 		if (post()) {
-			assert unchanged(target.getHour());
+			assert unchanged(target.getHour()) : "hour unchanged";
 			assert target.getMinute() == minute : "minute set";
-			assert unchanged(target.getSecond());
+			assert unchanged(target.getSecond()) : "second unchanged";
 		}
 	}
 
@@ -82,8 +82,8 @@ public class TimeOfDaySpecContract implements TimeOfDaySpec {
 			assert second <= 59 : "second <= 59";
 		}
 		if (post()) {
-			assert unchanged(target.getHour());
-			assert unchanged(target.getMinute());
+			assert unchanged(target.getHour()) : "hour unchanged";
+			assert unchanged(target.getMinute()) : "minute unchanged";
 			assert target.getSecond() == second : "second set";
 		}
 	}
