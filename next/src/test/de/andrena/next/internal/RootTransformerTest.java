@@ -4,12 +4,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anySetOf;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import java.util.Collection;
+import java.util.Set;
 
 import javassist.ByteArrayClassPath;
 import javassist.ClassPool;
@@ -56,16 +57,17 @@ public class RootTransformerTest {
 		assertNotNull(transformer.transformClass(TargetClass.class.getName()));
 		assertEquals(targetClass, transformer.contractRegistry.getContractInfo(contractClass).getTargetClass());
 		assertEquals(contractClass, transformer.contractRegistry.getContractInfo(contractClass).getContractClass());
-		verify(targetClassTransformer).transform(argThat(new ArgumentMatcher<Collection<ContractInfo>>() {
-			@Override
-			public boolean matches(Object argument) {
-				@SuppressWarnings("unchecked")
-				Collection<ContractInfo> contractInfos = (Collection<ContractInfo>) argument;
-				return contractInfos != null && contractInfos.size() == 1
-						&& contractInfos.iterator().next().getTargetClass().equals(targetClass)
-						&& contractInfos.iterator().next().getContractClass().equals(contractClass);
-			}
-		}), eq(targetClass));
+		verify(targetClassTransformer).transform(anySetOf(CtClass.class),
+				argThat(new ArgumentMatcher<Set<ContractInfo>>() {
+					@Override
+					public boolean matches(Object argument) {
+						@SuppressWarnings("unchecked")
+						Set<ContractInfo> contractInfos = (Set<ContractInfo>) argument;
+						return contractInfos != null && contractInfos.size() == 1
+								&& contractInfos.iterator().next().getTargetClass().equals(targetClass)
+								&& contractInfos.iterator().next().getContractClass().equals(contractClass);
+					}
+				}), eq(targetClass));
 	}
 
 	@Test
@@ -119,11 +121,11 @@ public class RootTransformerTest {
 	}
 
 	@Test
-	public void testGetContractsForClass() throws Exception {
+	public void testGetInvolvedTypes() throws Exception {
 		CtClass noSuperClass = pool.get(NoSuperClass.class.getName());
-		assertEquals(1, transformer.getContractsForClass(noSuperClass).size());
+		assertEquals(2, transformer.getInvolvedTypes(noSuperClass).size());
 		CtClass subClass = pool.get(SubClass.class.getName());
-		assertEquals(5, transformer.getContractsForClass(subClass).size());
+		assertEquals(6, transformer.getInvolvedTypes(subClass).size());
 	}
 
 	@Contract(NoSuperClassContract.class)

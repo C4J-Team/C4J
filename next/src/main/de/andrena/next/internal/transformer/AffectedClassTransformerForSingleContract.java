@@ -1,6 +1,6 @@
 package de.andrena.next.internal.transformer;
 
-import java.util.Collection;
+import java.util.Set;
 
 import javassist.CtClass;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
@@ -8,8 +8,9 @@ import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 public abstract class AffectedClassTransformerForSingleContract extends AbstractAffectedClassTransformer {
 
 	@Override
-	public void transform(Collection<ContractInfo> contractInfos, CtClass affectedClass) throws Exception {
-		for (ContractInfo contractInfo : contractInfos) {
+	public void transform(Set<CtClass> involvedClasses, Set<ContractInfo> contracts, CtClass affectedClass)
+			throws Exception {
+		for (ContractInfo contractInfo : contracts) {
 			logger.info("transforming class " + affectedClass.getName() + " with contract-class "
 					+ contractInfo.getContractClass().getName() + " from target-class "
 					+ contractInfo.getTargetClass().getName());

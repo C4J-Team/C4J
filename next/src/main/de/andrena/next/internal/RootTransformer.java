@@ -2,8 +2,8 @@ package de.andrena.next.internal;
 
 import java.lang.instrument.ClassFileTransformer;
 import java.security.ProtectionDomain;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javassist.ByteArrayClassPath;
 import javassist.ClassPool;
@@ -26,10 +26,10 @@ public class RootTransformer implements ClassFileTransformer {
 	private Logger logger = Logger.getLogger(getClass());
 	ClassPool pool = ClassPool.getDefault();
 
+	ContractRegistry contractRegistry = new ContractRegistry();
+
 	AffectedClassTransformer targetClassTransformer = new AffectedClassTransformer();
 	ContractClassTransformer contractClassTransformer = new ContractClassTransformer(pool);
-
-	ContractRegistry contractRegistry = new ContractRegistry();
 
 	private static Throwable lastException;
 
@@ -67,40 +67,38 @@ public class RootTransformer implements ClassFileTransformer {
 			contractClassTransformer.transform(contractInfo, affectedClass);
 			return affectedClass.toBytecode();
 		}
-		List<ContractInfo> contractInfos = getContractsForClass(affectedClass);
-		targetClassTransformer.transform(contractInfos, affectedClass);
+		Set<CtClass> involvedTypes = getInvolvedTypes(affectedClass);
+		targetClassTransformer.transform(involvedTypes, getContractsForTypes(involvedTypes), affectedClass);
 		return affectedClass.toBytecode();
 	}
 
-	List<ContractInfo> getContractsForClass(CtClass affectedClass) throws NotFoundException {
-		List<ContractInfo> contractsForClass = new ArrayList<ContractInfo>();
-		addContractsFromType(contractsForClass, affectedClass);
-		CtClass superClass = affectedClass;
-		while (!superClass.getSuperclass().getName().equals(Object.class.getName())) {
-			superClass = superClass.getSuperclass();
-			addContractsFromType(contractsForClass, superClass);
+	Set<CtClass> getInvolvedTypes(CtClass type) throws NotFoundException {
+		Set<CtClass> inheritedTypes = new HashSet<CtClass>();
+		inheritedTypes.add(type);
+		if (type.getSuperclass() != null) {
+			inheritedTypes.addAll(getInvolvedTypes(type.getSuperclass()));
 		}
-		return contractsForClass;
+		for (CtClass interfaze : type.getInterfaces()) {
+			inheritedTypes.addAll(getInvolvedTypes(interfaze));
+		}
+		return inheritedTypes;
 	}
 
-	private void addContractsFromType(List<ContractInfo> contractsForClass, CtClass type) throws NotFoundException {
-		if (type.hasAnnotation(Contract.class)) {
-			if (contractRegistry.hasRegisteredContract(type)) {
-				contractsForClass.add(contractRegistry.getContractInfoForTargetClass(type));
-			} else {
-				String contractClassString = new BackdoorAnnotationLoader(type).getClassValue(Contract.class, "value");
-				CtClass contractClass = pool.get(contractClassString);
-				contractsForClass.add(contractRegistry.registerContract(type, contractClass));
+	private Set<ContractInfo> getContractsForTypes(Set<CtClass> types) throws NotFoundException {
+		Set<ContractInfo> contracts = new HashSet<ContractInfo>();
+		for (CtClass type : types) {
+			if (type.hasAnnotation(Contract.class)) {
+				if (contractRegistry.hasRegisteredContract(type)) {
+					contracts.add(contractRegistry.getContractInfoForTargetClass(type));
+				} else {
+					String contractClassString = new BackdoorAnnotationLoader(type).getClassValue(Contract.class,
+							"value");
+					CtClass contractClass = pool.get(contractClassString);
+					contracts.add(contractRegistry.registerContract(type, contractClass));
+				}
 			}
 		}
-		addContractsFromInterfaces(contractsForClass, type.getInterfaces());
-	}
-
-	private void addContractsFromInterfaces(List<ContractInfo> contractsForClass, CtClass[] interfaces)
-			throws NotFoundException {
-		for (CtClass interfaze : interfaces) {
-			addContractsFromType(contractsForClass, interfaze);
-		}
+		return contracts;
 	}
 
 	void updateClassPath(ClassLoader loader, byte[] classfileBuffer, String className) {
