@@ -1,5 +1,6 @@
 package de.andrena.next.internal.transformer;
 
+import java.lang.annotation.Annotation;
 import java.util.Set;
 
 import javassist.CannotCompileException;
@@ -47,15 +48,16 @@ public class PureTransformer extends AbstractAffectedClassTransformer {
 		affectedBehavior.instrument(new PureMethodExpressionEditor(affectedBehavior));
 	}
 
-	private void addBehaviorAnnotation(CtBehavior targetBehavior, Class<?> annotationClass) throws NotFoundException {
-		AnnotationsAttribute targetAttribute = (AnnotationsAttribute) targetBehavior.getMethodInfo().getAttribute(
+	private void addBehaviorAnnotation(CtBehavior behavior, Class<? extends Annotation> annotationClass)
+			throws NotFoundException {
+		AnnotationsAttribute targetAttribute = (AnnotationsAttribute) behavior.getMethodInfo().getAttribute(
 				AnnotationsAttribute.invisibleTag);
 		if (targetAttribute == null) {
-			targetAttribute = new AnnotationsAttribute(targetBehavior.getMethodInfo().getConstPool(),
+			targetAttribute = new AnnotationsAttribute(behavior.getMethodInfo().getConstPool(),
 					AnnotationsAttribute.invisibleTag);
-			targetBehavior.getMethodInfo().addAttribute(targetAttribute);
+			behavior.getMethodInfo().addAttribute(targetAttribute);
 		}
-		targetAttribute.addAnnotation(new javassist.bytecode.annotation.Annotation(targetBehavior.getMethodInfo()
+		targetAttribute.addAnnotation(new javassist.bytecode.annotation.Annotation(behavior.getMethodInfo()
 				.getConstPool(), ClassPool.getDefault().get(annotationClass.getName())));
 	}
 
