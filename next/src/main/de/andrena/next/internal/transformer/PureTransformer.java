@@ -20,28 +20,26 @@ public class PureTransformer extends AbstractAffectedClassTransformer {
 			throws Exception {
 		for (CtBehavior affectedBehavior : affectedClass.getDeclaredBehaviors()) {
 			for (CtClass involvedClass : involvedClasses) {
-				CtBehavior involvedBehavior;
-				if (affectedBehavior instanceof CtConstructor) {
-					try {
-						involvedBehavior = involvedClass.getDeclaredConstructor(affectedBehavior.getParameterTypes());
-					} catch (NotFoundException e) {
-						continue;
-					}
-				} else {
-					try {
-						involvedBehavior = involvedClass.getDeclaredMethod(affectedBehavior.getName(),
-								affectedBehavior.getParameterTypes());
-					} catch (NotFoundException e) {
-						continue;
-					}
-				}
-				if (involvedBehavior.hasAnnotation(Pure.class)) {
+				CtBehavior involvedBehavior = getBehaviorFromType(affectedBehavior, involvedClass);
+				if (involvedBehavior != null && involvedBehavior.hasAnnotation(Pure.class)) {
 					addBehaviorAnnotation(affectedBehavior, Pure.class);
 				}
 			}
 			if (affectedBehavior.hasAnnotation(Pure.class)) {
 				verifyPure(affectedBehavior);
 			}
+		}
+	}
+
+	private CtBehavior getBehaviorFromType(CtBehavior behavior, CtClass type) {
+		try {
+			if (behavior instanceof CtConstructor) {
+				return type.getDeclaredConstructor(behavior.getParameterTypes());
+			} else {
+				return type.getDeclaredMethod(behavior.getName(), behavior.getParameterTypes());
+			}
+		} catch (NotFoundException e) {
+			return null;
 		}
 	}
 
