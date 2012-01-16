@@ -16,7 +16,7 @@ import de.andrena.next.internal.compiler.ValueExp;
 import de.andrena.next.internal.evaluator.Evaluator;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 
-public class ClassInvariantTransformer extends AbstractAffectedClassTransformer {
+public class ClassInvariantTransformer extends AffectedClassTransformerForSingleContract {
 
 	@Override
 	public void transform(ContractInfo contractInfo, CtClass affectedClass) throws Exception {

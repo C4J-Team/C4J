@@ -4,11 +4,15 @@ import static de.andrena.next.Condition.pre;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.next.Contract;
+import de.andrena.next.systemtest.TransformerAwareRule;
 
 public class ConstructorInInnerClassesSystemTest {
+	@Rule
+	public TransformerAwareRule transformerAware = new TransformerAwareRule();
 
 	private static int expectedNumCalls;
 

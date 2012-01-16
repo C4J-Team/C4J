@@ -18,7 +18,7 @@ import de.andrena.next.internal.evaluator.Evaluator;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 import de.andrena.next.internal.util.ObjectConverter;
 
-public class BeforeAndAfterTriggerTransformer extends AbstractAffectedClassTransformer {
+public class BeforeAndAfterTriggerTransformer extends AffectedClassTransformerForSingleContract {
 
 	@Override
 	public void transform(ContractInfo contractInfo, CtClass affectedClass) throws Exception {

@@ -4,12 +4,16 @@ import static de.andrena.next.Condition.post;
 import static de.andrena.next.Condition.unchanged;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.next.Condition;
 import de.andrena.next.Contract;
+import de.andrena.next.systemtest.TransformerAwareRule;
 
 public class UnchangedSystemTest {
+	@Rule
+	public TransformerAwareRule transformerAware = new TransformerAwareRule();
 
 	private TargetClass target;
 

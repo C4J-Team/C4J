@@ -2,12 +2,16 @@ package de.andrena.next.systemtest.contractclassmagic;
 
 import static de.andrena.next.Condition.post;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.next.Condition;
 import de.andrena.next.Contract;
+import de.andrena.next.systemtest.TransformerAwareRule;
 
 public class RecursiveSystemTest {
+	@Rule
+	public TransformerAwareRule transformerAware = new TransformerAwareRule();
 
 	@Test
 	public void testCorrectEquals() {

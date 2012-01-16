@@ -8,6 +8,9 @@ import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+
+import java.util.Collection;
+
 import javassist.ByteArrayClassPath;
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -53,12 +56,14 @@ public class RootTransformerTest {
 		assertNotNull(transformer.transformClass(TargetClass.class.getName()));
 		assertEquals(targetClass, transformer.contractRegistry.getContractInfo(contractClass).getTargetClass());
 		assertEquals(contractClass, transformer.contractRegistry.getContractInfo(contractClass).getContractClass());
-		verify(targetClassTransformer).transform(argThat(new ArgumentMatcher<ContractInfo>() {
+		verify(targetClassTransformer).transform(argThat(new ArgumentMatcher<Collection<ContractInfo>>() {
 			@Override
 			public boolean matches(Object argument) {
-				ContractInfo contractInfo = (ContractInfo) argument;
-				return contractInfo != null && contractInfo.getTargetClass().equals(targetClass)
-						&& contractInfo.getContractClass().equals(contractClass);
+				@SuppressWarnings("unchecked")
+				Collection<ContractInfo> contractInfos = (Collection<ContractInfo>) argument;
+				return contractInfos != null && contractInfos.size() == 1
+						&& contractInfos.iterator().next().getTargetClass().equals(targetClass)
+						&& contractInfos.iterator().next().getContractClass().equals(contractClass);
 			}
 		}), eq(targetClass));
 	}
@@ -79,7 +84,7 @@ public class RootTransformerTest {
 
 	@Test
 	public void testTransformClassUninvolvedClass() throws Exception {
-		assertNull(transformer.transformClass(UninvolvedClass.class.getName()));
+		assertNotNull(transformer.transformClass(UninvolvedClass.class.getName()));
 	}
 
 	@Test

@@ -3,11 +3,16 @@ package de.andrena.next.systemtest.contractclassmagic;
 import static de.andrena.next.Condition.pre;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.next.Contract;
+import de.andrena.next.systemtest.TransformerAwareRule;
 
 public class RetainingStateSystemTest {
+	@Rule
+	public TransformerAwareRule transformerAware = new TransformerAwareRule();
+
 	private TargetClass target;
 
 	@Before

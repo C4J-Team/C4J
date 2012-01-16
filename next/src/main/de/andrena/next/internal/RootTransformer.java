@@ -61,20 +61,15 @@ public class RootTransformer implements ClassFileTransformer {
 			logger.debug("transformation aborted, as class is an interface");
 			return null;
 		}
-		List<ContractInfo> contractInfos = getContractsForClass(affectedClass);
 		if (contractRegistry.isContractClass(affectedClass)) {
 			ContractInfo contractInfo = contractRegistry.getContractInfo(affectedClass);
 			logger.info("transforming contract " + className);
 			contractClassTransformer.transform(contractInfo, affectedClass);
 			return affectedClass.toBytecode();
 		}
-		if (!contractInfos.isEmpty()) {
-			for (ContractInfo contractInfo : contractInfos) {
-				targetClassTransformer.transform(contractInfo, affectedClass);
-			}
-			return affectedClass.toBytecode();
-		}
-		return null;
+		List<ContractInfo> contractInfos = getContractsForClass(affectedClass);
+		targetClassTransformer.transform(contractInfos, affectedClass);
+		return affectedClass.toBytecode();
 	}
 
 	List<ContractInfo> getContractsForClass(CtClass affectedClass) throws NotFoundException {
