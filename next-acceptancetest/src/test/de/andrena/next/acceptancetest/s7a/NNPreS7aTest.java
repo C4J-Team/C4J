@@ -4,10 +4,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import static de.andrena.next.Condition.ignored;
-import static de.andrena.next.Condition.pre;
-
-import de.andrena.next.Contract;
+import de.andrena.next.acceptancetest.floatingwindow.NorthEastAndSouthWestFloatingWindow;
+import de.andrena.next.acceptancetest.floatingwindow.NorthEastFloatingWindowSpec;
+import de.andrena.next.acceptancetest.floatingwindow.Vector;
+import de.andrena.next.acceptancetest.workingstudent.WorkingStudent;
+import de.andrena.next.acceptancetest.workingstudent.YoungWorkingStudent;
 import de.andrena.next.systemtest.TransformerAwareRule;
 
 public class NNPreS7aTest {
@@ -19,6 +20,8 @@ public class NNPreS7aTest {
 	public ExpectedException thrown = ExpectedException.none();
 	
 	private NorthEastFloatingWindowSpec northEastFloatingWindow;
+	private WorkingStudent workingStudent;
+	private YoungWorkingStudent youngWorkingStudent;
 	
 	@Test
 	public void testErrorByMultipleInheritance() {
@@ -29,138 +32,29 @@ public class NNPreS7aTest {
 		northEastFloatingWindow.move(new Vector(-2, -5));
 	}
 	
-	private interface Window {
+	@Test
+	public void testWarningMessageByStrengtheningOfPrecondition() {
+		transformerAware.expectLogWarning(
+				"Precondition for method setAge in class WorkingStudent was ignored." +
+				"Preconditions should not be strengthened in a subtype.");
 		
-		Vector getUpperLeftCorner();
-		
-		int getWidth();
-		
-		int getHeight();
-		
+		youngWorkingStudent = new YoungWorkingStudent();
+		youngWorkingStudent.setAge(60);
 	}
 	
-	@Contract(NorthEastFloatingWindowContract.class)
-	public interface NorthEastFloatingWindowSpec extends Window {
-		
-		void move(Vector vector);
-		
+	@Test
+	public void testMultipleInheritanceOk_PreTrue() {
+		workingStudent = new WorkingStudent();
+		workingStudent.setAge(99);
 	}
 	
-	public static class NorthEastFloatingWindowContract implements NorthEastFloatingWindowSpec {
-
-		@Override
-		public Vector getUpperLeftCorner() {
-			// No contracts identified yet
-			return ignored();
-		}
-
-		@Override
-		public int getWidth() {
-			// No contracts identified yet
-			return ignored();
-		}
-
-		@Override
-		public int getHeight() {
-			// No contracts identified yet
-			return ignored();
-		}
-
-		@Override
-		public void move(Vector vector) {
-			if(pre()) {
-				assert vector.x > 0 : "vector.x > 0";
-				assert vector.y > 0 : "vector.y > 0";
-			}		
-		}
+	@Test
+	public void testMultipleInheritanceOk_PreFalse() {
+		thrown.expect(AssertionError.class);
+		thrown.expectMessage("age < 100");
 		
-	}
-	
-	@Contract(SouthWestFloatingWindowContract.class)
-	public interface SouthWestFloatingWindowSpec extends Window {
-		
-		void move(Vector vector);
-		
-	}
-	
-	public static class SouthWestFloatingWindowContract implements SouthWestFloatingWindowSpec {
-
-		@Override
-		public Vector getUpperLeftCorner() {
-			// No contracts identified yet
-			return ignored();
-		}
-
-		@Override
-		public int getWidth() {
-			// No contracts identified yet
-			return ignored();
-		}
-
-		@Override
-		public int getHeight() {
-			// No contracts identified yet
-			return ignored();
-		}
-
-		@Override
-		public void move(Vector vector) {
-			if(pre()) {
-				assert vector.x < 0 : "vector.x < 0";
-				assert vector.y < 0 : "vector.y < 0";
-			}		
-		}
-		
-	}
-	
-	public class NorthEastAndSouthWestFloatingWindow implements NorthEastFloatingWindowSpec, SouthWestFloatingWindowSpec {
-
-		private Vector upperLeftCorner;		
-		private int width;		
-		private int height;
-		
-		public NorthEastAndSouthWestFloatingWindow(Vector upperLeftCorner, int width, int height) {
-			this.upperLeftCorner = upperLeftCorner;
-			this.width = width;
-			this.height = height;
-		}
-		
-		@Override
-		public Vector getUpperLeftCorner() {
-			return upperLeftCorner;
-		}
-
-		@Override
-		public int getWidth() {
-			return width;
-		}
-
-		@Override
-		public int getHeight() {
-			return height;
-		}
-
-		@Override
-		public void move(Vector vector) {
-			upperLeftCorner.add(vector);
-		}
-		
-	}
-	
-	public class Vector {
-		
-		int x, y;
-		
-		public Vector(int x, int y) {
-			this.x = x;
-			this.y = y;
-		}
-		
-		public void add(Vector vector) {
-			this.x += vector.x;
-			this.y += vector.y;
-		}
-		
+		workingStudent = new WorkingStudent();
+		workingStudent.setAge(101);
 	}
 	
 }
