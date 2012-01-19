@@ -34,8 +34,8 @@ public class PureMethodExpressionEditor extends ExprEditor {
 
 	private void editFieldAccess(FieldAccess fieldAccess) throws CannotCompileException, NotFoundException {
 		if (fieldAccess.isWriter()) {
-			pureError("illegal field write access in pure method " + affectedBehavior + " on field "
-					+ fieldAccess.getField().getName() + " on line " + fieldAccess.getLineNumber());
+			pureError("illegal field write access on field " + fieldAccess.getField().getName() + " in pure method "
+					+ affectedBehavior.getLongName() + " on line " + fieldAccess.getLineNumber());
 		}
 	}
 
@@ -50,8 +50,8 @@ public class PureMethodExpressionEditor extends ExprEditor {
 
 	private void editMethodCall(MethodCall methodCall) throws NotFoundException, CannotCompileException {
 		if (!methodCall.getMethod().hasAnnotation(Pure.class)) {
-			pureError("illegal method access on in pure method " + affectedBehavior + " on method "
-					+ methodCall.getMethod().getLongName() + " on line " + methodCall.getLineNumber());
+			pureError("illegal method access on method " + methodCall.getMethod().getLongName() + " in pure method "
+					+ affectedBehavior.getLongName() + " on line " + methodCall.getLineNumber());
 		}
 	}
 

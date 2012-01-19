@@ -1,6 +1,5 @@
 package de.andrena.next.internal.transformer;
 
-import java.lang.annotation.Annotation;
 import java.util.Set;
 
 import javassist.CannotCompileException;
@@ -21,8 +20,22 @@ public class PureTransformer extends AbstractAffectedClassTransformer {
 			throws Exception {
 		for (CtBehavior affectedBehavior : affectedClass.getDeclaredBehaviors()) {
 			for (CtClass involvedClass : involvedClasses) {
-				CtBehavior involvedBehavior = getBehaviorFromType(affectedBehavior, involvedClass);
-				if (involvedBehavior != null && involvedBehavior.hasAnnotation(Pure.class)) {
+				CtBehavior involvedBehavior;
+				if (affectedBehavior instanceof CtConstructor) {
+					try {
+						involvedBehavior = involvedClass.getDeclaredConstructor(affectedBehavior.getParameterTypes());
+					} catch (NotFoundException e) {
+						continue;
+					}
+				} else {
+					try {
+						involvedBehavior = involvedClass.getDeclaredMethod(affectedBehavior.getName(),
+								affectedBehavior.getParameterTypes());
+					} catch (NotFoundException e) {
+						continue;
+					}
+				}
+				if (involvedBehavior.hasAnnotation(Pure.class)) {
 					addBehaviorAnnotation(affectedBehavior, Pure.class);
 				}
 			}
@@ -32,32 +45,19 @@ public class PureTransformer extends AbstractAffectedClassTransformer {
 		}
 	}
 
-	private CtBehavior getBehaviorFromType(CtBehavior behavior, CtClass type) {
-		try {
-			if (behavior instanceof CtConstructor) {
-				return type.getDeclaredConstructor(behavior.getParameterTypes());
-			} else {
-				return type.getDeclaredMethod(behavior.getName(), behavior.getParameterTypes());
-			}
-		} catch (NotFoundException e) {
-			return null;
-		}
-	}
-
 	private void verifyPure(CtBehavior affectedBehavior) throws CannotCompileException {
 		affectedBehavior.instrument(new PureMethodExpressionEditor(affectedBehavior));
 	}
 
-	private void addBehaviorAnnotation(CtBehavior behavior, Class<? extends Annotation> annotationClass)
-			throws NotFoundException {
-		AnnotationsAttribute targetAttribute = (AnnotationsAttribute) behavior.getMethodInfo().getAttribute(
+	private void addBehaviorAnnotation(CtBehavior targetBehavior, Class<?> annotationClass) throws NotFoundException {
+		AnnotationsAttribute targetAttribute = (AnnotationsAttribute) targetBehavior.getMethodInfo().getAttribute(
 				AnnotationsAttribute.invisibleTag);
 		if (targetAttribute == null) {
-			targetAttribute = new AnnotationsAttribute(behavior.getMethodInfo().getConstPool(),
+			targetAttribute = new AnnotationsAttribute(targetBehavior.getMethodInfo().getConstPool(),
 					AnnotationsAttribute.invisibleTag);
-			behavior.getMethodInfo().addAttribute(targetAttribute);
+			targetBehavior.getMethodInfo().addAttribute(targetAttribute);
 		}
-		targetAttribute.addAnnotation(new javassist.bytecode.annotation.Annotation(behavior.getMethodInfo()
+		targetAttribute.addAnnotation(new javassist.bytecode.annotation.Annotation(targetBehavior.getMethodInfo()
 				.getConstPool(), ClassPool.getDefault().get(annotationClass.getName())));
 	}
 

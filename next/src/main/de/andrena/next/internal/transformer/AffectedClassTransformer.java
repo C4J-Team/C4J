@@ -10,7 +10,8 @@ import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 
 public class AffectedClassTransformer extends AbstractAffectedClassTransformer {
 	private AbstractAffectedClassTransformer[] transformers = new AbstractAffectedClassTransformer[] {
-			new BeforeAndAfterTriggerTransformer(), new ClassInvariantTransformer(), new PureTransformer() };
+			// beware: PureTransformer has to run first!
+			new PureTransformer(), new BeforeAndAfterTriggerTransformer(), new ClassInvariantTransformer() };
 	private Logger logger = Logger.getLogger(getClass());
 
 	protected AbstractAffectedClassTransformer[] getTransformers() {
