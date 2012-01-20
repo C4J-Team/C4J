@@ -6,6 +6,7 @@ import de.andrena.next.ClassInvariant;
 import de.andrena.next.Condition;
 
 public class TimeOfDayContract extends TimeOfDay {
+	
 	private TimeOfDay target = Condition.target();
 
 	public TimeOfDayContract() {

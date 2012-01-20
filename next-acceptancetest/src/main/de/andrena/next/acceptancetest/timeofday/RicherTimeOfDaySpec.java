@@ -5,6 +5,7 @@ import de.andrena.next.Pure;
 
 @Contract(RicherTimeOfDaySpecContract.class)
 public interface RicherTimeOfDaySpec extends TimeOfDaySpec {
+	
 	@Pure
 	int getNearestHour();
 

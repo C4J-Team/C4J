@@ -6,6 +6,7 @@ import de.andrena.next.ClassInvariant;
 import de.andrena.next.Condition;
 
 public class RicherTimeOfDayContract extends RicherTimeOfDay {
+	
 	private RicherTimeOfDay target = Condition.target();
 
 	public RicherTimeOfDayContract() {

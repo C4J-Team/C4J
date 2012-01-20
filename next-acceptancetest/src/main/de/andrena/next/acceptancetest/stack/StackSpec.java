@@ -6,6 +6,7 @@ import de.andrena.next.Pure;
 @Contract(StackSpecContract.class)
 public interface StackSpec<T>
 {
+	
 	@Pure
 	int capacity ();
 
@@ -27,5 +28,6 @@ public interface StackSpec<T>
 
     @Pure
     T get (int index);
+    
 }
 

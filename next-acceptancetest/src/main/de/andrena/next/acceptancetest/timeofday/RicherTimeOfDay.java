@@ -4,6 +4,7 @@ import de.andrena.next.Contract;
 
 @Contract(RicherTimeOfDayContract.class)
 public class RicherTimeOfDay extends TimeOfDay implements RicherTimeOfDaySpec {
+	
 	@Override
 	public int getNearestHour() {
 		int result = 0;
@@ -20,4 +21,5 @@ public class RicherTimeOfDay extends TimeOfDay implements RicherTimeOfDaySpec {
 		}
 		return result;
 	}
+	
 }

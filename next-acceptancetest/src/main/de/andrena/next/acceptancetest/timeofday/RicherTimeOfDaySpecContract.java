@@ -7,6 +7,7 @@ import static de.andrena.next.Condition.result;
 import de.andrena.next.Condition;
 
 public class RicherTimeOfDaySpecContract implements RicherTimeOfDaySpec {
+	
 	private RicherTimeOfDaySpec target = Condition.target();
 
 	@Override
@@ -87,4 +88,5 @@ public class RicherTimeOfDaySpecContract implements RicherTimeOfDaySpec {
 		}
 		return ignored();
 	}
+	
 }

@@ -4,6 +4,7 @@ import de.andrena.next.Contract;
 
 @Contract(TimeOfDayContract.class)
 public class TimeOfDay implements TimeOfDaySpec {
+	
 	private int hour;
 	private int minute;
 	private int second;
@@ -49,4 +50,5 @@ public class TimeOfDay implements TimeOfDaySpec {
 	public void setSecond(int second) {
 		this.second = second;
 	}
+	
 }

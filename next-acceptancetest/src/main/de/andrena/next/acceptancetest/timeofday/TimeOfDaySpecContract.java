@@ -8,6 +8,7 @@ import static de.andrena.next.Condition.unchanged;
 import de.andrena.next.Condition;
 
 public class TimeOfDaySpecContract implements TimeOfDaySpec {
+	
 	private TimeOfDaySpec target = Condition.target();
 
 	@Override

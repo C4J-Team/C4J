@@ -11,6 +11,7 @@ import org.junit.rules.ExpectedException;
 import de.andrena.next.systemtest.TransformerAwareRule;
 
 public class StackTest {
+	
 	private Stack<Integer> classUnderTest;
 	private final int CAPACITY = 5;
 
