@@ -1,6 +1,7 @@
 package de.andrena.next.internal;
 
 import java.lang.instrument.ClassFileTransformer;
+import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,7 +14,9 @@ import javassist.NotFoundException;
 
 import org.apache.log4j.Logger;
 
+import de.andrena.next.Configuration;
 import de.andrena.next.Contract;
+import de.andrena.next.DefaultConfiguration;
 import de.andrena.next.internal.transformer.AffectedClassTransformer;
 import de.andrena.next.internal.transformer.ContractClassTransformer;
 import de.andrena.next.internal.transformer.TransformationException;
@@ -28,10 +31,62 @@ public class RootTransformer implements ClassFileTransformer {
 
 	ContractRegistry contractRegistry = new ContractRegistry();
 
-	AffectedClassTransformer targetClassTransformer = new AffectedClassTransformer();
-	ContractClassTransformer contractClassTransformer = new ContractClassTransformer(pool);
+	AffectedClassTransformer targetClassTransformer = new AffectedClassTransformer(this);
+	ContractClassTransformer contractClassTransformer = new ContractClassTransformer(this);
 
 	private static Throwable lastException;
+
+	private Configuration configuration;
+
+	public ClassPool getPool() {
+		return pool;
+	}
+
+	public Configuration getConfiguration() {
+		return configuration;
+	}
+
+	public RootTransformer(String agentArgs, Instrumentation inst) {
+		loadConfiguration(agentArgs, inst);
+	}
+
+	private void loadConfiguration(String agentArgs, Instrumentation inst) {
+		if (agentArgs == null || agentArgs.isEmpty()) {
+			logger.warn("no configuration given - errors from @Pure are completely disabled. using default configuration.");
+			configuration = new DefaultConfiguration();
+		} else {
+			try {
+				Class<?> configurationClass = Class.forName(agentArgs);
+				configuration = (Configuration) configurationClass.newInstance();
+				checkConfigurationLoadingRootClasses(agentArgs);
+				logger.info("loaded configuration from class '" + agentArgs + "'.");
+			} catch (Exception e) {
+				logger.error("could not load configuration from class '" + agentArgs
+						+ "'. using default configuration.", e);
+				configuration = new DefaultConfiguration();
+			}
+		}
+	}
+
+	private void checkConfigurationLoadingRootClasses(String agentArgs) throws NotFoundException {
+		CtClass ctClass = pool.get(agentArgs);
+		@SuppressWarnings("unchecked")
+		Set<String> configurationClasses = ctClass.getClassFile().getConstPool().getClassNames();
+		Set<String> rootPackages = configuration.getRootPackages();
+		for (String classNameWithSlashes : configurationClasses) {
+			String className = convertSlashesToDots(classNameWithSlashes);
+			if (className.equals(agentArgs)) {
+				continue;
+			}
+			for (String rootPackage : rootPackages) {
+				if (className.startsWith(rootPackage)) {
+					throw new RuntimeException(
+							"classes within root-packages must not be referenced by the configuration. offending class: '"
+									+ className + "'.");
+				}
+			}
+		}
+	}
 
 	public static Throwable getLastException() {
 		return lastException;
@@ -40,7 +95,7 @@ public class RootTransformer implements ClassFileTransformer {
 	@Override
 	public byte[] transform(ClassLoader loader, String classNameWithSlashes, Class<?> classBeingRedefined,
 			ProtectionDomain protectionDomain, byte[] classfileBuffer) {
-		String className = classNameWithSlashes.replace('/', '.');
+		String className = convertSlashesToDots(classNameWithSlashes);
 		logger.debug("transformation started for class " + className);
 		try {
 			updateClassPath(loader, classfileBuffer, className);
@@ -53,6 +108,10 @@ public class RootTransformer implements ClassFileTransformer {
 			logger.fatal("transformation failed for class '" + className + "'", e);
 		}
 		return null;
+	}
+
+	private String convertSlashesToDots(String classNameWithSlashes) {
+		return classNameWithSlashes.replace('/', '.');
 	}
 
 	byte[] transformClass(String className) throws Exception {

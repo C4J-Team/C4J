@@ -6,13 +6,19 @@ import javassist.CtClass;
 
 import org.apache.log4j.Logger;
 
+import de.andrena.next.internal.RootTransformer;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 
 public class AffectedClassTransformer extends AbstractAffectedClassTransformer {
-	private AbstractAffectedClassTransformer[] transformers = new AbstractAffectedClassTransformer[] {
-			// beware: PureTransformer has to run first!
-			new PureTransformer(), new BeforeAndAfterTriggerTransformer(), new ClassInvariantTransformer() };
+	private AbstractAffectedClassTransformer[] transformers;
 	private Logger logger = Logger.getLogger(getClass());
+
+	public AffectedClassTransformer(RootTransformer rootTransformer) {
+		transformers = new AbstractAffectedClassTransformer[] {
+				// beware: PureTransformer has to run first!
+				new PureTransformer(rootTransformer), new BeforeAndAfterTriggerTransformer(),
+				new ClassInvariantTransformer() };
+	}
 
 	protected AbstractAffectedClassTransformer[] getTransformers() {
 		return transformers;

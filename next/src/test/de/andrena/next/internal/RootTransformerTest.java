@@ -37,7 +37,7 @@ public class RootTransformerTest {
 
 	@Before
 	public void before() throws Exception {
-		transformer = new RootTransformer();
+		transformer = new RootTransformer("", null);
 		targetClassTransformer = mock(AffectedClassTransformer.class);
 		transformer.targetClassTransformer = targetClassTransformer;
 		contractClassTransformer = mock(ContractClassTransformer.class);

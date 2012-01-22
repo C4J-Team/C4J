@@ -1,14 +1,14 @@
 package de.andrena.next.internal.transformer;
 
-import javassist.ClassPool;
 import javassist.CtClass;
+import de.andrena.next.internal.RootTransformer;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 
 public class ContractClassTransformer extends AbstractContractClassTransformer {
 
 	private AbstractContractClassTransformer[] transformers;
 
-	public ContractClassTransformer(ClassPool pool) {
+	public ContractClassTransformer(RootTransformer rootTransformer) {
 		this.transformers = new AbstractContractClassTransformer[] { new ContractExpressionTransformer(),
 				new ConstructorTransformer() };
 	}
