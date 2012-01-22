@@ -1,14 +1,20 @@
 package de.andrena.next.internal.editor;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 
 import javassist.CannotCompileException;
 import javassist.CtBehavior;
+import javassist.CtClass;
+import javassist.CtConstructor;
+import javassist.CtMember;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 import javassist.expr.ExprEditor;
 import javassist.expr.FieldAccess;
 import javassist.expr.MethodCall;
+import javassist.expr.NewExpr;
 
 import org.apache.log4j.Logger;
 
@@ -54,37 +60,69 @@ public class PureMethodExpressionEditor extends ExprEditor {
 		}
 	}
 
+	@Override
+	public void edit(NewExpr newExpr) throws CannotCompileException {
+		try {
+			editNewExpr(newExpr);
+		} catch (Exception e) {
+			throw new CannotCompileException(e);
+		}
+	}
+
 	private void editMethodCall(MethodCall methodCall) throws NotFoundException, CannotCompileException,
 			SecurityException, NoSuchMethodException {
 		CtMethod method = methodCall.getMethod();
-		for (Method whitelistMethod : configuration.getPureWhitelist()) {
-			if (isEqual(method, whitelistMethod)) {
+		for (Member whitelistMember : configuration.getPureWhitelist()) {
+			if (whitelistMember instanceof Method && isEqual(method, (Method) whitelistMember)) {
 				return;
 			}
 		}
 		if (!method.hasAnnotation(Pure.class)) {
-			pureError("illegal method access on method " + method.getLongName() + " in pure method "
+			pureError("illegal method access on method " + method.getLongName() + " in pure method/constructor "
 					+ affectedBehavior.getLongName() + " on line " + methodCall.getLineNumber());
 		}
 	}
 
+	private void editNewExpr(NewExpr newExpr) throws NotFoundException, SecurityException, NoSuchMethodException,
+			CannotCompileException {
+		CtConstructor constructor = newExpr.getConstructor();
+		for (Member whitelistMember : configuration.getPureWhitelist()) {
+			if (whitelistMember instanceof Constructor && isEqual(constructor, (Constructor<?>) whitelistMember)) {
+				return;
+			}
+		}
+		if (!constructor.hasAnnotation(Pure.class)) {
+			pureError("illegal constructor access on constructor " + constructor.getLongName()
+					+ " in pure method/constructor " + affectedBehavior.getLongName() + " on line "
+					+ newExpr.getLineNumber());
+		}
+	}
+
+	private boolean isEqual(CtConstructor constructor, Constructor<?> whitelistConstructor) throws NotFoundException {
+		hasSameClass(constructor, whitelistConstructor);
+		return isEqual(constructor.getParameterTypes(), whitelistConstructor.getParameterTypes());
+	}
+
+	private boolean hasSameClass(CtMember member, Member whitelistMember) {
+		return whitelistMember.getDeclaringClass().getName().equals(member.getDeclaringClass().getName());
+	}
+
 	private boolean isEqual(CtMethod method, Method whitelistMethod) throws NotFoundException {
-		if (!whitelistMethod.getDeclaringClass().getName().equals(method.getDeclaringClass().getName())) {
-			logger.info(whitelistMethod.getDeclaringClass().getName() + " vs " + method.getDeclaringClass().getName());
+		if (!hasSameClass(method, whitelistMethod)) {
 			return false;
 		}
 		if (!whitelistMethod.getName().equals(method.getName())) {
-			logger.info(whitelistMethod.getName() + " vs " + method.getName());
 			return false;
 		}
-		Class<?>[] whitelistParamTypes = whitelistMethod.getParameterTypes();
-		if (whitelistParamTypes.length != method.getParameterTypes().length) {
-			logger.info(whitelistParamTypes.length + " vs " + method.getParameterTypes().length);
+		return isEqual(method.getParameterTypes(), whitelistMethod.getParameterTypes());
+	}
+
+	private boolean isEqual(CtClass[] parameterTypes, Class<?>[] whitelistParamTypes) {
+		if (whitelistParamTypes.length != parameterTypes.length) {
 			return false;
 		}
 		for (int i = 0; i < whitelistParamTypes.length; i++) {
-			if (!whitelistParamTypes[i].getName().equals(method.getParameterTypes()[i].getName())) {
-				logger.info(whitelistParamTypes[i].getName() + " vs " + method.getParameterTypes()[i].getName());
+			if (!whitelistParamTypes[i].getName().equals(parameterTypes[i].getName())) {
 				return false;
 			}
 		}

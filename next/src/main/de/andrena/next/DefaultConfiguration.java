@@ -1,6 +1,6 @@
 package de.andrena.next;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.Member;
 import java.util.Collections;
 import java.util.Set;
 
@@ -11,7 +11,7 @@ public class DefaultConfiguration implements Configuration {
 	}
 
 	@Override
-	public Set<Method> getPureWhitelist() {
+	public Set<Member> getPureWhitelist() {
 		return Collections.emptySet();
 	}
 }

@@ -1,6 +1,6 @@
 package de.andrena.next;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.Member;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -17,8 +17,8 @@ public class TestConfiguration implements Configuration {
 	}
 
 	@Override
-	public Set<Method> getPureWhitelist() throws NoSuchMethodException, SecurityException {
-		Set<Method> pureWhitelist = new HashSet<Method>();
+	public Set<Member> getPureWhitelist() throws NoSuchMethodException, SecurityException {
+		Set<Member> pureWhitelist = new HashSet<Member>();
 		pureWhitelist.add(ArrayList.class.getMethod("size"));
 		pureWhitelist.add(ArrayList.class.getMethod("get", int.class));
 		pureWhitelist.add(ArrayList.class.getMethod("isEmpty"));
