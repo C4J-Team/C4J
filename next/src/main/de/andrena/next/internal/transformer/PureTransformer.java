@@ -11,7 +11,7 @@ import javassist.NotFoundException;
 import javassist.bytecode.AnnotationsAttribute;
 import de.andrena.next.Pure;
 import de.andrena.next.internal.RootTransformer;
-import de.andrena.next.internal.editor.PureMethodExpressionEditor;
+import de.andrena.next.internal.editor.PureBehaviorExpressionEditor;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 
 public class PureTransformer extends AbstractAffectedClassTransformer {
@@ -55,7 +55,7 @@ public class PureTransformer extends AbstractAffectedClassTransformer {
 
 	private void verifyPure(CtBehavior affectedBehavior) throws CannotCompileException {
 		affectedBehavior
-				.instrument(new PureMethodExpressionEditor(affectedBehavior, rootTransformer.getConfiguration()));
+				.instrument(new PureBehaviorExpressionEditor(affectedBehavior, rootTransformer.getConfiguration()));
 	}
 
 	private void addBehaviorAnnotation(CtBehavior targetBehavior, Class<?> annotationClass) throws NotFoundException {

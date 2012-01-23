@@ -47,10 +47,10 @@ public class PureInContractSystemTest {
 
 	@Test(expected = AssertionError.class)
 	public void testPureInContractForUnpureMethod() {
-		new TargetClassForPureMethod().method();
+		new TargetClassForUnpureMethod().method();
 	}
 
-	@Contract(ContractClassForPureMethod.class)
+	@Contract(ContractClassForUnpureMethod.class)
 	public static class TargetClassForUnpureMethod {
 		public void method() {
 		}
