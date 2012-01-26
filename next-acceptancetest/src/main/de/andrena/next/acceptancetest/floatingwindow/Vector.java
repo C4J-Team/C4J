@@ -1,5 +1,7 @@
 package de.andrena.next.acceptancetest.floatingwindow;
 
+import de.andrena.next.Pure;
+
 public class Vector {
 	
 	private int x, y;
@@ -14,10 +16,12 @@ public class Vector {
 		this.y += vector.y;
 	}
 	
+	@Pure
 	public int getX() {
 		return x;
 	}
 	
+	@Pure
 	public int getY() {
 		return y;
 	}
