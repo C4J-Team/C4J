@@ -13,7 +13,7 @@ import org.junit.rules.ExpectedException;
 import de.andrena.next.systemtest.TransformerAwareRule;
 
 public class ColoredPointTest {
-	
+
 	@Rule
 	public TransformerAwareRule transformerAware = new TransformerAwareRule();
 
@@ -107,8 +107,8 @@ public class ColoredPointTest {
 		// Test post-condition for "is symmetric"
 		// assert x.equals(y) == y.equals(x) : "is symmetric";
 		ColoredPoint x = classUnderTest;
-		ColoredPoint y = new ColoredPoint(x.getX(), x.getY(), x.getColor());
-		assertTrue(x.equals(y));
+		Point y = new Point(x.getX(), x.getY());
+		assertFalse(x.equals(y));
 	}
 
 	@Test

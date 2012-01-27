@@ -8,13 +8,13 @@ import de.andrena.next.Condition;
 public class ObjectSpecContract implements ObjectSpec {
 
 	private ObjectSpec target = Condition.target();
-	
+
 	private Object z;
 	private Integer firstHashCode;
 
 	@Override
 	public boolean equals(Object obj) {
-		if(post()) {
+		if (post()) {
 			boolean result = result(Boolean.class);
 			Object x = target;
 			Object y = obj;
@@ -41,10 +41,10 @@ public class ObjectSpecContract implements ObjectSpec {
 				}
 			}
 		}
-		
+
 		return ignored();
 	}
-	
+
 	@Override
 	public int hashCode() {
 		if (post()) {
@@ -59,7 +59,7 @@ public class ObjectSpecContract implements ObjectSpec {
 
 	@Override
 	public String toString() {
-		if(post()) {
+		if (post()) {
 			String result = result(String.class);
 			assert result != null : "result not null";
 		}
