@@ -1,13 +1,12 @@
 package de.andrena.next.internal.transformer;
 
-import java.lang.reflect.Modifier;
-
 import javassist.CannotCompileException;
 import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.CtConstructor;
 import javassist.CtMethod;
 import javassist.CtNewMethod;
+import javassist.Modifier;
 import javassist.NotFoundException;
 import de.andrena.next.ClassInvariant;
 import de.andrena.next.internal.compiler.ArrayExp;
@@ -31,6 +30,9 @@ public class BeforeAndAfterTriggerTransformer extends AffectedClassTransformerFo
 			throws Exception {
 		CtBehavior affectedBehavior = getAffectedBehavior(contractInfo, affectedClass, contractBehavior);
 		if (affectedBehavior == null) {
+			return;
+		}
+		if (Modifier.isAbstract(affectedBehavior.getModifiers())) {
 			return;
 		}
 		String contractBehaviorName = getContractBehaviorName(contractBehavior);
@@ -108,6 +110,8 @@ public class BeforeAndAfterTriggerTransformer extends AffectedClassTransformerFo
 					+ affectedClass.getName() + " for contract class " + contractInfo.getContractClass().getName()
 					+ " - inserting an empty method");
 			affectedMethod = CtNewMethod.delegator(affectedMethod, affectedClass);
+			affectedMethod.setModifiers(Modifier.clear(affectedMethod.getModifiers(), Modifier.NATIVE));
+			affectedMethod.setModifiers(Modifier.clear(affectedMethod.getModifiers(), Modifier.ABSTRACT));
 			affectedClass.addMethod(affectedMethod);
 		}
 		return affectedMethod;

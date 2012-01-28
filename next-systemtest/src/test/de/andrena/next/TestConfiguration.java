@@ -69,4 +69,9 @@ public class TestConfiguration implements Configuration {
 		}
 	}
 
+	@Override
+	public boolean writeTransformedClasses() {
+		return false;
+	}
+
 }

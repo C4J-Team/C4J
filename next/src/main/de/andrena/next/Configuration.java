@@ -7,4 +7,6 @@ public interface Configuration {
 	Set<String> getRootPackages();
 
 	Set<Member> getPureWhitelist() throws NoSuchMethodException, SecurityException;
+
+	boolean writeTransformedClasses();
 }

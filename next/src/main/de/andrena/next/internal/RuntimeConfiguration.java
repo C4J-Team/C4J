@@ -21,11 +21,13 @@ public class RuntimeConfiguration {
 	private Set<CtMethod> whitelistMethods = new HashSet<CtMethod>();
 	private Set<CtConstructor> whitelistConstructors = new HashSet<CtConstructor>();
 	private Set<String> rootPackages;
+	private boolean writeTransformedClasses;
 	private ClassPool pool;
 	private Logger logger = Logger.getLogger(getClass());
 
 	public RuntimeConfiguration(Configuration configuration, ClassPool pool) throws Exception {
 		this.rootPackages = configuration.getRootPackages();
+		this.writeTransformedClasses = configuration.writeTransformedClasses();
 		this.pool = pool;
 		convertWhitelist(configuration.getPureWhitelist());
 	}
@@ -79,6 +81,10 @@ public class RuntimeConfiguration {
 			}
 		}
 		return false;
+	}
+
+	public boolean writeTransformedClasses() {
+		return writeTransformedClasses;
 	}
 
 }

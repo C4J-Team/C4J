@@ -128,10 +128,13 @@ public class RootTransformer implements ClassFileTransformer {
 			ContractInfo contractInfo = contractRegistry.getContractInfo(affectedClass);
 			logger.info("transforming contract " + className);
 			contractClassTransformer.transform(contractInfo, affectedClass);
-			return affectedClass.toBytecode();
+		} else {
+			Set<CtClass> involvedTypes = involvedTypeInspector.inspect(affectedClass);
+			targetClassTransformer.transform(involvedTypes, getContractsForTypes(involvedTypes), affectedClass);
 		}
-		Set<CtClass> involvedTypes = involvedTypeInspector.inspect(affectedClass);
-		targetClassTransformer.transform(involvedTypes, getContractsForTypes(involvedTypes), affectedClass);
+		if (configuration.writeTransformedClasses()) {
+			affectedClass.writeFile();
+		}
 		return affectedClass.toBytecode();
 	}
 

@@ -14,4 +14,9 @@ public class DefaultConfiguration implements Configuration {
 	public Set<Member> getPureWhitelist() {
 		return Collections.emptySet();
 	}
+
+	@Override
+	public boolean writeTransformedClasses() {
+		return false;
+	}
 }
