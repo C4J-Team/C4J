@@ -1,13 +1,8 @@
 package de.andrena.next.internal.editor;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Member;
-
 import javassist.CannotCompileException;
 import javassist.CtBehavior;
-import javassist.CtClass;
 import javassist.CtConstructor;
-import javassist.CtMember;
 import javassist.NotFoundException;
 import javassist.expr.ConstructorCall;
 import javassist.expr.ExprEditor;
@@ -59,27 +54,6 @@ public class PureConstructorExpressionEditor extends ExprEditor {
 			pureError("illegal constructor access on constructor " + constructor.getLongName()
 					+ " in pure method/constructor " + affectedBehavior.getLongName() + " on line " + lineNumber);
 		}
-	}
-
-	private boolean isEqual(CtConstructor constructor, Constructor<?> whitelistConstructor) throws NotFoundException {
-		hasSameClass(constructor, whitelistConstructor);
-		return isEqual(constructor.getParameterTypes(), whitelistConstructor.getParameterTypes());
-	}
-
-	protected boolean isEqual(CtClass[] parameterTypes, Class<?>[] whitelistParamTypes) {
-		if (whitelistParamTypes.length != parameterTypes.length) {
-			return false;
-		}
-		for (int i = 0; i < whitelistParamTypes.length; i++) {
-			if (!whitelistParamTypes[i].getName().equals(parameterTypes[i].getName())) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	protected boolean hasSameClass(CtMember member, Member whitelistMember) {
-		return whitelistMember.getDeclaringClass().getName().equals(member.getDeclaringClass().getName());
 	}
 
 	protected void pureError(String errorMsg) throws CannotCompileException {

@@ -1,7 +1,5 @@
 package de.andrena.next.internal.editor;
 
-import java.lang.reflect.Method;
-
 import javassist.CannotCompileException;
 import javassist.CtBehavior;
 import javassist.CtConstructor;
@@ -97,16 +95,6 @@ public class PureBehaviorExpressionEditor extends PureConstructorExpressionEdito
 	private void editNewExpr(NewExpr newExpr) throws NotFoundException, SecurityException, NoSuchMethodException,
 			CannotCompileException {
 		checkConstructor(affectedBehavior, newExpr.getConstructor(), newExpr.getLineNumber());
-	}
-
-	private boolean isEqual(CtMethod method, Method whitelistMethod) throws NotFoundException {
-		if (!hasSameClass(method, whitelistMethod)) {
-			return false;
-		}
-		if (!whitelistMethod.getName().equals(method.getName())) {
-			return false;
-		}
-		return isEqual(method.getParameterTypes(), whitelistMethod.getParameterTypes());
 	}
 
 	private boolean isSynthetic(CtBehavior behavior) {
