@@ -4,7 +4,7 @@ import org.junit.Test;
 
 import de.andrena.next.Contract;
 
-public class ContractForNativeMethodSystemTest {
+public class ContractForNativeOrAbstractMethodSystemTest {
 
 	@Test
 	public void testContractForNativeMethod() {
