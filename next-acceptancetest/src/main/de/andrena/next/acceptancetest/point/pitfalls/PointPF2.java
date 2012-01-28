@@ -1,5 +1,6 @@
 package de.andrena.next.acceptancetest.point.pitfalls;
 
+import de.andrena.next.Pure;
 import de.andrena.next.acceptancetest.object.ObjectSpec;
 
 public class PointPF2 implements ObjectSpec {
@@ -12,10 +13,12 @@ public class PointPF2 implements ObjectSpec {
 		this.y = y;
 	}
 
+	@Pure
 	public int getX() {
 		return x;
 	}
 
+	@Pure
 	public int getY() {
 		return y;
 	}
