@@ -35,12 +35,12 @@ public class NNPostS4Test {
 	public void before() {
 		stack = new Stack<String>(2);
 	}
-	
+
 	@Test
 	public void countPostconditionFulfilled() throws Exception {
 		stack.count();
 	}
-	
+
 	@Test
 	public void countPostconditionViolatedLowerBound() throws Exception {
 		Stack<String> brokenStack = new Stack<String>(10) {
@@ -53,7 +53,7 @@ public class NNPostS4Test {
 		thrown.expectMessage("result >= 0");
 		brokenStack.count();
 	}
-	
+
 	@Test
 	public void countPostconditionViolatedUpperBound() throws Exception {
 		Stack<String> brokenStack = new Stack<String>(10) {
@@ -66,12 +66,12 @@ public class NNPostS4Test {
 		thrown.expectMessage("count <= capacity");
 		brokenStack.count();
 	}
-	
+
 	@Test
 	public void pushPostconditionFulfilled() throws Exception {
 		stack.push("bottom");
 	}
-	
+
 	@Test
 	public void pushConditionViolatedByNotPushing() throws Exception {
 		Stack<String> brokenStack = new Stack<String>(10) {
@@ -84,13 +84,13 @@ public class NNPostS4Test {
 		thrown.expectMessage("x set");
 		brokenStack.push("bottom");
 	}
-	
+
 	@Test
 	public void popPostconditionFulfilled() throws Exception {
 		stack.push("string");
 		stack.pop();
 	}
-	
+
 	@Test
 	public void popPostconditionViolatedByChangingValues() throws Exception {
 		Stack<String> brokenStack = new Stack<String>(10) {
@@ -111,14 +111,14 @@ public class NNPostS4Test {
 		thrown.expectMessage("values unchanged");
 		brokenStack.pop();
 	}
-	
+
 	@Test
 	public void topPostconditionFulfilled() throws Exception {
 		String x = "teststring";
 		stack.push(x);
 		assertThat(stack.top(), is(sameInstance(x)));
 	}
-	
+
 	@Test
 	public void topPostconditionViolatedByReturningFifoInsteadOfLifo() throws Exception {
 		Stack<String> brokenStack = new Stack<String>(2) {
@@ -134,7 +134,7 @@ public class NNPostS4Test {
 		thrown.expectMessage(containsString("result == top_item"));
 		brokenStack.top();
 	}
-	
+
 	@Test
 	public void isFullPostconditionFulfilled() throws Exception {
 		stack.isFull();
@@ -143,7 +143,7 @@ public class NNPostS4Test {
 		stack.push("last");
 		stack.isFull();
 	}
-	
+
 	@Test
 	public void isFullPostcondtionViolatedInCaseOfFullStack() throws Exception {
 		Stack<String> brokenStack = new Stack<String>(2) {
@@ -159,7 +159,7 @@ public class NNPostS4Test {
 		thrown.expectMessage(containsString("count < capacity"));
 		brokenStack.isFull();
 	}
-	
+
 	@Test
 	public void isFullPostcondtionViolatedInCaseOfNotFullStack() throws Exception {
 		Stack<String> brokenStack = new Stack<String>(2) {
@@ -179,7 +179,7 @@ public class NNPostS4Test {
 		stack.push("first");
 		stack.isEmpty();
 	}
-	
+
 	@Test
 	public void isEmptyPostcondtionViolatedInCaseOfNotEmptyStack() throws Exception {
 		Stack<String> brokenStack = new Stack<String>(2) {
@@ -194,7 +194,7 @@ public class NNPostS4Test {
 		thrown.expectMessage(containsString("count == 0"));
 		brokenStack.isEmpty();
 	}
-	
+
 	@Test
 	public void isEmptyPostcondtionViolatedInCaseOfEmptyStack() throws Exception {
 		Stack<String> brokenStack = new Stack<String>(2) {
@@ -212,28 +212,26 @@ public class NNPostS4Test {
 	public void capacityPostconditionFulfilled() throws Exception {
 		stack.capacity();
 	}
-	
+
 	@Test
 	public void capacityPostconditionViolatedWithAnonymousSubclass() throws Exception {
 		Stack<String> brokenStack = new Stack<String>(1) {
-			// this marker is necessary because capacity() is already called during the verification of
+			// this condition is necessary because capacity() is already called during the verification of
 			// the postcondition of the constructor of Stack<T>
 			// and we want the constructor call to pass the contract
-			private boolean capacityCalled = false;
 			@Override
 			public int capacity() {
-				if (!capacityCalled) {
-					capacityCalled = true;
-					return super.capacity(); 
+				if (new Exception().getStackTrace()[1].getClassName().equals(NNPostS4Test.class.getName())) {
+					return -1;
 				}
-				return -1;
+				return super.capacity();
 			}
 		};
 		thrown.expect(AssertionError.class);
 		thrown.expectMessage(containsString("result > 0"));
 		brokenStack.capacity();
 	}
-	
+
 	@Test
 	public void capacityPostconditionViolatedWithBrokenStack() throws Exception {
 		stack = new BrokenStack<String>(1);
@@ -241,7 +239,7 @@ public class NNPostS4Test {
 		thrown.expectMessage(containsString("result > 0"));
 		stack.capacity();
 	}
-	
+
 	@Test
 	public void capacityPostconditionViolatedWithBrokenStackWithoutClassContract() throws Exception {
 		BrokenStackWithoutClassContract<String> brokenStack = new BrokenStackWithoutClassContract<String>(1);
@@ -251,55 +249,69 @@ public class NNPostS4Test {
 	}
 
 	private static class BrokenStack<T> extends Stack<T> {
-		private boolean capacityCalled = false;
 		public BrokenStack(int capacity) {
 			super(capacity);
 		}
+
 		@Override
 		public int capacity() {
-			if (!capacityCalled) {
-				capacityCalled = true;
-				return super.capacity(); 
+			if (new Exception().getStackTrace()[1].getClassName().equals(NNPostS4Test.class.getName())) {
+				return -1;
 			}
-			return -1;
+			return super.capacity();
 		}
 	}
-	
+
 	private static class BrokenStackWithoutClassContract<T> implements StackSpec<T> {
 		private Stack<T> delegatee;
+
 		public BrokenStackWithoutClassContract(int capacity) {
 			delegatee = new Stack<T>(capacity);
 		}
+
 		@Override
 		public int capacity() {
 			return -1;
 		}
-		
+
 		// methods delegated to delegatee
-		
+
+		@Override
 		public int count() {
 			return delegatee.count();
 		}
+
+		@Override
 		public void push(T x) {
 			delegatee.push(x);
 		}
+
+		@Override
 		public void pop() {
 			delegatee.pop();
 		}
+
+		@Override
 		public T top() {
 			return delegatee.top();
 		}
+
+		@Override
 		public boolean isFull() {
 			return delegatee.isFull();
 		}
+
+		@Override
 		public boolean isEmpty() {
 			return delegatee.isEmpty();
 		}
+
+		@Override
 		public T get(int index) {
 			return delegatee.get(index);
 		}
 	}
-	
+
 	private <T> List<T> getPrivateValuesFieldFromStack(Stack<T> stack) {
 		Field valuesField;
 		try {

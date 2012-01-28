@@ -25,6 +25,7 @@ public class TestConfiguration implements Configuration {
 		pureWhitelist.add(Boolean.class.getMethod("booleanValue"));
 		pureWhitelist.add(Class.class.getMethod("desiredAssertionStatus"));
 		pureWhitelist.add(Class.class.getMethod("getClass"));
+		pureWhitelist.add(Class.class.getMethod("getName"));
 		pureWhitelist.add(Collection.class.getMethod("size"));
 		pureWhitelist.add(Collection.class.getMethod("isEmpty"));
 		pureWhitelist.add(Integer.class.getMethod("intValue"));
@@ -32,7 +33,8 @@ public class TestConfiguration implements Configuration {
 		pureWhitelist.add(List.class.getMethod("get", int.class));
 		pureWhitelist.add(Object.class.getMethod("equals", Object.class));
 		pureWhitelist.add(Object.class.getMethod("hashCode"));
-		pureWhitelist.add(Throwable.class.getMethod("printStackTrace"));
+		pureWhitelist.add(StackTraceElement.class.getMethod("getClassName"));
+		pureWhitelist.add(Throwable.class.getMethod("getStackTrace"));
 		return pureWhitelist;
 	}
 

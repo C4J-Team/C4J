@@ -22,14 +22,15 @@ public class NNUnchangedS5bTest {
 	public void returnsValueWhenUnchanged() {
 		assertThat(new Bottom(0).unchanged(), is(0));
 	}
-	
+
 	@Test
 	public void failsWhenClassInvariantConditionIsNotMet() {
 		thrown.expect(AssertionError.class);
 		thrown.expectMessage("unchanged");
 		new Bottom(0) {
+			@Override
 			public int unchanged() {
-				return value++;
+				return value + new Exception().getStackTrace().length;
 			};
 		}.unchanged();
 	}

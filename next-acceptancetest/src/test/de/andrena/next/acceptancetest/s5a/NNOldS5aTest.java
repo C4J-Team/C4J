@@ -22,14 +22,15 @@ public class NNOldS5aTest {
 	public void returnsValueWhenOldValueIsReturned() {
 		assertThat(new VeryBottom(0).old(), is(0));
 	}
-	
+
 	@Test
 	public void failsWhenDifferentValueIsReturned() {
 		thrown.expect(AssertionError.class);
 		thrown.expectMessage("old value");
 		new VeryBottom(0) {
+			@Override
 			public int old() {
-				return value++;
+				return value + new Exception().getStackTrace().length;
 			};
 		}.old();
 	}
