@@ -45,12 +45,12 @@ public class PureSystemTest {
 
 	@Test
 	public void testPureMethodCallingPureMethodInOtherClass() {
-		target.pureMethodCallingPureMethodInOtherClass();
+		target.pureMethodCallingPureMethodInOtherClass(new OtherClass());
 	}
 
 	@Test(expected = AssertionError.class)
 	public void testUnpureMethodCallingUnpureMethodInOtherClass() {
-		target.unpureMethodCallingUnpureMethodInOtherClass();
+		target.unpureMethodCallingUnpureMethodInOtherClass(new OtherClass());
 	}
 
 	public static class TargetClass {
@@ -88,13 +88,13 @@ public class PureSystemTest {
 		}
 
 		@Pure
-		public void pureMethodCallingPureMethodInOtherClass() {
-			new OtherClass().pureMethodInOtherClass();
+		public void pureMethodCallingPureMethodInOtherClass(OtherClass other) {
+			other.pureMethodInOtherClass();
 		}
 
 		@Pure
-		public void unpureMethodCallingUnpureMethodInOtherClass() {
-			new OtherClass().unpureMethodInOtherClass();
+		public void unpureMethodCallingUnpureMethodInOtherClass(OtherClass other) {
+			other.unpureMethodInOtherClass();
 		}
 	}
 

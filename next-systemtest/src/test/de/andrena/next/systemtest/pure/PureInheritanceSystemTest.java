@@ -95,9 +95,11 @@ public class PureInheritanceSystemTest {
 	}
 
 	public static class ClassHavingIndirectUnpureMethod extends SuperClassWithInterface {
+		private ClassHavingUnpureMethod otherObj = new ClassHavingUnpureMethod();
+
 		@Override
 		public void pureMethod() {
-			new ClassHavingUnpureMethod().unpureMethod();
+			otherObj.unpureMethod();
 		}
 	}
 }

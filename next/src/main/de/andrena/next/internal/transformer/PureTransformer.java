@@ -10,6 +10,10 @@ import javassist.NotFoundException;
 import javassist.bytecode.AnnotationsAttribute;
 import de.andrena.next.Pure;
 import de.andrena.next.internal.RootTransformer;
+import de.andrena.next.internal.compiler.AssignmentExp;
+import de.andrena.next.internal.compiler.EmptyExp;
+import de.andrena.next.internal.compiler.NestedExp;
+import de.andrena.next.internal.compiler.StandaloneExp;
 import de.andrena.next.internal.editor.PureBehaviorExpressionEditor;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 import de.andrena.next.internal.util.PureInspector;
@@ -39,7 +43,19 @@ public class PureTransformer extends AbstractAffectedClassTransformer implements
 		}
 	}
 
-	private void verifyPure(CtBehavior affectedBehavior) throws CannotCompileException {
+	private void verifyPure(CtBehavior affectedBehavior) throws CannotCompileException, NotFoundException {
+		StandaloneExp paramAssignments = new EmptyExp();
+		int i = 1;
+		for (CtClass paramType : affectedBehavior.getParameterTypes()) {
+			if (!paramType.isPrimitive()) {
+				affectedBehavior.addLocalVariable(NestedExp.callingArg(i).toString(), paramType);
+				paramAssignments = paramAssignments
+						.append(new AssignmentExp(NestedExp.callingArg(i), NestedExp.arg(i)));
+			}
+			i++;
+		}
+		logger.info("puremagic.insertBefore " + affectedBehavior.getLongName() + ": \n" + paramAssignments.getCode());
+		paramAssignments.insertBefore(affectedBehavior);
 		affectedBehavior.instrument(new PureBehaviorExpressionEditor(affectedBehavior, rootTransformer, this, false));
 	}
 

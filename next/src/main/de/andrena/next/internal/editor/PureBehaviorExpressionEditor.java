@@ -49,8 +49,10 @@ public class PureBehaviorExpressionEditor extends PureConstructorExpressionEdito
 		if (field.hasAnnotation(AllowPureAccess.class)) {
 			return;
 		}
-		pureError("illegal field write access on field " + field.getName() + " in pure method "
-				+ affectedBehavior.getLongName() + " on line " + fieldAccess.getLineNumber());
+		String errorMsg = "illegal field write access on field " + field.getName() + " in pure method "
+				+ affectedBehavior.getLongName() + " on line " + fieldAccess.getLineNumber();
+		logger.error(errorMsg);
+		getThrowable(errorMsg).insertBefore(affectedBehavior);
 	}
 
 	private boolean isAllowedOwnStateChange(CtMember member) throws NotFoundException {
@@ -94,8 +96,7 @@ public class PureBehaviorExpressionEditor extends PureConstructorExpressionEdito
 				rootTransformer.getInvolvedTypeInspector().inspect(method.getDeclaringClass()), method) != null) {
 			return;
 		}
-		pureError("illegal method access on unpure method " + method.getLongName() + " in pure method/constructor "
-				+ affectedBehavior.getLongName() + " on line " + methodCall.getLineNumber());
+		replaceWithPureCheck(methodCall, method);
 	}
 
 	private boolean constructorModifyingOwnClass(CtMember member) {
@@ -105,7 +106,7 @@ public class PureBehaviorExpressionEditor extends PureConstructorExpressionEdito
 
 	private void editNewExpr(NewExpr newExpr) throws NotFoundException, SecurityException, NoSuchMethodException,
 			CannotCompileException {
-		checkConstructor(affectedBehavior, newExpr.getConstructor(), newExpr.getLineNumber());
+		checkConstructor(newExpr, affectedBehavior, newExpr.getConstructor(), newExpr.getLineNumber());
 	}
 
 	private boolean isSynthetic(CtBehavior behavior) {

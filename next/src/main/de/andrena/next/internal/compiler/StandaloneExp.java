@@ -3,6 +3,7 @@ package de.andrena.next.internal.compiler;
 import javassist.CannotCompileException;
 import javassist.CtBehavior;
 import javassist.CtConstructor;
+import javassist.expr.Expr;
 
 public abstract class StandaloneExp extends Exp {
 
@@ -29,6 +30,10 @@ public abstract class StandaloneExp extends Exp {
 
 	public void insertAfter(CtBehavior behavior) throws CannotCompileException {
 		behavior.insertAfter(getInsertCode(getCode()));
+	}
+
+	public void replace(Expr expression) throws CannotCompileException {
+		expression.replace(getInsertCode(getCode()));
 	}
 
 	private String getInsertCode(String code) {
