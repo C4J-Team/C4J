@@ -15,7 +15,7 @@ public class PureInConstructorSystemTest {
 		new DummyClass().pureMethodCallingPureConstructor();
 	}
 
-	@Test(expected = AssertionError.class)
+	@Test
 	public void testCallingUnpureConstructor() {
 		new DummyClass().pureMethodCallingUnpureConstructor();
 	}
@@ -39,7 +39,6 @@ public class PureInConstructorSystemTest {
 	public static class ClassWithPureConstructor {
 		protected int value;
 
-		@Pure
 		public ClassWithPureConstructor(int value) {
 			this.value = value;
 			setValue(value);
@@ -56,13 +55,12 @@ public class PureInConstructorSystemTest {
 		}
 	}
 
-	@Test(expected = AssertionError.class)
+	@Test
 	public void testPureConstructorCallingUnpureConstructor() {
 		new ClassWithPureConstructorCallingUnpureConstructor();
 	}
 
 	public static class ClassWithPureConstructorCallingUnpureConstructor {
-		@Pure
 		public ClassWithPureConstructorCallingUnpureConstructor() {
 			this(3);
 		}
@@ -72,13 +70,12 @@ public class PureInConstructorSystemTest {
 		}
 	}
 
-	@Test(expected = AssertionError.class)
+	@Test
 	public void testPureConstructorCallingUnpureSuperConstructor() {
 		new ClassWithPureConstructorCallingUnpureSuperConstructor();
 	}
 
 	public static class ClassWithPureConstructorCallingUnpureSuperConstructor extends ClassWithUnpureSuperConstructor {
-		@Pure
 		public ClassWithPureConstructorCallingUnpureSuperConstructor() {
 			super(3);
 		}

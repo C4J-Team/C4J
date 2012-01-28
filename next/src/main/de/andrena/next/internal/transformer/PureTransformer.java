@@ -31,7 +31,7 @@ public class PureTransformer extends AbstractAffectedClassTransformer implements
 	@Override
 	public void transform(Set<CtClass> involvedClasses, Set<ContractInfo> contracts, CtClass affectedClass)
 			throws Exception {
-		for (CtBehavior affectedBehavior : affectedClass.getDeclaredBehaviors()) {
+		for (CtBehavior affectedBehavior : affectedClass.getDeclaredMethods()) {
 			CtBehavior pureBehavior = pureInspector.inspect(involvedClasses, affectedBehavior);
 			if (pureBehavior != null) {
 				addBehaviorAnnotation(affectedBehavior, Pure.class);

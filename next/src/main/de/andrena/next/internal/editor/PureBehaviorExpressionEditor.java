@@ -1,29 +1,91 @@
 package de.andrena.next.internal.editor;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import javassist.CannotCompileException;
 import javassist.CtBehavior;
+import javassist.CtClass;
 import javassist.CtConstructor;
 import javassist.CtField;
 import javassist.CtMember;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 import javassist.bytecode.AccessFlag;
+import javassist.expr.Expr;
+import javassist.expr.ExprEditor;
 import javassist.expr.FieldAccess;
 import javassist.expr.MethodCall;
-import javassist.expr.NewExpr;
+
+import org.apache.log4j.Logger;
+
 import de.andrena.next.AllowPureAccess;
 import de.andrena.next.Pure;
 import de.andrena.next.internal.RootTransformer;
+import de.andrena.next.internal.compiler.BooleanExp;
+import de.andrena.next.internal.compiler.CastExp;
+import de.andrena.next.internal.compiler.CompareExp;
+import de.andrena.next.internal.compiler.ConstructorExp;
+import de.andrena.next.internal.compiler.IfExp;
+import de.andrena.next.internal.compiler.NestedExp;
+import de.andrena.next.internal.compiler.StandaloneExp;
+import de.andrena.next.internal.compiler.ThrowExp;
+import de.andrena.next.internal.compiler.ValueExp;
 import de.andrena.next.internal.util.PureInspectorProvider;
 
-public class PureBehaviorExpressionEditor extends PureConstructorExpressionEditor {
+public class PureBehaviorExpressionEditor extends ExprEditor {
 
+	private Logger logger = Logger.getLogger(getClass());
+	private CtBehavior affectedBehavior;
+	private RootTransformer rootTransformer;
+	private PureInspectorProvider pureInspectorProvider;
 	private boolean allowOwnStateChange;
 
 	public PureBehaviorExpressionEditor(CtBehavior affectedBehavior, RootTransformer rootTransformer,
 			PureInspectorProvider pureInspectorProvider, boolean allowOwnStateChange) {
-		super(affectedBehavior, rootTransformer, pureInspectorProvider);
+		this.affectedBehavior = affectedBehavior;
+		this.rootTransformer = rootTransformer;
+		this.pureInspectorProvider = pureInspectorProvider;
 		this.allowOwnStateChange = allowOwnStateChange;
+	}
+
+	protected void replaceWithPureCheck(Expr expression, CtBehavior behavior) throws NotFoundException,
+			CannotCompileException {
+		BooleanExp unpureConditions = new CompareExp(NestedExp.CALLING_OBJECT).eq(NestedExp.THIS);
+		int i = 1;
+		for (CtClass paramType : affectedBehavior.getParameterTypes()) {
+			if (!paramType.isPrimitive()) {
+				unpureConditions = unpureConditions.or(new CompareExp(NestedExp.CALLING_OBJECT).eq(NestedExp
+						.callingArg(i)));
+			}
+			i++;
+		}
+		for (CtField field : getAccessibleFields(affectedBehavior)) {
+			if (!field.getType().isPrimitive()) {
+				unpureConditions = unpureConditions.or(new CompareExp(NestedExp.CALLING_OBJECT).eq(NestedExp
+						.field(field)));
+			}
+		}
+		IfExp unpureCondition = new IfExp(unpureConditions);
+		String errorMsg = "illegal method access on unpure method/constructor " + behavior.getLongName()
+				+ " in pure method/constructor " + affectedBehavior.getLongName() + " on line "
+				+ expression.getLineNumber();
+		unpureCondition.addIfBody(getThrowable(errorMsg));
+		StandaloneExp replacementExp = unpureCondition.append(StandaloneExp.proceed);
+		logger.info("puremagic.replacement-code: \n" + replacementExp.getCode());
+		replacementExp.replace(expression);
+	}
+
+	private Set<CtField> getAccessibleFields(CtBehavior affectedBehavior) {
+		Set<CtField> accessibleFields = new HashSet<CtField>();
+		Collections.addAll(accessibleFields, affectedBehavior.getDeclaringClass().getFields());
+		Collections.addAll(accessibleFields, affectedBehavior.getDeclaringClass().getDeclaredFields());
+		return accessibleFields;
+	}
+
+	protected ThrowExp getThrowable(String errorMsg) throws CannotCompileException {
+		return new ThrowExp(new ConstructorExp(AssertionError.class, new CastExp(Object.class, new ValueExp(errorMsg))));
 	}
 
 	@Override
@@ -68,15 +130,6 @@ public class PureBehaviorExpressionEditor extends PureConstructorExpressionEdito
 		}
 	}
 
-	@Override
-	public void edit(NewExpr newExpr) throws CannotCompileException {
-		try {
-			editNewExpr(newExpr);
-		} catch (Exception e) {
-			throw new CannotCompileException(e);
-		}
-	}
-
 	private void editMethodCall(MethodCall methodCall) throws NotFoundException, CannotCompileException,
 			SecurityException, NoSuchMethodException {
 		CtMethod method = methodCall.getMethod();
@@ -102,11 +155,6 @@ public class PureBehaviorExpressionEditor extends PureConstructorExpressionEdito
 	private boolean constructorModifyingOwnClass(CtMember member) {
 		return affectedBehavior instanceof CtConstructor
 				&& member.getDeclaringClass().equals(affectedBehavior.getDeclaringClass());
-	}
-
-	private void editNewExpr(NewExpr newExpr) throws NotFoundException, SecurityException, NoSuchMethodException,
-			CannotCompileException {
-		checkConstructor(newExpr, affectedBehavior, newExpr.getConstructor(), newExpr.getLineNumber());
 	}
 
 	private boolean isSynthetic(CtBehavior behavior) {
