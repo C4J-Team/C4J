@@ -33,6 +33,7 @@ public class TestConfiguration implements Configuration {
 		pureWhitelist.add(List.class.getMethod("get", int.class));
 		pureWhitelist.add(Object.class.getMethod("equals", Object.class));
 		pureWhitelist.add(Object.class.getMethod("hashCode"));
+		pureWhitelist.add(Object.class.getMethod("toString"));
 		pureWhitelist.add(StackTraceElement.class.getMethod("getClassName"));
 		pureWhitelist.add(Throwable.class.getMethod("getStackTrace"));
 		return pureWhitelist;

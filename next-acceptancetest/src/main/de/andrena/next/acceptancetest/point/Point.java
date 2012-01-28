@@ -1,5 +1,6 @@
 package de.andrena.next.acceptancetest.point;
 
+import de.andrena.next.AllowPureAccess;
 import de.andrena.next.Contract;
 
 @Contract(PointContract.class)
@@ -8,6 +9,7 @@ public class Point implements PointSpec {
 	private int x;
 	private int y;
 	private int hashCode;
+	@AllowPureAccess
 	private boolean hashCodeSet;
 
 	public Point(int x, int y) {

@@ -3,6 +3,7 @@ package de.andrena.next.internal.editor;
 import javassist.CannotCompileException;
 import javassist.CtBehavior;
 import javassist.CtConstructor;
+import javassist.CtField;
 import javassist.CtMember;
 import javassist.CtMethod;
 import javassist.NotFoundException;
@@ -10,6 +11,7 @@ import javassist.bytecode.AccessFlag;
 import javassist.expr.FieldAccess;
 import javassist.expr.MethodCall;
 import javassist.expr.NewExpr;
+import de.andrena.next.AllowPureAccess;
 import de.andrena.next.Pure;
 import de.andrena.next.internal.RootTransformer;
 import de.andrena.next.internal.util.PureInspectorProvider;
@@ -34,13 +36,21 @@ public class PureBehaviorExpressionEditor extends PureConstructorExpressionEdito
 	}
 
 	private void editFieldAccess(FieldAccess fieldAccess) throws CannotCompileException, NotFoundException {
-		if (constructorModifyingOwnClass(fieldAccess.getField())) {
+		CtField field = fieldAccess.getField();
+		if (constructorModifyingOwnClass(field)) {
 			return;
 		}
-		if (fieldAccess.isWriter() && !isAllowedOwnStateChange(fieldAccess.getField())) {
-			pureError("illegal field write access on field " + fieldAccess.getField().getName() + " in pure method "
-					+ affectedBehavior.getLongName() + " on line " + fieldAccess.getLineNumber());
+		if (!fieldAccess.isWriter()) {
+			return;
 		}
+		if (isAllowedOwnStateChange(field)) {
+			return;
+		}
+		if (field.hasAnnotation(AllowPureAccess.class)) {
+			return;
+		}
+		pureError("illegal field write access on field " + field.getName() + " in pure method "
+				+ affectedBehavior.getLongName() + " on line " + fieldAccess.getLineNumber());
 	}
 
 	private boolean isAllowedOwnStateChange(CtMember member) throws NotFoundException {
@@ -77,14 +87,15 @@ public class PureBehaviorExpressionEditor extends PureConstructorExpressionEdito
 		if (rootTransformer.getConfiguration().getWhitelistMethods().contains(method)) {
 			return;
 		}
-		if (!method.hasAnnotation(Pure.class)) {
-			if (pureInspectorProvider.getPureInspector().inspect(
-					rootTransformer.getInvolvedTypeInspector().inspect(method.getDeclaringClass()), method) == null) {
-				pureError("illegal method access on unpure method " + method.getLongName()
-						+ " in pure method/constructor " + affectedBehavior.getLongName() + " on line "
-						+ methodCall.getLineNumber());
-			}
+		if (method.hasAnnotation(Pure.class)) {
+			return;
 		}
+		if (pureInspectorProvider.getPureInspector().inspect(
+				rootTransformer.getInvolvedTypeInspector().inspect(method.getDeclaringClass()), method) != null) {
+			return;
+		}
+		pureError("illegal method access on unpure method " + method.getLongName() + " in pure method/constructor "
+				+ affectedBehavior.getLongName() + " on line " + methodCall.getLineNumber());
 	}
 
 	private boolean constructorModifyingOwnClass(CtMember member) {

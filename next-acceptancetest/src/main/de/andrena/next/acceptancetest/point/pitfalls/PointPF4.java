@@ -1,12 +1,15 @@
 package de.andrena.next.acceptancetest.point.pitfalls;
 
+import de.andrena.next.AllowPureAccess;
+import de.andrena.next.Pure;
 import de.andrena.next.acceptancetest.object.ObjectSpec;
 
 public class PointPF4 implements ObjectSpec {
 
 	private int x;
 	private int y;
-	
+
+	@AllowPureAccess
 	private boolean hashCodeSet;
 	private final int hashCode;
 
@@ -16,10 +19,12 @@ public class PointPF4 implements ObjectSpec {
 		hashCode = hashCode();
 	}
 
+	@Pure
 	public int getX() {
 		return x;
 	}
 
+	@Pure
 	public int getY() {
 		return y;
 	}

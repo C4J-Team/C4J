@@ -2,6 +2,7 @@ package de.andrena.next.internal.transformer;
 
 import javassist.CtClass;
 import javassist.CtConstructor;
+import javassist.CtField;
 import javassist.CtNewConstructor;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 
@@ -17,7 +18,13 @@ public class ConstructorTransformer extends AbstractContractClassTransformer {
 				}
 				contractClass.addMethod(constructor.toMethod(CONSTRUCTOR_REPLACEMENT_NAME, contractClass));
 			}
-			contractClass.getClassFile().setSuperclass(null);
+			if (contractClass.getSuperclass() != null) {
+				CtClass oldSuperclass = contractClass.getSuperclass();
+				contractClass.getClassFile().setSuperclass(null);
+				for (CtField superclassField : oldSuperclass.getFields()) {
+					contractClass.addField(new CtField(superclassField, contractClass));
+				}
+			}
 			for (CtConstructor constructor : contractClass.getConstructors()) {
 				contractClass.removeConstructor(constructor);
 			}
