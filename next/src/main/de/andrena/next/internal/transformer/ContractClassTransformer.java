@@ -9,8 +9,10 @@ public class ContractClassTransformer extends AbstractContractClassTransformer {
 	private AbstractContractClassTransformer[] transformers;
 
 	public ContractClassTransformer(RootTransformer rootTransformer) {
-		this.transformers = new AbstractContractClassTransformer[] { new ContractExpressionTransformer(),
-				new ConstructorTransformer() };
+		this.transformers = new AbstractContractClassTransformer[] {
+				// BEWARE: has to run in this exact order
+				new ConstructorTransformer(), new PureContractTransformer(rootTransformer),
+				new ContractExpressionTransformer() };
 	}
 
 	@Override

@@ -54,8 +54,8 @@ public class PureTransformer extends AbstractAffectedClassTransformer {
 	}
 
 	private void verifyPure(CtBehavior affectedBehavior) throws CannotCompileException {
-		affectedBehavior
-				.instrument(new PureBehaviorExpressionEditor(affectedBehavior, rootTransformer.getConfiguration()));
+		affectedBehavior.instrument(new PureBehaviorExpressionEditor(affectedBehavior, rootTransformer
+				.getConfiguration(), false));
 	}
 
 	private void addBehaviorAnnotation(CtBehavior targetBehavior, Class<?> annotationClass) throws NotFoundException {

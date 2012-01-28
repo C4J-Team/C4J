@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import de.andrena.next.ClassInvariant;
 import de.andrena.next.Contract;
+import de.andrena.next.Pure;
 import de.andrena.next.systemtest.TransformerAwareRule;
 
 public class ClassInvariantSystemTest {
@@ -45,6 +46,7 @@ public class ClassInvariantSystemTest {
 			this.hour = hour;
 		}
 
+		@Pure
 		public int getHour() {
 			return hour;
 		}

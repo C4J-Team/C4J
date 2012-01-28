@@ -14,8 +14,8 @@ import javassist.expr.ExprEditor;
 
 import org.apache.log4j.Logger;
 
-import de.andrena.next.Configuration;
 import de.andrena.next.Pure;
+import de.andrena.next.internal.RuntimeConfiguration;
 import de.andrena.next.internal.compiler.CastExp;
 import de.andrena.next.internal.compiler.ConstructorExp;
 import de.andrena.next.internal.compiler.ThrowExp;
@@ -24,9 +24,9 @@ import de.andrena.next.internal.compiler.ValueExp;
 public class PureConstructorExpressionEditor extends ExprEditor {
 	protected Logger logger = Logger.getLogger(getClass());
 	protected CtBehavior affectedBehavior;
-	protected Configuration configuration;
+	protected RuntimeConfiguration configuration;
 
-	public PureConstructorExpressionEditor(CtBehavior affectedBehavior, Configuration configuration) {
+	public PureConstructorExpressionEditor(CtBehavior affectedBehavior, RuntimeConfiguration configuration) {
 		this.affectedBehavior = affectedBehavior;
 		this.configuration = configuration;
 	}
@@ -48,10 +48,8 @@ public class PureConstructorExpressionEditor extends ExprEditor {
 						constructor.getDeclaringClass(), constructor.getMethodInfo2());
 			return;
 		}
-		for (Member whitelistMember : configuration.getPureWhitelist()) {
-			if (whitelistMember instanceof Constructor && isEqual(constructor, (Constructor<?>) whitelistMember)) {
-				return;
-			}
+		if (configuration.getWhitelistConstructors().contains(constructor)) {
+			return;
 		}
 		if (!constructor.hasAnnotation(Pure.class)) {
 			pureError("illegal constructor access on constructor " + constructor.getLongName()

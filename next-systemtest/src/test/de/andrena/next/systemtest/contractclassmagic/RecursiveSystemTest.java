@@ -32,7 +32,6 @@ public class RecursiveSystemTest {
 		@Override
 		public boolean equals(Object obj) {
 			if (post()) {
-				System.out.println("just before is reflexive");
 				assert target.equals(target) : "is reflexive";
 				assert target.equals(obj) == obj.equals(target) : "is symmetric";
 			}
@@ -99,9 +98,6 @@ public class RecursiveSystemTest {
 		@Override
 		public boolean equals(Object obj) {
 			if (post()) {
-				System.out.println("just before is reflexive");
-				System.out.println(target);
-				new Exception().printStackTrace();
 				assert target.equals(target) : "is reflexive";
 				assert target.equals(obj) == obj.equals(target) : "is symmetric";
 			}

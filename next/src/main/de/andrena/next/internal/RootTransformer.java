@@ -36,34 +36,34 @@ public class RootTransformer implements ClassFileTransformer {
 
 	private static Throwable lastException;
 
-	private Configuration configuration;
+	private RuntimeConfiguration configuration;
 
 	public ClassPool getPool() {
 		return pool;
 	}
 
-	public Configuration getConfiguration() {
+	public RuntimeConfiguration getConfiguration() {
 		return configuration;
 	}
 
-	public RootTransformer(String agentArgs, Instrumentation inst) {
+	public RootTransformer(String agentArgs, Instrumentation inst) throws Exception {
 		loadConfiguration(agentArgs, inst);
 	}
 
-	private void loadConfiguration(String agentArgs, Instrumentation inst) {
+	private void loadConfiguration(String agentArgs, Instrumentation inst) throws Exception {
 		if (agentArgs == null || agentArgs.isEmpty()) {
 			logger.warn("no configuration given - errors from @Pure are completely disabled. using default configuration.");
-			configuration = new DefaultConfiguration();
+			configuration = new RuntimeConfiguration(new DefaultConfiguration(), pool);
 		} else {
 			try {
 				Class<?> configurationClass = Class.forName(agentArgs);
-				configuration = (Configuration) configurationClass.newInstance();
+				configuration = new RuntimeConfiguration((Configuration) configurationClass.newInstance(), pool);
 				checkConfigurationLoadingRootClasses(agentArgs);
 				logger.info("loaded configuration from class '" + agentArgs + "'.");
 			} catch (Exception e) {
 				logger.error("could not load configuration from class '" + agentArgs
 						+ "'. using default configuration.", e);
-				configuration = new DefaultConfiguration();
+				configuration = new RuntimeConfiguration(new DefaultConfiguration(), pool);
 			}
 		}
 	}
@@ -72,18 +72,15 @@ public class RootTransformer implements ClassFileTransformer {
 		CtClass ctClass = pool.get(agentArgs);
 		@SuppressWarnings("unchecked")
 		Set<String> configurationClasses = ctClass.getClassFile().getConstPool().getClassNames();
-		Set<String> rootPackages = configuration.getRootPackages();
 		for (String classNameWithSlashes : configurationClasses) {
 			String className = convertSlashesToDots(classNameWithSlashes);
 			if (className.equals(agentArgs)) {
 				continue;
 			}
-			for (String rootPackage : rootPackages) {
-				if (className.startsWith(rootPackage)) {
-					throw new RuntimeException(
-							"classes within root-packages must not be referenced by the configuration. offending class: '"
-									+ className + "'.");
-				}
+			if (configuration.isWithinRootPackages(className)) {
+				throw new RuntimeException(
+						"classes within root-packages must not be referenced by the configuration. offending class: '"
+								+ className + "'.");
 			}
 		}
 	}

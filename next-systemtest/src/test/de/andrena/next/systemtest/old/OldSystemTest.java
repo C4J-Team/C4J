@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import de.andrena.next.Condition;
 import de.andrena.next.Contract;
+import de.andrena.next.Pure;
 import de.andrena.next.systemtest.TransformerAwareRule;
 
 public class OldSystemTest {
@@ -45,6 +46,7 @@ public class OldSystemTest {
 			this.value = value;
 		}
 
+		@Pure
 		public int getValue() {
 			return value;
 		}

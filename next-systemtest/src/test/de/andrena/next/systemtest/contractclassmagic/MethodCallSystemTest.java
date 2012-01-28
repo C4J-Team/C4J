@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import de.andrena.next.Condition;
 import de.andrena.next.Contract;
+import de.andrena.next.Pure;
 import de.andrena.next.systemtest.TransformerAwareRule;
 
 public class MethodCallSystemTest {
@@ -48,10 +49,12 @@ public class MethodCallSystemTest {
 			this.value = value;
 		}
 
+		@Pure
 		protected int getValue() {
 			return value;
 		}
 
+		@Pure
 		protected int getValueAlsoInContract() {
 			return value;
 		}
@@ -95,6 +98,7 @@ public class MethodCallSystemTest {
 			}
 		}
 
+		@Pure
 		public int getFive() {
 			return 5;
 		}

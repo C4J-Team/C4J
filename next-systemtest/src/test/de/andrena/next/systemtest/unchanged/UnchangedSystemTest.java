@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import de.andrena.next.Condition;
 import de.andrena.next.Contract;
+import de.andrena.next.Pure;
 import de.andrena.next.systemtest.TransformerAwareRule;
 
 public class UnchangedSystemTest {
@@ -59,6 +60,7 @@ public class UnchangedSystemTest {
 			this.minuteForGetter = hour;
 		}
 
+		@Pure
 		public int getMinute() {
 			return minuteForGetter;
 		}

@@ -1,22 +1,28 @@
 package de.andrena.next.internal.editor;
 
-import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 
 import javassist.CannotCompileException;
 import javassist.CtBehavior;
+import javassist.CtConstructor;
+import javassist.CtMember;
 import javassist.CtMethod;
 import javassist.NotFoundException;
+import javassist.bytecode.AccessFlag;
 import javassist.expr.FieldAccess;
 import javassist.expr.MethodCall;
 import javassist.expr.NewExpr;
-import de.andrena.next.Configuration;
 import de.andrena.next.Pure;
+import de.andrena.next.internal.RuntimeConfiguration;
 
 public class PureBehaviorExpressionEditor extends PureConstructorExpressionEditor {
 
-	public PureBehaviorExpressionEditor(CtBehavior affectedBehavior, Configuration configuration) {
+	private boolean allowOwnStateChange;
+
+	public PureBehaviorExpressionEditor(CtBehavior affectedBehavior, RuntimeConfiguration configuration,
+			boolean allowOwnStateChange) {
 		super(affectedBehavior, configuration);
+		this.allowOwnStateChange = allowOwnStateChange;
 	}
 
 	@Override
@@ -29,10 +35,17 @@ public class PureBehaviorExpressionEditor extends PureConstructorExpressionEdito
 	}
 
 	private void editFieldAccess(FieldAccess fieldAccess) throws CannotCompileException, NotFoundException {
-		if (fieldAccess.isWriter()) {
+		if (constructorModifyingOwnClass(fieldAccess.getField())) {
+			return;
+		}
+		if (fieldAccess.isWriter() && !isAllowedOwnStateChange(fieldAccess.getField())) {
 			pureError("illegal field write access on field " + fieldAccess.getField().getName() + " in pure method "
 					+ affectedBehavior.getLongName() + " on line " + fieldAccess.getLineNumber());
 		}
+	}
+
+	private boolean isAllowedOwnStateChange(CtMember member) throws NotFoundException {
+		return allowOwnStateChange && affectedBehavior.getDeclaringClass().equals(member.getDeclaringClass());
 	}
 
 	@Override
@@ -56,15 +69,24 @@ public class PureBehaviorExpressionEditor extends PureConstructorExpressionEdito
 	private void editMethodCall(MethodCall methodCall) throws NotFoundException, CannotCompileException,
 			SecurityException, NoSuchMethodException {
 		CtMethod method = methodCall.getMethod();
-		for (Member whitelistMember : configuration.getPureWhitelist()) {
-			if (whitelistMember instanceof Method && isEqual(method, (Method) whitelistMember)) {
-				return;
-			}
+		if (isSynthetic(method)) {
+			return;
+		}
+		if (constructorModifyingOwnClass(method)) {
+			return;
+		}
+		if (configuration.getWhitelistMethods().contains(method)) {
+			return;
 		}
 		if (!method.hasAnnotation(Pure.class)) {
 			pureError("illegal method access on method " + method.getLongName() + " in pure method/constructor "
 					+ affectedBehavior.getLongName() + " on line " + methodCall.getLineNumber());
 		}
+	}
+
+	private boolean constructorModifyingOwnClass(CtMember member) {
+		return affectedBehavior instanceof CtConstructor
+				&& member.getDeclaringClass().equals(affectedBehavior.getDeclaringClass());
 	}
 
 	private void editNewExpr(NewExpr newExpr) throws NotFoundException, SecurityException, NoSuchMethodException,
@@ -80,5 +102,9 @@ public class PureBehaviorExpressionEditor extends PureConstructorExpressionEdito
 			return false;
 		}
 		return isEqual(method.getParameterTypes(), whitelistMethod.getParameterTypes());
+	}
+
+	private boolean isSynthetic(CtBehavior behavior) {
+		return (AccessFlag.of(behavior.getModifiers()) & AccessFlag.SYNTHETIC) > 0;
 	}
 }

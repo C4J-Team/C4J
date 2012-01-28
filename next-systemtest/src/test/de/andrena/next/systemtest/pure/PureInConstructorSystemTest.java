@@ -20,6 +20,10 @@ public class PureInConstructorSystemTest {
 		new DummyClass().pureMethodCallingUnpureConstructor();
 	}
 
+	public static class ExternalClass {
+		public static int VALUE;
+	}
+
 	public static class DummyClass {
 		@Pure
 		public void pureMethodCallingPureConstructor() {
@@ -33,17 +37,22 @@ public class PureInConstructorSystemTest {
 	}
 
 	public static class ClassWithPureConstructor {
+		protected int value;
+
 		@Pure
 		public ClassWithPureConstructor(int value) {
-			value++;
+			this.value = value;
+			setValue(value);
+		}
+
+		public void setValue(int value) {
+			this.value = value;
 		}
 	}
 
 	public static class ClassWithUnpureConstructor {
-		protected int value;
-
 		public ClassWithUnpureConstructor(int value) {
-			this.value = value;
+			ExternalClass.VALUE = 1;
 		}
 	}
 
@@ -53,15 +62,13 @@ public class PureInConstructorSystemTest {
 	}
 
 	public static class ClassWithPureConstructorCallingUnpureConstructor {
-		protected int value;
-
 		@Pure
 		public ClassWithPureConstructorCallingUnpureConstructor() {
 			this(3);
 		}
 
 		public ClassWithPureConstructorCallingUnpureConstructor(int value) {
-			this.value = value;
+			ExternalClass.VALUE = 1;
 		}
 	}
 
@@ -78,10 +85,8 @@ public class PureInConstructorSystemTest {
 	}
 
 	public static class ClassWithUnpureSuperConstructor {
-		protected int value;
-
 		public ClassWithUnpureSuperConstructor(int value) {
-			this.value = value;
+			ExternalClass.VALUE = 1;
 		}
 	}
 }
