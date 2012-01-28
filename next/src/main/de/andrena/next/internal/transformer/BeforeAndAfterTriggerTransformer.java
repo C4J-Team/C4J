@@ -39,10 +39,11 @@ public class BeforeAndAfterTriggerTransformer extends AffectedClassTransformerFo
 		ArrayExp paramTypesArray = ArrayExp.forParamTypes(contractBehavior);
 		ArrayExp argsArray = getArgsArray(affectedClass, contractBehavior);
 		StaticCallExp callBefore = new StaticCallExp(Evaluator.before, NestedExp.THIS, new ValueExp(
-				contractInfo.getContractClass()), new ValueExp(contractBehaviorName), paramTypesArray, argsArray);
+				contractInfo.getContractClass()), new ValueExp(affectedClass), new ValueExp(contractBehaviorName),
+				paramTypesArray, argsArray);
 		StaticCallExp callAfter = new StaticCallExp(Evaluator.after, NestedExp.THIS, new ValueExp(
-				contractInfo.getContractClass()), new ValueExp(contractBehaviorName), paramTypesArray, argsArray,
-				getReturnValueExp(affectedBehavior));
+				contractInfo.getContractClass()), new ValueExp(affectedClass), new ValueExp(contractBehaviorName),
+				paramTypesArray, argsArray, getReturnValueExp(affectedBehavior));
 		logger.info("before: " + callBefore.toStandalone().getCode());
 		logger.info("after: " + callAfter.toStandalone().getCode());
 		callBefore.toStandalone().insertBefore(affectedBehavior);

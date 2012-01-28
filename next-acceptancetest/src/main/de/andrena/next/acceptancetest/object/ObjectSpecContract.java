@@ -52,7 +52,7 @@ public class ObjectSpecContract implements ObjectSpec {
 			if (firstHashCode == null) {
 				firstHashCode = result;
 			}
-			assert result == firstHashCode : "is immutable";
+			assert result == firstHashCode.intValue() : "is immutable";
 		}
 		return ignored();
 	}

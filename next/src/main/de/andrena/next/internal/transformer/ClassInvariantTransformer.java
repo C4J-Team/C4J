@@ -33,18 +33,21 @@ public class ClassInvariantTransformer extends AffectedClassTransformerForSingle
 
 	private void transformTargetMethods(CtClass contractClass, CtClass affectedClass,
 			List<CtMethod> classInvariantMethods) throws CannotCompileException {
-		StandaloneExp callInvariantExpression = callInvariantExpression(contractClass, classInvariantMethods);
+		StandaloneExp callInvariantExpression = callInvariantExpression(contractClass, affectedClass,
+				classInvariantMethods);
 		logger.info("classInvariant after: " + callInvariantExpression.getCode());
 		for (CtBehavior behavior : affectedClass.getDeclaredBehaviors()) {
 			callInvariantExpression.insertAfter(behavior);
 		}
 	}
 
-	private StandaloneExp callInvariantExpression(CtClass contractClass, List<CtMethod> classInvariantMethods) {
+	private StandaloneExp callInvariantExpression(CtClass contractClass, CtClass affectedClass,
+			List<CtMethod> classInvariantMethods) {
 		StandaloneExp callInvariantExpression = new EmptyExp();
 		for (CtMethod classInvariantMethod : classInvariantMethods) {
 			callInvariantExpression = callInvariantExpression.append(new StaticCallExp(Evaluator.callInvariant,
-					NestedExp.THIS, new ValueExp(contractClass), new ValueExp(classInvariantMethod.getName())));
+					NestedExp.THIS, new ValueExp(contractClass), new ValueExp(affectedClass), new ValueExp(
+							classInvariantMethod.getName())));
 		}
 		return callInvariantExpression;
 	}

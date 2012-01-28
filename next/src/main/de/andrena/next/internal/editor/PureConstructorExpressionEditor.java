@@ -15,7 +15,7 @@ import javassist.expr.ExprEditor;
 import org.apache.log4j.Logger;
 
 import de.andrena.next.Pure;
-import de.andrena.next.internal.RuntimeConfiguration;
+import de.andrena.next.internal.RootTransformer;
 import de.andrena.next.internal.compiler.CastExp;
 import de.andrena.next.internal.compiler.ConstructorExp;
 import de.andrena.next.internal.compiler.ThrowExp;
@@ -24,11 +24,11 @@ import de.andrena.next.internal.compiler.ValueExp;
 public class PureConstructorExpressionEditor extends ExprEditor {
 	protected Logger logger = Logger.getLogger(getClass());
 	protected CtBehavior affectedBehavior;
-	protected RuntimeConfiguration configuration;
+	protected RootTransformer rootTransformer;
 
-	public PureConstructorExpressionEditor(CtBehavior affectedBehavior, RuntimeConfiguration configuration) {
+	public PureConstructorExpressionEditor(CtBehavior affectedBehavior, RootTransformer rootTransformer) {
 		this.affectedBehavior = affectedBehavior;
-		this.configuration = configuration;
+		this.rootTransformer = rootTransformer;
 	}
 
 	@Override
@@ -44,11 +44,11 @@ public class PureConstructorExpressionEditor extends ExprEditor {
 			throws CannotCompileException, SecurityException, NoSuchMethodException, NotFoundException {
 		if (constructor.isEmpty()) {
 			if (constructor.getDeclaringClass().isFrozen())
-				new PureConstructorExpressionEditor(affectedBehavior, configuration).doit(
+				new PureConstructorExpressionEditor(affectedBehavior, rootTransformer).doit(
 						constructor.getDeclaringClass(), constructor.getMethodInfo2());
 			return;
 		}
-		if (configuration.getWhitelistConstructors().contains(constructor)) {
+		if (rootTransformer.getConfiguration().getWhitelistConstructors().contains(constructor)) {
 			return;
 		}
 		if (!constructor.hasAnnotation(Pure.class)) {

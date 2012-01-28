@@ -21,14 +21,18 @@ public class TestConfiguration implements Configuration {
 	@Override
 	public Set<Member> getPureWhitelist() throws NoSuchMethodException, SecurityException {
 		Set<Member> pureWhitelist = new HashSet<Member>();
-		pureWhitelist.add(Collection.class.getMethod("size"));
-		pureWhitelist.add(List.class.getMethod("get", int.class));
-		pureWhitelist.add(Collection.class.getMethod("isEmpty"));
-		pureWhitelist.add(Class.class.getMethod("desiredAssertionStatus"));
 		pureWhitelist.add(AssertionError.class.getConstructor(Object.class));
-		pureWhitelist.add(Object.class.getMethod("equals", Object.class));
+		pureWhitelist.add(Boolean.class.getMethod("booleanValue"));
+		pureWhitelist.add(Class.class.getMethod("desiredAssertionStatus"));
+		pureWhitelist.add(Class.class.getMethod("getClass"));
+		pureWhitelist.add(Collection.class.getMethod("size"));
+		pureWhitelist.add(Collection.class.getMethod("isEmpty"));
 		pureWhitelist.add(Integer.class.getMethod("intValue"));
 		pureWhitelist.add(Integer.class.getMethod("valueOf", int.class));
+		pureWhitelist.add(List.class.getMethod("get", int.class));
+		pureWhitelist.add(Object.class.getMethod("equals", Object.class));
+		pureWhitelist.add(Object.class.getMethod("hashCode"));
+		pureWhitelist.add(Throwable.class.getMethod("printStackTrace"));
 		return pureWhitelist;
 	}
 

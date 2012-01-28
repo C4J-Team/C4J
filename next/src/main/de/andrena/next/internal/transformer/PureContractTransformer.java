@@ -15,7 +15,6 @@ public class PureContractTransformer extends ContractDeclaredBehaviorTransformer
 
 	@Override
 	public void transform(ContractInfo contractInfo, CtBehavior contractBehavior) throws Exception {
-		contractBehavior.instrument(new PureBehaviorExpressionEditor(contractBehavior, rootTransformer
-				.getConfiguration(), true));
+		contractBehavior.instrument(new PureBehaviorExpressionEditor(contractBehavior, rootTransformer, true));
 	}
 }

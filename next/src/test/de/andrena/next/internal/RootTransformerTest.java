@@ -120,28 +120,6 @@ public class RootTransformerTest {
 	public static class UninvolvedClass {
 	}
 
-	@Test
-	public void testGetInvolvedTypes() throws Exception {
-		CtClass noSuperClass = pool.get(NoSuperClass.class.getName());
-		assertEquals(2, transformer.getInvolvedTypes(noSuperClass).size());
-		CtClass subClass = pool.get(SubClass.class.getName());
-		assertEquals(6, transformer.getInvolvedTypes(subClass).size());
-	}
-
-	@Contract(NoSuperClassContract.class)
-	public static class NoSuperClass {
-	}
-
-	public static class NoSuperClassContract {
-	}
-
-	@Contract(SubClassContract.class)
-	public static class SubClass extends SuperClass {
-	}
-
-	public static class SubClassContract extends SubClass {
-	}
-
 	@Contract(SuperClassContract.class)
 	public static class SuperClass implements HasContract {
 	}

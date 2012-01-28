@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 
 import de.andrena.next.internal.compiler.StaticCall;
 import de.andrena.next.internal.util.ObjectMapper;
+import de.andrena.next.internal.util.Pair;
 
 public class Evaluator {
 	public static final StaticCall before = new StaticCall(Evaluator.class, "before");
@@ -27,7 +28,7 @@ public class Evaluator {
 
 	private static final Logger logger = Logger.getLogger(Evaluator.class);
 
-	private static final ObjectMapper<Class<?>, Object> contractCache = new ObjectMapper<Class<?>, Object>();
+	private static final ObjectMapper<Pair<Class<?>, Class<?>>, Object> contractCache = new ObjectMapper<Pair<Class<?>, Class<?>>, Object>();
 
 	private static final Map<Class<?>, Object> primitiveReturnValues = new HashMap<Class<?>, Object>() {
 		private static final long serialVersionUID = 5365905181961089260L;
@@ -123,46 +124,47 @@ public class Evaluator {
 		return (T) Evaluator.returnValue.get();
 	}
 
-	public static void before(Object target, Class<?> contractClass, String methodName, Class<?>[] argTypes,
-			Object[] args) {
+	public static void before(Object target, Class<?> contractClass, Class<?> callingClass, String methodName,
+			Class<?>[] argTypes, Object[] args) {
 		if (Evaluator.evaluationPhase.get() == EvaluationPhase.NONE) {
 			Evaluator.evaluationPhase.set(EvaluationPhase.BEFORE);
 			Evaluator.currentTarget.set(target);
 			logger.info("before " + methodName);
-			callContractMethod(contractClass, methodName, argTypes, args);
+			callContractMethod(contractClass, callingClass, methodName, argTypes, args);
 		}
 	}
 
-	public static void after(Object target, Class<?> contractClass, String methodName, Class<?>[] argTypes,
-			Object[] args, Object returnValue) {
+	public static void after(Object target, Class<?> contractClass, Class<?> callingClass, String methodName,
+			Class<?>[] argTypes, Object[] args, Object returnValue) {
 		if (Evaluator.evaluationPhase.get() == EvaluationPhase.NONE) {
 			Evaluator.evaluationPhase.set(EvaluationPhase.AFTER);
 			Evaluator.currentTarget.set(target);
 			logger.info("setting return value to " + returnValue);
 			Evaluator.returnValue.set(returnValue);
 			logger.info("after " + methodName);
-			callContractMethod(contractClass, methodName, argTypes, args);
+			callContractMethod(contractClass, callingClass, methodName, argTypes, args);
 		}
 	}
 
-	public static void callInvariant(Object target, Class<?> contractClass, String methodName) {
+	public static void callInvariant(Object target, Class<?> contractClass, Class<?> callingClass, String methodName) {
 		if (Evaluator.evaluationPhase.get() == EvaluationPhase.NONE) {
 			Evaluator.evaluationPhase.set(EvaluationPhase.INVARIANT);
 			Evaluator.currentTarget.set(target);
 			logger.info("calling invariant " + methodName);
-			callContractMethod(contractClass, methodName, new Class<?>[0], new Object[0]);
+			callContractMethod(contractClass, callingClass, methodName, new Class<?>[0], new Object[0]);
 		}
 	}
 
-	static void callContractMethod(Class<?> contractClass, String methodName, Class<?>[] argTypes, Object[] args)
-			throws AssertionError {
+	static void callContractMethod(Class<?> contractClass, Class<?> callingClass, String methodName,
+			Class<?>[] argTypes, Object[] args) throws AssertionError {
 		try {
 			Object contract;
-			if (contractCache.contains(Evaluator.currentTarget.get(), contractClass)) {
-				contract = contractCache.get(Evaluator.currentTarget.get(), contractClass);
+			Pair<Class<?>, Class<?>> classPair = new Pair<Class<?>, Class<?>>(contractClass, callingClass);
+			if (contractCache.contains(Evaluator.currentTarget.get(), classPair)) {
+				contract = contractCache.get(Evaluator.currentTarget.get(), classPair);
 			} else {
 				contract = contractClass.newInstance();
-				contractCache.put(Evaluator.currentTarget.get(), contractClass, contract);
+				contractCache.put(Evaluator.currentTarget.get(), classPair, contract);
 			}
 			Method method = contractClass.getDeclaredMethod(methodName, argTypes);
 			method.setAccessible(true);

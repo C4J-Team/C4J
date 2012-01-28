@@ -13,15 +13,15 @@ import javassist.expr.FieldAccess;
 import javassist.expr.MethodCall;
 import javassist.expr.NewExpr;
 import de.andrena.next.Pure;
-import de.andrena.next.internal.RuntimeConfiguration;
+import de.andrena.next.internal.RootTransformer;
 
 public class PureBehaviorExpressionEditor extends PureConstructorExpressionEditor {
 
 	private boolean allowOwnStateChange;
 
-	public PureBehaviorExpressionEditor(CtBehavior affectedBehavior, RuntimeConfiguration configuration,
+	public PureBehaviorExpressionEditor(CtBehavior affectedBehavior, RootTransformer rootTransformer,
 			boolean allowOwnStateChange) {
-		super(affectedBehavior, configuration);
+		super(affectedBehavior, rootTransformer);
 		this.allowOwnStateChange = allowOwnStateChange;
 	}
 
@@ -75,12 +75,16 @@ public class PureBehaviorExpressionEditor extends PureConstructorExpressionEdito
 		if (constructorModifyingOwnClass(method)) {
 			return;
 		}
-		if (configuration.getWhitelistMethods().contains(method)) {
+		if (rootTransformer.getConfiguration().getWhitelistMethods().contains(method)) {
 			return;
 		}
 		if (!method.hasAnnotation(Pure.class)) {
-			pureError("illegal method access on method " + method.getLongName() + " in pure method/constructor "
-					+ affectedBehavior.getLongName() + " on line " + methodCall.getLineNumber());
+			if (rootTransformer.getPureInspector().inspect(
+					rootTransformer.getInvolvedTypeInspector().inspect(method.getDeclaringClass()), method) == null) {
+				pureError("illegal method access on unpure method " + method.getLongName()
+						+ " in pure method/constructor " + affectedBehavior.getLongName() + " on line "
+						+ methodCall.getLineNumber());
+			}
 		}
 	}
 

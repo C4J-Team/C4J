@@ -6,7 +6,6 @@ import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtBehavior;
 import javassist.CtClass;
-import javassist.CtConstructor;
 import javassist.NotFoundException;
 import javassist.bytecode.AnnotationsAttribute;
 import de.andrena.next.Pure;
@@ -26,11 +25,10 @@ public class PureTransformer extends AbstractAffectedClassTransformer {
 	public void transform(Set<CtClass> involvedClasses, Set<ContractInfo> contracts, CtClass affectedClass)
 			throws Exception {
 		for (CtBehavior affectedBehavior : affectedClass.getDeclaredBehaviors()) {
-			for (CtClass involvedClass : involvedClasses) {
-				CtBehavior involvedBehavior = getInvolvedBehavior(affectedBehavior, involvedClass);
-				if (involvedBehavior != null && involvedBehavior.hasAnnotation(Pure.class)) {
-					addBehaviorAnnotation(affectedBehavior, Pure.class);
-				}
+			CtBehavior pureBehavior = rootTransformer.getPureInspector().inspect(involvedClasses, affectedBehavior);
+			if (pureBehavior != null) {
+				addBehaviorAnnotation(affectedBehavior, Pure.class);
+				logger.info("added @Pure from " + pureBehavior.getLongName() + " to " + affectedBehavior.getLongName());
 			}
 			if (affectedBehavior.hasAnnotation(Pure.class)) {
 				verifyPure(affectedBehavior);
@@ -38,24 +36,8 @@ public class PureTransformer extends AbstractAffectedClassTransformer {
 		}
 	}
 
-	private CtBehavior getInvolvedBehavior(CtBehavior affectedBehavior, CtClass involvedClass) {
-		if (affectedBehavior instanceof CtConstructor) {
-			try {
-				return involvedClass.getDeclaredConstructor(affectedBehavior.getParameterTypes());
-			} catch (NotFoundException e) {
-				return null;
-			}
-		}
-		try {
-			return involvedClass.getDeclaredMethod(affectedBehavior.getName(), affectedBehavior.getParameterTypes());
-		} catch (NotFoundException e) {
-			return null;
-		}
-	}
-
 	private void verifyPure(CtBehavior affectedBehavior) throws CannotCompileException {
-		affectedBehavior.instrument(new PureBehaviorExpressionEditor(affectedBehavior, rootTransformer
-				.getConfiguration(), false));
+		affectedBehavior.instrument(new PureBehaviorExpressionEditor(affectedBehavior, rootTransformer, false));
 	}
 
 	private void addBehaviorAnnotation(CtBehavior targetBehavior, Class<?> annotationClass) throws NotFoundException {

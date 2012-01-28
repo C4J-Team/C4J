@@ -23,6 +23,8 @@ import de.andrena.next.internal.transformer.TransformationException;
 import de.andrena.next.internal.util.BackdoorAnnotationLoader;
 import de.andrena.next.internal.util.ContractRegistry;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
+import de.andrena.next.internal.util.InvolvedTypeInspector;
+import de.andrena.next.internal.util.PureInspector;
 
 public class RootTransformer implements ClassFileTransformer {
 
@@ -38,12 +40,23 @@ public class RootTransformer implements ClassFileTransformer {
 
 	private RuntimeConfiguration configuration;
 
+	private InvolvedTypeInspector involvedTypeInspector = new InvolvedTypeInspector();
+	private PureInspector pureInspector = new PureInspector();
+
 	public ClassPool getPool() {
 		return pool;
 	}
 
 	public RuntimeConfiguration getConfiguration() {
 		return configuration;
+	}
+
+	public InvolvedTypeInspector getInvolvedTypeInspector() {
+		return involvedTypeInspector;
+	}
+
+	public PureInspector getPureInspector() {
+		return pureInspector;
 	}
 
 	public RootTransformer(String agentArgs, Instrumentation inst) throws Exception {
@@ -123,21 +136,9 @@ public class RootTransformer implements ClassFileTransformer {
 			contractClassTransformer.transform(contractInfo, affectedClass);
 			return affectedClass.toBytecode();
 		}
-		Set<CtClass> involvedTypes = getInvolvedTypes(affectedClass);
+		Set<CtClass> involvedTypes = involvedTypeInspector.inspect(affectedClass);
 		targetClassTransformer.transform(involvedTypes, getContractsForTypes(involvedTypes), affectedClass);
 		return affectedClass.toBytecode();
-	}
-
-	Set<CtClass> getInvolvedTypes(CtClass type) throws NotFoundException {
-		Set<CtClass> inheritedTypes = new HashSet<CtClass>();
-		inheritedTypes.add(type);
-		if (type.getSuperclass() != null) {
-			inheritedTypes.addAll(getInvolvedTypes(type.getSuperclass()));
-		}
-		for (CtClass interfaze : type.getInterfaces()) {
-			inheritedTypes.addAll(getInvolvedTypes(interfaze));
-		}
-		return inheritedTypes;
 	}
 
 	private Set<ContractInfo> getContractsForTypes(Set<CtClass> types) throws NotFoundException {
