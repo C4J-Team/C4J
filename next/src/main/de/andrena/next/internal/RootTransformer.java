@@ -24,7 +24,6 @@ import de.andrena.next.internal.util.BackdoorAnnotationLoader;
 import de.andrena.next.internal.util.ContractRegistry;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 import de.andrena.next.internal.util.InvolvedTypeInspector;
-import de.andrena.next.internal.util.PureInspector;
 
 public class RootTransformer implements ClassFileTransformer {
 
@@ -41,7 +40,6 @@ public class RootTransformer implements ClassFileTransformer {
 	private RuntimeConfiguration configuration;
 
 	private InvolvedTypeInspector involvedTypeInspector = new InvolvedTypeInspector();
-	private PureInspector pureInspector = new PureInspector();
 
 	public ClassPool getPool() {
 		return pool;
@@ -53,10 +51,6 @@ public class RootTransformer implements ClassFileTransformer {
 
 	public InvolvedTypeInspector getInvolvedTypeInspector() {
 		return involvedTypeInspector;
-	}
-
-	public PureInspector getPureInspector() {
-		return pureInspector;
 	}
 
 	public RootTransformer(String agentArgs, Instrumentation inst) throws Exception {

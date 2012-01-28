@@ -14,14 +14,15 @@ import javassist.expr.MethodCall;
 import javassist.expr.NewExpr;
 import de.andrena.next.Pure;
 import de.andrena.next.internal.RootTransformer;
+import de.andrena.next.internal.util.PureInspectorProvider;
 
 public class PureBehaviorExpressionEditor extends PureConstructorExpressionEditor {
 
 	private boolean allowOwnStateChange;
 
 	public PureBehaviorExpressionEditor(CtBehavior affectedBehavior, RootTransformer rootTransformer,
-			boolean allowOwnStateChange) {
-		super(affectedBehavior, rootTransformer);
+			PureInspectorProvider pureInspectorProvider, boolean allowOwnStateChange) {
+		super(affectedBehavior, rootTransformer, pureInspectorProvider);
 		this.allowOwnStateChange = allowOwnStateChange;
 	}
 
@@ -79,7 +80,7 @@ public class PureBehaviorExpressionEditor extends PureConstructorExpressionEdito
 			return;
 		}
 		if (!method.hasAnnotation(Pure.class)) {
-			if (rootTransformer.getPureInspector().inspect(
+			if (pureInspectorProvider.getPureInspector().inspect(
 					rootTransformer.getInvolvedTypeInspector().inspect(method.getDeclaringClass()), method) == null) {
 				pureError("illegal method access on unpure method " + method.getLongName()
 						+ " in pure method/constructor " + affectedBehavior.getLongName() + " on line "

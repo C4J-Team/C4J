@@ -11,7 +11,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.andrena.next.ClassInvariant;
-import de.andrena.next.internal.evaluator.Evaluator;
 import de.andrena.next.internal.evaluator.Evaluator.EvaluationPhase;
 
 public class EvaluatorTest {
@@ -78,7 +77,8 @@ public class EvaluatorTest {
 
 	@Test
 	public void testBefore() {
-		Evaluator.before(currentTarget, ContractClassForBefore.class, "contractMethod", new Class<?>[0], new Object[0]);
+		Evaluator.before(currentTarget, ContractClassForBefore.class, DummyClass.class, "contractMethod",
+				new Class<?>[0], new Object[0]);
 		assertEquals(EvaluationPhase.NONE, Evaluator.evaluationPhase.get());
 	}
 
@@ -91,8 +91,8 @@ public class EvaluatorTest {
 
 	@Test
 	public void testAfter() {
-		Evaluator.after(currentTarget, ContractClassForAfter.class, "contractMethod", new Class<?>[0], new Object[0],
-				Integer.valueOf(4));
+		Evaluator.after(currentTarget, ContractClassForAfter.class, DummyClass.class, "contractMethod",
+				new Class<?>[0], new Object[0], Integer.valueOf(4));
 		assertEquals(EvaluationPhase.NONE, Evaluator.evaluationPhase.get());
 	}
 
@@ -107,7 +107,7 @@ public class EvaluatorTest {
 
 	@Test
 	public void testCallInvariant() {
-		Evaluator.callInvariant(currentTarget, ContractClassForInvariant.class, "invariant");
+		Evaluator.callInvariant(currentTarget, ContractClassForInvariant.class, DummyClass.class, "invariant");
 		assertEquals(EvaluationPhase.NONE, Evaluator.evaluationPhase.get());
 	}
 
@@ -122,7 +122,8 @@ public class EvaluatorTest {
 	@Test
 	public void testCallContractMethod() {
 		Evaluator.evaluationPhase.set(EvaluationPhase.AFTER);
-		Evaluator.callContractMethod(ContractClass.class, "contractMethod", new Class<?>[0], new Object[0]);
+		Evaluator.callContractMethod(ContractClass.class, DummyClass.class, "contractMethod", new Class<?>[0],
+				new Object[0]);
 		assertEquals(EvaluationPhase.NONE, Evaluator.evaluationPhase.get());
 	}
 
@@ -130,8 +131,8 @@ public class EvaluatorTest {
 	public void testCallContractMethodThrowingException() {
 		Evaluator.evaluationPhase.set(EvaluationPhase.AFTER);
 		try {
-			Evaluator.callContractMethod(ContractClass.class, "contractMethodThrowingException", new Class<?>[0],
-					new Object[0]);
+			Evaluator.callContractMethod(ContractClass.class, DummyClass.class, "contractMethodThrowingException",
+					new Class<?>[0], new Object[0]);
 			fail("expected EvaluationException");
 		} catch (EvaluationException e) {
 			// expected
@@ -143,8 +144,8 @@ public class EvaluatorTest {
 	public void testCallContractMethodThrowingAssertionError() {
 		Evaluator.evaluationPhase.set(EvaluationPhase.AFTER);
 		try {
-			Evaluator.callContractMethod(ContractClass.class, "contractMethodThrowingAssertionError", new Class<?>[0],
-					new Object[0]);
+			Evaluator.callContractMethod(ContractClass.class, DummyClass.class, "contractMethodThrowingAssertionError",
+					new Class<?>[0], new Object[0]);
 			fail("expected AssertionError");
 		} catch (AssertionError e) {
 			// expected
@@ -172,10 +173,10 @@ public class EvaluatorTest {
 	public void testCallContractMethodRetainingState() {
 		Evaluator.evaluationPhase.set(EvaluationPhase.AFTER);
 		Evaluator.currentTarget.set(currentTarget);
-		Evaluator.callContractMethod(ContractClassRetainingState.class, "contractMethod", new Class<?>[0],
-				new Object[0]);
-		Evaluator.callContractMethod(ContractClassRetainingState.class, "contractMethod", new Class<?>[0],
-				new Object[0]);
+		Evaluator.callContractMethod(ContractClassRetainingState.class, DummyClass.class, "contractMethod",
+				new Class<?>[0], new Object[0]);
+		Evaluator.callContractMethod(ContractClassRetainingState.class, DummyClass.class, "contractMethod",
+				new Class<?>[0], new Object[0]);
 	}
 
 	public static class ContractClassRetainingState {
