@@ -7,6 +7,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import de.andrena.next.AllowPureAccess;
 import de.andrena.next.acceptancetest.subinterfaces.VeryBottom;
 import de.andrena.next.systemtest.TransformerAwareRule;
 
@@ -28,9 +29,12 @@ public class NNUnchangedS5aTest {
 		thrown.expect(AssertionError.class);
 		thrown.expectMessage("unchanged");
 		new VeryBottom(0) {
+			@AllowPureAccess
+			private int unchangedDestroyer;
+
 			@Override
 			public int unchanged() {
-				return value + new Exception().getStackTrace().length;
+				return value + unchangedDestroyer++;
 			};
 		}.unchanged();
 	}

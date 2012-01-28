@@ -7,6 +7,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import de.andrena.next.AllowPureAccess;
 import de.andrena.next.acceptancetest.subinterfaces.VeryBottom;
 import de.andrena.next.systemtest.TransformerAwareRule;
 
@@ -28,9 +29,12 @@ public class NNOldS5aTest {
 		thrown.expect(AssertionError.class);
 		thrown.expectMessage("old value");
 		new VeryBottom(0) {
+			@AllowPureAccess
+			private int oldDestroyer;
+
 			@Override
 			public int old() {
-				return value + new Exception().getStackTrace().length;
+				return value + oldDestroyer++;
 			};
 		}.old();
 	}
