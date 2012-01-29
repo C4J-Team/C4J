@@ -122,8 +122,8 @@ public class EvaluatorTest {
 	@Test
 	public void testCallContractMethod() {
 		Evaluator.evaluationPhase.set(EvaluationPhase.AFTER);
-		Evaluator.callContractMethod(ContractClass.class, DummyClass.class, "contractMethod", new Class<?>[0],
-				new Object[0]);
+		Evaluator.callContractMethod(currentTarget, ContractClass.class, DummyClass.class, "contractMethod",
+				new Class<?>[0], new Object[0]);
 		assertEquals(EvaluationPhase.NONE, Evaluator.evaluationPhase.get());
 	}
 
@@ -131,8 +131,8 @@ public class EvaluatorTest {
 	public void testCallContractMethodThrowingException() {
 		Evaluator.evaluationPhase.set(EvaluationPhase.AFTER);
 		try {
-			Evaluator.callContractMethod(ContractClass.class, DummyClass.class, "contractMethodThrowingException",
-					new Class<?>[0], new Object[0]);
+			Evaluator.callContractMethod(currentTarget, ContractClass.class, DummyClass.class,
+					"contractMethodThrowingException", new Class<?>[0], new Object[0]);
 			fail("expected EvaluationException");
 		} catch (EvaluationException e) {
 			// expected
@@ -144,8 +144,8 @@ public class EvaluatorTest {
 	public void testCallContractMethodThrowingAssertionError() {
 		Evaluator.evaluationPhase.set(EvaluationPhase.AFTER);
 		try {
-			Evaluator.callContractMethod(ContractClass.class, DummyClass.class, "contractMethodThrowingAssertionError",
-					new Class<?>[0], new Object[0]);
+			Evaluator.callContractMethod(currentTarget, ContractClass.class, DummyClass.class,
+					"contractMethodThrowingAssertionError", new Class<?>[0], new Object[0]);
 			fail("expected AssertionError");
 		} catch (AssertionError e) {
 			// expected
@@ -172,11 +172,10 @@ public class EvaluatorTest {
 	@Test
 	public void testCallContractMethodRetainingState() {
 		Evaluator.evaluationPhase.set(EvaluationPhase.AFTER);
-		Evaluator.currentTarget.set(currentTarget);
-		Evaluator.callContractMethod(ContractClassRetainingState.class, DummyClass.class, "contractMethod",
-				new Class<?>[0], new Object[0]);
-		Evaluator.callContractMethod(ContractClassRetainingState.class, DummyClass.class, "contractMethod",
-				new Class<?>[0], new Object[0]);
+		Evaluator.callContractMethod(currentTarget, ContractClassRetainingState.class, DummyClass.class,
+				"contractMethod", new Class<?>[0], new Object[0]);
+		Evaluator.callContractMethod(currentTarget, ContractClassRetainingState.class, DummyClass.class,
+				"contractMethod", new Class<?>[0], new Object[0]);
 	}
 
 	public static class ContractClassRetainingState {

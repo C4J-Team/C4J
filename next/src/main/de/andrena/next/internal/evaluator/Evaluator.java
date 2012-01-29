@@ -72,13 +72,13 @@ public class Evaluator {
 	}
 
 	public static boolean isBefore() {
-		logger.info("isBefore returning " + (Evaluator.evaluationPhase.get() == EvaluationPhase.BEFORE));
-		return Evaluator.evaluationPhase.get() == EvaluationPhase.BEFORE;
+		logger.info("isBefore returning " + (evaluationPhase.get() == EvaluationPhase.BEFORE));
+		return evaluationPhase.get() == EvaluationPhase.BEFORE;
 	}
 
 	public static boolean isAfter() {
-		logger.info("isAfter returning " + (Evaluator.evaluationPhase.get() == EvaluationPhase.AFTER));
-		return Evaluator.evaluationPhase.get() == EvaluationPhase.AFTER;
+		logger.info("isAfter returning " + (evaluationPhase.get() == EvaluationPhase.AFTER));
+		return evaluationPhase.get() == EvaluationPhase.AFTER;
 	}
 
 	public static Object oldFieldAccess(String fieldName) {
@@ -99,7 +99,7 @@ public class Evaluator {
 
 	public static Object fieldAccess(String fieldName) {
 		try {
-			Object target = Evaluator.currentTarget.get();
+			Object target = currentTarget.get();
 			Field field = target.getClass().getDeclaredField(fieldName);
 			field.setAccessible(true);
 			return field.get(target);
@@ -110,7 +110,7 @@ public class Evaluator {
 
 	public static Object methodCall(String methodName, Class<?>[] argTypes, Object[] args) {
 		try {
-			Object target = Evaluator.currentTarget.get();
+			Object target = currentTarget.get();
 			Method method = target.getClass().getDeclaredMethod(methodName, argTypes);
 			method.setAccessible(true);
 			return method.invoke(target, args);
@@ -121,51 +121,44 @@ public class Evaluator {
 
 	@SuppressWarnings("unchecked")
 	public static <T> T getReturnValue() {
-		return (T) Evaluator.returnValue.get();
+		return (T) returnValue.get();
 	}
 
 	public static void before(Object target, Class<?> contractClass, Class<?> callingClass, String methodName,
 			Class<?>[] argTypes, Object[] args) {
-		if (Evaluator.evaluationPhase.get() == EvaluationPhase.NONE) {
-			Evaluator.evaluationPhase.set(EvaluationPhase.BEFORE);
-			Evaluator.currentTarget.set(target);
+		if (evaluationPhase.get() == EvaluationPhase.NONE) {
+			evaluationPhase.set(EvaluationPhase.BEFORE);
 			logger.info("before " + methodName);
-			callContractMethod(contractClass, callingClass, methodName, argTypes, args);
+			callContractMethod(target, contractClass, callingClass, methodName, argTypes, args);
 		}
 	}
 
 	public static void after(Object target, Class<?> contractClass, Class<?> callingClass, String methodName,
-			Class<?>[] argTypes, Object[] args, Object returnValue) {
-		if (Evaluator.evaluationPhase.get() == EvaluationPhase.NONE) {
-			Evaluator.evaluationPhase.set(EvaluationPhase.AFTER);
-			Evaluator.currentTarget.set(target);
-			logger.info("setting return value to " + returnValue);
-			Evaluator.returnValue.set(returnValue);
+			Class<?>[] argTypes, Object[] args, Object actualReturnValue) {
+		if (evaluationPhase.get() == EvaluationPhase.NONE) {
+			evaluationPhase.set(EvaluationPhase.AFTER);
+			logger.info("setting return value to " + actualReturnValue);
+			returnValue.set(actualReturnValue);
 			logger.info("after " + methodName);
-			callContractMethod(contractClass, callingClass, methodName, argTypes, args);
+			callContractMethod(target, contractClass, callingClass, methodName, argTypes, args);
+			returnValue.set(null);
 		}
 	}
 
 	public static void callInvariant(Object target, Class<?> contractClass, Class<?> callingClass, String methodName) {
-		if (Evaluator.evaluationPhase.get() == EvaluationPhase.NONE) {
-			Evaluator.evaluationPhase.set(EvaluationPhase.INVARIANT);
-			Evaluator.currentTarget.set(target);
+		if (evaluationPhase.get() == EvaluationPhase.NONE) {
+			evaluationPhase.set(EvaluationPhase.INVARIANT);
 			logger.info("calling invariant " + methodName);
-			callContractMethod(contractClass, callingClass, methodName, new Class<?>[0], new Object[0]);
+			callContractMethod(target, contractClass, callingClass, methodName, new Class<?>[0], new Object[0]);
 		}
 	}
 
-	static void callContractMethod(Class<?> contractClass, Class<?> callingClass, String methodName,
+	static void callContractMethod(Object target, Class<?> contractClass, Class<?> callingClass, String methodName,
 			Class<?>[] argTypes, Object[] args) throws AssertionError {
 		try {
-			Object contract;
-			Pair<Class<?>, Class<?>> classPair = new Pair<Class<?>, Class<?>>(contractClass, callingClass);
-			if (contractCache.contains(Evaluator.currentTarget.get(), classPair)) {
-				contract = contractCache.get(Evaluator.currentTarget.get(), classPair);
-			} else {
-				contract = contractClass.newInstance();
-				contractCache.put(Evaluator.currentTarget.get(), classPair, contract);
-			}
+			// constructor (with newInstance) already needs access to the current target
+			currentTarget.set(target);
+			Object contract = getContractFromCache(target, contractClass, callingClass);
 			Method method = contractClass.getDeclaredMethod(methodName, argTypes);
 			method.setAccessible(true);
 			logger.info("setting return type for " + method.getName() + " to " + method.getReturnType());
@@ -182,8 +175,23 @@ public class Evaluator {
 			throw new EvaluationException("could not call contract method " + methodName + " of class "
 					+ contractClass.getName(), e);
 		} finally {
-			Evaluator.evaluationPhase.set(EvaluationPhase.NONE);
+			contractReturnType.set(null);
+			currentTarget.set(null);
+			evaluationPhase.set(EvaluationPhase.NONE);
 		}
+	}
+
+	private static Object getContractFromCache(Object target, Class<?> contractClass, Class<?> callingClass)
+			throws InstantiationException, IllegalAccessException {
+		Object contract;
+		Pair<Class<?>, Class<?>> classPair = new Pair<Class<?>, Class<?>>(contractClass, callingClass);
+		if (contractCache.contains(target, classPair)) {
+			contract = contractCache.get(target, classPair);
+		} else {
+			contract = contractClass.newInstance();
+			contractCache.put(target, classPair, contract);
+		}
+		return contract;
 	}
 
 	@SuppressWarnings("unchecked")
