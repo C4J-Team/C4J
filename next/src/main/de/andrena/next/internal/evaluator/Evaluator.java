@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import de.andrena.next.internal.compiler.StaticCall;
 import de.andrena.next.internal.util.ObjectMapper;
 import de.andrena.next.internal.util.Pair;
+import de.andrena.next.internal.util.StackDepthAware;
 
 public class Evaluator {
 	public static final StaticCall before = new StaticCall(Evaluator.class, "before");
@@ -25,6 +26,7 @@ public class Evaluator {
 	public static final StaticCall oldMethodCall = new StaticCall(Evaluator.class, "oldMethodCall");
 	public static final StaticCall storeFieldAccess = new StaticCall(Evaluator.class, "storeFieldAccess");
 	public static final StaticCall storeMethodCall = new StaticCall(Evaluator.class, "storeMethodCall");
+	public static final StaticCall getCurrentTarget = new StaticCall(Evaluator.class, "getCurrentTarget");
 
 	private static final Logger logger = Logger.getLogger(Evaluator.class);
 
@@ -59,16 +61,27 @@ public class Evaluator {
 	final static ThreadLocal<Object> currentTarget = new ThreadLocal<Object>();
 	final static ThreadLocal<Class<?>> contractReturnType = new ThreadLocal<Class<?>>();
 
-	private static final ThreadLocal<Map<String, Object>> oldStore = new ThreadLocal<Map<String, Object>>() {
+	private static final ThreadLocal<Integer> currentStackTraceDepth = new ThreadLocal<Integer>();
+	private static final ThreadLocal<StackDepthAware<Map<String, Object>>> oldStore = new ThreadLocal<StackDepthAware<Map<String, Object>>>() {
 		@Override
-		protected Map<String, Object> initialValue() {
-			return new HashMap<String, Object>();
+		protected StackDepthAware<Map<String, Object>> initialValue() {
+			return new StackDepthAware<Map<String, Object>>() {
+				@Override
+				protected Map<String, Object> initialValue() {
+					return new HashMap<String, Object>();
+				}
+
+			};
 		}
 	};
 
 	@SuppressWarnings("unchecked")
 	public static <T> T getCurrentTarget() {
 		return (T) currentTarget.get();
+	}
+
+	public static int getOldStoreSize() {
+		return oldStore.get().size();
 	}
 
 	public static boolean isBefore() {
@@ -82,19 +95,23 @@ public class Evaluator {
 	}
 
 	public static Object oldFieldAccess(String fieldName) {
-		return oldStore.get().get(fieldName);
+		return getCurrentOldStore().get(fieldName);
+	}
+
+	private static Map<String, Object> getCurrentOldStore() {
+		return oldStore.get().get(currentStackTraceDepth.get());
 	}
 
 	public static Object oldMethodCall(String methodName) {
-		return oldStore.get().get(methodName);
+		return getCurrentOldStore().get(methodName);
 	}
 
 	public static void storeFieldAccess(String fieldName) {
-		oldStore.get().put(fieldName, fieldAccess(fieldName));
+		getCurrentOldStore().put(fieldName, fieldAccess(fieldName));
 	}
 
 	public static void storeMethodCall(String methodName) {
-		oldStore.get().put(methodName, methodCall(methodName, new Class<?>[0], new Object[0]));
+		getCurrentOldStore().put(methodName, methodCall(methodName, new Class<?>[0], new Object[0]));
 	}
 
 	public static Object fieldAccess(String fieldName) {
@@ -141,8 +158,13 @@ public class Evaluator {
 			returnValue.set(actualReturnValue);
 			logger.info("after " + methodName);
 			callContractMethod(target, contractClass, callingClass, methodName, argTypes, args);
-			returnValue.set(null);
+			clearBeforeMethodReturns();
 		}
+	}
+
+	private static void clearBeforeMethodReturns() {
+		returnValue.set(null);
+		getCurrentOldStore().clear();
 	}
 
 	public static void callInvariant(Object target, Class<?> contractClass, Class<?> callingClass, String methodName) {
@@ -163,8 +185,10 @@ public class Evaluator {
 			method.setAccessible(true);
 			logger.info("setting return type for " + method.getName() + " to " + method.getReturnType());
 			contractReturnType.set(method.getReturnType());
+			currentStackTraceDepth.set(Integer.valueOf(new Exception().getStackTrace().length));
 			method.invoke(contract, args);
 		} catch (InvocationTargetException e) {
+			clearBeforeMethodReturns();
 			if (e.getTargetException().getClass().equals(AssertionError.class)) {
 				throw (AssertionError) e.getTargetException();
 			} else {
@@ -172,6 +196,7 @@ public class Evaluator {
 						+ contractClass.getName(), e.getTargetException());
 			}
 		} catch (Exception e) {
+			clearBeforeMethodReturns();
 			throw new EvaluationException("could not call contract method " + methodName + " of class "
 					+ contractClass.getName(), e);
 		} finally {

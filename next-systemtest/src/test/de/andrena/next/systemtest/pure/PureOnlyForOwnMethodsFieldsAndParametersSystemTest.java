@@ -23,4 +23,6 @@ public class PureOnlyForOwnMethodsFieldsAndParametersSystemTest {
 		}
 	}
 
+	// TODO: test params, fields, own methods, static, etc.
+
 }
