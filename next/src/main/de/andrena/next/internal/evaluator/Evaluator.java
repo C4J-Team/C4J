@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
 import de.andrena.next.internal.compiler.StaticCall;
 import de.andrena.next.internal.util.ObjectMapper;
 import de.andrena.next.internal.util.Pair;
-import de.andrena.next.internal.util.StackDepthAware;
+import de.andrena.next.internal.util.SelfInitializingMap;
 
 public class Evaluator {
 	public static final StaticCall before = new StaticCall(Evaluator.class, "before");
@@ -61,11 +61,14 @@ public class Evaluator {
 	final static ThreadLocal<Object> currentTarget = new ThreadLocal<Object>();
 	final static ThreadLocal<Class<?>> contractReturnType = new ThreadLocal<Class<?>>();
 
-	private static final ThreadLocal<Integer> currentStackTraceDepth = new ThreadLocal<Integer>();
-	private static final ThreadLocal<StackDepthAware<Map<String, Object>>> oldStore = new ThreadLocal<StackDepthAware<Map<String, Object>>>() {
+	/**
+	 * Integer = stack trace depth, class = contract class
+	 */
+	private static final ThreadLocal<Pair<Integer, Class<?>>> currentOldCacheEnvironment = new ThreadLocal<Pair<Integer, Class<?>>>();
+	private static final ThreadLocal<SelfInitializingMap<Pair<Integer, Class<?>>, Map<String, Object>>> oldStore = new ThreadLocal<SelfInitializingMap<Pair<Integer, Class<?>>, Map<String, Object>>>() {
 		@Override
-		protected StackDepthAware<Map<String, Object>> initialValue() {
-			return new StackDepthAware<Map<String, Object>>() {
+		protected SelfInitializingMap<Pair<Integer, Class<?>>, Map<String, Object>> initialValue() {
+			return new SelfInitializingMap<Pair<Integer, Class<?>>, Map<String, Object>>() {
 				@Override
 				protected Map<String, Object> initialValue() {
 					return new HashMap<String, Object>();
@@ -95,33 +98,46 @@ public class Evaluator {
 	}
 
 	public static Object oldFieldAccess(String fieldName) {
-		return getCurrentOldStore().get(fieldName);
+		return getCurrentOldCache().get(fieldName);
 	}
 
-	private static Map<String, Object> getCurrentOldStore() {
-		return oldStore.get().get(currentStackTraceDepth.get());
+	private static Map<String, Object> getCurrentOldCache() {
+		return oldStore.get().get(currentOldCacheEnvironment.get());
 	}
 
 	public static Object oldMethodCall(String methodName) {
-		return getCurrentOldStore().get(methodName);
+		return getCurrentOldCache().get(methodName);
 	}
 
 	public static void storeFieldAccess(String fieldName) {
-		getCurrentOldStore().put(fieldName, fieldAccess(fieldName));
+		getCurrentOldCache().put(fieldName, fieldAccess(fieldName));
 	}
 
 	public static void storeMethodCall(String methodName) {
-		getCurrentOldStore().put(methodName, methodCall(methodName, new Class<?>[0], new Object[0]));
+		getCurrentOldCache().put(methodName, methodCall(methodName, new Class<?>[0], new Object[0]));
 	}
 
 	public static Object fieldAccess(String fieldName) {
 		try {
 			Object target = currentTarget.get();
-			Field field = target.getClass().getDeclaredField(fieldName);
+			Field field = getInheritedField(fieldName, target.getClass());
 			field.setAccessible(true);
 			return field.get(target);
 		} catch (Exception e) {
 			throw new EvaluationException("could not access field " + fieldName, e);
+		}
+	}
+
+	private static Field getInheritedField(String fieldName, Class<?> clazz) throws NoSuchFieldException {
+		try {
+			return clazz.getDeclaredField(fieldName);
+		} catch (SecurityException e) {
+			throw e;
+		} catch (NoSuchFieldException e) {
+			if (clazz.getSuperclass() != null) {
+				return getInheritedField(fieldName, clazz.getSuperclass());
+			}
+			throw e;
 		}
 	}
 
@@ -164,7 +180,7 @@ public class Evaluator {
 
 	private static void clearBeforeMethodReturns() {
 		returnValue.set(null);
-		getCurrentOldStore().clear();
+		getCurrentOldCache().clear();
 	}
 
 	public static void callInvariant(Object target, Class<?> contractClass, Class<?> callingClass, String methodName) {
@@ -185,7 +201,10 @@ public class Evaluator {
 			method.setAccessible(true);
 			logger.info("setting return type for " + method.getName() + " to " + method.getReturnType());
 			contractReturnType.set(method.getReturnType());
-			currentStackTraceDepth.set(Integer.valueOf(new Exception().getStackTrace().length));
+			currentOldCacheEnvironment.set(new Pair<Integer, Class<?>>(
+					Integer.valueOf(new Exception().getStackTrace().length), contractClass));
+			new Exception().printStackTrace();
+			System.err.println(new Exception().getStackTrace().length);
 			method.invoke(contract, args);
 		} catch (InvocationTargetException e) {
 			clearBeforeMethodReturns();

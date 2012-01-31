@@ -1,5 +1,6 @@
 package de.andrena.next.internal.editor;
 
+import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -41,6 +42,8 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 	private RootTransformer rootTransformer;
 	private PureInspectorProvider pureInspectorProvider;
 	private boolean allowOwnStateChange;
+	// necessary to work around bug https://issues.jboss.org/browse/JASSIST-149
+	private boolean exceptionThrown;
 
 	public PureBehaviorExpressionEditor(CtBehavior affectedBehavior, RootTransformer rootTransformer,
 			PureInspectorProvider pureInspectorProvider, boolean allowOwnStateChange) {
@@ -67,6 +70,7 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 						.field(field)));
 			}
 		}
+		unpureConditions = new CompareExp(NestedExp.CALLING_OBJECT).ne(NestedExp.NULL).and(unpureConditions);
 		IfExp unpureCondition = new IfExp(unpureConditions);
 		String errorMsg = "illegal method access on unpure method/constructor " + behavior.getLongName()
 				+ " in pure method/constructor " + affectedBehavior.getLongName() + " on line "
@@ -98,6 +102,9 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 	}
 
 	private void editFieldAccess(FieldAccess fieldAccess) throws CannotCompileException, NotFoundException {
+		if (exceptionThrown) {
+			return;
+		}
 		CtField field = fieldAccess.getField();
 		if (constructorModifyingOwnClass(field)) {
 			return;
@@ -113,8 +120,15 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 		}
 		String errorMsg = "illegal field write access on field " + field.getName() + " in pure method "
 				+ affectedBehavior.getLongName() + " on line " + fieldAccess.getLineNumber();
+		pureError(errorMsg);
+	}
+
+	private void pureError(String errorMsg) throws CannotCompileException {
 		logger.error(errorMsg);
-		getThrowable(errorMsg).insertBefore(affectedBehavior);
+		ThrowExp throwExp = getThrowable(errorMsg);
+		logger.info("pure error replacement code: " + throwExp.getCode());
+		throwExp.insertBefore(affectedBehavior);
+		exceptionThrown = true;
 	}
 
 	private boolean isAllowedOwnStateChange(CtMember member) throws NotFoundException {
@@ -132,6 +146,9 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 
 	private void editMethodCall(MethodCall methodCall) throws NotFoundException, CannotCompileException,
 			SecurityException, NoSuchMethodException {
+		if (exceptionThrown) {
+			return;
+		}
 		CtMethod method = methodCall.getMethod();
 		if (isSynthetic(method)) {
 			return;
@@ -143,6 +160,12 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 			return;
 		}
 		if (method.hasAnnotation(Pure.class)) {
+			return;
+		}
+		if (Modifier.isStatic(method.getModifiers())) {
+			String errorMsg = "illegal method access on static method " + method.getLongName() + " in pure method "
+					+ affectedBehavior.getLongName() + " on line " + methodCall.getLineNumber();
+			pureError(errorMsg);
 			return;
 		}
 		if (pureInspectorProvider.getPureInspector().inspect(

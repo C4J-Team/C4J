@@ -12,6 +12,7 @@ import org.junit.Test;
 import de.andrena.next.Condition;
 import de.andrena.next.Contract;
 import de.andrena.next.Pure;
+import de.andrena.next.Target;
 import de.andrena.next.systemtest.TransformerAwareRule;
 
 public class OldSystemTest {
@@ -83,6 +84,38 @@ public class OldSystemTest {
 			if (post()) {
 				assert target.getValue() == old(target.getValue()) + 1;
 			}
+		}
+	}
+
+	@Test
+	public void testDeepOldAccess() {
+		new SubClass().method();
+	}
+
+	@Contract(SubClassContract.class)
+	public static class SubClass extends SuperClass {
+	}
+
+	public static class SubClassContract extends SubClass {
+		@Target
+		private SubClass target;
+
+		@Override
+		public int method() {
+			if (post()) {
+				assert old(target.field) == 0;
+				assert old(target.method()) == 0;
+			}
+			return 0;
+		}
+	}
+
+	public static class SuperClass {
+		protected int field;
+
+		@Pure
+		public int method() {
+			return 0;
 		}
 	}
 }

@@ -29,13 +29,31 @@ public class ConstructorTransformer extends AbstractContractClassTransformer {
 		if (contractClass.getSuperclass() != null) {
 			CtClass oldSuperclass = contractClass.getSuperclass();
 			contractClass.getClassFile().setSuperclass(null);
-			for (CtField superclassField : oldSuperclass.getFields()) {
-				contractClass.addField(new CtField(superclassField, contractClass));
-			}
+			addFieldsFromSuperclass(contractClass, oldSuperclass);
 		}
 		for (CtConstructor constructor : contractClass.getConstructors()) {
 			contractClass.removeConstructor(constructor);
 		}
 	}
 
+	private void addFieldsFromSuperclass(CtClass contractClass, CtClass superclass) throws CannotCompileException,
+			NotFoundException {
+		for (CtField superclassField : superclass.getFields()) {
+			if (!hasField(contractClass, superclassField)) {
+				contractClass.addField(new CtField(superclassField, contractClass));
+			}
+		}
+		if (superclass.getSuperclass() != null) {
+			addFieldsFromSuperclass(contractClass, superclass.getSuperclass());
+		}
+	}
+
+	private boolean hasField(CtClass contractClass, CtField superclassField) throws NotFoundException {
+		try {
+			contractClass.getField(superclassField.getName());
+			return true;
+		} catch (NotFoundException e) {
+			return false;
+		}
+	}
 }

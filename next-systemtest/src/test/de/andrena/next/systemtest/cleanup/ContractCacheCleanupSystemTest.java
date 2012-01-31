@@ -3,7 +3,6 @@ package de.andrena.next.systemtest.cleanup;
 import static de.andrena.next.Condition.old;
 import static de.andrena.next.Condition.post;
 import static de.andrena.next.Condition.pre;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import java.lang.ref.WeakReference;
@@ -12,7 +11,6 @@ import org.junit.Test;
 
 import de.andrena.next.Contract;
 import de.andrena.next.Target;
-import de.andrena.next.internal.evaluator.Evaluator;
 import de.andrena.next.systemtest.TestUtil;
 
 public class ContractCacheCleanupSystemTest {
@@ -50,21 +48,6 @@ public class ContractCacheCleanupSystemTest {
 		target = null;
 		TestUtil.forceGarbageCollection();
 		assertNull(targetWeakReference.get());
-	}
-
-	@Test
-	public void testOldStoreCleanup() {
-		new OldClass().method(3);
-		assertEquals(0, Evaluator.getOldStoreSize());
-	}
-
-	@Test
-	public void testOldStoreCleanupAfterFailure() {
-		try {
-			new OldClass().methodFailing(3);
-		} catch (AssertionError e) {
-		}
-		assertEquals(0, Evaluator.getOldStoreSize());
 	}
 
 	@Contract(OldClassContract.class)
