@@ -203,8 +203,6 @@ public class Evaluator {
 			contractReturnType.set(method.getReturnType());
 			currentOldCacheEnvironment.set(new Pair<Integer, Class<?>>(
 					Integer.valueOf(new Exception().getStackTrace().length), contractClass));
-			new Exception().printStackTrace();
-			System.err.println(new Exception().getStackTrace().length);
 			method.invoke(contract, args);
 		} catch (InvocationTargetException e) {
 			clearBeforeMethodReturns();
