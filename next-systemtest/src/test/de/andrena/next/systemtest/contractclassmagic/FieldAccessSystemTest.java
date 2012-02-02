@@ -6,7 +6,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import de.andrena.next.Condition;
 import de.andrena.next.Contract;
 import de.andrena.next.Target;
 import de.andrena.next.systemtest.TransformerAwareRule;
@@ -41,7 +40,8 @@ public class FieldAccessSystemTest {
 	}
 
 	public static class DummyContract extends DummyClass {
-		DummyClass target = Condition.target();
+		@Target
+		private DummyClass target;
 
 		@Override
 		public void methodContractHasFieldAccess() {

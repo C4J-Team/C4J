@@ -37,14 +37,4 @@ public class Condition {
 	public static boolean unchanged(Object... fieldOrMethodWithoutParameters) {
 		return false;
 	}
-
-	@Pure
-	public static <T> T target(Class<T> targetType) {
-		return Evaluator.<T> getCurrentTarget();
-	}
-
-	@Pure
-	public static <T> T target() {
-		return Evaluator.<T> getCurrentTarget();
-	}
 }

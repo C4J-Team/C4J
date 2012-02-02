@@ -2,18 +2,19 @@ package de.andrena.next.acceptancetest.point;
 
 import static de.andrena.next.Condition.post;
 import static de.andrena.next.Condition.pre;
-import de.andrena.next.Condition;
+import de.andrena.next.Target;
 
 public class ColoredPointContract extends ColoredPoint {
 
-	private ColoredPoint target = Condition.target();
-	
+	@Target
+	private ColoredPoint target;
+
 	public ColoredPointContract(int x, int y, Color color) {
 		super(x, y, color);
-		if(pre()) {
+		if (pre()) {
 			assert color != null : "color not null";
 		}
-		if(post()) {
+		if (post()) {
 			assert target.getX() == x : "x set";
 			assert target.getY() == y : "y set";
 			assert target.getColor() == color : "color set";

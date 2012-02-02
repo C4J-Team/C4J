@@ -9,7 +9,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import de.andrena.next.Condition;
 import de.andrena.next.Contract;
 import de.andrena.next.Pure;
 import de.andrena.next.Target;
@@ -70,7 +69,8 @@ public class OldSystemTest {
 	}
 
 	public static class DummyContract extends DummyClass {
-		private DummyClass target = Condition.target();
+		@Target
+		private DummyClass target;
 
 		@Override
 		public void incrementValueCheckField() {

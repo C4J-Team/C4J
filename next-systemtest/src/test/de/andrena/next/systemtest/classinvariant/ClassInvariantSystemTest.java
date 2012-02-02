@@ -1,13 +1,12 @@
 package de.andrena.next.systemtest.classinvariant;
 
-import static de.andrena.next.Condition.target;
-
 import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.next.ClassInvariant;
 import de.andrena.next.Contract;
 import de.andrena.next.Pure;
+import de.andrena.next.Target;
 import de.andrena.next.systemtest.TransformerAwareRule;
 
 public class ClassInvariantSystemTest {
@@ -57,7 +56,8 @@ public class ClassInvariantSystemTest {
 	}
 
 	public static class DummyClassContract extends DummyClass {
-		private DummyClass target = target();
+		@Target
+		private DummyClass target;
 
 		public DummyClassContract(int hour) {
 			super(hour);

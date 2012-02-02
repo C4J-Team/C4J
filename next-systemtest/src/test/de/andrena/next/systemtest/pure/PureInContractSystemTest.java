@@ -6,9 +6,9 @@ import static de.andrena.next.Condition.pre;
 import org.junit.Rule;
 import org.junit.Test;
 
-import de.andrena.next.Condition;
 import de.andrena.next.Contract;
 import de.andrena.next.Pure;
+import de.andrena.next.Target;
 import de.andrena.next.systemtest.TransformerAwareRule;
 
 public class PureInContractSystemTest {
@@ -32,7 +32,8 @@ public class PureInContractSystemTest {
 	}
 
 	public static class ContractClassForPureMethod extends TargetClassForPureMethod {
-		private TargetClassForPureMethod target = Condition.target();
+		@Target
+		private TargetClassForPureMethod target;
 
 		@Override
 		public void method() {
@@ -61,7 +62,8 @@ public class PureInContractSystemTest {
 	}
 
 	public static class ContractClassForUnpureMethod extends TargetClassForUnpureMethod {
-		private TargetClassForUnpureMethod target = Condition.target();
+		@Target
+		private TargetClassForUnpureMethod target;
 
 		@Override
 		public void method() {

@@ -4,9 +4,12 @@ import static de.andrena.next.Condition.ignored;
 import static de.andrena.next.Condition.result;
 import de.andrena.next.ClassInvariant;
 import de.andrena.next.Condition;
-import de.andrena.next.Pure;
+import de.andrena.next.Target;
 
 public class TopContract implements Top {
+
+	@Target
+	private Top target;
 
 	@Override
 	public int pre(String parameter) {
@@ -42,13 +45,13 @@ public class TopContract implements Top {
 
 	@ClassInvariant
 	public void aIsAlwaysAMultipleOfTwo() {
-		assert target().pre("") % 2 == 0 : "a() is a multiple of two";
+		assert target.pre("") % 2 == 0 : "a() is a multiple of two";
 	}
 
 	@Override
 	public int unchanged() {
 		if (Condition.post()) {
-			assert Condition.unchanged(target().unchanged()) : "unchanged never changes";
+			assert Condition.unchanged(target.unchanged()) : "unchanged never changes";
 		}
 		return ignored();
 	}
@@ -56,14 +59,9 @@ public class TopContract implements Top {
 	@Override
 	public int old() {
 		if (Condition.post()) {
-			assert result().equals(Condition.old(target().old())) : "old value is preserved";
+			assert result().equals(Condition.old(target.old())) : "old value is preserved";
 		}
 		return ignored();
-	}
-
-	@Pure
-	private Top target() {
-		return Condition.target();
 	}
 
 }

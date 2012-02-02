@@ -2,12 +2,12 @@ package de.andrena.next.acceptancetest.point;
 
 import static de.andrena.next.Condition.ignored;
 import static de.andrena.next.Condition.post;
-
-import de.andrena.next.Condition;
+import de.andrena.next.Target;
 
 public class PointSpecContract implements PointSpec {
-	
-	private PointSpec target = Condition.target();
+
+	@Target
+	private PointSpec target;
 
 	@Override
 	public int getX() {
@@ -23,15 +23,15 @@ public class PointSpecContract implements PointSpec {
 
 	@Override
 	public void setX(int x) {
-		if(post()) {
+		if (post()) {
 			assert target.getX() == x : "x set";
 		}
 	}
 
 	@Override
 	public void setY(int y) {
-		if(post()) {
-			assert target.getY() == y : "y set";	
+		if (post()) {
+			assert target.getY() == y : "y set";
 		}
 	}
 

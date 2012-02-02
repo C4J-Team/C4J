@@ -4,11 +4,12 @@ import static de.andrena.next.Condition.ignored;
 import static de.andrena.next.Condition.post;
 import static de.andrena.next.Condition.pre;
 import static de.andrena.next.Condition.result;
-import de.andrena.next.Condition;
+import de.andrena.next.Target;
 
 public class ColoredPointSpecContract implements ColoredPointSpec {
 
-	private ColoredPointSpec target = Condition.target();
+	@Target
+	private ColoredPointSpec target;
 
 	@Override
 	public int getX() {
@@ -34,7 +35,7 @@ public class ColoredPointSpecContract implements ColoredPointSpec {
 
 	@Override
 	public Color getColor() {
-		if(post()) {
+		if (post()) {
 			Color result = result(Color.class);
 			assert result != null : "result not null";
 		}
@@ -43,12 +44,12 @@ public class ColoredPointSpecContract implements ColoredPointSpec {
 
 	@Override
 	public void setColor(Color color) {
-		if(pre()) {
+		if (pre()) {
 			assert color != null : "color not null";
 		}
-		if(post()) {
+		if (post()) {
 			assert target.getColor() == color : "color set";
-		}	
+		}
 	}
 
 }

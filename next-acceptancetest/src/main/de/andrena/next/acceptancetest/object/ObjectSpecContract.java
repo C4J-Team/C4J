@@ -3,11 +3,12 @@ package de.andrena.next.acceptancetest.object;
 import static de.andrena.next.Condition.ignored;
 import static de.andrena.next.Condition.post;
 import static de.andrena.next.Condition.result;
-import de.andrena.next.Condition;
+import de.andrena.next.Target;
 
 public class ObjectSpecContract implements ObjectSpec {
 
-	private ObjectSpec target = Condition.target();
+	@Target
+	private ObjectSpec target;
 
 	private Object z;
 	private Integer firstHashCode;

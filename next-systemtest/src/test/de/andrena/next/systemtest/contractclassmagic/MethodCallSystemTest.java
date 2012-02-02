@@ -7,9 +7,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import de.andrena.next.Condition;
 import de.andrena.next.Contract;
 import de.andrena.next.Pure;
+import de.andrena.next.Target;
 import de.andrena.next.systemtest.TransformerAwareRule;
 
 public class MethodCallSystemTest {
@@ -70,7 +70,8 @@ public class MethodCallSystemTest {
 	}
 
 	public static class ContractClass extends TargetClass {
-		private TargetClass target = Condition.target();
+		@Target
+		private TargetClass target;
 
 		@Override
 		public void methodContractHasMethodAccess() {

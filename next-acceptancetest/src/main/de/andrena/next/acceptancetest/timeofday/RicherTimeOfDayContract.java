@@ -3,11 +3,12 @@ package de.andrena.next.acceptancetest.timeofday;
 import static de.andrena.next.Condition.post;
 import static de.andrena.next.Condition.pre;
 import de.andrena.next.ClassInvariant;
-import de.andrena.next.Condition;
+import de.andrena.next.Target;
 
 public class RicherTimeOfDayContract extends RicherTimeOfDay {
-	
-	private RicherTimeOfDay target = Condition.target();
+
+	@Target
+	private RicherTimeOfDay target;
 
 	public RicherTimeOfDayContract() {
 		super();

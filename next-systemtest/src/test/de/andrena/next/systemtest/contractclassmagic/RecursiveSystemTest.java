@@ -5,8 +5,8 @@ import static de.andrena.next.Condition.post;
 import org.junit.Rule;
 import org.junit.Test;
 
-import de.andrena.next.Condition;
 import de.andrena.next.Contract;
+import de.andrena.next.Target;
 import de.andrena.next.systemtest.TransformerAwareRule;
 
 public class RecursiveSystemTest {
@@ -27,7 +27,8 @@ public class RecursiveSystemTest {
 	}
 
 	public static class ContractClassWithCorrectEquals extends TargetClassWithCorrectEquals {
-		private TargetClassWithCorrectEquals target = Condition.target();
+		@Target
+		private TargetClassWithCorrectEquals target;
 
 		@Override
 		public boolean equals(Object obj) {
@@ -54,7 +55,8 @@ public class RecursiveSystemTest {
 	}
 
 	public static class ContractClassWithUnreflexiveEquals extends TargetClassWithUnreflexiveEquals {
-		private TargetClassWithUnreflexiveEquals target = Condition.target();
+		@Target
+		private TargetClassWithUnreflexiveEquals target;
 
 		@Override
 		public boolean equals(Object obj) {
@@ -89,7 +91,8 @@ public class RecursiveSystemTest {
 	}
 
 	public static class ContractClassWithUnsymmetricEquals extends TargetClassWithUnsymmetricEquals {
-		private TargetClassWithUnsymmetricEquals target = Condition.target();
+		@Target
+		private TargetClassWithUnsymmetricEquals target;
 
 		public ContractClassWithUnsymmetricEquals(int value) {
 			super(value);

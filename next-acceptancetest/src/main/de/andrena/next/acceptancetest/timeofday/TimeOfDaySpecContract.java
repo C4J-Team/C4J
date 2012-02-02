@@ -5,11 +5,12 @@ import static de.andrena.next.Condition.post;
 import static de.andrena.next.Condition.pre;
 import static de.andrena.next.Condition.result;
 import static de.andrena.next.Condition.unchanged;
-import de.andrena.next.Condition;
+import de.andrena.next.Target;
 
 public class TimeOfDaySpecContract implements TimeOfDaySpec {
-	
-	private TimeOfDaySpec target = Condition.target();
+
+	@Target
+	private TimeOfDaySpec target;
 
 	@Override
 	public int getHour() {

@@ -4,11 +4,12 @@ import static de.andrena.next.Condition.ignored;
 import static de.andrena.next.Condition.post;
 import static de.andrena.next.Condition.pre;
 import static de.andrena.next.Condition.result;
-import de.andrena.next.Condition;
+import de.andrena.next.Target;
 
 public class RicherTimeOfDaySpecContract implements RicherTimeOfDaySpec {
-	
-	private RicherTimeOfDaySpec target = Condition.target();
+
+	@Target
+	private RicherTimeOfDaySpec target;
 
 	@Override
 	public int getHour() {
@@ -88,5 +89,5 @@ public class RicherTimeOfDaySpecContract implements RicherTimeOfDaySpec {
 		}
 		return ignored();
 	}
-	
+
 }
