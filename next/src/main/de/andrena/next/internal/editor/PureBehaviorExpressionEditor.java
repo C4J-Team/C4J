@@ -14,7 +14,6 @@ import javassist.CtMember;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 import javassist.bytecode.AccessFlag;
-import javassist.expr.Expr;
 import javassist.expr.ExprEditor;
 import javassist.expr.FieldAccess;
 import javassist.expr.MethodCall;
@@ -53,9 +52,15 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 		this.allowOwnStateChange = allowOwnStateChange;
 	}
 
-	protected void replaceWithPureCheck(Expr expression, CtBehavior behavior) throws NotFoundException,
-			CannotCompileException {
-		BooleanExp unpureConditions = new CompareExp(NestedExp.CALLING_OBJECT).eq(NestedExp.THIS);
+	protected void replaceWithPureCheck(MethodCall methodCall) throws NotFoundException, CannotCompileException {
+		CtMethod method = methodCall.getMethod();
+		BooleanExp unpureConditions;
+		boolean methodIsStatic = Modifier.isStatic(affectedBehavior.getModifiers());
+		if (methodIsStatic) {
+			unpureConditions = BooleanExp.FALSE;
+		} else {
+			unpureConditions = new CompareExp(NestedExp.CALLING_OBJECT).eq(NestedExp.THIS);
+		}
 		int i = 1;
 		for (CtClass paramType : affectedBehavior.getParameterTypes()) {
 			if (!paramType.isPrimitive()) {
@@ -65,20 +70,21 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 			i++;
 		}
 		for (CtField field : getAccessibleFields(affectedBehavior)) {
-			if (!field.getType().isPrimitive()) {
+			if (!field.getType().isPrimitive() && (!methodIsStatic || Modifier.isStatic(field.getModifiers()))) {
 				unpureConditions = unpureConditions.or(new CompareExp(NestedExp.CALLING_OBJECT).eq(NestedExp
 						.field(field)));
 			}
 		}
 		unpureConditions = new CompareExp(NestedExp.CALLING_OBJECT).ne(NestedExp.NULL).and(unpureConditions);
 		IfExp unpureCondition = new IfExp(unpureConditions);
-		String errorMsg = "illegal method access on unpure method/constructor " + behavior.getLongName()
+		String errorMsg = "illegal method access on unpure method/constructor " + method.getLongName()
 				+ " in pure method/constructor " + affectedBehavior.getLongName() + " on line "
-				+ expression.getLineNumber();
+				+ methodCall.getLineNumber();
 		unpureCondition.addIfBody(getThrowable(errorMsg));
 		StandaloneExp replacementExp = unpureCondition.append(StandaloneExp.proceed);
+		logger.info("possible call to unpure method " + method.getLongName());
 		logger.info("puremagic.replacement-code: \n" + replacementExp.getCode());
-		replacementExp.replace(expression);
+		replacementExp.replace(methodCall);
 	}
 
 	private Set<CtField> getAccessibleFields(CtBehavior affectedBehavior) {
@@ -172,7 +178,7 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 				rootTransformer.getInvolvedTypeInspector().inspect(method.getDeclaringClass()), method) != null) {
 			return;
 		}
-		replaceWithPureCheck(methodCall, method);
+		replaceWithPureCheck(methodCall);
 	}
 
 	private boolean constructorModifyingOwnClass(CtMember member) {
