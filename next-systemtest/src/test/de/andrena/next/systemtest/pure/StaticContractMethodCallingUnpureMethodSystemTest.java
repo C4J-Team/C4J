@@ -1,10 +1,10 @@
-package de.andrena.next.systemtest.contractclassmagic;
+package de.andrena.next.systemtest.pure;
 
 import org.junit.Test;
 
 import de.andrena.next.Contract;
 
-public class PureCheckForClassInitializerSystemTest {
+public class StaticContractMethodCallingUnpureMethodSystemTest {
 
 	@Test
 	public void test() {

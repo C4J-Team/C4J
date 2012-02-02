@@ -32,23 +32,23 @@ import de.andrena.next.internal.compiler.NestedExp;
 import de.andrena.next.internal.compiler.StandaloneExp;
 import de.andrena.next.internal.compiler.ThrowExp;
 import de.andrena.next.internal.compiler.ValueExp;
-import de.andrena.next.internal.util.PureInspectorProvider;
+import de.andrena.next.internal.util.PureInspector;
 
 public class PureBehaviorExpressionEditor extends ExprEditor {
 
 	private Logger logger = Logger.getLogger(getClass());
 	private CtBehavior affectedBehavior;
 	private RootTransformer rootTransformer;
-	private PureInspectorProvider pureInspectorProvider;
+	private PureInspector pureInspector;
 	private boolean allowOwnStateChange;
 	// necessary to work around bug https://issues.jboss.org/browse/JASSIST-149
 	private boolean exceptionThrown;
 
 	public PureBehaviorExpressionEditor(CtBehavior affectedBehavior, RootTransformer rootTransformer,
-			PureInspectorProvider pureInspectorProvider, boolean allowOwnStateChange) {
+			PureInspector pureInspector, boolean allowOwnStateChange) {
 		this.affectedBehavior = affectedBehavior;
 		this.rootTransformer = rootTransformer;
-		this.pureInspectorProvider = pureInspectorProvider;
+		this.pureInspector = pureInspector;
 		this.allowOwnStateChange = allowOwnStateChange;
 	}
 
@@ -174,8 +174,8 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 			pureError(errorMsg);
 			return;
 		}
-		if (pureInspectorProvider.getPureInspector().inspect(
-				rootTransformer.getInvolvedTypeInspector().inspect(method.getDeclaringClass()), method) != null) {
+		if (pureInspector.inspect(rootTransformer.getInvolvedTypeInspector().inspect(method.getDeclaringClass()),
+				method) != null) {
 			return;
 		}
 		replaceWithPureCheck(methodCall);
