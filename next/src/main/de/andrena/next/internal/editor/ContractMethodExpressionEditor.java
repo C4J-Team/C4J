@@ -29,6 +29,7 @@ import de.andrena.next.internal.compiler.StaticCallExp;
 import de.andrena.next.internal.compiler.ValueExp;
 import de.andrena.next.internal.evaluator.Evaluator;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
+import de.andrena.next.internal.util.InvolvedTypeInspector;
 
 public class ContractMethodExpressionEditor extends ExprEditor {
 	private Logger logger = Logger.getLogger(getClass());
@@ -38,6 +39,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 	Set<CtClass> nestedInnerClasses = new HashSet<CtClass>();
 	private List<StaticCallExp> storeExpressions = new ArrayList<StaticCallExp>();
 	private ContractInfo contract;
+	private InvolvedTypeInspector involvedTypeInspector = new InvolvedTypeInspector();
 
 	public List<StaticCallExp> getStoreExpressions() {
 		return storeExpressions;
@@ -91,7 +93,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 
 	void editMethodCall(MethodCall methodCall) throws NotFoundException, CannotCompileException {
 		CtMethod method = methodCall.getMethod();
-		if (method.getDeclaringClass().equals(contract.getTargetClass())) {
+		if (involvedTypeInspector.inspect(contract.getTargetClass()).contains(method.getDeclaringClass())) {
 			handleTargetMethodCall(methodCall);
 		} else if (method.getDeclaringClass().getName().equals(Condition.class.getName())) {
 			if (method.getName().equals("old")) {
@@ -107,6 +109,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		lastMethodCall = method;
 		arrayMembers.add(method);
 		lastFieldAccess = null;
+		logger.info("last method call: " + method.getLongName());
 	}
 
 	private void handleOldMethodCall(MethodCall methodCall) throws NotFoundException, CannotCompileException {

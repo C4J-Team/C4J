@@ -1,9 +1,12 @@
 package de.andrena.next.internal.compiler;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.CtField;
+import javassist.NotFoundException;
 import de.andrena.next.internal.compiler.StandaloneExp.CodeStandaloneExp;
 
 public abstract class NestedExp extends Exp {
@@ -26,6 +29,18 @@ public abstract class NestedExp extends Exp {
 
 	public static NestedExp field(CtField field) {
 		return new CodeNestedExp("this." + field.getName());
+	}
+
+	public static NestedExp var(String name) {
+		return new CodeNestedExp(name);
+	}
+
+	public static List<NestedExp> getArgsList(CtBehavior behavior, int startIndex) throws NotFoundException {
+		List<NestedExp> args = new ArrayList<NestedExp>();
+		for (int i = 0; i < behavior.getParameterTypes().length; i++) {
+			args.add(NestedExp.arg(i + startIndex));
+		}
+		return args;
 	}
 
 	/**

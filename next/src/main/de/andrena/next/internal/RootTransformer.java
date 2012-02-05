@@ -124,18 +124,46 @@ public class RootTransformer implements ClassFileTransformer {
 			logger.debug("transformation aborted, as class is an interface");
 			return null;
 		}
-		if (contractRegistry.isContractClass(affectedClass)) {
-			ContractInfo contractInfo = contractRegistry.getContractInfo(affectedClass);
-			logger.info("transforming contract " + className);
-			contractClassTransformer.transform(contractInfo, affectedClass);
-		} else {
-			Set<CtClass> involvedTypes = involvedTypeInspector.inspect(affectedClass);
-			targetClassTransformer.transform(involvedTypes, getContractsForTypes(involvedTypes), affectedClass);
+		if (!affectedClass.hasAnnotation(Transformed.class)) {
+			transformClass(affectedClass);
 		}
 		if (configuration.writeTransformedClasses()) {
 			affectedClass.writeFile();
 		}
 		return affectedClass.toBytecode();
+	}
+
+	private void transformClass(CtClass affectedClass) throws Exception {
+		if (contractRegistry.isContractClass(affectedClass)) {
+			ContractInfo contractInfo = contractRegistry.getContractInfo(affectedClass);
+			transformContractClass(affectedClass, contractInfo);
+		} else {
+			transformAffectedClass(affectedClass);
+		}
+	}
+
+	private void transformAffectedClass(CtClass affectedClass) throws NotFoundException, Exception {
+		Set<CtClass> involvedTypes = involvedTypeInspector.inspect(affectedClass);
+		Set<ContractInfo> contracts = transformInvolvedContracts(affectedClass, involvedTypes);
+		targetClassTransformer.transform(involvedTypes, contracts, affectedClass);
+	}
+
+	private Set<ContractInfo> transformInvolvedContracts(CtClass affectedClass, Set<CtClass> involvedTypes)
+			throws NotFoundException, Exception {
+		Set<ContractInfo> contracts = getContractsForTypes(involvedTypes);
+		for (ContractInfo contract : contracts) {
+			for (CtClass contractClass : contract.getAllContractClasses()) {
+				if (!contractClass.hasAnnotation(Transformed.class)) {
+					transformContractClass(contractClass, contract);
+				}
+			}
+		}
+		return contracts;
+	}
+
+	private void transformContractClass(CtClass contractClass, ContractInfo contractInfo) throws Exception {
+		logger.info("transforming contract " + contractClass.getName());
+		contractClassTransformer.transform(contractInfo, contractClass);
 	}
 
 	private Set<ContractInfo> getContractsForTypes(Set<CtClass> types) throws NotFoundException {

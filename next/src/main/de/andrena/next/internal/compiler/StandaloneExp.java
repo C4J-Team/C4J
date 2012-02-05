@@ -32,6 +32,10 @@ public abstract class StandaloneExp extends Exp {
 		behavior.insertAfter(getInsertCode(getCode()));
 	}
 
+	public void insertFinally(CtBehavior behavior) throws CannotCompileException {
+		behavior.insertAfter(getInsertCode(getCode()), true);
+	}
+
 	public void replace(Expr expression) throws CannotCompileException {
 		expression.replace(getInsertCode(getCode()));
 	}

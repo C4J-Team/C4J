@@ -1,5 +1,7 @@
 package de.andrena.next.internal.transformer;
 
+import java.util.List;
+
 import javassist.CannotCompileException;
 import javassist.CtBehavior;
 import javassist.CtClass;
@@ -10,8 +12,13 @@ import javassist.Modifier;
 import javassist.NotFoundException;
 import de.andrena.next.ClassInvariant;
 import de.andrena.next.internal.compiler.ArrayExp;
+import de.andrena.next.internal.compiler.CastExp;
+import de.andrena.next.internal.compiler.IfExp;
 import de.andrena.next.internal.compiler.NestedExp;
+import de.andrena.next.internal.compiler.StandaloneExp;
 import de.andrena.next.internal.compiler.StaticCallExp;
+import de.andrena.next.internal.compiler.ThrowExp;
+import de.andrena.next.internal.compiler.TryExp;
 import de.andrena.next.internal.compiler.ValueExp;
 import de.andrena.next.internal.evaluator.Evaluator;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
@@ -38,18 +45,41 @@ public class BeforeAndAfterTriggerTransformer extends AffectedClassTransformerFo
 		String contractBehaviorName = getContractBehaviorName(contractBehavior);
 		logger.info("transforming method " + affectedBehavior.getLongName() + ", triggered by "
 				+ contractBehavior.getLongName());
-		ArrayExp paramTypesArray = ArrayExp.forParamTypes(contractBehavior);
-		ArrayExp argsArray = getArgsArray(affectedClass, contractBehavior);
-		StaticCallExp callBefore = new StaticCallExp(Evaluator.before, NestedExp.THIS, new ValueExp(
-				contractInfo.getContractClass()), new ValueExp(affectedClass), new ValueExp(contractBehaviorName),
-				paramTypesArray, argsArray);
-		StaticCallExp callAfter = new StaticCallExp(Evaluator.after, NestedExp.THIS, new ValueExp(
-				contractInfo.getContractClass()), new ValueExp(affectedClass), new ValueExp(contractBehaviorName),
-				paramTypesArray, argsArray, getReturnValueExp(affectedBehavior));
-		logger.info("before: " + callBefore.toStandalone().getCode());
-		logger.info("after: " + callAfter.toStandalone().getCode());
-		callBefore.toStandalone().insertBefore(affectedBehavior);
-		callAfter.toStandalone().insertAfter(affectedBehavior);
+		ValueExp contractClassExp = new ValueExp(contractInfo.getContractClass());
+		ValueExp callingClassExp = new ValueExp(affectedClass);
+		StandaloneExp afterContractExp = new StaticCallExp(Evaluator.afterContract).toStandalone();
+
+		StandaloneExp afterContractMethod = new StaticCallExp(Evaluator.afterContractMethod).toStandalone();
+
+		TryExp callContractPre = new TryExp(new CastExp(contractInfo.getContractClass(), new StaticCallExp(
+				Evaluator.getContractFromCache, NestedExp.THIS, contractClassExp, callingClassExp)).appendCall(
+				contractBehaviorName, getArgsList(affectedClass, contractBehavior)).toStandalone());
+		callContractPre.addCatch(AssertionError.class,
+				afterContractMethod.append(new ThrowExp(callContractPre.getCatchClauseVar(1))));
+		callContractPre.addCatch(Throwable.class, afterContractMethod);
+		callContractPre.addFinally(afterContractExp);
+
+		TryExp callContractPost = new TryExp(new CastExp(contractInfo.getContractClass(), new StaticCallExp(
+				Evaluator.getContractFromCache, NestedExp.THIS, contractClassExp, callingClassExp)).appendCall(
+				contractBehaviorName, getArgsList(affectedClass, contractBehavior)).toStandalone());
+		callContractPost.addFinally(afterContractExp.append(afterContractMethod));
+
+		NestedExp returnTypeExp = NestedExp.NULL;
+		if (contractBehavior instanceof CtMethod) {
+			returnTypeExp = new ValueExp(((CtMethod) contractBehavior).getReturnType());
+		}
+
+		IfExp callPreCondition = new IfExp(new StaticCallExp(Evaluator.beforePre, NestedExp.THIS, contractClassExp,
+				returnTypeExp));
+		callPreCondition.addIfBody(callContractPre);
+		IfExp callPostCondition = new IfExp(new StaticCallExp(Evaluator.beforePost, NestedExp.THIS, contractClassExp,
+				returnTypeExp, getReturnValueExp(affectedBehavior)));
+		callPostCondition.addIfBody(callContractPost);
+
+		logger.info("preCondition: " + callPreCondition.getCode());
+		logger.info("postCondition: " + callPostCondition.getCode());
+		callPreCondition.insertBefore(affectedBehavior);
+		callPostCondition.insertAfter(affectedBehavior);
 	}
 
 	private NestedExp getReturnValueExp(CtBehavior affectedBehavior) throws NotFoundException {
@@ -165,6 +195,13 @@ public class BeforeAndAfterTriggerTransformer extends AffectedClassTransformerFo
 			return ArrayExp.forArgs(contractBehavior, 2);
 		}
 		return ArrayExp.forArgs(contractBehavior);
+	}
+
+	private List<NestedExp> getArgsList(CtClass affectedClass, CtBehavior contractBehavior) throws NotFoundException {
+		if (isConstructor(contractBehavior) && constructorHasAdditionalParameter(affectedClass)) {
+			return NestedExp.getArgsList(contractBehavior, 2);
+		}
+		return NestedExp.getArgsList(contractBehavior, 1);
 	}
 
 	boolean isConstructor(CtBehavior contractBehavior) {

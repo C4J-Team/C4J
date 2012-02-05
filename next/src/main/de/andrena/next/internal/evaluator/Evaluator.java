@@ -14,9 +14,7 @@ import de.andrena.next.internal.util.Pair;
 import de.andrena.next.internal.util.SelfInitializingMap;
 
 public class Evaluator {
-	public static final StaticCall before = new StaticCall(Evaluator.class, "before");
 	public static final StaticCall isBefore = new StaticCall(Evaluator.class, "isBefore");
-	public static final StaticCall after = new StaticCall(Evaluator.class, "after");
 	public static final StaticCall isAfter = new StaticCall(Evaluator.class, "isAfter");
 	public static final StaticCall callInvariant = new StaticCall(Evaluator.class, "callInvariant");
 	public static final StaticCall getReturnValue = new StaticCall(Evaluator.class, "getReturnValue");
@@ -27,6 +25,11 @@ public class Evaluator {
 	public static final StaticCall storeFieldAccess = new StaticCall(Evaluator.class, "storeFieldAccess");
 	public static final StaticCall storeMethodCall = new StaticCall(Evaluator.class, "storeMethodCall");
 	public static final StaticCall getCurrentTarget = new StaticCall(Evaluator.class, "getCurrentTarget");
+	public static final StaticCall beforePre = new StaticCall(Evaluator.class, "beforePre");
+	public static final StaticCall beforePost = new StaticCall(Evaluator.class, "beforePost");
+	public static final StaticCall afterContract = new StaticCall(Evaluator.class, "afterContract");
+	public static final StaticCall afterContractMethod = new StaticCall(Evaluator.class, "afterContractMethod");
+	public static final StaticCall getContractFromCache = new StaticCall(Evaluator.class, "getContractFromCache");
 
 	private static final Logger logger = Logger.getLogger(Evaluator.class);
 
@@ -98,6 +101,8 @@ public class Evaluator {
 	}
 
 	public static Object oldFieldAccess(String fieldName) {
+		logger.info("oldFieldAccess for field '" + fieldName + "' with " + currentOldCacheEnvironment.get().getFirst()
+				+ " " + currentOldCacheEnvironment.get().getSecond());
 		return getCurrentOldCache().get(fieldName);
 	}
 
@@ -106,14 +111,20 @@ public class Evaluator {
 	}
 
 	public static Object oldMethodCall(String methodName) {
+		logger.info("oldMethodCall for method '" + methodName + "' with " + currentOldCacheEnvironment.get().getFirst()
+				+ " " + currentOldCacheEnvironment.get().getSecond());
 		return getCurrentOldCache().get(methodName);
 	}
 
 	public static void storeFieldAccess(String fieldName) {
+		logger.info("storeFieldAccess for field '" + fieldName + "' with "
+				+ currentOldCacheEnvironment.get().getFirst() + " " + currentOldCacheEnvironment.get().getSecond());
 		getCurrentOldCache().put(fieldName, fieldAccess(fieldName));
 	}
 
 	public static void storeMethodCall(String methodName) {
+		logger.info("storeMethodCall for method '" + methodName + "' with "
+				+ currentOldCacheEnvironment.get().getFirst() + " " + currentOldCacheEnvironment.get().getSecond());
 		getCurrentOldCache().put(methodName, methodCall(methodName, new Class<?>[0], new Object[0]));
 	}
 
@@ -157,6 +168,45 @@ public class Evaluator {
 		return (T) returnValue.get();
 	}
 
+	public static boolean beforePre(Object target, Class<?> contractClass, Class<?> returnType) {
+		if (evaluationPhase.get() == EvaluationPhase.NONE) {
+			evaluationPhase.set(EvaluationPhase.BEFORE);
+			beforeContract(target, contractClass, returnType);
+			return true;
+		}
+		return false;
+	}
+
+	private static void beforeContract(Object target, Class<?> contractClass, Class<?> returnType) {
+		currentTarget.set(target);
+		currentOldCacheEnvironment.set(new Pair<Integer, Class<?>>(
+				Integer.valueOf(new Exception().getStackTrace().length), contractClass));
+		contractReturnType.set(returnType);
+	}
+
+	public static boolean beforePost(Object target, Class<?> contractClass, Class<?> returnType,
+			Object actualReturnValue) {
+		if (evaluationPhase.get() == EvaluationPhase.NONE) {
+			evaluationPhase.set(EvaluationPhase.AFTER);
+			beforeContract(target, contractClass, returnType);
+			returnValue.set(actualReturnValue);
+			return true;
+		}
+		return false;
+	}
+
+	public static void afterContract() {
+		contractReturnType.set(null);
+		currentTarget.set(null);
+		evaluationPhase.set(EvaluationPhase.NONE);
+	}
+
+	public static void afterContractMethod() {
+		logger.info("afterContractMethod");
+		returnValue.set(null);
+		getCurrentOldCache().clear();
+	}
+
 	public static void before(Object target, Class<?> contractClass, Class<?> callingClass, String methodName,
 			Class<?>[] argTypes, Object[] args) {
 		if (evaluationPhase.get() == EvaluationPhase.NONE) {
@@ -174,13 +224,8 @@ public class Evaluator {
 			returnValue.set(actualReturnValue);
 			logger.info("after " + methodName);
 			callContractMethod(target, contractClass, callingClass, methodName, argTypes, args);
-			clearBeforeMethodReturns();
+			afterContractMethod();
 		}
-	}
-
-	private static void clearBeforeMethodReturns() {
-		returnValue.set(null);
-		getCurrentOldCache().clear();
 	}
 
 	public static void callInvariant(Object target, Class<?> contractClass, Class<?> callingClass, String methodName) {
@@ -205,7 +250,7 @@ public class Evaluator {
 					Integer.valueOf(new Exception().getStackTrace().length), contractClass));
 			method.invoke(contract, args);
 		} catch (InvocationTargetException e) {
-			clearBeforeMethodReturns();
+			afterContractMethod();
 			if (e.getTargetException().getClass().equals(AssertionError.class)) {
 				throw (AssertionError) e.getTargetException();
 			} else {
@@ -213,7 +258,7 @@ public class Evaluator {
 						+ contractClass.getName(), e.getTargetException());
 			}
 		} catch (Exception e) {
-			clearBeforeMethodReturns();
+			afterContractMethod();
 			throw new EvaluationException("could not call contract method " + methodName + " of class "
 					+ contractClass.getName(), e);
 		} finally {
@@ -223,7 +268,7 @@ public class Evaluator {
 		}
 	}
 
-	private static Object getContractFromCache(Object target, Class<?> contractClass, Class<?> callingClass)
+	public static Object getContractFromCache(Object target, Class<?> contractClass, Class<?> callingClass)
 			throws InstantiationException, IllegalAccessException {
 		Object contract;
 		Pair<Class<?>, Class<?>> classPair = new Pair<Class<?>, Class<?>>(contractClass, callingClass);

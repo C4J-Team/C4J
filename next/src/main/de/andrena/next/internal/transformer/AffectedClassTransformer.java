@@ -7,6 +7,7 @@ import javassist.CtClass;
 import org.apache.log4j.Logger;
 
 import de.andrena.next.internal.RootTransformer;
+import de.andrena.next.internal.Transformed;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 
 public class AffectedClassTransformer extends AbstractAffectedClassTransformer {
@@ -20,10 +21,6 @@ public class AffectedClassTransformer extends AbstractAffectedClassTransformer {
 				new ClassInvariantTransformer() };
 	}
 
-	protected AbstractAffectedClassTransformer[] getTransformers() {
-		return transformers;
-	}
-
 	@Override
 	public void transform(Set<CtClass> involvedClasses, Set<ContractInfo> contracts, CtClass affectedClass)
 			throws Exception {
@@ -31,5 +28,6 @@ public class AffectedClassTransformer extends AbstractAffectedClassTransformer {
 		for (AbstractAffectedClassTransformer transformer : transformers) {
 			transformer.transform(involvedClasses, contracts, affectedClass);
 		}
+		addClassAnnotation(affectedClass, Transformed.class);
 	}
 }
