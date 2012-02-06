@@ -43,17 +43,6 @@ public class ClassInvariantTransformer extends AffectedClassTransformerForSingle
 		}
 	}
 
-	private StandaloneExp callInvariantExpression(CtClass contractClass, CtClass affectedClass,
-			List<CtMethod> classInvariantMethods) {
-		StandaloneExp callInvariantExpression = new EmptyExp();
-		for (CtMethod classInvariantMethod : classInvariantMethods) {
-			callInvariantExpression = callInvariantExpression.append(new StaticCallExp(Evaluator.callInvariant,
-					NestedExp.THIS, new ValueExp(contractClass), new ValueExp(affectedClass), new ValueExp(
-							classInvariantMethod.getName())));
-		}
-		return callInvariantExpression;
-	}
-
 	private IfExp getInvariantCall(CtClass contractClass, CtClass affectedClass, List<CtMethod> classInvariantMethods)
 			throws NotFoundException {
 		StandaloneExp invariantCalls = new EmptyExp();

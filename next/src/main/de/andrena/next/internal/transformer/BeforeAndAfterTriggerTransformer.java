@@ -9,7 +9,6 @@ import javassist.CtNewMethod;
 import javassist.Modifier;
 import javassist.NotFoundException;
 import de.andrena.next.ClassInvariant;
-import de.andrena.next.internal.compiler.ArrayExp;
 import de.andrena.next.internal.compiler.IfExp;
 import de.andrena.next.internal.compiler.NestedExp;
 import de.andrena.next.internal.compiler.StandaloneExp;
@@ -175,12 +174,5 @@ public class BeforeAndAfterTriggerTransformer extends AffectedClassTransformerFo
 			}
 		}
 		return parameterTypes;
-	}
-
-	private ArrayExp getArgsArray(CtClass affectedClass, CtBehavior contractBehavior) throws NotFoundException {
-		if (isConstructor(contractBehavior) && constructorHasAdditionalParameter(affectedClass)) {
-			return ArrayExp.forArgs(contractBehavior, 2);
-		}
-		return ArrayExp.forArgs(contractBehavior);
 	}
 }

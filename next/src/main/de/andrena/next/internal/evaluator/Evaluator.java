@@ -1,7 +1,6 @@
 package de.andrena.next.internal.evaluator;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +15,6 @@ import de.andrena.next.internal.util.SelfInitializingMap;
 public class Evaluator {
 	public static final StaticCall isBefore = new StaticCall(Evaluator.class, "isBefore");
 	public static final StaticCall isAfter = new StaticCall(Evaluator.class, "isAfter");
-	public static final StaticCall callInvariant = new StaticCall(Evaluator.class, "callInvariant");
 	public static final StaticCall getReturnValue = new StaticCall(Evaluator.class, "getReturnValue");
 	public static final StaticCall fieldAccess = new StaticCall(Evaluator.class, "fieldAccess");
 	public static final StaticCall methodCall = new StaticCall(Evaluator.class, "methodCall");
@@ -215,67 +213,6 @@ public class Evaluator {
 		logger.info("afterContractMethod");
 		returnValue.set(null);
 		getCurrentOldCache().clear();
-	}
-
-	public static void before(Object target, Class<?> contractClass, Class<?> callingClass, String methodName,
-			Class<?>[] argTypes, Object[] args) {
-		if (evaluationPhase.get() == EvaluationPhase.NONE) {
-			evaluationPhase.set(EvaluationPhase.BEFORE);
-			logger.info("before " + methodName);
-			callContractMethod(target, contractClass, callingClass, methodName, argTypes, args);
-		}
-	}
-
-	public static void after(Object target, Class<?> contractClass, Class<?> callingClass, String methodName,
-			Class<?>[] argTypes, Object[] args, Object actualReturnValue) {
-		if (evaluationPhase.get() == EvaluationPhase.NONE) {
-			evaluationPhase.set(EvaluationPhase.AFTER);
-			logger.info("setting return value to " + actualReturnValue);
-			returnValue.set(actualReturnValue);
-			logger.info("after " + methodName);
-			callContractMethod(target, contractClass, callingClass, methodName, argTypes, args);
-			afterContractMethod();
-		}
-	}
-
-	public static void callInvariant(Object target, Class<?> contractClass, Class<?> callingClass, String methodName) {
-		if (evaluationPhase.get() == EvaluationPhase.NONE) {
-			evaluationPhase.set(EvaluationPhase.INVARIANT);
-			logger.info("calling invariant " + methodName);
-			callContractMethod(target, contractClass, callingClass, methodName, new Class<?>[0], new Object[0]);
-		}
-	}
-
-	static void callContractMethod(Object target, Class<?> contractClass, Class<?> callingClass, String methodName,
-			Class<?>[] argTypes, Object[] args) throws AssertionError {
-		try {
-			// constructor (with newInstance) already needs access to the current target
-			currentTarget.set(target);
-			Object contract = getContractFromCache(target, contractClass, callingClass);
-			Method method = contractClass.getDeclaredMethod(methodName, argTypes);
-			method.setAccessible(true);
-			logger.info("setting return type for " + method.getName() + " to " + method.getReturnType());
-			contractReturnType.set(method.getReturnType());
-			currentOldCacheEnvironment.set(new Pair<Integer, Class<?>>(
-					Integer.valueOf(new Exception().getStackTrace().length), contractClass));
-			method.invoke(contract, args);
-		} catch (InvocationTargetException e) {
-			afterContractMethod();
-			if (e.getTargetException().getClass().equals(AssertionError.class)) {
-				throw (AssertionError) e.getTargetException();
-			} else {
-				throw new EvaluationException("exception while calling contract method " + methodName + " of class "
-						+ contractClass.getName(), e.getTargetException());
-			}
-		} catch (Exception e) {
-			afterContractMethod();
-			throw new EvaluationException("could not call contract method " + methodName + " of class "
-					+ contractClass.getName(), e);
-		} finally {
-			contractReturnType.set(null);
-			currentTarget.set(null);
-			evaluationPhase.set(EvaluationPhase.NONE);
-		}
 	}
 
 	public static Object getContractFromCache(Object target, Class<?> contractClass, Class<?> callingClass)
