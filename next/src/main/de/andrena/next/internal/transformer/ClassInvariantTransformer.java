@@ -7,11 +7,14 @@ import javassist.CannotCompileException;
 import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.CtMethod;
+import javassist.NotFoundException;
 import de.andrena.next.ClassInvariant;
 import de.andrena.next.internal.compiler.EmptyExp;
+import de.andrena.next.internal.compiler.IfExp;
 import de.andrena.next.internal.compiler.NestedExp;
 import de.andrena.next.internal.compiler.StandaloneExp;
 import de.andrena.next.internal.compiler.StaticCallExp;
+import de.andrena.next.internal.compiler.TryExp;
 import de.andrena.next.internal.compiler.ValueExp;
 import de.andrena.next.internal.evaluator.Evaluator;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
@@ -32,9 +35,8 @@ public class ClassInvariantTransformer extends AffectedClassTransformerForSingle
 	}
 
 	private void transformTargetMethods(CtClass contractClass, CtClass affectedClass,
-			List<CtMethod> classInvariantMethods) throws CannotCompileException {
-		StandaloneExp callInvariantExpression = callInvariantExpression(contractClass, affectedClass,
-				classInvariantMethods);
+			List<CtMethod> classInvariantMethods) throws CannotCompileException, NotFoundException {
+		StandaloneExp callInvariantExpression = getInvariantCall(contractClass, affectedClass, classInvariantMethods);
 		logger.info("classInvariant after: " + callInvariantExpression.getCode());
 		for (CtBehavior behavior : affectedClass.getDeclaredBehaviors()) {
 			callInvariantExpression.insertAfter(behavior);
@@ -52,4 +54,18 @@ public class ClassInvariantTransformer extends AffectedClassTransformerForSingle
 		return callInvariantExpression;
 	}
 
+	private IfExp getInvariantCall(CtClass contractClass, CtClass affectedClass, List<CtMethod> classInvariantMethods)
+			throws NotFoundException {
+		StandaloneExp invariantCalls = new EmptyExp();
+		for (CtMethod classInvariantMethod : classInvariantMethods) {
+			invariantCalls = invariantCalls.append(getContractCallExp(contractClass, affectedClass,
+					classInvariantMethod));
+		}
+		TryExp tryInvariants = new TryExp(invariantCalls);
+		tryInvariants.addFinally(getAfterContractCall());
+		IfExp invariantCondition = new IfExp(new StaticCallExp(Evaluator.beforeInvariant, NestedExp.THIS, new ValueExp(
+				contractClass)));
+		invariantCondition.addIfBody(tryInvariants);
+		return invariantCondition;
+	}
 }

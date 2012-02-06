@@ -27,6 +27,7 @@ public class Evaluator {
 	public static final StaticCall getCurrentTarget = new StaticCall(Evaluator.class, "getCurrentTarget");
 	public static final StaticCall beforePre = new StaticCall(Evaluator.class, "beforePre");
 	public static final StaticCall beforePost = new StaticCall(Evaluator.class, "beforePost");
+	public static final StaticCall beforeInvariant = new StaticCall(Evaluator.class, "beforeInvariant");
 	public static final StaticCall afterContract = new StaticCall(Evaluator.class, "afterContract");
 	public static final StaticCall afterContractMethod = new StaticCall(Evaluator.class, "afterContractMethod");
 	public static final StaticCall getContractFromCache = new StaticCall(Evaluator.class, "getContractFromCache");
@@ -172,6 +173,15 @@ public class Evaluator {
 		if (evaluationPhase.get() == EvaluationPhase.NONE) {
 			evaluationPhase.set(EvaluationPhase.BEFORE);
 			beforeContract(target, contractClass, returnType);
+			return true;
+		}
+		return false;
+	}
+
+	public static boolean beforeInvariant(Object target, Class<?> contractClass) {
+		if (evaluationPhase.get() == EvaluationPhase.NONE) {
+			evaluationPhase.set(EvaluationPhase.INVARIANT);
+			beforeContract(target, contractClass, void.class);
 			return true;
 		}
 		return false;
