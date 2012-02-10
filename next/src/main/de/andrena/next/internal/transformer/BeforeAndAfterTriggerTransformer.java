@@ -154,7 +154,7 @@ public class BeforeAndAfterTriggerTransformer extends AffectedClassTransformerFo
 			return affectedConstructor;
 		}
 		try {
-			contractInfo.getContractClass().getDeclaredMethod(ConstructorTransformer.CONSTRUCTOR_REPLACEMENT_NAME,
+			contractInfo.getContractClass().getDeclaredMethod(ContractBehaviorTransformer.CONSTRUCTOR_REPLACEMENT_NAME,
 					contractBehavior.getParameterTypes());
 			return null;
 		} catch (NotFoundException e) {

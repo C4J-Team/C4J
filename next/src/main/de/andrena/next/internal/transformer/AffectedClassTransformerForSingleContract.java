@@ -49,7 +49,7 @@ public abstract class AffectedClassTransformerForSingleContract extends Abstract
 
 	boolean isConstructor(CtBehavior contractBehavior) {
 		return contractBehavior instanceof CtConstructor
-				|| contractBehavior.getName().equals(ConstructorTransformer.CONSTRUCTOR_REPLACEMENT_NAME);
+				|| contractBehavior.getName().equals(ContractBehaviorTransformer.CONSTRUCTOR_REPLACEMENT_NAME);
 	}
 
 	protected boolean constructorHasAdditionalParameter(CtClass affectedClass) throws NotFoundException {
@@ -59,7 +59,7 @@ public abstract class AffectedClassTransformerForSingleContract extends Abstract
 	String getContractBehaviorName(CtBehavior contractBehavior) {
 		String contractBehaviorName;
 		if (isConstructor(contractBehavior)) {
-			contractBehaviorName = ConstructorTransformer.CONSTRUCTOR_REPLACEMENT_NAME;
+			contractBehaviorName = ContractBehaviorTransformer.CONSTRUCTOR_REPLACEMENT_NAME;
 		} else {
 			contractBehaviorName = contractBehavior.getName();
 		}

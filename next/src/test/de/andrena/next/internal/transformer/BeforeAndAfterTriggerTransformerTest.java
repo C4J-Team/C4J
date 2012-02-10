@@ -54,14 +54,14 @@ public class BeforeAndAfterTriggerTransformerTest {
 	@Test
 	public void testGetContractBehaviorNameForConstructor() throws Exception {
 		assertEquals(transformer.getContractBehaviorName(contractClass.getDeclaredConstructor(new CtClass[0])),
-				ConstructorTransformer.CONSTRUCTOR_REPLACEMENT_NAME);
+				ContractBehaviorTransformer.CONSTRUCTOR_REPLACEMENT_NAME);
 	}
 
 	@Test
 	public void testGetContractBehaviorNameForTransformedConstructor() throws Exception {
 		assertEquals(transformer.getContractBehaviorName(contractClass
-				.getDeclaredMethod(ConstructorTransformer.CONSTRUCTOR_REPLACEMENT_NAME)),
-				ConstructorTransformer.CONSTRUCTOR_REPLACEMENT_NAME);
+				.getDeclaredMethod(ContractBehaviorTransformer.CONSTRUCTOR_REPLACEMENT_NAME)),
+				ContractBehaviorTransformer.CONSTRUCTOR_REPLACEMENT_NAME);
 	}
 
 	public static class IndirectClass extends TargetClass {
@@ -154,7 +154,7 @@ public class BeforeAndAfterTriggerTransformerTest {
 	public void testGetAffectedConstructorForSynthetic() throws Exception {
 		assertEquals(targetClass.getDeclaredConstructor(new CtClass[0]), transformer.getAffectedConstructor(
 				contractInfo, targetClass,
-				contractClass.getDeclaredMethod(ConstructorTransformer.CONSTRUCTOR_REPLACEMENT_NAME, new CtClass[0])));
+				contractClass.getDeclaredMethod(ContractBehaviorTransformer.CONSTRUCTOR_REPLACEMENT_NAME, new CtClass[0])));
 	}
 
 	@Test
@@ -189,7 +189,7 @@ public class BeforeAndAfterTriggerTransformerTest {
 	@Test
 	public void testIsConstructorForTransformedConstructor() throws Exception {
 		assertTrue(transformer.isConstructor(contractClass
-				.getDeclaredMethod(ConstructorTransformer.CONSTRUCTOR_REPLACEMENT_NAME)));
+				.getDeclaredMethod(ContractBehaviorTransformer.CONSTRUCTOR_REPLACEMENT_NAME)));
 	}
 
 }

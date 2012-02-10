@@ -1,21 +1,32 @@
 package de.andrena.next.internal.transformer;
 
 import javassist.CannotCompileException;
+import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.CtConstructor;
 import javassist.CtField;
 import javassist.CtNewConstructor;
+import javassist.Modifier;
 import javassist.NotFoundException;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 
-public class ConstructorTransformer extends AbstractContractClassTransformer {
+public class ContractBehaviorTransformer extends AbstractContractClassTransformer {
 	public static final String CONSTRUCTOR_REPLACEMENT_NAME = "constructor$";
 
 	@Override
 	public void transform(ContractInfo contractInfo, CtClass contractClass) throws Exception {
-		if (contractClass.equals(contractInfo.getContractClass()) && !(contractInfo.getTargetClass().isInterface())) {
-			replaceConstructors(contractClass);
-			contractClass.addConstructor(CtNewConstructor.defaultConstructor(contractClass));
+		if (contractClass.equals(contractInfo.getContractClass())) {
+			if (!(contractInfo.getTargetClass().isInterface())) {
+				replaceConstructors(contractClass);
+				contractClass.addConstructor(CtNewConstructor.defaultConstructor(contractClass));
+			}
+			makeAllBehaviorsAccessible(contractClass);
+		}
+	}
+
+	private void makeAllBehaviorsAccessible(CtClass contractClass) {
+		for (CtBehavior behavior : contractClass.getDeclaredBehaviors()) {
+			behavior.setModifiers(Modifier.setPublic(behavior.getModifiers()));
 		}
 	}
 

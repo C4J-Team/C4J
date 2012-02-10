@@ -141,8 +141,6 @@ public class Evaluator {
 	private static Field getInheritedField(String fieldName, Class<?> clazz) throws NoSuchFieldException {
 		try {
 			return clazz.getDeclaredField(fieldName);
-		} catch (SecurityException e) {
-			throw e;
 		} catch (NoSuchFieldException e) {
 			if (clazz.getSuperclass() != null) {
 				return getInheritedField(fieldName, clazz.getSuperclass());
