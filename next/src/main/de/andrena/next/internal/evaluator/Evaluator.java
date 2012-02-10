@@ -168,7 +168,7 @@ public class Evaluator {
 	public static boolean beforePre(Object target, Class<?> contractClass, Class<?> returnType) {
 		if (evaluationPhase.get() == EvaluationPhase.NONE) {
 			evaluationPhase.set(EvaluationPhase.BEFORE);
-			beforeContract(target, contractClass, returnType);
+			beforeContract(target, contractClass, returnType, new Exception().getStackTrace().length);
 			return true;
 		}
 		return false;
@@ -177,16 +177,15 @@ public class Evaluator {
 	public static boolean beforeInvariant(Object target, Class<?> contractClass) {
 		if (evaluationPhase.get() == EvaluationPhase.NONE) {
 			evaluationPhase.set(EvaluationPhase.INVARIANT);
-			beforeContract(target, contractClass, void.class);
+			beforeContract(target, contractClass, void.class, new Exception().getStackTrace().length);
 			return true;
 		}
 		return false;
 	}
 
-	private static void beforeContract(Object target, Class<?> contractClass, Class<?> returnType) {
+	private static void beforeContract(Object target, Class<?> contractClass, Class<?> returnType, int stackTraceDepth) {
 		currentTarget.set(target);
-		currentOldCacheEnvironment.set(new Pair<Integer, Class<?>>(
-				Integer.valueOf(new Exception().getStackTrace().length), contractClass));
+		currentOldCacheEnvironment.set(new Pair<Integer, Class<?>>(Integer.valueOf(stackTraceDepth), contractClass));
 		contractReturnType.set(returnType);
 	}
 
@@ -194,7 +193,7 @@ public class Evaluator {
 			Object actualReturnValue) {
 		if (evaluationPhase.get() == EvaluationPhase.NONE) {
 			evaluationPhase.set(EvaluationPhase.AFTER);
-			beforeContract(target, contractClass, returnType);
+			beforeContract(target, contractClass, returnType, new Exception().getStackTrace().length);
 			returnValue.set(actualReturnValue);
 			return true;
 		}
@@ -207,10 +206,12 @@ public class Evaluator {
 		evaluationPhase.set(EvaluationPhase.NONE);
 	}
 
-	public static void afterContractMethod() {
+	public static void afterContractMethod(Class<?> contractClass) {
 		logger.info("afterContractMethod");
 		returnValue.set(null);
-		getCurrentOldCache().clear();
+		oldStore.get()
+				.get(new Pair<Integer, Class<?>>(Integer.valueOf(new Exception().getStackTrace().length), contractClass))
+				.clear();
 	}
 
 	public static Object getContractFromCache(Object target, Class<?> contractClass, Class<?> callingClass)

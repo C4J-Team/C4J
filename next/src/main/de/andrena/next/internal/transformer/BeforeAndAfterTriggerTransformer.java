@@ -13,7 +13,6 @@ import de.andrena.next.internal.compiler.IfExp;
 import de.andrena.next.internal.compiler.NestedExp;
 import de.andrena.next.internal.compiler.StandaloneExp;
 import de.andrena.next.internal.compiler.StaticCallExp;
-import de.andrena.next.internal.compiler.ThrowExp;
 import de.andrena.next.internal.compiler.TryExp;
 import de.andrena.next.internal.compiler.ValueExp;
 import de.andrena.next.internal.evaluator.Evaluator;
@@ -43,18 +42,20 @@ public class BeforeAndAfterTriggerTransformer extends AffectedClassTransformerFo
 
 		IfExp callPreCondition = getPreConditionCall(contractInfo, affectedClass, contractBehavior);
 		IfExp callPostCondition = getPostConditionCall(contractInfo, affectedClass, contractBehavior, affectedBehavior);
+		StandaloneExp afterContractMethodCall = getAfterContractMethodCall(contractInfo);
 
 		logger.info("preCondition: " + callPreCondition.getCode());
 		logger.info("postCondition: " + callPostCondition.getCode());
 		callPreCondition.insertBefore(affectedBehavior);
 		callPostCondition.insertAfter(affectedBehavior);
+		afterContractMethodCall.insertFinally(affectedBehavior);
 	}
 
 	private IfExp getPostConditionCall(ContractInfo contractInfo, CtClass affectedClass, CtBehavior contractBehavior,
 			CtBehavior affectedBehavior) throws NotFoundException {
 		TryExp callContractPost = new TryExp(getContractCallExp(contractInfo.getContractClass(), affectedClass,
 				contractBehavior));
-		callContractPost.addFinally(getAfterContractCall().append(getAfterContractMethodCall()));
+		callContractPost.addFinally(getAfterContractCall());
 
 		IfExp callPostCondition = new IfExp(new StaticCallExp(Evaluator.beforePost, NestedExp.THIS, new ValueExp(
 				contractInfo.getContractClass()), getReturnTypeExp(contractBehavior),
@@ -67,9 +68,6 @@ public class BeforeAndAfterTriggerTransformer extends AffectedClassTransformerFo
 			throws NotFoundException {
 		TryExp callContractPre = new TryExp(getContractCallExp(contractInfo.getContractClass(), affectedClass,
 				contractBehavior));
-		callContractPre.addCatch(AssertionError.class,
-				getAfterContractMethodCall().append(new ThrowExp(callContractPre.getCatchClauseVar(1))));
-		callContractPre.addCatch(Throwable.class, getAfterContractMethodCall());
 		callContractPre.addFinally(getAfterContractCall());
 		IfExp callPreCondition = new IfExp(new StaticCallExp(Evaluator.beforePre, NestedExp.THIS, new ValueExp(
 				contractInfo.getContractClass()), getReturnTypeExp(contractBehavior)));
@@ -77,8 +75,9 @@ public class BeforeAndAfterTriggerTransformer extends AffectedClassTransformerFo
 		return callPreCondition;
 	}
 
-	private StandaloneExp getAfterContractMethodCall() {
-		StandaloneExp afterContractMethod = new StaticCallExp(Evaluator.afterContractMethod).toStandalone();
+	private StandaloneExp getAfterContractMethodCall(ContractInfo contractInfo) {
+		StandaloneExp afterContractMethod = new StaticCallExp(Evaluator.afterContractMethod, new ValueExp(
+				contractInfo.getContractClass())).toStandalone();
 		return afterContractMethod;
 	}
 

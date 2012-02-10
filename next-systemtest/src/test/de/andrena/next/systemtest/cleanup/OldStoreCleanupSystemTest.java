@@ -22,8 +22,17 @@ public class OldStoreCleanupSystemTest {
 	@Test
 	public void testOldStoreCleanupAfterFailure() {
 		try {
-			new OldClass().methodFailing(3);
+			new OldClass().methodFailingContract(3);
 		} catch (AssertionError e) {
+		}
+		assertEquals(0, Evaluator.getOldStoreSize());
+	}
+
+	@Test
+	public void testOldStoreCleanupAfterFailureInMethod() {
+		try {
+			new OldClass().methodFailingSelf(3);
+		} catch (RuntimeException e) {
 		}
 		assertEquals(0, Evaluator.getOldStoreSize());
 	}
@@ -36,7 +45,11 @@ public class OldStoreCleanupSystemTest {
 			value += incrementor;
 		}
 
-		public void methodFailing(int incrementor) {
+		public void methodFailingContract(int incrementor) {
+		}
+
+		public void methodFailingSelf(int incrementor) {
+			throw new RuntimeException();
 		}
 	}
 
@@ -53,10 +66,18 @@ public class OldStoreCleanupSystemTest {
 		}
 
 		@Override
-		public void methodFailing(int incrementor) {
+		public void methodFailingContract(int incrementor) {
 			if (pre()) {
 				assert false;
 			}
+			if (post()) {
+				int oldValue = old(target.value);
+				assert target.value == (oldValue + incrementor);
+			}
+		}
+
+		@Override
+		public void methodFailingSelf(int incrementor) {
 			if (post()) {
 				int oldValue = old(target.value);
 				assert target.value == (oldValue + incrementor);
