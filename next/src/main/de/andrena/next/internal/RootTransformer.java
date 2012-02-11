@@ -3,8 +3,8 @@ package de.andrena.next.internal;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import javassist.ByteArrayClassPath;
 import javassist.ClassPool;
@@ -132,14 +132,14 @@ public class RootTransformer implements ClassFileTransformer {
 	}
 
 	private void transformAffectedClass(CtClass affectedClass) throws NotFoundException, Exception {
-		Set<CtClass> involvedTypes = involvedTypeInspector.inspect(affectedClass);
-		Set<ContractInfo> contracts = transformInvolvedContracts(affectedClass, involvedTypes);
+		List<CtClass> involvedTypes = involvedTypeInspector.inspect(affectedClass);
+		List<ContractInfo> contracts = transformInvolvedContracts(affectedClass, involvedTypes);
 		targetClassTransformer.transform(involvedTypes, contracts, affectedClass);
 	}
 
-	private Set<ContractInfo> transformInvolvedContracts(CtClass affectedClass, Set<CtClass> involvedTypes)
+	private List<ContractInfo> transformInvolvedContracts(CtClass affectedClass, List<CtClass> involvedTypes)
 			throws NotFoundException, Exception {
-		Set<ContractInfo> contracts = getContractsForTypes(involvedTypes);
+		List<ContractInfo> contracts = getContractsForTypes(involvedTypes);
 		for (ContractInfo contract : contracts) {
 			for (CtClass contractClass : contract.getAllContractClasses()) {
 				if (!contractClass.hasAnnotation(Transformed.class)) {
@@ -155,8 +155,8 @@ public class RootTransformer implements ClassFileTransformer {
 		contractClassTransformer.transform(contractInfo, contractClass);
 	}
 
-	private Set<ContractInfo> getContractsForTypes(Set<CtClass> types) throws NotFoundException {
-		Set<ContractInfo> contracts = new HashSet<ContractInfo>();
+	private List<ContractInfo> getContractsForTypes(List<CtClass> types) throws NotFoundException {
+		List<ContractInfo> contracts = new ArrayList<ContractInfo>();
 		for (CtClass type : types) {
 			if (type.hasAnnotation(Contract.class)) {
 				if (contractRegistry.hasRegisteredContract(type)) {

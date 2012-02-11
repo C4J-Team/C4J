@@ -1,6 +1,6 @@
 package de.andrena.next.internal.transformer;
 
-import java.util.Set;
+import java.util.List;
 
 import javassist.CtClass;
 
@@ -22,7 +22,7 @@ public class AffectedClassTransformer extends AbstractAffectedClassTransformer {
 	}
 
 	@Override
-	public void transform(Set<CtClass> involvedClasses, Set<ContractInfo> contracts, CtClass affectedClass)
+	public void transform(List<CtClass> involvedClasses, List<ContractInfo> contracts, CtClass affectedClass)
 			throws Exception {
 		logger.info("transforming class " + affectedClass.getName());
 		for (AbstractAffectedClassTransformer transformer : transformers) {

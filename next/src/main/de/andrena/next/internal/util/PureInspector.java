@@ -1,6 +1,6 @@
 package de.andrena.next.internal.util;
 
-import java.util.Set;
+import java.util.List;
 
 import javassist.CannotCompileException;
 import javassist.CtBehavior;
@@ -26,7 +26,7 @@ public class PureInspector {
 		this.rootTransformer = rootTransformer;
 	}
 
-	public CtBehavior inspect(Set<CtClass> involvedClasses, CtBehavior behavior) {
+	public CtBehavior inspect(List<CtClass> involvedClasses, CtBehavior behavior) {
 		for (CtClass involvedClass : involvedClasses) {
 			CtBehavior involvedBehavior = getInvolvedBehavior(behavior, involvedClass);
 			if (involvedBehavior != null && involvedBehavior.hasAnnotation(Pure.class)) {

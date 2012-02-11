@@ -1,6 +1,6 @@
 package de.andrena.next.internal.transformer;
 
-import java.util.Set;
+import java.util.List;
 
 import javassist.ClassPool;
 import javassist.CtBehavior;
@@ -21,7 +21,7 @@ public class PureTransformer extends AbstractAffectedClassTransformer {
 	}
 
 	@Override
-	public void transform(Set<CtClass> involvedClasses, Set<ContractInfo> contracts, CtClass affectedClass)
+	public void transform(List<CtClass> involvedClasses, List<ContractInfo> contracts, CtClass affectedClass)
 			throws Exception {
 		for (CtBehavior affectedBehavior : affectedClass.getDeclaredMethods()) {
 			CtBehavior pureBehavior = pureInspector.inspect(involvedClasses, affectedBehavior);

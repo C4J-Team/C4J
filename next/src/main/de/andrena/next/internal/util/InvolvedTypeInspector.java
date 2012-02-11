@@ -1,14 +1,14 @@
 package de.andrena.next.internal.util;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import javassist.CtClass;
 import javassist.NotFoundException;
 
 public class InvolvedTypeInspector {
-	public Set<CtClass> inspect(CtClass type) throws NotFoundException {
-		Set<CtClass> inheritedTypes = new HashSet<CtClass>();
+	public List<CtClass> inspect(CtClass type) throws NotFoundException {
+		List<CtClass> inheritedTypes = new ArrayList<CtClass>();
 		inheritedTypes.add(type);
 		if (type.getSuperclass() != null) {
 			inheritedTypes.addAll(inspect(type.getSuperclass()));
