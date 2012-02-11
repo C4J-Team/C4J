@@ -56,9 +56,11 @@ public class TimeOfDaySpecContract implements TimeOfDaySpec {
 		if (pre()) {
 			assert hour >= 0 : "hour >= 0";
 			assert hour <= 23 : "hour <= 23";
+			System.out.println(target.getMinute());
 		}
 		if (post()) {
 			assert target.getHour() == hour : "hour set";
+			System.out.println(target.getMinute());
 			assert unchanged(target.getMinute()) : "minute unchanged";
 			assert unchanged(target.getSecond()) : "second unchanged";
 		}

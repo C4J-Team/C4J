@@ -100,9 +100,10 @@ public class Evaluator {
 	}
 
 	public static Object oldFieldAccess(String fieldName) {
+		Object oldValue = getCurrentOldCache().get(fieldName);
 		logger.info("oldFieldAccess for field '" + fieldName + "' with " + currentOldCacheEnvironment.get().getFirst()
-				+ " " + currentOldCacheEnvironment.get().getSecond());
-		return getCurrentOldCache().get(fieldName);
+				+ " " + currentOldCacheEnvironment.get().getSecond() + " returning " + oldValue);
+		return oldValue;
 	}
 
 	private static Map<String, Object> getCurrentOldCache() {
@@ -110,21 +111,26 @@ public class Evaluator {
 	}
 
 	public static Object oldMethodCall(String methodName) {
+		Object oldValue = getCurrentOldCache().get(methodName);
 		logger.info("oldMethodCall for method '" + methodName + "' with " + currentOldCacheEnvironment.get().getFirst()
-				+ " " + currentOldCacheEnvironment.get().getSecond());
-		return getCurrentOldCache().get(methodName);
+				+ " " + currentOldCacheEnvironment.get().getSecond() + " returning " + oldValue);
+		return oldValue;
 	}
 
 	public static void storeFieldAccess(String fieldName) {
+		Object storedValue = fieldAccess(fieldName);
 		logger.info("storeFieldAccess for field '" + fieldName + "' with "
-				+ currentOldCacheEnvironment.get().getFirst() + " " + currentOldCacheEnvironment.get().getSecond());
-		getCurrentOldCache().put(fieldName, fieldAccess(fieldName));
+				+ currentOldCacheEnvironment.get().getFirst() + " " + currentOldCacheEnvironment.get().getSecond()
+				+ " storing " + storedValue);
+		getCurrentOldCache().put(fieldName, storedValue);
 	}
 
 	public static void storeMethodCall(String methodName) {
+		Object storedValue = methodCall(methodName, new Class<?>[0], new Object[0]);
 		logger.info("storeMethodCall for method '" + methodName + "' with "
-				+ currentOldCacheEnvironment.get().getFirst() + " " + currentOldCacheEnvironment.get().getSecond());
-		getCurrentOldCache().put(methodName, methodCall(methodName, new Class<?>[0], new Object[0]));
+				+ currentOldCacheEnvironment.get().getFirst() + " " + currentOldCacheEnvironment.get().getSecond()
+				+ " storing " + storedValue);
+		getCurrentOldCache().put(methodName, storedValue);
 	}
 
 	public static Object fieldAccess(String fieldName) {
@@ -132,7 +138,9 @@ public class Evaluator {
 			Object target = currentTarget.get();
 			Field field = getInheritedField(fieldName, target.getClass());
 			field.setAccessible(true);
-			return field.get(target);
+			Object value = field.get(target);
+			logger.info("fieldAccess returning " + value);
+			return value;
 		} catch (Exception e) {
 			throw new EvaluationException("could not access field " + fieldName, e);
 		}
@@ -154,7 +162,9 @@ public class Evaluator {
 			Object target = currentTarget.get();
 			Method method = target.getClass().getDeclaredMethod(methodName, argTypes);
 			method.setAccessible(true);
-			return method.invoke(target, args);
+			Object value = method.invoke(target, args);
+			logger.info("methodCall returning " + value);
+			return value;
 		} catch (Exception e) {
 			throw new EvaluationException("could not call method " + methodName, e);
 		}

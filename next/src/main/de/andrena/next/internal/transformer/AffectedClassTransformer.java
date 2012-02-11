@@ -1,7 +1,5 @@
 package de.andrena.next.internal.transformer;
 
-import java.util.List;
-
 import javassist.CtClass;
 
 import org.apache.log4j.Logger;
@@ -9,6 +7,7 @@ import org.apache.log4j.Logger;
 import de.andrena.next.internal.RootTransformer;
 import de.andrena.next.internal.Transformed;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
+import de.andrena.next.internal.util.ListOrderedSet;
 
 public class AffectedClassTransformer extends AbstractAffectedClassTransformer {
 	private AbstractAffectedClassTransformer[] transformers;
@@ -22,8 +21,8 @@ public class AffectedClassTransformer extends AbstractAffectedClassTransformer {
 	}
 
 	@Override
-	public void transform(List<CtClass> involvedClasses, List<ContractInfo> contracts, CtClass affectedClass)
-			throws Exception {
+	public void transform(ListOrderedSet<CtClass> involvedClasses, ListOrderedSet<ContractInfo> contracts,
+			CtClass affectedClass) throws Exception {
 		logger.info("transforming class " + affectedClass.getName());
 		for (AbstractAffectedClassTransformer transformer : transformers) {
 			transformer.transform(involvedClasses, contracts, affectedClass);

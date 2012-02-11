@@ -34,4 +34,9 @@ public class AcceptanceTestConfiguration extends DefaultConfiguration {
 		return pureWhitelist;
 	}
 
+	@Override
+	public boolean writeTransformedClasses() {
+		return false;
+	}
+
 }

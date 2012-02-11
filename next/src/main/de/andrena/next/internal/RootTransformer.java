@@ -3,8 +3,6 @@ package de.andrena.next.internal;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
-import java.util.ArrayList;
-import java.util.List;
 
 import javassist.ByteArrayClassPath;
 import javassist.ClassPool;
@@ -24,6 +22,7 @@ import de.andrena.next.internal.util.BackdoorAnnotationLoader;
 import de.andrena.next.internal.util.ContractRegistry;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 import de.andrena.next.internal.util.InvolvedTypeInspector;
+import de.andrena.next.internal.util.ListOrderedSet;
 
 public class RootTransformer implements ClassFileTransformer {
 
@@ -132,14 +131,14 @@ public class RootTransformer implements ClassFileTransformer {
 	}
 
 	private void transformAffectedClass(CtClass affectedClass) throws NotFoundException, Exception {
-		List<CtClass> involvedTypes = involvedTypeInspector.inspect(affectedClass);
-		List<ContractInfo> contracts = transformInvolvedContracts(affectedClass, involvedTypes);
+		ListOrderedSet<CtClass> involvedTypes = involvedTypeInspector.inspect(affectedClass);
+		ListOrderedSet<ContractInfo> contracts = transformInvolvedContracts(affectedClass, involvedTypes);
 		targetClassTransformer.transform(involvedTypes, contracts, affectedClass);
 	}
 
-	private List<ContractInfo> transformInvolvedContracts(CtClass affectedClass, List<CtClass> involvedTypes)
-			throws NotFoundException, Exception {
-		List<ContractInfo> contracts = getContractsForTypes(involvedTypes);
+	private ListOrderedSet<ContractInfo> transformInvolvedContracts(CtClass affectedClass,
+			ListOrderedSet<CtClass> involvedTypes) throws NotFoundException, Exception {
+		ListOrderedSet<ContractInfo> contracts = getContractsForTypes(involvedTypes);
 		for (ContractInfo contract : contracts) {
 			for (CtClass contractClass : contract.getAllContractClasses()) {
 				if (!contractClass.hasAnnotation(Transformed.class)) {
@@ -155,8 +154,8 @@ public class RootTransformer implements ClassFileTransformer {
 		contractClassTransformer.transform(contractInfo, contractClass);
 	}
 
-	private List<ContractInfo> getContractsForTypes(List<CtClass> types) throws NotFoundException {
-		List<ContractInfo> contracts = new ArrayList<ContractInfo>();
+	private ListOrderedSet<ContractInfo> getContractsForTypes(ListOrderedSet<CtClass> types) throws NotFoundException {
+		ListOrderedSet<ContractInfo> contracts = new ListOrderedSet<ContractInfo>();
 		for (CtClass type : types) {
 			if (type.hasAnnotation(Contract.class)) {
 				if (contractRegistry.hasRegisteredContract(type)) {

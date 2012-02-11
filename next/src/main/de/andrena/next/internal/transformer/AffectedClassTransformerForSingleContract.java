@@ -15,12 +15,13 @@ import de.andrena.next.internal.compiler.StaticCallExp;
 import de.andrena.next.internal.compiler.ValueExp;
 import de.andrena.next.internal.evaluator.Evaluator;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
+import de.andrena.next.internal.util.ListOrderedSet;
 
 public abstract class AffectedClassTransformerForSingleContract extends AbstractAffectedClassTransformer {
 
 	@Override
-	public void transform(List<CtClass> involvedClasses, List<ContractInfo> contracts, CtClass affectedClass)
-			throws Exception {
+	public void transform(ListOrderedSet<CtClass> involvedClasses, ListOrderedSet<ContractInfo> contracts,
+			CtClass affectedClass) throws Exception {
 		for (ContractInfo contractInfo : contracts) {
 			logger.info("transforming class " + affectedClass.getName() + " with contract-class "
 					+ contractInfo.getContractClass().getName() + " from target-class "

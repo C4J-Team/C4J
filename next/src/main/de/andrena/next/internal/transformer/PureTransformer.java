@@ -1,7 +1,5 @@
 package de.andrena.next.internal.transformer;
 
-import java.util.List;
-
 import javassist.ClassPool;
 import javassist.CtBehavior;
 import javassist.CtClass;
@@ -10,6 +8,7 @@ import javassist.bytecode.AnnotationsAttribute;
 import de.andrena.next.Pure;
 import de.andrena.next.internal.RootTransformer;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
+import de.andrena.next.internal.util.ListOrderedSet;
 import de.andrena.next.internal.util.PureInspector;
 
 public class PureTransformer extends AbstractAffectedClassTransformer {
@@ -21,8 +20,8 @@ public class PureTransformer extends AbstractAffectedClassTransformer {
 	}
 
 	@Override
-	public void transform(List<CtClass> involvedClasses, List<ContractInfo> contracts, CtClass affectedClass)
-			throws Exception {
+	public void transform(ListOrderedSet<CtClass> involvedClasses, ListOrderedSet<ContractInfo> contracts,
+			CtClass affectedClass) throws Exception {
 		for (CtBehavior affectedBehavior : affectedClass.getDeclaredMethods()) {
 			CtBehavior pureBehavior = pureInspector.inspect(involvedClasses, affectedBehavior);
 			if (pureBehavior != null) {
