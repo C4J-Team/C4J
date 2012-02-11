@@ -66,7 +66,7 @@ public class Evaluator {
 	/**
 	 * Integer = stack trace depth, class = contract class
 	 */
-	private static final ThreadLocal<Pair<Integer, Class<?>>> currentOldCacheEnvironment = new ThreadLocal<Pair<Integer, Class<?>>>();
+	static final ThreadLocal<Pair<Integer, Class<?>>> currentOldCacheEnvironment = new ThreadLocal<Pair<Integer, Class<?>>>();
 	private static final ThreadLocal<SelfInitializingMap<Pair<Integer, Class<?>>, Map<String, Object>>> oldStore = new ThreadLocal<SelfInitializingMap<Pair<Integer, Class<?>>, Map<String, Object>>>() {
 		@Override
 		protected SelfInitializingMap<Pair<Integer, Class<?>>, Map<String, Object>> initialValue() {

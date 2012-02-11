@@ -37,7 +37,7 @@ public class RootTransformer implements ClassFileTransformer {
 
 	private static Throwable lastException;
 
-	private RuntimeConfiguration configuration;
+	private ConfigurationManager configuration;
 
 	private InvolvedTypeInspector involvedTypeInspector = new InvolvedTypeInspector();
 
@@ -45,7 +45,7 @@ public class RootTransformer implements ClassFileTransformer {
 		return pool;
 	}
 
-	public RuntimeConfiguration getConfiguration() {
+	public ConfigurationManager getConfigurationManager() {
 		return configuration;
 	}
 
@@ -60,30 +60,23 @@ public class RootTransformer implements ClassFileTransformer {
 	private void loadConfiguration(String agentArgs, Instrumentation inst) throws Exception {
 		if (agentArgs == null || agentArgs.isEmpty()) {
 			logger.warn("no configuration given - errors from @Pure are completely disabled. using default configuration.");
-			configuration = new RuntimeConfiguration(new DefaultConfiguration(), pool);
+			configuration = new ConfigurationManager(new DefaultConfiguration(), pool);
 		} else {
 			try {
 				Class<?> configurationClass = Class.forName(agentArgs);
-				configuration = new RuntimeConfiguration((Configuration) configurationClass.newInstance(), pool);
+				configuration = new ConfigurationManager((Configuration) configurationClass.newInstance(), pool);
 				checkConfigurationLoadingRootClasses(agentArgs);
 				logger.info("loaded configuration from class '" + agentArgs + "'.");
 			} catch (Exception e) {
 				logger.error("could not load configuration from class '" + agentArgs
 						+ "'. using default configuration.", e);
-				configuration = new RuntimeConfiguration(new DefaultConfiguration(), pool);
+				configuration = new ConfigurationManager(new DefaultConfiguration(), pool);
 			}
 		}
 	}
 
 	private void checkConfigurationLoadingRootClasses(String agentArgs) throws NotFoundException {
-		CtClass ctClass = pool.get(agentArgs);
-		@SuppressWarnings("unchecked")
-		Set<String> configurationClasses = ctClass.getClassFile().getConstPool().getClassNames();
-		for (String classNameWithSlashes : configurationClasses) {
-			String className = convertSlashesToDots(classNameWithSlashes);
-			if (className.equals(agentArgs)) {
-				continue;
-			}
+		for (String className : configuration.getInvolvedClassNames(pool)) {
 			if (configuration.isWithinRootPackages(className)) {
 				throw new RuntimeException(
 						"classes within root-packages must not be referenced by the configuration. offending class: '"
@@ -99,7 +92,7 @@ public class RootTransformer implements ClassFileTransformer {
 	@Override
 	public byte[] transform(ClassLoader loader, String classNameWithSlashes, Class<?> classBeingRedefined,
 			ProtectionDomain protectionDomain, byte[] classfileBuffer) {
-		String className = convertSlashesToDots(classNameWithSlashes);
+		String className = classNameWithSlashes.replace('/', '.');
 		logger.debug("transformation started for class " + className);
 		try {
 			updateClassPath(loader, classfileBuffer, className);
@@ -114,10 +107,6 @@ public class RootTransformer implements ClassFileTransformer {
 		return null;
 	}
 
-	private String convertSlashesToDots(String classNameWithSlashes) {
-		return classNameWithSlashes.replace('/', '.');
-	}
-
 	byte[] transformClass(String className) throws Exception {
 		CtClass affectedClass = pool.get(className);
 		if (affectedClass.isInterface()) {
@@ -127,7 +116,7 @@ public class RootTransformer implements ClassFileTransformer {
 		if (!affectedClass.hasAnnotation(Transformed.class)) {
 			transformClass(affectedClass);
 		}
-		if (configuration.writeTransformedClasses()) {
+		if (configuration.writeTransformedClass(affectedClass)) {
 			affectedClass.writeFile();
 		}
 		return affectedClass.toBytecode();

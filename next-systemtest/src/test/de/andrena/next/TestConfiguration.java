@@ -1,6 +1,6 @@
 package de.andrena.next;
 
-import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,7 +8,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import de.andrena.next.systemtest.config.DefaultPreConditionTrueConfiguration;
+import de.andrena.next.systemtest.config.InvalidPreConditionBehaviorErrorConfiguration;
+
 public class TestConfiguration implements Configuration {
+
+	@Override
+	public Set<Configuration> getConfigurations() {
+		Set<Configuration> configurations = new HashSet<Configuration>();
+		configurations.add(new DefaultPreConditionTrueConfiguration());
+		configurations.add(new InvalidPreConditionBehaviorErrorConfiguration());
+		return configurations;
+	}
 
 	@Override
 	public Set<String> getRootPackages() {
@@ -19,9 +30,8 @@ public class TestConfiguration implements Configuration {
 	}
 
 	@Override
-	public Set<Member> getPureWhitelist() throws NoSuchMethodException, SecurityException {
-		Set<Member> pureWhitelist = new HashSet<Member>();
-		pureWhitelist.add(AssertionError.class.getConstructor(Object.class));
+	public Set<Method> getPureWhitelist() throws NoSuchMethodException, SecurityException {
+		Set<Method> pureWhitelist = new HashSet<Method>();
 		pureWhitelist.add(Boolean.class.getMethod("booleanValue"));
 		pureWhitelist.add(Class.class.getMethod("desiredAssertionStatus"));
 		pureWhitelist.add(Class.class.getMethod("getClass"));
@@ -76,6 +86,16 @@ public class TestConfiguration implements Configuration {
 	@Override
 	public boolean writeTransformedClasses() {
 		return true;
+	}
+
+	@Override
+	public DefaultPreCondition getDefaultPreCondition() {
+		return DefaultPreCondition.UNDEFINED;
+	}
+
+	@Override
+	public InvalidPreConditionBehavior getInvalidPreConditionBehavior() {
+		return InvalidPreConditionBehavior.IGNORE_AND_WARN;
 	}
 
 }

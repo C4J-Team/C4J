@@ -77,9 +77,8 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 		}
 		unpureConditions = new CompareExp(NestedExp.CALLING_OBJECT).ne(NestedExp.NULL).and(unpureConditions);
 		IfExp unpureCondition = new IfExp(unpureConditions);
-		String errorMsg = "illegal method access on unpure method/constructor " + method.getLongName()
-				+ " in pure method/constructor " + affectedBehavior.getLongName() + " on line "
-				+ methodCall.getLineNumber();
+		String errorMsg = "illegal method access on unpure method " + method.getLongName() + " in pure method "
+				+ affectedBehavior.getLongName() + " on line " + methodCall.getLineNumber();
 		unpureCondition.addIfBody(getThrowable(errorMsg));
 		StandaloneExp replacementExp = unpureCondition.append(StandaloneExp.proceed);
 		logger.info("possible call to unpure method " + method.getLongName());
@@ -162,7 +161,8 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 		if (constructorModifyingOwnClass(method)) {
 			return;
 		}
-		if (rootTransformer.getConfiguration().getWhitelistMethods().contains(method)) {
+		if (rootTransformer.getConfigurationManager().getWhitelistMethods(affectedBehavior.getDeclaringClass())
+				.contains(method)) {
 			return;
 		}
 		if (method.hasAnnotation(Pure.class)) {
