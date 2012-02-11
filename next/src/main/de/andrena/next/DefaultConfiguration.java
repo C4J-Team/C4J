@@ -16,7 +16,7 @@ public class DefaultConfiguration implements Configuration {
 	}
 
 	@Override
-	public Set<Method> getPureWhitelist() {
+	public Set<Method> getPureWhitelist() throws NoSuchMethodException, SecurityException {
 		return Collections.emptySet();
 	}
 
