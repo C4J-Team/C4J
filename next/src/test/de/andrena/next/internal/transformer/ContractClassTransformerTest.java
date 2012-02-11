@@ -1,9 +1,11 @@
 package de.andrena.next.internal.transformer;
 
-import org.junit.Test;
-
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import javassist.ClassPool;
+import javassist.CtClass;
+
+import org.junit.Test;
 
 public class ContractClassTransformerTest {
 
@@ -14,9 +16,13 @@ public class ContractClassTransformerTest {
 		for (int i = 0; i < subTransformers.length; i++) {
 			subTransformers[i] = mock(subTransformers[i].getClass());
 		}
-		transformer.transform(null, null);
+		CtClass contractClass = ClassPool.getDefault().get(ContractClass.class.getName());
+		transformer.transform(null, contractClass);
 		for (AbstractContractClassTransformer subTransformer : transformer.getTransformers()) {
-			verify(subTransformer).transform(null, null);
+			verify(subTransformer).transform(null, contractClass);
 		}
+	}
+
+	public static class ContractClass {
 	}
 }
