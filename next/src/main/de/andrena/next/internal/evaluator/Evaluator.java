@@ -160,13 +160,25 @@ public class Evaluator {
 	public static Object methodCall(String methodName, Class<?>[] argTypes, Object[] args) {
 		try {
 			Object target = currentTarget.get();
-			Method method = target.getClass().getDeclaredMethod(methodName, argTypes);
+			Method method = getInheritedMethod(methodName, target.getClass(), argTypes);
 			method.setAccessible(true);
 			Object value = method.invoke(target, args);
 			logger.info("methodCall returning " + value);
 			return value;
 		} catch (Exception e) {
 			throw new EvaluationException("could not call method " + methodName, e);
+		}
+	}
+
+	private static Method getInheritedMethod(String methodName, Class<? extends Object> clazz, Class<?>[] argTypes)
+			throws NoSuchMethodException {
+		try {
+			return clazz.getDeclaredMethod(methodName, argTypes);
+		} catch (NoSuchMethodException e) {
+			if (clazz.getSuperclass() != null) {
+				return getInheritedMethod(methodName, clazz.getSuperclass(), argTypes);
+			}
+			throw e;
 		}
 	}
 

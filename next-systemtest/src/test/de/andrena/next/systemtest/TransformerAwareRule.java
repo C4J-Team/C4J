@@ -13,22 +13,35 @@ import de.andrena.next.internal.RootTransformer;
 public class TransformerAwareRule extends Verifier {
 	private String expectedLogMessage;
 	private Level expectedLogLevel;
+	private Level bannedLogLevel;
+	private String bannedLogMessage;
 
 	private static Map<String, Level> logMap = new HashMap<String, Level>();
 
 	public void expectLogWarning(String message) {
-		expectedLogLevel = Level.WARN;
-		expectedLogMessage = message;
+		expectLog(Level.WARN, message);
 	}
 
 	public void expectLogError(String message) {
-		expectedLogLevel = Level.ERROR;
-		expectedLogMessage = message;
+		expectLog(Level.ERROR, message);
 	}
 
 	public void expectLog(Level level, String message) {
 		expectedLogLevel = level;
 		expectedLogMessage = message;
+	}
+
+	public void banLogWarning(String message) {
+		banLog(Level.WARN, message);
+	}
+
+	public void banLogError(String message) {
+		banLog(Level.ERROR, message);
+	}
+
+	public void banLog(Level level, String message) {
+		bannedLogLevel = level;
+		bannedLogMessage = message;
 	}
 
 	@Override
@@ -42,6 +55,13 @@ public class TransformerAwareRule extends Verifier {
 		expectedLogLevel = null;
 		if (logMessage != null && (!logMap.containsKey(logMessage) || !logMap.get(logMessage).equals(logLevel))) {
 			throw new Exception("expected " + logLevel + " with message '" + logMessage + "'");
+		}
+		logMessage = bannedLogMessage;
+		logLevel = bannedLogLevel;
+		bannedLogMessage = null;
+		bannedLogLevel = null;
+		if (logMessage != null && logMap.containsKey(logMessage) && logMap.get(logMessage).equals(logLevel)) {
+			throw new Exception("noticed banned " + logLevel + " with message '" + logMessage + "'");
 		}
 	}
 

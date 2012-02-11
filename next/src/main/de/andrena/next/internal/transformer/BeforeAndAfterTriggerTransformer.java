@@ -9,6 +9,7 @@ import javassist.CtNewMethod;
 import javassist.Modifier;
 import javassist.NotFoundException;
 import de.andrena.next.ClassInvariant;
+import de.andrena.next.internal.RootTransformer;
 import de.andrena.next.internal.compiler.IfExp;
 import de.andrena.next.internal.compiler.NestedExp;
 import de.andrena.next.internal.compiler.StandaloneExp;
@@ -17,9 +18,15 @@ import de.andrena.next.internal.compiler.TryExp;
 import de.andrena.next.internal.compiler.ValueExp;
 import de.andrena.next.internal.evaluator.Evaluator;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
+import de.andrena.next.internal.util.ListOrderedSet;
 import de.andrena.next.internal.util.ObjectConverter;
 
 public class BeforeAndAfterTriggerTransformer extends AffectedClassTransformerForSingleContract {
+	private RootTransformer rootTransformer;
+
+	public BeforeAndAfterTriggerTransformer(RootTransformer rootTransformer) {
+		this.rootTransformer = rootTransformer;
+	}
 
 	@Override
 	public void transform(ContractInfo contractInfo, CtClass affectedClass) throws Exception {
@@ -124,7 +131,10 @@ public class BeforeAndAfterTriggerTransformer extends AffectedClassTransformerFo
 					+ contractInfo.getContractClass().getName());
 			return null;
 		}
-		if (!affectedMethod.getDeclaringClass().equals(affectedClass)) {
+		if (affectedMethod.getDeclaringClass().equals(affectedClass)) {
+			return affectedMethod;
+		}
+		if (!hasContract(affectedMethod.getDeclaringClass(), contractInfo)) {
 			logger.warn("could not find method " + contractBehavior.getName() + " in affected class "
 					+ affectedClass.getName() + " for contract class " + contractInfo.getContractClass().getName()
 					+ " - inserting an empty method");
@@ -132,8 +142,15 @@ public class BeforeAndAfterTriggerTransformer extends AffectedClassTransformerFo
 			affectedMethod.setModifiers(Modifier.clear(affectedMethod.getModifiers(), Modifier.NATIVE));
 			affectedMethod.setModifiers(Modifier.clear(affectedMethod.getModifiers(), Modifier.ABSTRACT));
 			affectedClass.addMethod(affectedMethod);
+			return affectedMethod;
 		}
-		return affectedMethod;
+		return null;
+	}
+
+	private boolean hasContract(CtClass clazz, ContractInfo contractInfo) throws NotFoundException {
+		ListOrderedSet<CtClass> involvedTypes = rootTransformer.getInvolvedTypeInspector().inspect(clazz);
+		ListOrderedSet<ContractInfo> contracts = rootTransformer.getContractsForTypes(involvedTypes);
+		return contracts.contains(contractInfo);
 	}
 
 	CtConstructor getAffectedConstructor(ContractInfo contractInfo, CtClass affectedClass, CtBehavior contractBehavior) {

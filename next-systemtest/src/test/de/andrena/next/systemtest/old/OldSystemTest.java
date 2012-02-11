@@ -120,4 +120,37 @@ public class OldSystemTest {
 			return 0;
 		}
 	}
+
+	@Test
+	public void testSubClassWithoutMethod() {
+		new SubClassWithoutMethod().method();
+	}
+
+	@Contract(SubClassWithoutMethodContract.class)
+	public static class SubClassWithoutMethod extends SuperClassWithOld {
+	}
+
+	public static class SubClassWithoutMethodContract extends SubClassWithoutMethod {
+	}
+
+	@Contract(SuperClassWithOldContract.class)
+	public static class SuperClassWithOld {
+		@Pure
+		public int method() {
+			return 0;
+		}
+	}
+
+	public static class SuperClassWithOldContract extends SuperClassWithOld {
+		@Target
+		private SuperClassWithOld target;
+
+		@Override
+		public int method() {
+			if (post()) {
+				assert old(target.method()) == target.method();
+			}
+			return 0;
+		}
+	}
 }

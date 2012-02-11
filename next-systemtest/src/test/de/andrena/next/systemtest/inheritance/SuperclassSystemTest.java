@@ -38,9 +38,24 @@ public class SuperclassSystemTest {
 		dummy.method(5);
 	}
 
+	@Test
+	public void testNoWarningWhenContractMethodNotOverwritten() {
+		transformerAware
+				.banLogWarning("could not find method method in affected class de.andrena.next.systemtest.inheritance.SuperclassSystemTest$NoWarningClass"
+						+ " for contract class de.andrena.next.systemtest.inheritance.SuperclassSystemTest$SuperContract - inserting an empty method");
+		new NoWarningClass().method(3);
+	}
+
 	@Test(expected = AssertionError.class)
 	public void testPreConditionFailsInSuperClassForDummyClassDeclaringMethod() {
 		new DummyClassDeclaringMethod().method(0);
+	}
+
+	@Contract(NoWarningClassContract.class)
+	public static class NoWarningClass extends SuperClass {
+	}
+
+	public static class NoWarningClassContract extends NoWarningClass {
 	}
 
 	@Contract(DummyContract.class)

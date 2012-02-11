@@ -16,7 +16,7 @@ public class AffectedClassTransformer extends AbstractAffectedClassTransformer {
 	public AffectedClassTransformer(RootTransformer rootTransformer) {
 		transformers = new AbstractAffectedClassTransformer[] {
 				// beware: PureTransformer has to run first!
-				new PureTransformer(rootTransformer), new BeforeAndAfterTriggerTransformer(),
+				new PureTransformer(rootTransformer), new BeforeAndAfterTriggerTransformer(rootTransformer),
 				new ClassInvariantTransformer() };
 	}
 

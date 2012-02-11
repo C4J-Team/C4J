@@ -154,7 +154,7 @@ public class RootTransformer implements ClassFileTransformer {
 		contractClassTransformer.transform(contractInfo, contractClass);
 	}
 
-	private ListOrderedSet<ContractInfo> getContractsForTypes(ListOrderedSet<CtClass> types) throws NotFoundException {
+	public ListOrderedSet<ContractInfo> getContractsForTypes(ListOrderedSet<CtClass> types) throws NotFoundException {
 		ListOrderedSet<ContractInfo> contracts = new ListOrderedSet<ContractInfo>();
 		for (CtClass type : types) {
 			if (type.hasAnnotation(Contract.class)) {
