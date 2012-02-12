@@ -1,7 +1,5 @@
 package de.andrena.next.systemtest.pure;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
 
 import de.andrena.next.Pure;
@@ -12,11 +10,16 @@ public class PurePassingParametersToUnpureMethodsSystemTest {
 	public void testPurePassingParametersToUnpureMethods() {
 		TargetClass target = new TargetClass();
 		target.move(3);
-		assertEquals(3, target.getPosition());
+	}
+
+	@Test(expected = AssertionError.class)
+	public void testStaticPurePassingParametersToUnpureMethods() {
+		TargetClass.moveStatic(3);
 	}
 
 	public static class TargetClass {
 		private Position position = new Position();
+		private static Position positionStatic = new Position();
 
 		public int getPosition() {
 			return position.getValue();
@@ -24,10 +27,14 @@ public class PurePassingParametersToUnpureMethodsSystemTest {
 
 		@Pure
 		public void move(int value) {
-			// PureEvaluator.registerUnpure(position);
 			PositionChanger changer = new PositionChanger(position);
 			changer.updatePosition(value);
-			// PureEvaluator.unregisterUnpure(position);
+		}
+
+		@Pure
+		public static void moveStatic(int value) {
+			PositionChanger changer = new PositionChanger(positionStatic);
+			changer.updatePosition(value);
 		}
 	}
 
@@ -35,12 +42,10 @@ public class PurePassingParametersToUnpureMethodsSystemTest {
 		private int value;
 
 		public int getValue() {
-			// PureEvaluator.checkUnpureAccess(this);
 			return value;
 		}
 
 		public void setValue(int value) {
-			// PureEvaluator.checkUnpureAccess(this);
 			this.value = value;
 		}
 	}
@@ -53,7 +58,6 @@ public class PurePassingParametersToUnpureMethodsSystemTest {
 		}
 
 		public void updatePosition(int value) {
-			// PureEvaluator.checkUnpureAccess(this);
 			position.setValue(value);
 		}
 	}

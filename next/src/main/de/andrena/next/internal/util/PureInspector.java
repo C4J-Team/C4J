@@ -105,13 +105,16 @@ public class PureInspector {
 	}
 
 	public void checkUnpureAccess(CtBehavior affectedBehavior) throws CannotCompileException {
-		if (!Modifier.isStatic(affectedBehavior.getModifiers())
-				&& rootTransformer.getConfigurationManager().isWithinRootPackages(affectedBehavior.getDeclaringClass())) {
-			StandaloneExp checkUnpureAccessExp = new StaticCallExp(PureEvaluator.checkUnpureAccess, NestedExp.THIS)
-					.toStandalone();
-			logger.info("puremagic.checkUnpureAccess insertBefore " + affectedBehavior.getLongName() + ": \n"
-					+ checkUnpureAccessExp.getCode());
-			checkUnpureAccessExp.insertBefore(affectedBehavior);
+		if (Modifier.isStatic(affectedBehavior.getModifiers())) {
+			return;
 		}
+		if (!rootTransformer.getConfigurationManager().isWithinRootPackages(affectedBehavior.getDeclaringClass())) {
+			return;
+		}
+		StandaloneExp checkUnpureAccessExp = new StaticCallExp(PureEvaluator.checkUnpureAccess, NestedExp.THIS)
+				.toStandalone();
+		logger.info("puremagic.checkUnpureAccess insertBefore " + affectedBehavior.getLongName() + ": \n"
+				+ checkUnpureAccessExp.getCode());
+		checkUnpureAccessExp.insertBefore(affectedBehavior);
 	}
 }

@@ -34,7 +34,7 @@ public class NestedExpTest {
 
 	@Test
 	public void testField() {
-		assertEquals("this.someField", NestedExp.field("someField").getCode());
+		assertEquals("someField", NestedExp.field("someField").getCode());
 	}
 
 	@Test

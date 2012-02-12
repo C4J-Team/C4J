@@ -10,10 +10,12 @@ import de.andrena.next.internal.RootTransformer;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 import de.andrena.next.internal.util.ListOrderedSet;
 import de.andrena.next.internal.util.PureInspector;
+import de.andrena.next.internal.util.ReflectionHelper;
 
 public class PureTransformer extends AbstractAffectedClassTransformer {
 
 	private PureInspector pureInspector;
+	private ReflectionHelper reflectionHelper = new ReflectionHelper();
 
 	public PureTransformer(RootTransformer rootTransformer) {
 		this.pureInspector = new PureInspector(rootTransformer);
@@ -22,7 +24,7 @@ public class PureTransformer extends AbstractAffectedClassTransformer {
 	@Override
 	public void transform(ListOrderedSet<CtClass> involvedClasses, ListOrderedSet<ContractInfo> contracts,
 			CtClass affectedClass) throws Exception {
-		for (CtBehavior affectedBehavior : affectedClass.getDeclaredMethods()) {
+		for (CtBehavior affectedBehavior : reflectionHelper.getDeclaredModifiableMethods(affectedClass)) {
 			CtBehavior pureBehavior = pureInspector.inspect(involvedClasses, affectedBehavior);
 			if (pureBehavior != null) {
 				addBehaviorAnnotation(affectedBehavior, Pure.class);

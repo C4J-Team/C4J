@@ -8,7 +8,7 @@ public class AssignmentExpTest {
 
 	@Test
 	public void testAssignmentExp() {
-		assertEquals("this.field = \"stringValue\"", new AssignmentExp(NestedExp.field("field"), new ValueExp(
-				"stringValue")).getCode());
+		assertEquals("field = \"stringValue\"",
+				new AssignmentExp(NestedExp.field("field"), new ValueExp("stringValue")).getCode());
 	}
 }

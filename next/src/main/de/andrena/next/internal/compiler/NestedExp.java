@@ -19,16 +19,12 @@ public abstract class NestedExp extends Exp {
 		return new CodeNestedExp("$" + num);
 	}
 
-	public static NestedExp callingArg(int num) {
-		return new CodeNestedExp("param$" + num);
-	}
-
 	public static NestedExp field(String name) {
-		return new CodeNestedExp("this." + name);
+		return new CodeNestedExp(name);
 	}
 
 	public static NestedExp field(CtField field) {
-		return new CodeNestedExp("this." + field.getName());
+		return new CodeNestedExp(field.getName());
 	}
 
 	public static NestedExp var(String name) {
