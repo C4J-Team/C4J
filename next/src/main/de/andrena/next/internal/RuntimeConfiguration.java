@@ -15,10 +15,21 @@ public class RuntimeConfiguration {
 
 	private Set<CtMethod> whitelistMethods;
 	private Configuration configuration;
+	private Set<String> rootPackages = new HashSet<String>();
 
 	public RuntimeConfiguration(Configuration configuration, WhitelistConverter whitelistConverter) throws Exception {
 		this.configuration = configuration;
 		whitelistMethods = whitelistConverter.convertWhitelist(configuration.getPureWhitelist());
+		normalizeRootPackages();
+	}
+
+	private void normalizeRootPackages() {
+		for (String rootPackage : configuration.getRootPackages()) {
+			if (!rootPackage.endsWith(".")) {
+				rootPackage += ".";
+			}
+			rootPackages.add(rootPackage);
+		}
 	}
 
 	public Class<?> getConfigurationClass() {
@@ -41,7 +52,7 @@ public class RuntimeConfiguration {
 	}
 
 	public Set<String> getRootPackages() {
-		return configuration.getRootPackages();
+		return rootPackages;
 	}
 
 	public boolean writeTransformedClasses() {

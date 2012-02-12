@@ -8,7 +8,7 @@ import de.andrena.next.DefaultConfiguration;
 public class InvalidPreConditionBehaviorErrorConfiguration extends DefaultConfiguration {
 	@Override
 	public Set<String> getRootPackages() {
-		return Collections.singleton("de.andrena.next.systemtest.config.invalidpreconditionbehavior");
+		return Collections.singleton("de.andrena.next.systemtest.config.invalidpreconditionbehaviorerror");
 	}
 
 	@Override

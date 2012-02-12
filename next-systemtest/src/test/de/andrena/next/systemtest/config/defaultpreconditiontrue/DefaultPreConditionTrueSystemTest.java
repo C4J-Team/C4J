@@ -19,7 +19,7 @@ public class DefaultPreConditionTrueSystemTest {
 						+ " de.andrena.next.systemtest.config.defaultpreconditiontrue.DefaultPreConditionTrueSystemTest$ContractClass.method(int)"
 						+ " which is already defined from de.andrena.next.systemtest.config.defaultpreconditiontrue.DefaultPreConditionTrueSystemTest$SuperClass"
 						+ " - ignoring the pre-condition");
-		new TargetClass().method(1);
+		new TargetClass().method(-1);
 	}
 
 	@Contract(ContractClass.class)

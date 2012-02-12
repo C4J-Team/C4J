@@ -6,9 +6,6 @@ import java.util.Set;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.NotFoundException;
-
-import org.apache.log4j.Logger;
-
 import de.andrena.next.Configuration;
 import de.andrena.next.DefaultConfiguration;
 import de.andrena.next.internal.util.WhitelistConverter;
@@ -16,7 +13,6 @@ import de.andrena.next.internal.util.WhitelistConverter;
 public class ConfigurationManager {
 	private Set<RuntimeConfiguration> configurations = new HashSet<RuntimeConfiguration>();
 	private RuntimeConfiguration defaultConfiguration;
-	private Logger logger = Logger.getLogger(getClass());
 
 	public ConfigurationManager(Configuration configuration, ClassPool pool) throws Exception {
 		WhitelistConverter whitelistConverter = new WhitelistConverter(pool);

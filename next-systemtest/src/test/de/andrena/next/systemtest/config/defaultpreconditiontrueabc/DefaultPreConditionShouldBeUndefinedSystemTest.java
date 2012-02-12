@@ -1,4 +1,4 @@
-package de.andrena.next.systemtest.config;
+package de.andrena.next.systemtest.config.defaultpreconditiontrueabc;
 
 import static de.andrena.next.Condition.pre;
 
@@ -8,7 +8,7 @@ import org.junit.Test;
 import de.andrena.next.Contract;
 import de.andrena.next.systemtest.TransformerAwareRule;
 
-public class DefaultPreConditionUndefinedSystemTest {
+public class DefaultPreConditionShouldBeUndefinedSystemTest {
 	@Rule
 	public TransformerAwareRule transformerAwareRule = new TransformerAwareRule();
 
@@ -34,5 +34,4 @@ public class DefaultPreConditionUndefinedSystemTest {
 		public void method(int arg) {
 		}
 	}
-
 }

@@ -19,7 +19,7 @@ public class InvalidPreConditionBehaviorErrorSystemTest {
 						+ " de.andrena.next.systemtest.config.invalidpreconditionbehaviorerror.InvalidPreConditionBehaviorErrorSystemTest$ContractClass.method(int)"
 						+ " which is already defined from"
 						+ " de.andrena.next.systemtest.config.invalidpreconditionbehaviorerror.InvalidPreConditionBehaviorErrorSystemTest$SuperClassContract");
-		new TargetClass().method(1);
+		new TargetClass().method(0);
 	}
 
 	@Contract(ContractClass.class)
