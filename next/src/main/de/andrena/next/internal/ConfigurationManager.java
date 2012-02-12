@@ -1,27 +1,28 @@
 package de.andrena.next.internal;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 import javassist.ClassPool;
 import javassist.CtClass;
-import javassist.CtMethod;
 import javassist.NotFoundException;
 
 import org.apache.log4j.Logger;
 
 import de.andrena.next.Configuration;
+import de.andrena.next.DefaultConfiguration;
 import de.andrena.next.internal.util.WhitelistConverter;
 
 public class ConfigurationManager {
 	private Set<RuntimeConfiguration> configurations = new HashSet<RuntimeConfiguration>();
+	private RuntimeConfiguration defaultConfiguration;
 	private Logger logger = Logger.getLogger(getClass());
 
 	public ConfigurationManager(Configuration configuration, ClassPool pool) throws Exception {
 		WhitelistConverter whitelistConverter = new WhitelistConverter(pool);
 		configurations.add(new RuntimeConfiguration(configuration, whitelistConverter));
 		addSubConfigurations(configuration, whitelistConverter);
+		defaultConfiguration = new RuntimeConfiguration(new DefaultConfiguration(), whitelistConverter);
 	}
 
 	private void addSubConfigurations(Configuration configuration, WhitelistConverter whitelistConverter)
@@ -32,7 +33,7 @@ public class ConfigurationManager {
 		}
 	}
 
-	private RuntimeConfiguration getResponsibleConfiguration(CtClass clazz) {
+	public RuntimeConfiguration getConfiguration(CtClass clazz) {
 		RuntimeConfiguration responsibleConfiguration = null;
 		String longestRootPackage = "";
 		for (RuntimeConfiguration configuration : configurations) {
@@ -43,20 +44,10 @@ public class ConfigurationManager {
 				}
 			}
 		}
-		return responsibleConfiguration;
-	}
-
-	public boolean writeTransformedClass(CtClass clazz) {
-		RuntimeConfiguration responsibleConfiguration = getResponsibleConfiguration(clazz);
-		return responsibleConfiguration != null && responsibleConfiguration.writeTransformedClasses();
-	}
-
-	public Set<CtMethod> getWhitelistMethods(CtClass clazz) {
-		RuntimeConfiguration responsibleConfiguration = getResponsibleConfiguration(clazz);
 		if (responsibleConfiguration == null) {
-			return Collections.emptySet();
+			return defaultConfiguration;
 		}
-		return responsibleConfiguration.getWhitelistMethods();
+		return responsibleConfiguration;
 	}
 
 	public boolean isWithinRootPackages(String className) {

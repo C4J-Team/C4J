@@ -20,6 +20,8 @@ import javassist.expr.NewArray;
 import org.apache.log4j.Logger;
 
 import de.andrena.next.Condition;
+import de.andrena.next.Configuration.DefaultPreCondition;
+import de.andrena.next.Configuration.InvalidPreConditionBehavior;
 import de.andrena.next.internal.RootTransformer;
 import de.andrena.next.internal.compiler.ArrayExp;
 import de.andrena.next.internal.compiler.AssignmentExp;
@@ -30,6 +32,7 @@ import de.andrena.next.internal.compiler.StandaloneExp;
 import de.andrena.next.internal.compiler.StaticCallExp;
 import de.andrena.next.internal.compiler.ValueExp;
 import de.andrena.next.internal.evaluator.Evaluator;
+import de.andrena.next.internal.transformer.TransformationException;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 import de.andrena.next.internal.util.ListOrderedSet;
 
@@ -116,21 +119,53 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		if (contract.getContractClass().equals(method.getDeclaringClass())) {
 			ListOrderedSet<CtClass> involvedTypes = rootTransformer.getInvolvedTypeInspector().inspect(
 					contract.getTargetClass());
-			ListOrderedSet<ContractInfo> contracts = rootTransformer.getContractsForTypes(involvedTypes);
-			contracts.remove(contract);
-			for (ContractInfo otherContract : contracts) {
-				try {
-					otherContract.getTargetClass().getDeclaredMethod(method.getName(), method.getParameterTypes());
-					logger.warn("found strengthening pre-condition in " + method.getLongName()
-							+ " which is already defined from " + otherContract.getContractClass().getName()
-							+ " - ignoring the pre-condition");
-					AssignmentExp replacementExp = new AssignmentExp(NestedExp.RETURN_VALUE, BooleanExp.FALSE);
-					replacementExp.toStandalone().replace(methodCall);
-					return;
-				} catch (NotFoundException e) {
-				}
+			if (rootTransformer.getConfigurationManager().getConfiguration(contract.getTargetClass())
+					.getDefaultPreCondition() == DefaultPreCondition.TRUE) {
+				handleTrueDefaultPreCondition(methodCall, method, involvedTypes);
+			} else {
+				handleUndefinedDefaultPreCondition(methodCall, method, involvedTypes);
 			}
 		}
+	}
+
+	private void handleTrueDefaultPreCondition(MethodCall methodCall, CtBehavior method,
+			ListOrderedSet<CtClass> involvedTypes) throws NotFoundException, CannotCompileException {
+		involvedTypes.remove(contract.getTargetClass());
+		for (CtClass involvedType : involvedTypes) {
+			try {
+				involvedType.getDeclaredMethod(method.getName(), method.getParameterTypes());
+				preConditionStrengthening(methodCall, method, involvedType);
+				return;
+			} catch (NotFoundException e) {
+			}
+		}
+	}
+
+	private void handleUndefinedDefaultPreCondition(MethodCall methodCall, CtBehavior method,
+			ListOrderedSet<CtClass> involvedTypes) throws NotFoundException, CannotCompileException {
+		ListOrderedSet<ContractInfo> contracts = rootTransformer.getContractsForTypes(involvedTypes);
+		contracts.remove(contract);
+		for (ContractInfo otherContract : contracts) {
+			try {
+				otherContract.getTargetClass().getDeclaredMethod(method.getName(), method.getParameterTypes());
+				preConditionStrengthening(methodCall, method, otherContract.getContractClass());
+				return;
+			} catch (NotFoundException e) {
+			}
+		}
+	}
+
+	private void preConditionStrengthening(MethodCall methodCall, CtBehavior method, CtClass definingClass)
+			throws CannotCompileException, NotFoundException {
+		String message = "found strengthening pre-condition in " + method.getLongName()
+				+ " which is already defined from " + definingClass.getName();
+		if (rootTransformer.getConfigurationManager().getConfiguration(contract.getTargetClass())
+				.getInvalidPreConditionBehavior() == InvalidPreConditionBehavior.ABORT_AND_ERROR) {
+			throw new TransformationException(message);
+		}
+		logger.warn(message + " - ignoring the pre-condition");
+		AssignmentExp replacementExp = new AssignmentExp(NestedExp.RETURN_VALUE, BooleanExp.FALSE);
+		replacementExp.toStandalone().replace(methodCall);
 	}
 
 	private void handleTargetMethodCall(MethodCall methodCall) throws NotFoundException, CannotCompileException {

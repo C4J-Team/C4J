@@ -14,7 +14,11 @@ public class DefaultPreConditionTrueSystemTest {
 
 	@Test
 	public void testPreConditionUndefined() {
-		transformerAwareRule.expectLogWarning("");
+		transformerAwareRule
+				.expectLogWarning("found strengthening pre-condition in"
+						+ " de.andrena.next.systemtest.config.defaultpreconditiontrue.DefaultPreConditionTrueSystemTest$ContractClass.method(int)"
+						+ " which is already defined from de.andrena.next.systemtest.config.defaultpreconditiontrue.DefaultPreConditionTrueSystemTest$SuperClass"
+						+ " - ignoring the pre-condition");
 		new TargetClass().method(1);
 	}
 

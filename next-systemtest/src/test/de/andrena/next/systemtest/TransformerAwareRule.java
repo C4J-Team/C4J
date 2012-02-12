@@ -9,21 +9,19 @@ import org.apache.log4j.spi.LoggingEvent;
 import org.junit.rules.Verifier;
 
 import de.andrena.next.internal.RootTransformer;
+import de.andrena.next.internal.transformer.TransformationException;
 
 public class TransformerAwareRule extends Verifier {
 	private String expectedLogMessage;
 	private Level expectedLogLevel;
 	private Level bannedLogLevel;
 	private String bannedLogMessage;
+	private Class<?> expectedException;
 
 	private static Map<String, Level> logMap = new HashMap<String, Level>();
 
 	public void expectLogWarning(String message) {
 		expectLog(Level.WARN, message);
-	}
-
-	public void expectLogError(String message) {
-		expectLog(Level.ERROR, message);
 	}
 
 	public void expectLog(Level level, String message) {
@@ -35,33 +33,50 @@ public class TransformerAwareRule extends Verifier {
 		banLog(Level.WARN, message);
 	}
 
-	public void banLogError(String message) {
-		banLog(Level.ERROR, message);
-	}
-
 	public void banLog(Level level, String message) {
 		bannedLogLevel = level;
 		bannedLogMessage = message;
 	}
 
+	public void expectTransformationException(String message) {
+		expectLog(Level.ERROR, message);
+		expectedException = TransformationException.class;
+	}
+
 	@Override
 	protected void verify() throws Throwable {
-		if (RootTransformer.getLastException() != null) {
+		try {
+			verifyException();
+			verifyLog();
+		} finally {
+			expectedException = null;
+			expectedLogLevel = null;
+			expectedLogMessage = null;
+			bannedLogLevel = null;
+			bannedLogMessage = null;
+			RootTransformer.resetLastException();
+		}
+	}
+
+	private void verifyLog() throws Exception {
+		if (expectedLogMessage != null
+				&& (!logMap.containsKey(expectedLogMessage) || !logMap.get(expectedLogMessage).equals(expectedLogLevel))) {
+			throw new Exception("expected " + expectedLogLevel + " with message '" + expectedLogMessage + "'");
+		}
+		if (bannedLogMessage != null && logMap.containsKey(bannedLogMessage)
+				&& logMap.get(bannedLogMessage).equals(bannedLogLevel)) {
+			throw new Exception("noticed banned " + bannedLogLevel + " with message '" + bannedLogMessage + "'");
+		}
+	}
+
+	private void verifyException() throws Exception, Throwable {
+		if (expectedException != null) {
+			if (RootTransformer.getLastException() == null
+					|| !RootTransformer.getLastException().getClass().equals(expectedException)) {
+				throw new Exception("expected a " + expectedException.getName() + " to be thrown");
+			}
+		} else if (RootTransformer.getLastException() != null) {
 			throw RootTransformer.getLastException();
-		}
-		String logMessage = expectedLogMessage;
-		Level logLevel = expectedLogLevel;
-		expectedLogMessage = null;
-		expectedLogLevel = null;
-		if (logMessage != null && (!logMap.containsKey(logMessage) || !logMap.get(logMessage).equals(logLevel))) {
-			throw new Exception("expected " + logLevel + " with message '" + logMessage + "'");
-		}
-		logMessage = bannedLogMessage;
-		logLevel = bannedLogLevel;
-		bannedLogMessage = null;
-		bannedLogLevel = null;
-		if (logMessage != null && logMap.containsKey(logMessage) && logMap.get(logMessage).equals(logLevel)) {
-			throw new Exception("noticed banned " + logLevel + " with message '" + logMessage + "'");
 		}
 	}
 

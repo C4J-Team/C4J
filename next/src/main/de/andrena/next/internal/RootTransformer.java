@@ -88,6 +88,10 @@ public class RootTransformer implements ClassFileTransformer {
 		return lastException;
 	}
 
+	public static void resetLastException() {
+		lastException = null;
+	}
+
 	@Override
 	public byte[] transform(ClassLoader loader, String classNameWithSlashes, Class<?> classBeingRedefined,
 			ProtectionDomain protectionDomain, byte[] classfileBuffer) {
@@ -98,7 +102,8 @@ public class RootTransformer implements ClassFileTransformer {
 			return transformClass(className);
 		} catch (TransformationException e) {
 			lastException = e;
-			logger.error(e.getMessage(), e);
+			logger.error(e.getMessage());
+			logger.debug(e);
 		} catch (Exception e) {
 			lastException = e;
 			logger.fatal("transformation failed for class '" + className + "'", e);
@@ -115,7 +120,7 @@ public class RootTransformer implements ClassFileTransformer {
 		if (!affectedClass.hasAnnotation(Transformed.class)) {
 			transformClass(affectedClass);
 		}
-		if (configuration.writeTransformedClass(affectedClass)) {
+		if (configuration.getConfiguration(affectedClass).writeTransformedClasses()) {
 			affectedClass.writeFile();
 		}
 		return affectedClass.toBytecode();

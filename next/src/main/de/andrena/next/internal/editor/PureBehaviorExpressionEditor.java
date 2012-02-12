@@ -161,8 +161,8 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 		if (constructorModifyingOwnClass(method)) {
 			return;
 		}
-		if (rootTransformer.getConfigurationManager().getWhitelistMethods(affectedBehavior.getDeclaringClass())
-				.contains(method)) {
+		if (rootTransformer.getConfigurationManager().getConfiguration(affectedBehavior.getDeclaringClass())
+				.getWhitelistMethods().contains(method)) {
 			return;
 		}
 		if (method.hasAnnotation(Pure.class)) {
