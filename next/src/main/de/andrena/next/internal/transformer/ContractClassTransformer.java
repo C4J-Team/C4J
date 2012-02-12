@@ -13,7 +13,7 @@ public class ContractClassTransformer extends AbstractContractClassTransformer {
 		this.transformers = new AbstractContractClassTransformer[] {
 				// BEWARE: has to run in this exact order
 				new ContractBehaviorTransformer(), new PureContractTransformer(rootTransformer),
-				new TargetTransformer(rootTransformer), new ContractExpressionTransformer() };
+				new TargetTransformer(rootTransformer), new ContractExpressionTransformer(rootTransformer) };
 	}
 
 	@Override

@@ -1,6 +1,6 @@
 package de.andrena.next.systemtest.inheritance;
 
-import static de.andrena.next.Condition.pre;
+import static de.andrena.next.Condition.post;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -26,12 +26,12 @@ public class SuperclassSystemTest {
 	}
 
 	@Test(expected = AssertionError.class)
-	public void testPreConditionFailsInSuperClass() {
+	public void testPostConditionFailsInSuperClass() {
 		dummy.method(0);
 	}
 
 	@Test(expected = AssertionError.class)
-	public void testPreConditionFailsInDummyClass() {
+	public void testPostConditionFailsInDummyClass() {
 		transformerAware
 				.expectLogWarning("could not find method method in affected class de.andrena.next.systemtest.inheritance.SuperclassSystemTest$DummyClass"
 						+ " for contract class de.andrena.next.systemtest.inheritance.SuperclassSystemTest$DummyContract - inserting an empty method");
@@ -65,7 +65,7 @@ public class SuperclassSystemTest {
 	public static class DummyContract extends DummyClass {
 		@Override
 		public void method(final int arg) {
-			if (pre()) {
+			if (post()) {
 				assert arg < 5;
 			}
 		}
@@ -81,7 +81,7 @@ public class SuperclassSystemTest {
 	public static class DummyContractDeclaringMethod extends DummyClassDeclaringMethod {
 		@Override
 		public void method(final int arg) {
-			if (pre()) {
+			if (post()) {
 				assert arg < 5;
 			}
 		}
@@ -96,7 +96,7 @@ public class SuperclassSystemTest {
 	public static class SuperContract extends SuperClass {
 		@Override
 		public void method(final int arg) {
-			if (pre()) {
+			if (post()) {
 				assert arg > 0;
 			}
 		}

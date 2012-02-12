@@ -16,6 +16,7 @@ import org.junit.Test;
 
 import de.andrena.next.ClassInvariant;
 import de.andrena.next.Contract;
+import de.andrena.next.internal.RootTransformer;
 import de.andrena.next.internal.util.ContractRegistry;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 
@@ -32,7 +33,7 @@ public class BeforeAndAfterTriggerTransformerTest {
 
 	@Before
 	public void before() throws Exception {
-		transformer = new BeforeAndAfterTriggerTransformer();
+		transformer = new BeforeAndAfterTriggerTransformer(new RootTransformer(null, null));
 		ClassPool pool = ClassPool.getDefault();
 		contractClass = pool.get(ContractClass.class.getName());
 		targetClass = pool.get(TargetClass.class.getName());
@@ -153,8 +154,8 @@ public class BeforeAndAfterTriggerTransformerTest {
 	@Test
 	public void testGetAffectedConstructorForSynthetic() throws Exception {
 		assertEquals(targetClass.getDeclaredConstructor(new CtClass[0]), transformer.getAffectedConstructor(
-				contractInfo, targetClass,
-				contractClass.getDeclaredMethod(ContractBehaviorTransformer.CONSTRUCTOR_REPLACEMENT_NAME, new CtClass[0])));
+				contractInfo, targetClass, contractClass.getDeclaredMethod(
+						ContractBehaviorTransformer.CONSTRUCTOR_REPLACEMENT_NAME, new CtClass[0])));
 	}
 
 	@Test

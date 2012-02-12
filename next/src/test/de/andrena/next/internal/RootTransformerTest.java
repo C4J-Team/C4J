@@ -4,14 +4,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anySetOf;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-
-import java.util.Set;
-
 import javassist.ByteArrayClassPath;
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -25,6 +21,7 @@ import de.andrena.next.Contract;
 import de.andrena.next.internal.transformer.AffectedClassTransformer;
 import de.andrena.next.internal.transformer.ContractClassTransformer;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
+import de.andrena.next.internal.util.ListOrderedSet;
 
 public class RootTransformerTest {
 
@@ -52,17 +49,17 @@ public class RootTransformerTest {
 		assertNull(transformer.transformClass(EmptyInterface.class.getName()));
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testTransformClassTargetClass() throws Exception {
 		assertNotNull(transformer.transformClass(TargetClass.class.getName()));
 		assertEquals(targetClass, transformer.contractRegistry.getContractInfo(contractClass).getTargetClass());
 		assertEquals(contractClass, transformer.contractRegistry.getContractInfo(contractClass).getContractClass());
-		verify(targetClassTransformer).transform(anySetOf(CtClass.class),
-				argThat(new ArgumentMatcher<Set<ContractInfo>>() {
+		verify(targetClassTransformer).transform(any(ListOrderedSet.class),
+				argThat(new ArgumentMatcher<ListOrderedSet<ContractInfo>>() {
 					@Override
 					public boolean matches(Object argument) {
-						@SuppressWarnings("unchecked")
-						Set<ContractInfo> contractInfos = (Set<ContractInfo>) argument;
+						ListOrderedSet<ContractInfo> contractInfos = (ListOrderedSet<ContractInfo>) argument;
 						return contractInfos != null && contractInfos.size() == 1
 								&& contractInfos.iterator().next().getTargetClass().equals(targetClass)
 								&& contractInfos.iterator().next().getContractClass().equals(contractClass);

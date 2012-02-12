@@ -21,6 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.andrena.next.Condition;
+import de.andrena.next.internal.RootTransformer;
 import de.andrena.next.internal.util.ContractRegistry;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 
@@ -45,7 +46,7 @@ public class ContractMethodExpressionEditorTest {
 		contract = new ContractRegistry().registerContract(targetClass, contractClass);
 		innerContractClass = pool.get(DummyInnerContractClass.class.getName());
 		contract.addInnerContractClass(innerContractClass);
-		editor = new ContractMethodExpressionEditor(contract);
+		editor = new ContractMethodExpressionEditor(new RootTransformer(null, null), contract);
 		fieldAccess = mock(FieldAccess.class);
 		when(fieldAccess.getField()).thenReturn(targetClass.getDeclaredField("someField"));
 		methodCall = mock(MethodCall.class);

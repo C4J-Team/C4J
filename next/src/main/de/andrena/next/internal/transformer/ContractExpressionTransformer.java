@@ -2,6 +2,7 @@ package de.andrena.next.internal.transformer;
 
 import javassist.CtBehavior;
 import javassist.CtClass;
+import de.andrena.next.internal.RootTransformer;
 import de.andrena.next.internal.compiler.IfExp;
 import de.andrena.next.internal.compiler.StaticCallExp;
 import de.andrena.next.internal.editor.ContractMethodExpressionEditor;
@@ -10,9 +11,16 @@ import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 
 public class ContractExpressionTransformer extends ContractDeclaredBehaviorTransformer {
 
+	private RootTransformer rootTransformer;
+
+	public ContractExpressionTransformer(RootTransformer rootTransformer) {
+		this.rootTransformer = rootTransformer;
+	}
+
 	@Override
 	public void transform(ContractInfo contractInfo, CtBehavior contractBehavior) throws Exception {
-		ContractMethodExpressionEditor expressionEditor = new ContractMethodExpressionEditor(contractInfo);
+		ContractMethodExpressionEditor expressionEditor = new ContractMethodExpressionEditor(rootTransformer,
+				contractInfo);
 		logger.info("transforming behavior " + contractBehavior.getLongName());
 		contractBehavior.instrument(expressionEditor);
 		additionalStoreExpressions(expressionEditor);

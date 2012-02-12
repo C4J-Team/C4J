@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import javassist.CannotCompileException;
+import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.CtField;
 import javassist.CtMember;
@@ -19,6 +20,7 @@ import javassist.expr.NewArray;
 import org.apache.log4j.Logger;
 
 import de.andrena.next.Condition;
+import de.andrena.next.internal.RootTransformer;
 import de.andrena.next.internal.compiler.ArrayExp;
 import de.andrena.next.internal.compiler.AssignmentExp;
 import de.andrena.next.internal.compiler.BooleanExp;
@@ -29,7 +31,7 @@ import de.andrena.next.internal.compiler.StaticCallExp;
 import de.andrena.next.internal.compiler.ValueExp;
 import de.andrena.next.internal.evaluator.Evaluator;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
-import de.andrena.next.internal.util.InvolvedTypeInspector;
+import de.andrena.next.internal.util.ListOrderedSet;
 
 public class ContractMethodExpressionEditor extends ExprEditor {
 	private Logger logger = Logger.getLogger(getClass());
@@ -39,13 +41,15 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 	Set<CtClass> nestedInnerClasses = new HashSet<CtClass>();
 	private List<StaticCallExp> storeExpressions = new ArrayList<StaticCallExp>();
 	private ContractInfo contract;
-	private InvolvedTypeInspector involvedTypeInspector = new InvolvedTypeInspector();
+	private RootTransformer rootTransformer;
 
 	public List<StaticCallExp> getStoreExpressions() {
 		return storeExpressions;
 	}
 
-	public ContractMethodExpressionEditor(ContractInfo contract) throws NotFoundException {
+	public ContractMethodExpressionEditor(RootTransformer rootTransformer, ContractInfo contract)
+			throws NotFoundException {
+		this.rootTransformer = rootTransformer;
 		this.contract = contract;
 	}
 
@@ -93,13 +97,38 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 
 	void editMethodCall(MethodCall methodCall) throws NotFoundException, CannotCompileException {
 		CtMethod method = methodCall.getMethod();
-		if (involvedTypeInspector.inspect(contract.getTargetClass()).contains(method.getDeclaringClass())) {
+		if (rootTransformer.getInvolvedTypeInspector().inspect(contract.getTargetClass())
+				.contains(method.getDeclaringClass())) {
 			handleTargetMethodCall(methodCall);
 		} else if (method.getDeclaringClass().getName().equals(Condition.class.getName())) {
 			if (method.getName().equals("old")) {
 				handleOldMethodCall(methodCall);
 			} else if (method.getName().equals("unchanged")) {
 				handleUnchangedMethodCall(methodCall);
+			} else if (method.getName().equals("pre")) {
+				handlePreConditionMethodCall(methodCall);
+			}
+		}
+	}
+
+	private void handlePreConditionMethodCall(MethodCall methodCall) throws NotFoundException, CannotCompileException {
+		CtBehavior method = methodCall.where();
+		if (contract.getContractClass().equals(method.getDeclaringClass())) {
+			ListOrderedSet<CtClass> involvedTypes = rootTransformer.getInvolvedTypeInspector().inspect(
+					contract.getTargetClass());
+			ListOrderedSet<ContractInfo> contracts = rootTransformer.getContractsForTypes(involvedTypes);
+			contracts.remove(contract);
+			for (ContractInfo otherContract : contracts) {
+				try {
+					otherContract.getTargetClass().getDeclaredMethod(method.getName(), method.getParameterTypes());
+					logger.warn("found strengthening pre-condition in " + method.getLongName()
+							+ " which is already defined from " + otherContract.getContractClass().getName()
+							+ " - ignoring the pre-condition");
+					AssignmentExp replacementExp = new AssignmentExp(NestedExp.RETURN_VALUE, BooleanExp.FALSE);
+					replacementExp.toStandalone().replace(methodCall);
+					return;
+				} catch (NotFoundException e) {
+				}
 			}
 		}
 	}
