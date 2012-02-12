@@ -10,15 +10,16 @@ import java.util.Set;
 
 /**
  * A Set containing Objects. Instead of relying on hashCode() for equality, this set relies on the == operator. It also
- * discards null values.
+ * discards null values and counts, how many times an object has been added to the set. Only after it is removed the
+ * same number of times it is being fully removed from this Set.
  */
 public class ObjectIdentitySet implements Set<Object> {
-	private Map<Integer, List<Object>> map = new HashMap<Integer, List<Object>>();
+	private Map<Integer, List<Entry>> map = new HashMap<Integer, List<Entry>>();
 
 	@Override
 	public int size() {
 		int size = 0;
-		for (List<Object> list : map.values()) {
+		for (List<Entry> list : map.values()) {
 			size += list.size();
 		}
 		return size;
@@ -35,8 +36,8 @@ public class ObjectIdentitySet implements Set<Object> {
 		if (!map.containsKey(hashCode)) {
 			return false;
 		}
-		for (Object entry : map.get(hashCode)) {
-			if (entry == o) {
+		for (Entry entry : map.get(hashCode)) {
+			if (entry.getObject() == o) {
 				return true;
 			}
 		}
@@ -62,16 +63,34 @@ public class ObjectIdentitySet implements Set<Object> {
 		throw new UnsupportedOperationException();
 	}
 
+	private Entry getEntry(Object o) {
+		Integer hashCode = getHashCode(o);
+		if (!map.containsKey(hashCode)) {
+			return null;
+		}
+		for (Entry entry : map.get(hashCode)) {
+			if (entry.getObject() == o) {
+				return entry;
+			}
+		}
+		return null;
+	}
+
 	@Override
 	public boolean add(Object e) {
-		if (e == null || contains(e)) {
+		if (e == null) {
+			return false;
+		}
+		Entry entry = getEntry(e);
+		if (entry != null) {
+			entry.incrementCount();
 			return false;
 		}
 		Integer hashCode = getHashCode(e);
 		if (!map.containsKey(hashCode)) {
-			map.put(hashCode, new ArrayList<Object>());
+			map.put(hashCode, new ArrayList<Entry>());
 		}
-		map.get(hashCode).add(e);
+		map.get(hashCode).add(new Entry(e));
 		return true;
 	}
 
@@ -81,17 +100,21 @@ public class ObjectIdentitySet implements Set<Object> {
 			return false;
 		}
 		Integer hashCode = getHashCode(o);
-		for (Iterator<Object> iterator = map.get(hashCode).iterator(); iterator.hasNext();) {
-			Object entry = iterator.next();
-			if (entry == o) {
-				iterator.remove();
+		for (Iterator<Entry> iterator = map.get(hashCode).iterator(); iterator.hasNext();) {
+			Entry entry = iterator.next();
+			if (entry.getObject() == o) {
+				entry.decrementCount();
+				if (entry.canBeRemoved()) {
+					iterator.remove();
+					if (map.get(hashCode).isEmpty()) {
+						map.remove(hashCode);
+					}
+					return true;
+				}
 				break;
 			}
 		}
-		if (map.get(hashCode).isEmpty()) {
-			map.remove(hashCode);
-		}
-		return true;
+		return false;
 	}
 
 	@Override
@@ -134,6 +157,32 @@ public class ObjectIdentitySet implements Set<Object> {
 	@Override
 	public void clear() {
 		map.clear();
+	}
+
+	private class Entry {
+		private Object object;
+		private int count;
+
+		public Entry(Object object) {
+			this.object = object;
+			count = 1;
+		}
+
+		public void incrementCount() {
+			count++;
+		}
+
+		public void decrementCount() {
+			count--;
+		}
+
+		public boolean canBeRemoved() {
+			return count <= 0;
+		}
+
+		public Object getObject() {
+			return object;
+		}
 	}
 
 }

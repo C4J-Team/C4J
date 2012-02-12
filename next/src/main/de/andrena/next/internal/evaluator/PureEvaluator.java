@@ -17,6 +17,10 @@ public class PureEvaluator {
 		}
 	};
 
+	public static boolean isUnpureCacheEmpty() {
+		return unpureCache.get().isEmpty();
+	}
+
 	public static void registerUnpure(Object[] objects) {
 		unpureCache.get().addAll(Arrays.asList(objects));
 	}

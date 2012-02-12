@@ -1,28 +1,61 @@
 package de.andrena.next.systemtest.pure;
 
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import de.andrena.next.Pure;
+import de.andrena.next.internal.evaluator.PureEvaluator;
+import de.andrena.next.systemtest.TransformerAwareRule;
 
 public class PurePassingParametersToUnpureMethodsSystemTest {
+	@Rule
+	public TransformerAwareRule transformerAwareRule = new TransformerAwareRule();
 
-	@Test(expected = AssertionError.class)
+	@Rule
+	public ExpectedException expectedException = ExpectedException.none();
+
+	@Test
 	public void testPurePassingParametersToUnpureMethods() {
-		TargetClass target = new TargetClass();
-		target.move(3);
+		expectedException.expect(AssertionError.class);
+		new TargetClass().move(3);
+		assertTrue(PureEvaluator.isUnpureCacheEmpty());
 	}
 
-	@Test(expected = AssertionError.class)
+	@Test
 	public void testStaticPurePassingParametersToUnpureMethods() {
+		expectedException.expect(AssertionError.class);
 		TargetClass.moveStatic(3);
+		assertTrue(PureEvaluator.isUnpureCacheEmpty());
+	}
+
+	@Test
+	public void testDoubleRegistration() {
+		expectedException.expect(AssertionError.class);
+		new TargetClass().doubleRegistration(3);
+		assertTrue(PureEvaluator.isUnpureCacheEmpty());
 	}
 
 	public static class TargetClass {
+		public Object[] stuff = new Object[] { "abc", "def" };
 		private Position position = new Position();
 		private static Position positionStatic = new Position();
 
 		public int getPosition() {
 			return position.getValue();
+		}
+
+		@Pure
+		public void doubleRegistration(int value) {
+			doNothing();
+			PositionChanger changer = new PositionChanger(position);
+			changer.updatePosition(value);
+		}
+
+		@Pure
+		public void doNothing() {
 		}
 
 		@Pure
