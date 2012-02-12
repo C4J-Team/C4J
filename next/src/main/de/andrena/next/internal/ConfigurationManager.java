@@ -61,6 +61,10 @@ public class ConfigurationManager {
 		return false;
 	}
 
+	public boolean isWithinRootPackages(CtClass clazz) {
+		return isWithinRootPackages(clazz.getName());
+	}
+
 	public Set<String> getInvolvedClassNames(ClassPool pool) throws NotFoundException {
 		Set<String> involvedClassNames = new HashSet<String>();
 		for (RuntimeConfiguration configuration : configurations) {

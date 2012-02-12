@@ -30,6 +30,8 @@ public class PureTransformer extends AbstractAffectedClassTransformer {
 			}
 			if (affectedBehavior.hasAnnotation(Pure.class)) {
 				pureInspector.verify(affectedBehavior, false);
+			} else {
+				pureInspector.checkUnpureAccess(affectedBehavior);
 			}
 		}
 	}

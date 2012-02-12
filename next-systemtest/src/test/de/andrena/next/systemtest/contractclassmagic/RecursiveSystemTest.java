@@ -6,6 +6,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.next.Contract;
+import de.andrena.next.Pure;
 import de.andrena.next.Target;
 import de.andrena.next.systemtest.TransformerAwareRule;
 
@@ -20,6 +21,7 @@ public class RecursiveSystemTest {
 
 	@Contract(ContractClassWithCorrectEquals.class)
 	public static class TargetClassWithCorrectEquals {
+		@Pure
 		@Override
 		public boolean equals(Object obj) {
 			return this == obj;
