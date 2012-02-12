@@ -5,13 +5,17 @@ import static de.andrena.next.Condition.post;
 import static de.andrena.next.Condition.pre;
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.next.Contract;
 import de.andrena.next.Target;
 import de.andrena.next.internal.evaluator.Evaluator;
+import de.andrena.next.systemtest.TransformerAwareRule;
 
 public class OldStoreCleanupSystemTest {
+	@Rule
+	public TransformerAwareRule transformerAwareRule = new TransformerAwareRule();
 
 	@Test
 	public void testOldStoreCleanup() {

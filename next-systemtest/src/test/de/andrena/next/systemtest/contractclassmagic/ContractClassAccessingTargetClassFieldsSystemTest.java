@@ -2,12 +2,16 @@ package de.andrena.next.systemtest.contractclassmagic;
 
 import static de.andrena.next.Condition.post;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.next.Contract;
 import de.andrena.next.Target;
+import de.andrena.next.systemtest.TransformerAwareRule;
 
 public class ContractClassAccessingTargetClassFieldsSystemTest {
+	@Rule
+	public TransformerAwareRule transformerAwareRule = new TransformerAwareRule();
 
 	// TODO
 	@Test

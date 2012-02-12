@@ -1,10 +1,14 @@
 package de.andrena.next.systemtest.pure;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.next.Contract;
+import de.andrena.next.systemtest.TransformerAwareRule;
 
 public class StaticContractMethodCallingUnpureMethodSystemTest {
+	@Rule
+	public TransformerAwareRule transformerAwareRule = new TransformerAwareRule();
 
 	@Test
 	public void test() {

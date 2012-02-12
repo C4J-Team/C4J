@@ -7,13 +7,17 @@ import static org.junit.Assert.assertNull;
 
 import java.lang.ref.WeakReference;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.next.Contract;
 import de.andrena.next.Target;
 import de.andrena.next.systemtest.TestUtil;
+import de.andrena.next.systemtest.TransformerAwareRule;
 
 public class ContractCacheCleanupSystemTest {
+	@Rule
+	public TransformerAwareRule transformerAwareRule = new TransformerAwareRule();
 
 	@Test
 	public void testContractCacheCleanup() throws Exception {

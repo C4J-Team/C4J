@@ -5,14 +5,18 @@ import static de.andrena.next.Condition.pre;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.next.Contract;
 import de.andrena.next.Target;
+import de.andrena.next.systemtest.TransformerAwareRule;
 
 public class PerformanceSystemTest {
-	private static TargetClass target;
+	@Rule
+	public TransformerAwareRule transformerAwareRule = new TransformerAwareRule();
 
+	private static TargetClass target;
 	private static final int NUM_CALLS = 100;
 
 	@BeforeClass

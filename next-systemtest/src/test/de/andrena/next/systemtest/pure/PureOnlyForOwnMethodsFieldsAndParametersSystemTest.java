@@ -1,11 +1,15 @@
 package de.andrena.next.systemtest.pure;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.next.Pure;
+import de.andrena.next.systemtest.TransformerAwareRule;
 
 public class PureOnlyForOwnMethodsFieldsAndParametersSystemTest {
+	@Rule
+	public TransformerAwareRule transformerAwareRule = new TransformerAwareRule();
 
 	private TargetClass target;
 
