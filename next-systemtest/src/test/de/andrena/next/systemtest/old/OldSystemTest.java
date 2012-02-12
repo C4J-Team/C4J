@@ -104,9 +104,7 @@ public class OldSystemTest {
 		public int method() {
 			if (post()) {
 				assert old(target.field) == 0;
-				Integer method = old(target.method());
-				System.out.println(method);
-				assert method == 0;
+				assert old(target.method()) == 0;
 			}
 			return 0;
 		}

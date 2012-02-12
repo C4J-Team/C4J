@@ -39,7 +39,6 @@ public class PurePassingParametersToUnpureMethodsSystemTest {
 	}
 
 	public static class TargetClass {
-		public Object[] stuff = new Object[] { "abc", "def" };
 		private Position position = new Position();
 		private static Position positionStatic = new Position();
 
