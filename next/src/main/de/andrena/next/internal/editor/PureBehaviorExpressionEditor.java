@@ -52,8 +52,8 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 		StandaloneExp checkUnpureAccessExp = new StaticCallExp(PureEvaluator.checkUnpureAccess,
 				NestedExp.CALLING_OBJECT).toStandalone();
 		StandaloneExp replacementExp = checkUnpureAccessExp.append(StandaloneExp.proceed);
-		logger.info("possible call to unpure method " + method.getLongName());
-		logger.info("puremagic.replacement-code: \n" + replacementExp.getCode());
+		logger.info("possible call to external unpure method " + method.getLongName());
+		logger.info("replacement-code: " + replacementExp.getCode());
 		replacementExp.replace(methodCall);
 	}
 

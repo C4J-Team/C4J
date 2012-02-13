@@ -256,4 +256,9 @@ public class Evaluator {
 		}
 		return (T) primitiveReturnValues.get(contractReturnType.get());
 	}
+
+	public static <T extends Throwable> T getException() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
