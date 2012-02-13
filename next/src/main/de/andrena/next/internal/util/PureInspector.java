@@ -23,11 +23,13 @@ import de.andrena.next.internal.compiler.NestedExp;
 import de.andrena.next.internal.compiler.StandaloneExp;
 import de.andrena.next.internal.compiler.StaticCallExp;
 import de.andrena.next.internal.editor.PureBehaviorExpressionEditor;
+import de.andrena.next.internal.editor.UnpureBehaviorExpressionEditor;
 import de.andrena.next.internal.evaluator.PureEvaluator;
 
 public class PureInspector {
 	private Logger logger = Logger.getLogger(getClass());
 	private RootTransformer rootTransformer;
+	private UnpureBehaviorExpressionEditor unpureBehaviorExpressionEditor = new UnpureBehaviorExpressionEditor();
 
 	public PureInspector(RootTransformer rootTransformer) {
 		this.rootTransformer = rootTransformer;
@@ -105,10 +107,11 @@ public class PureInspector {
 	}
 
 	public void checkUnpureAccess(CtBehavior affectedBehavior) throws CannotCompileException {
-		if (Modifier.isStatic(affectedBehavior.getModifiers())) {
+		if (!rootTransformer.getConfigurationManager().isWithinRootPackages(affectedBehavior.getDeclaringClass())) {
 			return;
 		}
-		if (!rootTransformer.getConfigurationManager().isWithinRootPackages(affectedBehavior.getDeclaringClass())) {
+		affectedBehavior.instrument(unpureBehaviorExpressionEditor);
+		if (Modifier.isStatic(affectedBehavior.getModifiers())) {
 			return;
 		}
 		StandaloneExp checkUnpureAccessExp = new StaticCallExp(PureEvaluator.checkUnpureAccess, NestedExp.THIS)

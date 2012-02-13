@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import de.andrena.next.AllowPureAccess;
 import de.andrena.next.Contract;
 import de.andrena.next.systemtest.TransformerAwareRule;
 
@@ -14,6 +15,7 @@ public class ConstructorInInnerClassesSystemTest {
 	@Rule
 	public TransformerAwareRule transformerAware = new TransformerAwareRule();
 
+	@AllowPureAccess
 	private static int expectedNumCalls;
 
 	@Before

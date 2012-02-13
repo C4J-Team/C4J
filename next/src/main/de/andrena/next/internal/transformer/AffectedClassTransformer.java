@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import de.andrena.next.internal.RootTransformer;
 import de.andrena.next.internal.Transformed;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
+import de.andrena.next.internal.util.HelperFactory;
 import de.andrena.next.internal.util.ListOrderedSet;
 
 public class AffectedClassTransformer extends AbstractAffectedClassTransformer {
@@ -27,6 +28,6 @@ public class AffectedClassTransformer extends AbstractAffectedClassTransformer {
 		for (AbstractAffectedClassTransformer transformer : transformers) {
 			transformer.transform(involvedClasses, contracts, affectedClass);
 		}
-		addClassAnnotation(affectedClass, Transformed.class);
+		HelperFactory.getTransformationHelper().addClassAnnotation(affectedClass, Transformed.class);
 	}
 }

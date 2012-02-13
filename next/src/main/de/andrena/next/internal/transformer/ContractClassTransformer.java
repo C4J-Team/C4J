@@ -4,6 +4,7 @@ import javassist.CtClass;
 import de.andrena.next.internal.RootTransformer;
 import de.andrena.next.internal.Transformed;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
+import de.andrena.next.internal.util.HelperFactory;
 
 public class ContractClassTransformer extends AbstractContractClassTransformer {
 
@@ -21,7 +22,7 @@ public class ContractClassTransformer extends AbstractContractClassTransformer {
 		for (AbstractContractClassTransformer transformer : transformers) {
 			transformer.transform(contractInfo, contractClass);
 		}
-		addClassAnnotation(contractClass, Transformed.class);
+		HelperFactory.getTransformationHelper().addClassAnnotation(contractClass, Transformed.class);
 	}
 
 	protected AbstractContractClassTransformer[] getTransformers() {

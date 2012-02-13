@@ -15,7 +15,7 @@ public class PureInConstructorSystemTest {
 		new DummyClass().pureMethodCallingPureConstructor();
 	}
 
-	@Test
+	@Test(expected = AssertionError.class)
 	public void testCallingUnpureConstructor() {
 		new DummyClass().pureMethodCallingUnpureConstructor();
 	}

@@ -9,6 +9,12 @@ import javassist.CtClass;
 import javassist.CtMethod;
 
 public class ReflectionHelper {
+	/**
+	 * Instantiated by ReflectionHelper.
+	 */
+	ReflectionHelper() {
+	}
+
 	public List<CtMethod> getDeclaredModifiableMethods(CtClass clazz) {
 		CtMethod[] declaredMethods = clazz.getDeclaredMethods();
 		List<CtMethod> declaredModifiableMethods = new ArrayList<CtMethod>(declaredMethods.length);
@@ -29,6 +35,28 @@ public class ReflectionHelper {
 			}
 		}
 		return declaredModifiableMethods;
+	}
+
+	public List<CtBehavior> getDeclaredModifiableBehaviors(CtClass clazz) {
+		CtBehavior[] declaredBehaviors = clazz.getDeclaredBehaviors();
+		List<CtBehavior> declaredModifiableBehaviors = new ArrayList<CtBehavior>(declaredBehaviors.length);
+		for (CtBehavior behavior : declaredBehaviors) {
+			if (isModifiable(behavior)) {
+				declaredModifiableBehaviors.add(behavior);
+			}
+		}
+		return declaredModifiableBehaviors;
+	}
+
+	public List<CtBehavior> getDeclaredModifiableDynamicBehaviors(CtClass clazz) {
+		CtBehavior[] declaredBehaviors = clazz.getDeclaredBehaviors();
+		List<CtBehavior> declaredModifiableBehaviors = new ArrayList<CtBehavior>(declaredBehaviors.length);
+		for (CtBehavior behavior : declaredBehaviors) {
+			if (isModifiable(behavior) && isDynamic(behavior)) {
+				declaredModifiableBehaviors.add(behavior);
+			}
+		}
+		return declaredModifiableBehaviors;
 	}
 
 	public boolean isModifiable(CtBehavior behavior) {

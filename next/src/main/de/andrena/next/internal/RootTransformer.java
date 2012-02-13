@@ -21,6 +21,7 @@ import de.andrena.next.internal.transformer.TransformationException;
 import de.andrena.next.internal.util.BackdoorAnnotationLoader;
 import de.andrena.next.internal.util.ContractRegistry;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
+import de.andrena.next.internal.util.HelperFactory;
 import de.andrena.next.internal.util.InvolvedTypeInspector;
 import de.andrena.next.internal.util.ListOrderedSet;
 
@@ -53,6 +54,7 @@ public class RootTransformer implements ClassFileTransformer {
 	}
 
 	public RootTransformer(String agentArgs, Instrumentation inst) throws Exception {
+		HelperFactory.init(pool);
 		loadConfiguration(agentArgs, inst);
 	}
 
