@@ -1,6 +1,5 @@
 package de.andrena.next.acceptancetest.point;
 
-import de.andrena.next.AllowPureAccess;
 import de.andrena.next.Contract;
 
 @Contract(PointContract.class)
@@ -8,15 +7,10 @@ public class Point implements PointSpec {
 
 	private int x;
 	private int y;
-	private int hashCode;
-	@AllowPureAccess
-	private boolean hashCodeSet;
 
 	public Point(int x, int y) {
 		this.x = x;
 		this.y = y;
-		this.hashCodeSet = false;
-		hashCode = hashCode();
 	}
 
 	@Override
@@ -57,11 +51,8 @@ public class Point implements PointSpec {
 
 	@Override
 	public int hashCode() {
-		int result = hashCode;
-		if (!hashCodeSet) {
-			result = 41 * (41 + getX()) + getY();
-			hashCodeSet = true;
-		}
+		int result = 0;
+		result = 41 * (41 + getX()) + getY();
 		return result;
 	}
 

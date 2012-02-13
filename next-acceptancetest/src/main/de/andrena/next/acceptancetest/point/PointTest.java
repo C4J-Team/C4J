@@ -20,7 +20,7 @@ public class PointTest {
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
-	
+
 	private Point classUnderTest;
 
 	@Before
@@ -125,16 +125,6 @@ public class PointTest {
 		Point x = classUnderTest;
 		Point y = new Point(x.getX(), x.getY());
 		assertTrue(x.equals(y));
-	}
-
-	@Test
-	public void hashCodeTestRight() {
-		// Test post-condition for "is immutable"
-		// assert returnValue == hashCode : "is immutable";
-		int hashCode = classUnderTest.hashCode();
-		classUnderTest.setX(5);
-		classUnderTest.setY(6);
-		assertEquals(hashCode, classUnderTest.hashCode());
 	}
 
 	@Test

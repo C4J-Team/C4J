@@ -11,7 +11,6 @@ public class ObjectSpecContract implements ObjectSpec {
 	private ObjectSpec target;
 
 	private Object z;
-	private Integer firstHashCode;
 
 	@Override
 	public boolean equals(Object obj) {
@@ -43,18 +42,6 @@ public class ObjectSpecContract implements ObjectSpec {
 			}
 		}
 
-		return ignored();
-	}
-
-	@Override
-	public int hashCode() {
-		if (post()) {
-			int result = result(Integer.class);
-			if (firstHashCode == null) {
-				firstHashCode = result;
-			}
-			assert result == firstHashCode.intValue() : "is immutable";
-		}
 		return ignored();
 	}
 
