@@ -149,4 +149,12 @@ public class ColoredPointTest {
 		assertNotNull(classUnderTest.toString());
 	}
 
+	@Test
+	public void testEqualsAfterFirstHashCode() {
+		ColoredPoint point1 = new ColoredPoint(3, 4, Color.BLUE);
+		ColoredPoint point2 = new ColoredPoint(4, 4, Color.BLUE);
+		point2.setX(3);
+		assertTrue(point1.equals(point2));
+	}
+
 }

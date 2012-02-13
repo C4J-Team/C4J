@@ -50,7 +50,6 @@ public class PointPF3Test {
 	@Test
 	public void testEquals_PointShouldBeFoundInHashSet() {
 		thrown.expect(AssertionError.class);
-		thrown.expectMessage("is immutable");
 		p1.setX(2);
 		p1.setY(3);
 		assertTrue(hashSet.contains(p1));

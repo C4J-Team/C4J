@@ -134,4 +134,12 @@ public class PointTest {
 		assertNotNull(classUnderTest.toString());
 	}
 
+	@Test
+	public void testEqualsAfterFirstHashCode() {
+		Point point1 = new Point(3, 4);
+		Point point2 = new Point(4, 4);
+		point2.setX(3);
+		assertTrue(point1.equals(point2));
+	}
+
 }
