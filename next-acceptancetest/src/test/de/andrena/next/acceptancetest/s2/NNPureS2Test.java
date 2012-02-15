@@ -1,6 +1,7 @@
 package de.andrena.next.acceptancetest.s2;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -9,6 +10,7 @@ import org.junit.rules.ExpectedException;
 
 import de.andrena.next.Pure;
 import de.andrena.next.acceptancetest.floatingwindow.Vector;
+import de.andrena.next.acceptancetest.point.Color;
 import de.andrena.next.systemtest.TransformerAwareRule;
 
 public class NNPureS2Test {
@@ -20,30 +22,109 @@ public class NNPureS2Test {
 	public ExpectedException thrown = ExpectedException.none();
 	
 	@Test
-	public void throwAssertionErrorByIncorrectUseOfPure() {		
+	public void testIncorrectPureUsage_IllegalMethodAccessOnBoxedField() {		
 		thrown.expect(AssertionError.class);
 		thrown.expectMessage(JUnitMatchers.containsString("illegal method access on unpure method"));
 		
 		FloatingWindow window = new FloatingWindow(new Vector(0, 0));
-		window.move(new Vector(5,10));
-		
-		//assert that the state of the window has changed
-		assertEquals(5, window.upperLeftCorner.getX());
-		assertEquals(10, window.upperLeftCorner.getY());
+		window.move(new Vector(5, 10));
+	}
+	
+	@Test
+	public void testIncorrectPureUsage_IllegalFieldWriteAccess() {
+		thrown.expect(AssertionError.class);
+		thrown.expectMessage(JUnitMatchers.containsString("illegal field write access on field"));
+
+		FloatingWindow window = new FloatingWindow(new Vector(0, 0));
+		window.setStyleColor(Color.GREEN);
+	}
+	
+	@Test
+	public void testCorrectPureUsage_ChangesOnLocalVariablesAllowed() {
+		FloatingWindow window = new FloatingWindow(new Vector(1, 3));
+		assertEquals("UpperLeftCorner: 1, 3\nColor: INDIGO", window.toString());
+	}
+	
+	@Test
+	public void testCorrectPureUsage_ReferenceCopySetToNullDoesNotChangeObject() {
+		FloatingWindow window = new FloatingWindow(new Vector(1, 3));
+		window.destroyUpperLeftCorner();
+		assertNotNull(window.upperLeftCorner);
+	}
+	
+	@Test
+	public void testIncorrectPureUsage_FieldModifiedInPureMethodOfAnotherType() {
+		thrown.expect(AssertionError.class);
+		thrown.expectMessage(JUnitMatchers.containsString("illegal method access"));
+		FloatingWindow window = new FloatingWindow(new Vector(1, 3));
+		window.resetUpperLeftCorner();
+	}
+	
+	@Test
+	public void testIncorrectPureUsage_IllegalFieldModification() {
+		thrown.expect(AssertionError.class);
+		thrown.expectMessage(JUnitMatchers.containsString("illegal field write access"));
+		FloatingWindow window = new FloatingWindow(new Vector(1, 3));
+		window.reallyDestroyUpperLeftCorner();
 	}
 	
 	private class FloatingWindow {
 		public Vector upperLeftCorner;
+		public WindowStyle style;
+		private VectorDestroyer destroyer;
 		
 		public FloatingWindow(Vector upperLeftCorner) {
 			this.upperLeftCorner = upperLeftCorner;
+			style = new WindowStyle();
+			destroyer = new VectorDestroyer();
 		}
 		
-		//Incorrect use of pure
-		@Pure
+		@Pure //method does nothing
+		public void destroyUpperLeftCorner() {
+			destroyer.destroyVector(upperLeftCorner);
+		}
+		
+		@Pure //method does nothing
+		public void reallyDestroyUpperLeftCorner() {
+			upperLeftCorner = null;
+		}
+		
+		@Pure //Incorrect use of pure
+		public void resetUpperLeftCorner() {
+			destroyer.resetVector(upperLeftCorner);
+		}
+		
+		@Pure //Incorrect use of pure
 		public void move(Vector vector) {
 			VectorBox upperLeftCornerBoxed = new VectorBox(upperLeftCorner);
 			upperLeftCornerBoxed.add(vector);
+		}
+		
+		@Pure //Incorrect use of pure
+		public void setStyleColor(Color color) {
+			style.color = color;
+		}
+		
+		@Pure
+		@Override
+		public String toString() {
+			StringBuffer buffer = new StringBuffer();
+			buffer.append("UpperLeftCorner: " + upperLeftCorner.getX() + ", " + upperLeftCorner.getY() + "\n");
+			buffer.append("Color: " + style.color);
+			return buffer.toString();
+		}
+	}
+	
+	private class VectorDestroyer {
+		@Pure
+		public void destroyVector(Vector vector) {
+			vector = null;
+		}
+		
+		@Pure
+		public void resetVector(Vector vector) {
+			vector.setX(0);
+			vector.setY(0);
 		}
 	}
 	
@@ -57,6 +138,10 @@ public class NNPureS2Test {
 		public void add(Vector vectorToAdd) {
 			vector.add(vectorToAdd);
 		}
+	}
+	
+	private class WindowStyle {
+		public Color color = Color.INDIGO;
 	}
 	
 }
