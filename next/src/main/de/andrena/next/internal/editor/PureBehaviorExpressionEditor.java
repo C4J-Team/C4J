@@ -87,7 +87,7 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 		if (field.hasAnnotation(AllowPureAccess.class)) {
 			return;
 		}
-		String errorMsg = "illegal field write access on field " + field.getName() + " in pure method "
+		String errorMsg = "illegal write access on field " + field.getName() + " in pure method "
 				+ affectedBehavior.getLongName() + " on line " + fieldAccess.getLineNumber();
 		pureError(errorMsg);
 	}
@@ -133,7 +133,7 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 			return;
 		}
 		if (Modifier.isStatic(method.getModifiers())) {
-			String errorMsg = "illegal method access on static method " + method.getLongName() + " in pure method "
+			String errorMsg = "illegal access on static method " + method.getLongName() + " in pure method "
 					+ affectedBehavior.getLongName() + " on line " + methodCall.getLineNumber();
 			pureError(errorMsg);
 			return;
