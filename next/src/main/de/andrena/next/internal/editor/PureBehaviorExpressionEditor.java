@@ -49,8 +49,8 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 
 	private void replaceWithPureCheck(MethodCall methodCall) throws NotFoundException, CannotCompileException {
 		CtMethod method = methodCall.getMethod();
-		StandaloneExp checkUnpureAccessExp = new StaticCallExp(PureEvaluator.checkUnpureAccess,
-				NestedExp.CALLING_OBJECT).toStandalone();
+		StandaloneExp checkUnpureAccessExp = new StaticCallExp(PureEvaluator.checkExternalAccess,
+				NestedExp.CALLING_OBJECT, new ValueExp(method.getLongName())).toStandalone();
 		StandaloneExp replacementExp = checkUnpureAccessExp.append(StandaloneExp.proceed);
 		logger.info("possible call to external unpure method " + method.getLongName());
 		logger.info("replacement-code: " + replacementExp.getCode());

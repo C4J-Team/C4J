@@ -29,6 +29,7 @@ public class Evaluator {
 	public static final StaticCall afterContract = new StaticCall(Evaluator.class, "afterContract");
 	public static final StaticCall afterContractMethod = new StaticCall(Evaluator.class, "afterContractMethod");
 	public static final StaticCall getContractFromCache = new StaticCall(Evaluator.class, "getContractFromCache");
+	public static final StaticCall setException = new StaticCall(Evaluator.class, "setException");
 
 	private static final Logger logger = Logger.getLogger(Evaluator.class);
 
@@ -60,6 +61,7 @@ public class Evaluator {
 	}
 
 	final static ThreadLocal<Object> returnValue = new ThreadLocal<Object>();
+	private final static ThreadLocal<Throwable> exceptionValue = new ThreadLocal<Throwable>();
 	final static ThreadLocal<Object> currentTarget = new ThreadLocal<Object>();
 	final static ThreadLocal<Class<?>> contractReturnType = new ThreadLocal<Class<?>>();
 
@@ -231,6 +233,7 @@ public class Evaluator {
 	public static void afterContractMethod(Class<?> contractClass) {
 		logger.info("afterContractMethod");
 		returnValue.set(null);
+		exceptionValue.set(null);
 		oldStore.get()
 				.get(new Pair<Integer, Class<?>>(Integer.valueOf(new Exception().getStackTrace().length), contractClass))
 				.clear();
@@ -257,8 +260,12 @@ public class Evaluator {
 		return (T) primitiveReturnValues.get(contractReturnType.get());
 	}
 
+	public static void setException(Throwable t) {
+		exceptionValue.set(t);
+	}
+
+	@SuppressWarnings("unchecked")
 	public static <T extends Throwable> T getException() {
-		// TODO Auto-generated method stub
-		return null;
+		return (T) exceptionValue.get();
 	}
 }

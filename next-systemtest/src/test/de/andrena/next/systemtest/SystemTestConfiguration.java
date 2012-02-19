@@ -9,6 +9,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.external.ExternalClass;
+
 import de.andrena.next.Configuration;
 import de.andrena.next.DefaultConfiguration;
 import de.andrena.next.systemtest.config.DefaultPreConditionTrueConfiguration;
@@ -42,6 +44,7 @@ public class SystemTestConfiguration extends DefaultConfiguration {
 		pureWhitelist.add(Class.class.getMethod("getName"));
 		pureWhitelist.add(Collection.class.getMethod("size"));
 		pureWhitelist.add(Collection.class.getMethod("isEmpty"));
+		pureWhitelist.add(ExternalClass.class.getMethod("unpureMethodWhitelistedInConfig"));
 		pureWhitelist.add(Integer.class.getMethod("intValue"));
 		pureWhitelist.add(Integer.class.getMethod("valueOf", int.class));
 		pureWhitelist.add(List.class.getMethod("get", int.class));

@@ -75,16 +75,14 @@ public class OldStoreCleanupSystemTest {
 				assert false;
 			}
 			if (post()) {
-				int oldValue = old(target.value);
-				assert target.value == (oldValue + incrementor);
+				assert target.value == old(target.value).intValue() + incrementor;
 			}
 		}
 
 		@Override
 		public void methodFailingSelf(int incrementor) {
 			if (post()) {
-				int oldValue = old(target.value);
-				assert target.value == (oldValue + incrementor);
+				assert target.value == old(target.value);
 			}
 		}
 	}

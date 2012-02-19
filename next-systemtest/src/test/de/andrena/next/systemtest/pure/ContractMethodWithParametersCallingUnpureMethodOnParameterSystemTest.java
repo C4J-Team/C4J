@@ -14,21 +14,26 @@ public class ContractMethodWithParametersCallingUnpureMethodOnParameterSystemTes
 
 	@Test(expected = AssertionError.class)
 	public void test() {
-		new TargetClass().method(new StringBuilder());
+		new TargetClass().method(new OtherClass());
 	}
 
 	@Contract(ContractClass.class)
 	public static class TargetClass {
-		public void method(StringBuilder builder) {
+		public void method(OtherClass other) {
 		}
 	}
 
 	public static class ContractClass extends TargetClass {
 		@Override
-		public void method(StringBuilder builder) {
+		public void method(OtherClass other) {
 			if (pre()) {
-				builder.append("appendedString");
+				other.unpureMethod();
 			}
+		}
+	}
+
+	public static class OtherClass {
+		public void unpureMethod() {
 		}
 	}
 }
