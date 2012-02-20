@@ -1,5 +1,6 @@
 package de.andrena.next.systemtest.pure;
 
+import org.apache.log4j.Level;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -21,8 +22,8 @@ public class PureExternalWhitelistBlacklistSystemTest {
 
 	@Test
 	public void testPureExternalUndefinedThrowingWarning() {
-		transformerAware
-				.expectLogWarning("access on unpure method com.external.ExternalClass.unpureMethodUndefinedInConfig() "
+		transformerAware.expectGlobalLog(Level.WARN,
+				"access on unpure method com.external.ExternalClass.unpureMethodUndefinedInConfig() "
 						+ "outside the root-packages. add it to the white- or blacklist in the configuration.");
 		target.pureMethodCallingUndefinedExternal();
 	}

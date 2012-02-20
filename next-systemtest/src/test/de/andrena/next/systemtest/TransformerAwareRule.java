@@ -6,59 +6,78 @@ import java.util.Map;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
 import org.apache.log4j.spi.LoggingEvent;
-import org.junit.rules.Verifier;
+import org.junit.rules.TestRule;
+import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
 
 import de.andrena.next.internal.RootTransformer;
 import de.andrena.next.internal.transformer.TransformationException;
 
-public class TransformerAwareRule extends Verifier {
+public class TransformerAwareRule implements TestRule {
 	private String expectedLogMessage;
 	private Level expectedLogLevel;
 	private Level bannedLogLevel;
 	private String bannedLogMessage;
 	private Class<?> expectedException;
+	private Map<String, Level> usedLogMap;
 
-	private static Map<String, Level> logMap = new HashMap<String, Level>();
+	private static Map<String, Level> globalLogMap = new HashMap<String, Level>();
+	private static Map<String, Level> localLogMap = new HashMap<String, Level>();
 
-	public void expectLogWarning(String message) {
-		expectLog(Level.WARN, message);
-	}
-
-	public void expectLog(Level level, String message) {
+	public void expectGlobalLog(Level level, String message) {
+		usedLogMap = globalLogMap;
 		expectedLogLevel = level;
 		expectedLogMessage = message;
 	}
 
-	public void banLogWarning(String message) {
-		banLog(Level.WARN, message);
+	public void banGlobalLog(Level level, String message) {
+		usedLogMap = globalLogMap;
+		bannedLogLevel = level;
+		bannedLogMessage = message;
 	}
 
-	public void banLog(Level level, String message) {
+	public void expectLocalLog(Level level, String message) {
+		usedLogMap = localLogMap;
+		expectedLogLevel = level;
+		expectedLogMessage = message;
+	}
+
+	public void banLocalLog(Level level, String message) {
+		usedLogMap = localLogMap;
 		bannedLogLevel = level;
 		bannedLogMessage = message;
 	}
 
 	public void expectTransformationException(String message) {
-		expectLog(Level.ERROR, message);
+		expectGlobalLog(Level.ERROR, message);
 		expectedException = TransformationException.class;
 	}
 
 	@Override
-	protected void verify() throws Throwable {
-		try {
-			verifyException();
-			verifyLog();
-		} finally {
-			expectedException = null;
-			expectedLogLevel = null;
-			expectedLogMessage = null;
-			bannedLogLevel = null;
-			bannedLogMessage = null;
-			RootTransformer.resetLastException();
-		}
+	public Statement apply(final Statement base, final Description description) {
+		return new Statement() {
+			@Override
+			public void evaluate() throws Throwable {
+				localLogMap.clear();
+				usedLogMap = null;
+				expectedException = null;
+				expectedLogLevel = null;
+				expectedLogMessage = null;
+				bannedLogLevel = null;
+				bannedLogMessage = null;
+				RootTransformer.resetLastException();
+				base.evaluate();
+				verify();
+			}
+		};
 	}
 
-	private void verifyLog() throws Exception {
+	protected void verify() throws Throwable {
+		verifyException();
+		verifyLog(usedLogMap);
+	}
+
+	private void verifyLog(Map<String, Level> logMap) throws Exception {
 		if (expectedLogMessage != null
 				&& (!logMap.containsKey(expectedLogMessage) || !logMap.get(expectedLogMessage).equals(expectedLogLevel))) {
 			throw new Exception("expected " + expectedLogLevel + " with message '" + expectedLogMessage + "'");
@@ -92,7 +111,8 @@ public class TransformerAwareRule extends Verifier {
 
 		@Override
 		protected void append(LoggingEvent event) {
-			logMap.put(event.getMessage().toString(), event.getLevel());
+			globalLogMap.put(event.getMessage().toString(), event.getLevel());
+			localLogMap.put(event.getMessage().toString(), event.getLevel());
 		}
 	}
 }

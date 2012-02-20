@@ -7,6 +7,7 @@ import javassist.ClassPool;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 import de.andrena.next.Configuration;
+import de.andrena.next.Configuration.ContractViolationAction;
 import de.andrena.next.Configuration.DefaultPreCondition;
 import de.andrena.next.Configuration.InvalidPreConditionBehavior;
 import de.andrena.next.internal.util.WhitelistConverter;
@@ -65,5 +66,9 @@ public class RuntimeConfiguration {
 
 	public InvalidPreConditionBehavior getInvalidPreConditionBehavior() {
 		return configuration.getInvalidPreConditionBehavior();
+	}
+
+	public Set<ContractViolationAction> getContractViolationActions() {
+		return configuration.getContractViolationActions();
 	}
 }

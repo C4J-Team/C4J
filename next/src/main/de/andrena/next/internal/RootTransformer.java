@@ -26,6 +26,7 @@ import de.andrena.next.internal.util.InvolvedTypeInspector;
 import de.andrena.next.internal.util.ListOrderedSet;
 
 public class RootTransformer implements ClassFileTransformer {
+	public static final RootTransformer INSTANCE = new RootTransformer();
 
 	private Logger logger = Logger.getLogger(getClass());
 	ClassPool pool = ClassPool.getDefault();
@@ -53,7 +54,10 @@ public class RootTransformer implements ClassFileTransformer {
 		return involvedTypeInspector;
 	}
 
-	public RootTransformer(String agentArgs, Instrumentation inst) throws Exception {
+	private RootTransformer() {
+	}
+
+	public void init(String agentArgs, Instrumentation inst) throws Exception {
 		HelperFactory.init(pool);
 		loadConfiguration(agentArgs, inst);
 	}

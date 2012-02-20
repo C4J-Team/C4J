@@ -1,5 +1,6 @@
 package de.andrena.next.acceptancetest.s7a;
 
+import org.apache.log4j.Level;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -35,8 +36,10 @@ public class NNPreS7aTest {
 	@Test
 	public void testWarningMessageByStrengtheningOfPrecondition() {
 		transformerAware
-				.expectLogWarning("found strengthening pre-condition in de.andrena.next.acceptancetest.workingstudent.YoungWorkingStudentContract.setAge(int)"
-						+ " which is already defined from de.andrena.next.acceptancetest.workingstudent.StudentSpecContract - ignoring the pre-condition");
+				.expectGlobalLog(
+						Level.WARN,
+						"found strengthening pre-condition in de.andrena.next.acceptancetest.workingstudent.YoungWorkingStudentContract.setAge(int)"
+								+ " which is already defined from de.andrena.next.acceptancetest.workingstudent.StudentSpecContract - ignoring the pre-condition");
 
 		youngWorkingStudent = new YoungWorkingStudent();
 		youngWorkingStudent.setAge(60);

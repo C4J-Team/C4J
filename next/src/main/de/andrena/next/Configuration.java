@@ -43,11 +43,17 @@ public interface Configuration {
 	 */
 	InvalidPreConditionBehavior getInvalidPreConditionBehavior();
 
+	Set<ContractViolationAction> getContractViolationActions();
+
 	public enum DefaultPreCondition {
 		TRUE, UNDEFINED;
 	}
 
 	public enum InvalidPreConditionBehavior {
 		IGNORE_AND_WARN, ABORT_AND_ERROR;
+	}
+
+	public enum ContractViolationAction {
+		LOG, ASSERTION_ERROR;
 	}
 }

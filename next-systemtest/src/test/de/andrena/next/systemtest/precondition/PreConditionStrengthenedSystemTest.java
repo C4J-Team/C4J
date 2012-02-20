@@ -2,6 +2,7 @@ package de.andrena.next.systemtest.precondition;
 
 import static de.andrena.next.Condition.pre;
 
+import org.apache.log4j.Level;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -15,10 +16,12 @@ public class PreConditionStrengthenedSystemTest {
 	@Test
 	public void testPreConditionUndefined() {
 		transformerAwareRule
-				.expectLogWarning("found strengthening pre-condition in"
-						+ " de.andrena.next.systemtest.precondition.PreConditionStrengthenedSystemTest$ContractClass.method(int)"
-						+ " which is already defined from de.andrena.next.systemtest.precondition.PreConditionStrengthenedSystemTest$SuperClassContract"
-						+ " - ignoring the pre-condition");
+				.expectGlobalLog(
+						Level.WARN,
+						"found strengthening pre-condition in"
+								+ " de.andrena.next.systemtest.precondition.PreConditionStrengthenedSystemTest$ContractClass.method(int)"
+								+ " which is already defined from de.andrena.next.systemtest.precondition.PreConditionStrengthenedSystemTest$SuperClassContract"
+								+ " - ignoring the pre-condition");
 		new TargetClass().method(1);
 	}
 

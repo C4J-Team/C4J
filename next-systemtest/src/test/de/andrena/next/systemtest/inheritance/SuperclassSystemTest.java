@@ -2,6 +2,7 @@ package de.andrena.next.systemtest.inheritance;
 
 import static de.andrena.next.Condition.post;
 
+import org.apache.log4j.Level;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,16 +34,20 @@ public class SuperclassSystemTest {
 	@Test(expected = AssertionError.class)
 	public void testPostConditionFailsInDummyClass() {
 		transformerAware
-				.expectLogWarning("could not find method method in affected class de.andrena.next.systemtest.inheritance.SuperclassSystemTest$DummyClass"
-						+ " for contract class de.andrena.next.systemtest.inheritance.SuperclassSystemTest$DummyContract - inserting an empty method");
+				.expectGlobalLog(
+						Level.WARN,
+						"could not find method method in affected class de.andrena.next.systemtest.inheritance.SuperclassSystemTest$DummyClass"
+								+ " for contract class de.andrena.next.systemtest.inheritance.SuperclassSystemTest$DummyContract - inserting an empty method");
 		dummy.method(5);
 	}
 
 	@Test
 	public void testNoWarningWhenContractMethodNotOverwritten() {
 		transformerAware
-				.banLogWarning("could not find method method in affected class de.andrena.next.systemtest.inheritance.SuperclassSystemTest$NoWarningClass"
-						+ " for contract class de.andrena.next.systemtest.inheritance.SuperclassSystemTest$SuperContract - inserting an empty method");
+				.banGlobalLog(
+						Level.WARN,
+						"could not find method method in affected class de.andrena.next.systemtest.inheritance.SuperclassSystemTest$NoWarningClass"
+								+ " for contract class de.andrena.next.systemtest.inheritance.SuperclassSystemTest$SuperContract - inserting an empty method");
 		new NoWarningClass().method(3);
 	}
 

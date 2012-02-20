@@ -75,7 +75,7 @@ public class BeforeAndAfterTriggerTransformer extends AffectedClassTransformerFo
 		TryExp callContractPost = new TryExp(getContractCallExp(contractInfo.getContractClass(), affectedClass,
 				contractBehavior));
 		callContractPost.addCatch(Throwable.class, new StaticCallExp(ContractViolationHandler.handleContractException,
-				callContractPost.getCatchClauseVar(1)).toStandalone());
+				callContractPost.getCatchClauseVar(1), new ValueExp(affectedClass)).toStandalone());
 		callContractPost.addFinally(getAfterContractCall());
 
 		IfExp callPostCondition = new IfExp(new StaticCallExp(Evaluator.beforePost, NestedExp.THIS, new ValueExp(
@@ -125,7 +125,7 @@ public class BeforeAndAfterTriggerTransformer extends AffectedClassTransformerFo
 		TryExp callContractPre = new TryExp(getContractCallExp(contractInfo.getContractClass(), affectedClass,
 				contractBehavior));
 		callContractPre.addCatch(Throwable.class, new StaticCallExp(ContractViolationHandler.handleContractException,
-				callContractPre.getCatchClauseVar(1)).toStandalone());
+				callContractPre.getCatchClauseVar(1), new ValueExp(affectedClass)).toStandalone());
 		callContractPre.addFinally(getAfterContractCall());
 		IfExp callPreCondition = new IfExp(new StaticCallExp(Evaluator.beforePre, NestedExp.THIS, new ValueExp(
 				contractInfo.getContractClass()), getReturnTypeExp(contractBehavior)));

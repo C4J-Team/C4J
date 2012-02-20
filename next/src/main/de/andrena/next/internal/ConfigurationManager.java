@@ -30,11 +30,19 @@ public class ConfigurationManager {
 	}
 
 	public RuntimeConfiguration getConfiguration(CtClass clazz) {
+		return getConfiguration(clazz.getName());
+	}
+
+	public RuntimeConfiguration getConfiguration(Class<?> clazz) {
+		return getConfiguration(clazz.getName());
+	}
+
+	public RuntimeConfiguration getConfiguration(String className) {
 		RuntimeConfiguration responsibleConfiguration = null;
 		String longestRootPackage = "";
 		for (RuntimeConfiguration configuration : configurations) {
 			for (String rootPackage : configuration.getRootPackages()) {
-				if (clazz.getName().startsWith(rootPackage) && rootPackage.length() > longestRootPackage.length()) {
+				if (className.startsWith(rootPackage) && rootPackage.length() > longestRootPackage.length()) {
 					responsibleConfiguration = configuration;
 					longestRootPackage = rootPackage;
 				}

@@ -2,6 +2,7 @@ package de.andrena.next;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 public class DefaultConfiguration implements Configuration {
@@ -33,5 +34,13 @@ public class DefaultConfiguration implements Configuration {
 	@Override
 	public InvalidPreConditionBehavior getInvalidPreConditionBehavior() {
 		return InvalidPreConditionBehavior.IGNORE_AND_WARN;
+	}
+
+	@Override
+	public Set<ContractViolationAction> getContractViolationActions() {
+		Set<ContractViolationAction> contractViolationActions = new HashSet<ContractViolationAction>();
+		contractViolationActions.add(ContractViolationAction.LOG);
+		contractViolationActions.add(ContractViolationAction.ASSERTION_ERROR);
+		return contractViolationActions;
 	}
 }

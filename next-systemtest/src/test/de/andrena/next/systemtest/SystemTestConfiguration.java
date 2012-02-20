@@ -13,8 +13,10 @@ import com.external.ExternalClass;
 
 import de.andrena.next.Configuration;
 import de.andrena.next.DefaultConfiguration;
+import de.andrena.next.systemtest.config.AssertionErrorOnlyConfiguration;
 import de.andrena.next.systemtest.config.DefaultPreConditionTrueConfiguration;
 import de.andrena.next.systemtest.config.InvalidPreConditionBehaviorErrorConfiguration;
+import de.andrena.next.systemtest.config.LogOnlyConfiguration;
 
 public class SystemTestConfiguration extends DefaultConfiguration {
 	@Override
@@ -22,6 +24,8 @@ public class SystemTestConfiguration extends DefaultConfiguration {
 		Set<Configuration> configurations = new HashSet<Configuration>();
 		configurations.add(new DefaultPreConditionTrueConfiguration());
 		configurations.add(new InvalidPreConditionBehaviorErrorConfiguration());
+		configurations.add(new LogOnlyConfiguration());
+		configurations.add(new AssertionErrorOnlyConfiguration());
 		return configurations;
 	}
 

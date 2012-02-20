@@ -4,6 +4,7 @@ import java.lang.instrument.Instrumentation;
 
 public class Agent {
 	public static void premain(String agentArgs, Instrumentation inst) throws Exception {
-		inst.addTransformer(new RootTransformer(agentArgs, inst));
+		RootTransformer.INSTANCE.init(agentArgs, inst);
+		inst.addTransformer(RootTransformer.INSTANCE);
 	}
 }
