@@ -4,6 +4,7 @@ import java.lang.reflect.Modifier;
 
 import javassist.CannotCompileException;
 import javassist.CtBehavior;
+import javassist.CtClass;
 import javassist.CtConstructor;
 import javassist.CtField;
 import javassist.CtMember;
@@ -27,7 +28,9 @@ import de.andrena.next.internal.compiler.StaticCallExp;
 import de.andrena.next.internal.compiler.ThrowExp;
 import de.andrena.next.internal.compiler.ValueExp;
 import de.andrena.next.internal.evaluator.PureEvaluator;
+import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 import de.andrena.next.internal.util.InvolvedTypeInspector;
+import de.andrena.next.internal.util.ListOrderedSet;
 import de.andrena.next.internal.util.PureInspector;
 
 public class PureBehaviorExpressionEditor extends ExprEditor {
@@ -140,12 +143,15 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 			pureError(errorMsg);
 			return;
 		}
-		if (pureInspector.inspect(involvedTypeInspector.inspect(method.getDeclaringClass()), method) != null) {
+		ListOrderedSet<CtClass> involvedTypes = involvedTypeInspector.inspect(method.getDeclaringClass());
+		ListOrderedSet<ContractInfo> contracts = RootTransformer.INSTANCE.getContractsForTypes(involvedTypes);
+		if (pureInspector.getPureOrigin(involvedTypes, contracts, method) != null) {
 			return;
 		}
-		if (!rootTransformer.getConfigurationManager().isWithinRootPackages(method.getDeclaringClass())) {
-			replaceWithPureCheck(methodCall);
+		if (rootTransformer.getConfigurationManager().isWithinRootPackages(method.getDeclaringClass())) {
+			return;
 		}
+		replaceWithPureCheck(methodCall);
 	}
 
 	private boolean constructorModifyingOwnClass(CtMember member) {

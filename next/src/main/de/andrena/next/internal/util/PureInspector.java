@@ -10,13 +10,14 @@ import java.util.Set;
 import javassist.CannotCompileException;
 import javassist.CtBehavior;
 import javassist.CtClass;
-import javassist.CtConstructor;
 import javassist.CtField;
+import javassist.CtMethod;
 import javassist.NotFoundException;
 
 import org.apache.log4j.Logger;
 
 import de.andrena.next.Pure;
+import de.andrena.next.PureTarget;
 import de.andrena.next.internal.RootTransformer;
 import de.andrena.next.internal.compiler.ArrayExp;
 import de.andrena.next.internal.compiler.NestedExp;
@@ -25,30 +26,32 @@ import de.andrena.next.internal.compiler.StaticCallExp;
 import de.andrena.next.internal.editor.PureBehaviorExpressionEditor;
 import de.andrena.next.internal.editor.UnpureBehaviorExpressionEditor;
 import de.andrena.next.internal.evaluator.PureEvaluator;
+import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 
 public class PureInspector {
 	private Logger logger = Logger.getLogger(getClass());
 	private RootTransformer rootTransformer = RootTransformer.INSTANCE;
 	private UnpureBehaviorExpressionEditor unpureBehaviorExpressionEditor = new UnpureBehaviorExpressionEditor();
+	private AffectedBehaviorLocator affectedBehaviorLocator = new AffectedBehaviorLocator();
 
-	public CtBehavior inspect(ListOrderedSet<CtClass> involvedClasses, CtBehavior behavior) {
+	public CtMethod getPureOrigin(ListOrderedSet<CtClass> involvedClasses, ListOrderedSet<ContractInfo> contracts,
+			CtMethod method) {
 		for (CtClass involvedClass : involvedClasses) {
-			CtBehavior involvedBehavior = getInvolvedBehavior(behavior, involvedClass);
-			if (involvedBehavior != null && involvedBehavior.hasAnnotation(Pure.class)) {
-				return involvedBehavior;
+			CtMethod involvedMethod = getInvolvedMethod(method, involvedClass);
+			if (involvedMethod != null && involvedMethod.hasAnnotation(Pure.class)) {
+				return involvedMethod;
+			}
+		}
+		for (ContractInfo contract : contracts) {
+			CtMethod contractMethod = affectedBehaviorLocator.getContractMethod(contract, method);
+			if (contractMethod != null && contractMethod.hasAnnotation(PureTarget.class)) {
+				return contractMethod;
 			}
 		}
 		return null;
 	}
 
-	private CtBehavior getInvolvedBehavior(CtBehavior affectedBehavior, CtClass involvedClass) {
-		if (affectedBehavior instanceof CtConstructor) {
-			try {
-				return involvedClass.getDeclaredConstructor(affectedBehavior.getParameterTypes());
-			} catch (NotFoundException e) {
-				return null;
-			}
-		}
+	private CtMethod getInvolvedMethod(CtMethod affectedBehavior, CtClass involvedClass) {
 		try {
 			return involvedClass.getDeclaredMethod(affectedBehavior.getName(), affectedBehavior.getParameterTypes());
 		} catch (NotFoundException e) {

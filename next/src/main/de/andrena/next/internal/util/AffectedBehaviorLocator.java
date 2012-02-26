@@ -22,6 +22,15 @@ public class AffectedBehaviorLocator {
 	private InvolvedTypeInspector involvedTypeInspector = new InvolvedTypeInspector();
 	private Logger logger = Logger.getLogger(getClass());
 
+	public CtMethod getContractMethod(ContractInfo contract, CtMethod affectedMethod) {
+		try {
+			return contract.getContractClass().getDeclaredMethod(affectedMethod.getName(),
+					affectedMethod.getParameterTypes());
+		} catch (NotFoundException e) {
+			return null;
+		}
+	}
+
 	public CtBehavior getAffectedBehavior(ContractInfo contractInfo, CtClass affectedClass, CtBehavior contractBehavior)
 			throws NotFoundException, CannotCompileException {
 		CtBehavior affectedBehavior = null;
