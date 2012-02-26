@@ -24,8 +24,8 @@ import de.andrena.next.internal.compiler.ValueExp;
 import de.andrena.next.internal.evaluator.Evaluator;
 import de.andrena.next.internal.util.AffectedBehaviorLocator;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
-import de.andrena.next.internal.util.HelperFactory;
 import de.andrena.next.internal.util.ObjectConverter;
+import de.andrena.next.internal.util.ReflectionHelper;
 
 /**
  * Transforming a method to look like the following block-comment:
@@ -66,7 +66,8 @@ try {
 */
 public class ConditionAndInvariantTransformer extends AffectedClassTransformerForSingleContract {
 	private RootTransformer rootTransformer = RootTransformer.INSTANCE;
-	private AffectedBehaviorLocator affectedBehaviorLocator = HelperFactory.getAffectedBehaviorLocator();
+	private AffectedBehaviorLocator affectedBehaviorLocator = new AffectedBehaviorLocator();
+	private ReflectionHelper reflectionHelper = new ReflectionHelper();
 
 	@Override
 	public void transform(ContractInfo contractInfo, CtClass affectedClass) throws Exception {
@@ -88,8 +89,7 @@ public class ConditionAndInvariantTransformer extends AffectedClassTransformerFo
 					contractBehavior);
 			contractMap.put(affectedBehavior, contractBehavior);
 		}
-		for (CtBehavior affectedBehavior : HelperFactory.getReflectionHelper().getDeclaredModifiableBehaviors(
-				affectedClass)) {
+		for (CtBehavior affectedBehavior : reflectionHelper.getDeclaredModifiableBehaviors(affectedClass)) {
 			transform(contractInfo, affectedClass, affectedBehavior, contractMap.get(affectedBehavior),
 					callInvariantExpression);
 		}

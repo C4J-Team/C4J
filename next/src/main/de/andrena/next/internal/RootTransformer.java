@@ -20,7 +20,6 @@ import de.andrena.next.internal.transformer.TransformationException;
 import de.andrena.next.internal.util.BackdoorAnnotationLoader;
 import de.andrena.next.internal.util.ContractRegistry;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
-import de.andrena.next.internal.util.HelperFactory;
 import de.andrena.next.internal.util.InvolvedTypeInspector;
 import de.andrena.next.internal.util.ListOrderedSet;
 
@@ -39,7 +38,7 @@ public class RootTransformer implements ClassFileTransformer {
 
 	private ConfigurationManager configuration;
 
-	private InvolvedTypeInspector involvedTypeInspector = HelperFactory.getInvolvedTypeInspector();
+	private InvolvedTypeInspector involvedTypeInspector = new InvolvedTypeInspector();
 
 	public ClassPool getPool() {
 		return pool;
@@ -53,9 +52,8 @@ public class RootTransformer implements ClassFileTransformer {
 	}
 
 	public void init(String agentArgs) throws Exception {
-		targetClassTransformer = new AffectedClassTransformer(this);
-		contractClassTransformer = new ContractClassTransformer(this);
-		HelperFactory.init(pool);
+		targetClassTransformer = new AffectedClassTransformer();
+		contractClassTransformer = new ContractClassTransformer();
 		loadConfiguration(agentArgs);
 	}
 

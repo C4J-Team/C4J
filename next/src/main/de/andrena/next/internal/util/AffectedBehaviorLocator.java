@@ -18,14 +18,9 @@ import de.andrena.next.internal.transformer.TransformationException;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 
 public class AffectedBehaviorLocator {
-	private ReflectionHelper reflectionHelper;
-	private InvolvedTypeInspector involvedTypeInspector;
+	private ReflectionHelper reflectionHelper = new ReflectionHelper();
+	private InvolvedTypeInspector involvedTypeInspector = new InvolvedTypeInspector();
 	private Logger logger = Logger.getLogger(getClass());
-
-	AffectedBehaviorLocator(ReflectionHelper reflectionHelper, InvolvedTypeInspector involvedTypeInspector) {
-		this.reflectionHelper = reflectionHelper;
-		this.involvedTypeInspector = involvedTypeInspector;
-	}
 
 	public CtBehavior getAffectedBehavior(ContractInfo contractInfo, CtClass affectedClass, CtBehavior contractBehavior)
 			throws NotFoundException, CannotCompileException {

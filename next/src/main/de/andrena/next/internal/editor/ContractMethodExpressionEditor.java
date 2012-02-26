@@ -34,7 +34,6 @@ import de.andrena.next.internal.compiler.ValueExp;
 import de.andrena.next.internal.evaluator.Evaluator;
 import de.andrena.next.internal.transformer.TransformationException;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
-import de.andrena.next.internal.util.HelperFactory;
 import de.andrena.next.internal.util.InvolvedTypeInspector;
 import de.andrena.next.internal.util.ListOrderedSet;
 
@@ -47,7 +46,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 	private List<StaticCallExp> storeExpressions = new ArrayList<StaticCallExp>();
 	private ContractInfo contract;
 	private RootTransformer rootTransformer;
-	private InvolvedTypeInspector involvedTypeInspector = HelperFactory.getInvolvedTypeInspector();
+	private InvolvedTypeInspector involvedTypeInspector = new InvolvedTypeInspector();
 
 	public List<StaticCallExp> getStoreExpressions() {
 		return storeExpressions;

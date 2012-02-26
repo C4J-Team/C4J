@@ -11,11 +11,7 @@ import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 
 public class ContractExpressionTransformer extends ContractDeclaredBehaviorTransformer {
 
-	private RootTransformer rootTransformer;
-
-	public ContractExpressionTransformer(RootTransformer rootTransformer) {
-		this.rootTransformer = rootTransformer;
-	}
+	private RootTransformer rootTransformer = RootTransformer.INSTANCE;
 
 	@Override
 	public void transform(ContractInfo contractInfo, CtBehavior contractBehavior) throws Exception {

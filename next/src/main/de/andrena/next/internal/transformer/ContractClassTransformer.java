@@ -4,25 +4,22 @@ import javassist.CtClass;
 import de.andrena.next.internal.RootTransformer;
 import de.andrena.next.internal.Transformed;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
-import de.andrena.next.internal.util.HelperFactory;
+import de.andrena.next.internal.util.TransformationHelper;
 
 public class ContractClassTransformer extends AbstractContractClassTransformer {
-
-	private AbstractContractClassTransformer[] transformers;
-
-	public ContractClassTransformer(RootTransformer rootTransformer) {
-		this.transformers = new AbstractContractClassTransformer[] {
-				// BEWARE: has to run in this exact order
-				new ContractBehaviorTransformer(), new PureContractTransformer(),
-				new TargetTransformer(rootTransformer), new ContractExpressionTransformer(rootTransformer) };
-	}
+	private AbstractContractClassTransformer[] transformers = new AbstractContractClassTransformer[] {
+			// BEWARE: has to run in this exact order
+			new ContractBehaviorTransformer(), new PureContractTransformer(), new TargetTransformer(),
+			new ContractExpressionTransformer() };
+	private TransformationHelper transformationHelper = new TransformationHelper();
 
 	@Override
 	public void transform(ContractInfo contractInfo, CtClass contractClass) throws Exception {
 		for (AbstractContractClassTransformer transformer : transformers) {
 			transformer.transform(contractInfo, contractClass);
 		}
-		HelperFactory.getTransformationHelper().addClassAnnotation(contractClass, Transformed.class);
+		transformationHelper.addClassAnnotation(contractClass,
+				RootTransformer.INSTANCE.getPool().get(Transformed.class.getName()));
 	}
 
 	protected AbstractContractClassTransformer[] getTransformers() {

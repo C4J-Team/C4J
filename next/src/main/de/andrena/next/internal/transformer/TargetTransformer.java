@@ -28,11 +28,7 @@ import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 public class TargetTransformer extends AbstractContractClassTransformer {
 
 	private static final String TARGET_FIELD_PREFIX = "target$";
-	private RootTransformer rootTransformer;
-
-	public TargetTransformer(RootTransformer rootTransformer) {
-		this.rootTransformer = rootTransformer;
-	}
+	private RootTransformer rootTransformer = RootTransformer.INSTANCE;
 
 	@Override
 	public void transform(ContractInfo contractInfo, CtClass contractClass) throws Exception {

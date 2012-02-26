@@ -13,12 +13,11 @@ import de.andrena.next.internal.compiler.StaticCallExp;
 import de.andrena.next.internal.compiler.ValueExp;
 import de.andrena.next.internal.evaluator.Evaluator;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
-import de.andrena.next.internal.util.HelperFactory;
 import de.andrena.next.internal.util.ListOrderedSet;
 import de.andrena.next.internal.util.ReflectionHelper;
 
 public abstract class AffectedClassTransformerForSingleContract extends AbstractAffectedClassTransformer {
-	private ReflectionHelper reflectionHelper = HelperFactory.getReflectionHelper();
+	private ReflectionHelper reflectionHelper = new ReflectionHelper();
 
 	@Override
 	public void transform(ListOrderedSet<CtClass> involvedClasses, ListOrderedSet<ContractInfo> contracts,

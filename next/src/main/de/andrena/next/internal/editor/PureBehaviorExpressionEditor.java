@@ -27,7 +27,6 @@ import de.andrena.next.internal.compiler.StaticCallExp;
 import de.andrena.next.internal.compiler.ThrowExp;
 import de.andrena.next.internal.compiler.ValueExp;
 import de.andrena.next.internal.evaluator.PureEvaluator;
-import de.andrena.next.internal.util.HelperFactory;
 import de.andrena.next.internal.util.InvolvedTypeInspector;
 import de.andrena.next.internal.util.PureInspector;
 
@@ -40,7 +39,7 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 	private boolean allowOwnStateChange;
 	// necessary to work around bug https://issues.jboss.org/browse/JASSIST-149
 	private boolean exceptionThrown;
-	private InvolvedTypeInspector involvedTypeInspector = HelperFactory.getInvolvedTypeInspector();
+	private InvolvedTypeInspector involvedTypeInspector = new InvolvedTypeInspector();
 
 	public PureBehaviorExpressionEditor(CtBehavior affectedBehavior, RootTransformer rootTransformer,
 			PureInspector pureInspector, boolean allowOwnStateChange) {

@@ -12,12 +12,6 @@ import javassist.NotFoundException;
 import de.andrena.next.internal.transformer.ContractBehaviorTransformer;
 
 public class ReflectionHelper {
-	/**
-	 * Instantiated by HelperFactory.
-	 */
-	ReflectionHelper() {
-	}
-
 	public List<CtMethod> getDeclaredModifiableMethods(CtClass clazz) {
 		CtMethod[] declaredMethods = clazz.getDeclaredMethods();
 		List<CtMethod> declaredModifiableMethods = new ArrayList<CtMethod>(declaredMethods.length);

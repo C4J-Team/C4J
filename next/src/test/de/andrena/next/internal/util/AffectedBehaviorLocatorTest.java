@@ -31,7 +31,7 @@ public class AffectedBehaviorLocatorTest {
 
 	@Before
 	public void before() throws Exception {
-		locator = HelperFactory.getAffectedBehaviorLocator();
+		locator = new AffectedBehaviorLocator();
 		ClassPool pool = ClassPool.getDefault();
 		contractClass = pool.get(ContractClass.class.getName());
 		targetClass = pool.get(TargetClass.class.getName());

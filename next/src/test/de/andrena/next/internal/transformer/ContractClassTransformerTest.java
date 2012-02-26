@@ -11,7 +11,7 @@ public class ContractClassTransformerTest {
 
 	@Test
 	public void testTransform() throws Exception {
-		ContractClassTransformer transformer = new ContractClassTransformer(null);
+		ContractClassTransformer transformer = new ContractClassTransformer();
 		AbstractContractClassTransformer[] subTransformers = transformer.getTransformers();
 		for (int i = 0; i < subTransformers.length; i++) {
 			subTransformers[i] = mock(subTransformers[i].getClass());

@@ -7,18 +7,15 @@ import org.apache.log4j.Logger;
 import de.andrena.next.internal.RootTransformer;
 import de.andrena.next.internal.Transformed;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
-import de.andrena.next.internal.util.HelperFactory;
 import de.andrena.next.internal.util.ListOrderedSet;
+import de.andrena.next.internal.util.TransformationHelper;
 
 public class AffectedClassTransformer extends AbstractAffectedClassTransformer {
-	private AbstractAffectedClassTransformer[] transformers;
 	private Logger logger = Logger.getLogger(getClass());
-
-	public AffectedClassTransformer(RootTransformer rootTransformer) {
-		transformers = new AbstractAffectedClassTransformer[] {
-				// beware: PureTransformer has to run first!
-				new PureTransformer(), new ConditionAndInvariantTransformer() };
-	}
+	private TransformationHelper transformationHelper = new TransformationHelper();
+	private AbstractAffectedClassTransformer[] transformers = new AbstractAffectedClassTransformer[] {
+			// beware: PureTransformer has to run first!
+			new PureTransformer(), new ConditionAndInvariantTransformer() };
 
 	@Override
 	public void transform(ListOrderedSet<CtClass> involvedClasses, ListOrderedSet<ContractInfo> contracts,
@@ -27,6 +24,7 @@ public class AffectedClassTransformer extends AbstractAffectedClassTransformer {
 		for (AbstractAffectedClassTransformer transformer : transformers) {
 			transformer.transform(involvedClasses, contracts, affectedClass);
 		}
-		HelperFactory.getTransformationHelper().addClassAnnotation(affectedClass, Transformed.class);
+		transformationHelper.addClassAnnotation(affectedClass,
+				RootTransformer.INSTANCE.getPool().get(Transformed.class.getName()));
 	}
 }
