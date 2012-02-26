@@ -10,7 +10,7 @@ public class TransformationHelper {
 	private ClassPool pool;
 
 	/**
-	 * Instantiated by ReflectionHelper.
+	 * Instantiated by HelperFactory.
 	 */
 	TransformationHelper(ClassPool pool) {
 		this.pool = pool;

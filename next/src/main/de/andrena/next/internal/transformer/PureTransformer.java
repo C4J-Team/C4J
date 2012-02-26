@@ -3,7 +3,6 @@ package de.andrena.next.internal.transformer;
 import javassist.CtBehavior;
 import javassist.CtClass;
 import de.andrena.next.Pure;
-import de.andrena.next.internal.RootTransformer;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 import de.andrena.next.internal.util.HelperFactory;
 import de.andrena.next.internal.util.ListOrderedSet;
@@ -11,11 +10,7 @@ import de.andrena.next.internal.util.PureInspector;
 
 public class PureTransformer extends AbstractAffectedClassTransformer {
 
-	private PureInspector pureInspector;
-
-	public PureTransformer(RootTransformer rootTransformer) {
-		this.pureInspector = new PureInspector(rootTransformer);
-	}
+	private PureInspector pureInspector = new PureInspector();
 
 	@Override
 	public void transform(ListOrderedSet<CtClass> involvedClasses, ListOrderedSet<ContractInfo> contracts,

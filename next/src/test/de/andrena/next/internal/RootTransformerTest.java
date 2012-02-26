@@ -34,7 +34,8 @@ public class RootTransformerTest {
 
 	@Before
 	public void before() throws Exception {
-		transformer = new RootTransformer("", null);
+		transformer = RootTransformer.INSTANCE;
+		transformer.init("");
 		targetClassTransformer = mock(AffectedClassTransformer.class);
 		transformer.targetClassTransformer = targetClassTransformer;
 		contractClassTransformer = mock(ContractClassTransformer.class);
@@ -89,18 +90,22 @@ public class RootTransformerTest {
 	@Test
 	public void testUpdateClassPathWithClassLoader() {
 		ClassPool poolMock = mock(ClassPool.class);
+		ClassPool oldPool = transformer.pool;
 		transformer.pool = poolMock;
 		ClassLoader classLoader = mock(ClassLoader.class);
 		transformer.updateClassPath(classLoader, null, null);
+		transformer.pool = oldPool;
 		verify(poolMock).insertClassPath(any(LoaderClassPath.class));
 	}
 
 	@Test
 	public void testUpdateClassPathWithByteArray() {
 		ClassPool poolMock = mock(ClassPool.class);
+		ClassPool oldPool = transformer.pool;
 		transformer.pool = poolMock;
 		ClassLoader classLoader = mock(ClassLoader.class);
 		transformer.updateClassPath(classLoader, null, null);
+		transformer.pool = oldPool;
 		verify(poolMock).insertClassPath(any(ByteArrayClassPath.class));
 	}
 

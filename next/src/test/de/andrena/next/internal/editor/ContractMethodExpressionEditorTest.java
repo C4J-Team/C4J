@@ -46,7 +46,7 @@ public class ContractMethodExpressionEditorTest {
 		contract = new ContractRegistry().registerContract(targetClass, contractClass);
 		innerContractClass = pool.get(DummyInnerContractClass.class.getName());
 		contract.addInnerContractClass(innerContractClass);
-		editor = new ContractMethodExpressionEditor(new RootTransformer(null, null), contract);
+		editor = new ContractMethodExpressionEditor(RootTransformer.INSTANCE, contract);
 		fieldAccess = mock(FieldAccess.class);
 		when(fieldAccess.getField()).thenReturn(targetClass.getDeclaredField("someField"));
 		methodCall = mock(MethodCall.class);

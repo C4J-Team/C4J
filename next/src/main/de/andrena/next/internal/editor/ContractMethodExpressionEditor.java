@@ -34,6 +34,8 @@ import de.andrena.next.internal.compiler.ValueExp;
 import de.andrena.next.internal.evaluator.Evaluator;
 import de.andrena.next.internal.transformer.TransformationException;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
+import de.andrena.next.internal.util.HelperFactory;
+import de.andrena.next.internal.util.InvolvedTypeInspector;
 import de.andrena.next.internal.util.ListOrderedSet;
 
 public class ContractMethodExpressionEditor extends ExprEditor {
@@ -45,6 +47,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 	private List<StaticCallExp> storeExpressions = new ArrayList<StaticCallExp>();
 	private ContractInfo contract;
 	private RootTransformer rootTransformer;
+	private InvolvedTypeInspector involvedTypeInspector = HelperFactory.getInvolvedTypeInspector();
 
 	public List<StaticCallExp> getStoreExpressions() {
 		return storeExpressions;
@@ -100,8 +103,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 
 	void editMethodCall(MethodCall methodCall) throws NotFoundException, CannotCompileException {
 		CtMethod method = methodCall.getMethod();
-		if (rootTransformer.getInvolvedTypeInspector().inspect(contract.getTargetClass())
-				.contains(method.getDeclaringClass())) {
+		if (involvedTypeInspector.inspect(contract.getTargetClass()).contains(method.getDeclaringClass())) {
 			handleTargetMethodCall(methodCall);
 		} else if (method.getDeclaringClass().getName().equals(Condition.class.getName())) {
 			if (method.getName().equals("old")) {
@@ -117,8 +119,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 	private void handlePreConditionMethodCall(MethodCall methodCall) throws NotFoundException, CannotCompileException {
 		CtBehavior method = methodCall.where();
 		if (contract.getContractClass().equals(method.getDeclaringClass())) {
-			ListOrderedSet<CtClass> involvedTypes = rootTransformer.getInvolvedTypeInspector().inspect(
-					contract.getTargetClass());
+			ListOrderedSet<CtClass> involvedTypes = involvedTypeInspector.inspect(contract.getTargetClass());
 			if (rootTransformer.getConfigurationManager().getConfiguration(contract.getTargetClass())
 					.getDefaultPreCondition() == DefaultPreCondition.TRUE) {
 				handleTrueDefaultPreCondition(methodCall, method, involvedTypes);

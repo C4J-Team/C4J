@@ -1,7 +1,6 @@
 package de.andrena.next.internal;
 
 import java.lang.instrument.ClassFileTransformer;
-import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
 
 import javassist.ByteArrayClassPath;
@@ -33,14 +32,14 @@ public class RootTransformer implements ClassFileTransformer {
 
 	ContractRegistry contractRegistry = new ContractRegistry();
 
-	AffectedClassTransformer targetClassTransformer = new AffectedClassTransformer(this);
-	ContractClassTransformer contractClassTransformer = new ContractClassTransformer(this);
+	AffectedClassTransformer targetClassTransformer;
+	ContractClassTransformer contractClassTransformer;
 
 	private static Throwable lastException;
 
 	private ConfigurationManager configuration;
 
-	private InvolvedTypeInspector involvedTypeInspector = new InvolvedTypeInspector();
+	private InvolvedTypeInspector involvedTypeInspector = HelperFactory.getInvolvedTypeInspector();
 
 	public ClassPool getPool() {
 		return pool;
@@ -50,19 +49,17 @@ public class RootTransformer implements ClassFileTransformer {
 		return configuration;
 	}
 
-	public InvolvedTypeInspector getInvolvedTypeInspector() {
-		return involvedTypeInspector;
-	}
-
 	private RootTransformer() {
 	}
 
-	public void init(String agentArgs, Instrumentation inst) throws Exception {
+	public void init(String agentArgs) throws Exception {
+		targetClassTransformer = new AffectedClassTransformer(this);
+		contractClassTransformer = new ContractClassTransformer(this);
 		HelperFactory.init(pool);
-		loadConfiguration(agentArgs, inst);
+		loadConfiguration(agentArgs);
 	}
 
-	private void loadConfiguration(String agentArgs, Instrumentation inst) throws Exception {
+	private void loadConfiguration(String agentArgs) throws Exception {
 		if (agentArgs == null || agentArgs.isEmpty()) {
 			logger.warn("no configuration given - errors from @Pure are completely disabled. using default configuration.");
 			configuration = new ConfigurationManager(new DefaultConfiguration(), pool);

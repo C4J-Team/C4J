@@ -14,14 +14,19 @@ import javassist.CtClass;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.andrena.next.ClassInvariant;
+import de.andrena.next.internal.transformer.ContractBehaviorTransformer;
+
 public class ReflectionHelperTest {
 	private ReflectionHelper helper;
 	private ClassPool pool;
+	private CtClass contractClass;
 
 	@Before
-	public void before() {
+	public void before() throws Throwable {
 		helper = new ReflectionHelper();
 		pool = ClassPool.getDefault();
+		contractClass = pool.get(ContractClass.class.getName());
 	}
 
 	@Test
@@ -49,4 +54,76 @@ public class ReflectionHelperTest {
 		assertTrue(helper.isDynamic(pool.get(Object.class.getName()).getDeclaredMethod("finalize")));
 		assertFalse(helper.isDynamic(pool.get(Arrays.class.getName()).getDeclaredMethod("asList")));
 	}
+
+	@Test
+	public void testGetContractBehaviorNameForMethod() throws Exception {
+		assertEquals(helper.getContractBehaviorName(contractClass.getDeclaredMethod("contractMethod")),
+				"contractMethod");
+	}
+
+	@Test
+	public void testGetContractBehaviorNameForConstructor() throws Exception {
+		assertEquals(helper.getContractBehaviorName(contractClass.getDeclaredConstructor(new CtClass[0])),
+				ContractBehaviorTransformer.CONSTRUCTOR_REPLACEMENT_NAME);
+	}
+
+	@Test
+	public void testGetContractBehaviorNameForTransformedConstructor() throws Exception {
+		assertEquals(helper.getContractBehaviorName(contractClass
+				.getDeclaredMethod(ContractBehaviorTransformer.CONSTRUCTOR_REPLACEMENT_NAME)),
+				ContractBehaviorTransformer.CONSTRUCTOR_REPLACEMENT_NAME);
+	}
+
+	@Test
+	public void testIsConstructorForMethod() throws Exception {
+		assertFalse(helper.isContractConstructor(contractClass.getDeclaredMethod("contractMethod")));
+	}
+
+	@Test
+	public void testIsConstructorForConstructor() throws Exception {
+		assertTrue(helper.isContractConstructor(contractClass.getDeclaredConstructor(new CtClass[0])));
+	}
+
+	@Test
+	public void testIsConstructorForTransformedConstructor() throws Exception {
+		assertTrue(helper.isContractConstructor(contractClass
+				.getDeclaredMethod(ContractBehaviorTransformer.CONSTRUCTOR_REPLACEMENT_NAME)));
+	}
+
+	public static class TargetClass {
+		public TargetClass() {
+		}
+
+		public TargetClass(double value) {
+		}
+
+		public void contractMethod() {
+		}
+	}
+
+	public static class ContractClass extends TargetClass {
+		public ContractClass() {
+		}
+
+		public ContractClass(int value) {
+		}
+
+		public ContractClass(double value) {
+		}
+
+		@ClassInvariant
+		public void invariant() {
+		}
+
+		public void constructor$() {
+		}
+
+		@Override
+		public void contractMethod() {
+		}
+
+		public void otherMethod() {
+		}
+	}
+
 }

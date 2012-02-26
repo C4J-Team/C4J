@@ -6,11 +6,14 @@ import java.util.List;
 
 import javassist.CtBehavior;
 import javassist.CtClass;
+import javassist.CtConstructor;
 import javassist.CtMethod;
+import javassist.NotFoundException;
+import de.andrena.next.internal.transformer.ContractBehaviorTransformer;
 
 public class ReflectionHelper {
 	/**
-	 * Instantiated by ReflectionHelper.
+	 * Instantiated by HelperFactory.
 	 */
 	ReflectionHelper() {
 	}
@@ -65,5 +68,24 @@ public class ReflectionHelper {
 
 	public boolean isDynamic(CtBehavior behavior) {
 		return !Modifier.isStatic(behavior.getModifiers());
+	}
+
+	public boolean constructorHasAdditionalParameter(CtClass affectedClass) throws NotFoundException {
+		return affectedClass.getDeclaringClass() != null && !Modifier.isStatic(affectedClass.getModifiers());
+	}
+
+	public boolean isContractConstructor(CtBehavior contractBehavior) {
+		return contractBehavior instanceof CtConstructor
+				|| contractBehavior.getName().equals(ContractBehaviorTransformer.CONSTRUCTOR_REPLACEMENT_NAME);
+	}
+
+	public String getContractBehaviorName(CtBehavior contractBehavior) {
+		String contractBehaviorName;
+		if (isContractConstructor(contractBehavior)) {
+			contractBehaviorName = ContractBehaviorTransformer.CONSTRUCTOR_REPLACEMENT_NAME;
+		} else {
+			contractBehaviorName = contractBehavior.getName();
+		}
+		return contractBehaviorName;
 	}
 }

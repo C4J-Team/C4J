@@ -27,6 +27,8 @@ import de.andrena.next.internal.compiler.StaticCallExp;
 import de.andrena.next.internal.compiler.ThrowExp;
 import de.andrena.next.internal.compiler.ValueExp;
 import de.andrena.next.internal.evaluator.PureEvaluator;
+import de.andrena.next.internal.util.HelperFactory;
+import de.andrena.next.internal.util.InvolvedTypeInspector;
 import de.andrena.next.internal.util.PureInspector;
 
 public class PureBehaviorExpressionEditor extends ExprEditor {
@@ -38,6 +40,7 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 	private boolean allowOwnStateChange;
 	// necessary to work around bug https://issues.jboss.org/browse/JASSIST-149
 	private boolean exceptionThrown;
+	private InvolvedTypeInspector involvedTypeInspector = HelperFactory.getInvolvedTypeInspector();
 
 	public PureBehaviorExpressionEditor(CtBehavior affectedBehavior, RootTransformer rootTransformer,
 			PureInspector pureInspector, boolean allowOwnStateChange) {
@@ -138,8 +141,7 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 			pureError(errorMsg);
 			return;
 		}
-		if (pureInspector.inspect(rootTransformer.getInvolvedTypeInspector().inspect(method.getDeclaringClass()),
-				method) != null) {
+		if (pureInspector.inspect(involvedTypeInspector.inspect(method.getDeclaringClass()), method) != null) {
 			return;
 		}
 		if (!rootTransformer.getConfigurationManager().isWithinRootPackages(method.getDeclaringClass())) {

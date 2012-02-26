@@ -28,12 +28,8 @@ import de.andrena.next.internal.evaluator.PureEvaluator;
 
 public class PureInspector {
 	private Logger logger = Logger.getLogger(getClass());
-	private RootTransformer rootTransformer;
+	private RootTransformer rootTransformer = RootTransformer.INSTANCE;
 	private UnpureBehaviorExpressionEditor unpureBehaviorExpressionEditor = new UnpureBehaviorExpressionEditor();
-
-	public PureInspector(RootTransformer rootTransformer) {
-		this.rootTransformer = rootTransformer;
-	}
 
 	public CtBehavior inspect(ListOrderedSet<CtClass> involvedClasses, CtBehavior behavior) {
 		for (CtClass involvedClass : involvedClasses) {

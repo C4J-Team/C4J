@@ -4,9 +4,7 @@ import java.util.List;
 
 import javassist.CtBehavior;
 import javassist.CtClass;
-import javassist.CtConstructor;
 import javassist.CtMethod;
-import javassist.Modifier;
 import javassist.NotFoundException;
 import de.andrena.next.internal.compiler.CastExp;
 import de.andrena.next.internal.compiler.NestedExp;
@@ -15,9 +13,12 @@ import de.andrena.next.internal.compiler.StaticCallExp;
 import de.andrena.next.internal.compiler.ValueExp;
 import de.andrena.next.internal.evaluator.Evaluator;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
+import de.andrena.next.internal.util.HelperFactory;
 import de.andrena.next.internal.util.ListOrderedSet;
+import de.andrena.next.internal.util.ReflectionHelper;
 
 public abstract class AffectedClassTransformerForSingleContract extends AbstractAffectedClassTransformer {
+	private ReflectionHelper reflectionHelper = HelperFactory.getReflectionHelper();
 
 	@Override
 	public void transform(ListOrderedSet<CtClass> involvedClasses, ListOrderedSet<ContractInfo> contracts,
@@ -36,34 +37,16 @@ public abstract class AffectedClassTransformerForSingleContract extends Abstract
 			throws NotFoundException {
 		CastExp getContractInstance = new CastExp(contractClass, new StaticCallExp(Evaluator.getContractFromCache,
 				NestedExp.THIS, new ValueExp(contractClass), new ValueExp(affectedClass)));
-		return getContractInstance.appendCall(getContractBehaviorName(contractBehavior),
+		return getContractInstance.appendCall(reflectionHelper.getContractBehaviorName(contractBehavior),
 				getArgsList(affectedClass, contractBehavior)).toStandalone();
 	}
 
 	protected List<NestedExp> getArgsList(CtClass affectedClass, CtBehavior contractBehavior) throws NotFoundException {
-		if (isConstructor(contractBehavior) && constructorHasAdditionalParameter(affectedClass)) {
+		if (reflectionHelper.isContractConstructor(contractBehavior)
+				&& reflectionHelper.constructorHasAdditionalParameter(affectedClass)) {
 			return NestedExp.getArgsList(contractBehavior, 2);
 		}
 		return NestedExp.getArgsList(contractBehavior, 1);
-	}
-
-	boolean isConstructor(CtBehavior contractBehavior) {
-		return contractBehavior instanceof CtConstructor
-				|| contractBehavior.getName().equals(ContractBehaviorTransformer.CONSTRUCTOR_REPLACEMENT_NAME);
-	}
-
-	protected boolean constructorHasAdditionalParameter(CtClass affectedClass) throws NotFoundException {
-		return affectedClass.getDeclaringClass() != null && !Modifier.isStatic(affectedClass.getModifiers());
-	}
-
-	String getContractBehaviorName(CtBehavior contractBehavior) {
-		String contractBehaviorName;
-		if (isConstructor(contractBehavior)) {
-			contractBehaviorName = ContractBehaviorTransformer.CONSTRUCTOR_REPLACEMENT_NAME;
-		} else {
-			contractBehaviorName = contractBehavior.getName();
-		}
-		return contractBehaviorName;
 	}
 
 	protected StandaloneExp getAfterContractCall() {
