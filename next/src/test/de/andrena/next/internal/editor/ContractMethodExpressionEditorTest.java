@@ -83,13 +83,6 @@ public class ContractMethodExpressionEditorTest {
 		verify(fieldAccess, never()).replace(anyString());
 	}
 
-	@Test(expected = CannotCompileException.class)
-	public void testEditFieldAccessOnWrittenTargetField() throws Exception {
-		when(fieldAccess.isStatic()).thenReturn(Boolean.FALSE);
-		when(fieldAccess.isWriter()).thenReturn(Boolean.TRUE);
-		editor.editFieldAccess(fieldAccess);
-	}
-
 	@Test
 	public void testEditFieldAccessOnWrittenContractField() throws Exception {
 		when(fieldAccess.getField()).thenReturn(contractClass.getDeclaredField("contractField"));
@@ -102,13 +95,6 @@ public class ContractMethodExpressionEditorTest {
 	public void testEditFieldAccessOnWrittenInnerContractField() throws Exception {
 		when(fieldAccess.getField()).thenReturn(innerContractClass.getDeclaredField("innerContractField"));
 		when(fieldAccess.isStatic()).thenReturn(Boolean.FALSE);
-		when(fieldAccess.isWriter()).thenReturn(Boolean.TRUE);
-		editor.editFieldAccess(fieldAccess);
-	}
-
-	@Test(expected = CannotCompileException.class)
-	public void testEditFieldAccessOnWrittenStaticTargetField() throws Exception {
-		when(fieldAccess.isStatic()).thenReturn(Boolean.TRUE);
 		when(fieldAccess.isWriter()).thenReturn(Boolean.TRUE);
 		editor.editFieldAccess(fieldAccess);
 	}

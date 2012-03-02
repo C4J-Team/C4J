@@ -86,9 +86,6 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 			lastMethodCall = null;
 			logger.info("last field access: " + field.getName());
 		}
-		if (fieldAccess.isWriter() && !contract.getAllContractClasses().contains(field.getDeclaringClass())) {
-			throw new CannotCompileException("illegal write access on field '" + field.getName() + "'.");
-		}
 	}
 
 	@Override

@@ -5,9 +5,12 @@ import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.CtConstructor;
 import javassist.CtField;
+import javassist.CtMethod;
 import javassist.CtNewConstructor;
 import javassist.Modifier;
 import javassist.NotFoundException;
+import de.andrena.next.InitializeContract;
+import de.andrena.next.internal.compiler.NestedExp;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 
 public class ContractBehaviorTransformer extends AbstractContractClassTransformer {
@@ -18,9 +21,29 @@ public class ContractBehaviorTransformer extends AbstractContractClassTransforme
 		if (contractClass.equals(contractInfo.getContractClass())) {
 			if (!(contractInfo.getTargetClass().isInterface())) {
 				replaceConstructors(contractClass);
-				contractClass.addConstructor(CtNewConstructor.defaultConstructor(contractClass));
+				contractClass.addConstructor(getContractConstructor(contractClass));
 			}
 			makeAllBehaviorsAccessible(contractClass);
+		}
+	}
+
+	private CtConstructor getContractConstructor(CtClass contractClass) throws CannotCompileException,
+			NotFoundException {
+		CtConstructor contractConstructor = CtNewConstructor.defaultConstructor(contractClass);
+		for (CtMethod method : contractClass.getDeclaredMethods()) {
+			if (method.hasAnnotation(InitializeContract.class)) {
+				appendInitializeContractMethod(contractConstructor, method);
+			}
+		}
+		return contractConstructor;
+	}
+
+	private void appendInitializeContractMethod(CtConstructor contractConstructor, CtMethod method)
+			throws NotFoundException, CannotCompileException {
+		if (method.getParameterTypes().length > 0) {
+			logger.warn("Ignoring @InitializeContract method " + method.getLongName() + " as it expects parameters.");
+		} else {
+			NestedExp.THIS.appendCall(method.getName()).toStandalone().insertAfter(contractConstructor);
 		}
 	}
 
