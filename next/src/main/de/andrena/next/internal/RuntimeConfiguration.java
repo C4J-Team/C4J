@@ -13,6 +13,7 @@ import de.andrena.next.Configuration;
 import de.andrena.next.Configuration.ContractViolationAction;
 import de.andrena.next.Configuration.DefaultPreCondition;
 import de.andrena.next.Configuration.InvalidPreConditionBehavior;
+import de.andrena.next.Configuration.PureBehavior;
 import de.andrena.next.internal.util.WhitelistConverter;
 
 public class RuntimeConfiguration {
@@ -89,5 +90,9 @@ public class RuntimeConfiguration {
 			return pool.get(externalContracts.get(type.getName()));
 		}
 		return null;
+	}
+
+	public Set<PureBehavior> getPureBehaviors() {
+		return configuration.getPureBehaviors();
 	}
 }

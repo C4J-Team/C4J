@@ -17,6 +17,12 @@ public interface Configuration {
 	 */
 	Set<String> getRootPackages();
 
+	/**
+	 * Define external contracts, as an alternative to the @Contract annotation on the target class. Needed when the
+	 * target class cannot be modified with the @Contract annotation.
+	 * 
+	 * @return A Map, mapping target classes to their corresponding contract class.
+	 */
 	Map<Class<?>, Class<?>> getExternalContracts();
 
 	/**
@@ -38,6 +44,10 @@ public interface Configuration {
 	 */
 	DefaultPreCondition getDefaultPreCondition();
 
+	public enum DefaultPreCondition {
+		TRUE, UNDEFINED;
+	}
+
 	/**
 	 * The behavior when an invalid pre-condition is detected.
 	 * 
@@ -46,17 +56,29 @@ public interface Configuration {
 	 */
 	InvalidPreConditionBehavior getInvalidPreConditionBehavior();
 
-	Set<ContractViolationAction> getContractViolationActions();
-
-	public enum DefaultPreCondition {
-		TRUE, UNDEFINED;
-	}
-
 	public enum InvalidPreConditionBehavior {
 		IGNORE_AND_WARN, ABORT_AND_ERROR;
 	}
 
+	/**
+	 * The actions taken on a contract violation.
+	 * 
+	 * @see ContractViolationAction
+	 */
+	Set<ContractViolationAction> getContractViolationActions();
+
 	public enum ContractViolationAction {
 		LOG, ASSERTION_ERROR;
+	}
+
+	/**
+	 * Defines the behaviors of the @Pure annotation on methods or the @PureTarget annotation on contract methods.
+	 * 
+	 * @see PureBehavior
+	 */
+	Set<PureBehavior> getPureBehaviors();
+
+	public enum PureBehavior {
+		VALIDATE_PURE, SKIP_INVARIANTS;
 	}
 }

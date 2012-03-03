@@ -11,6 +11,8 @@ import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 import de.andrena.next.ClassInvariant;
+import de.andrena.next.Configuration.PureBehavior;
+import de.andrena.next.Pure;
 import de.andrena.next.internal.ContractViolationHandler;
 import de.andrena.next.internal.RootTransformer;
 import de.andrena.next.internal.compiler.EmptyExp;
@@ -90,8 +92,14 @@ public class ConditionAndInvariantTransformer extends AffectedClassTransformerFo
 			contractMap.put(affectedBehavior, contractBehavior);
 		}
 		for (CtBehavior affectedBehavior : reflectionHelper.getDeclaredModifiableBehaviors(affectedClass)) {
+			StandaloneExp behaviorInvariant = callInvariantExpression;
+			if (affectedBehavior.hasAnnotation(Pure.class)
+					&& rootTransformer.getConfigurationManager().getConfiguration(affectedClass).getPureBehaviors()
+							.contains(PureBehavior.SKIP_INVARIANTS)) {
+				behaviorInvariant = null;
+			}
 			transform(contractInfo, affectedClass, affectedBehavior, contractMap.get(affectedBehavior),
-					callInvariantExpression);
+					behaviorInvariant);
 		}
 	}
 

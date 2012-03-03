@@ -49,4 +49,12 @@ public class DefaultConfiguration implements Configuration {
 		contractViolationActions.add(ContractViolationAction.ASSERTION_ERROR);
 		return contractViolationActions;
 	}
+
+	@Override
+	public Set<PureBehavior> getPureBehaviors() {
+		Set<PureBehavior> pureBehaviors = new HashSet<PureBehavior>();
+		pureBehaviors.add(PureBehavior.SKIP_INVARIANTS);
+		pureBehaviors.add(PureBehavior.VALIDATE_PURE);
+		return pureBehaviors;
+	}
 }
