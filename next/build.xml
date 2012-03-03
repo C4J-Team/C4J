@@ -11,11 +11,20 @@
 		<copy todir="target">
 			<fileset dir="src/main"/>
 		</copy>
+		<unjar dest="target" src="lib/javassist.jar">
+			<patternset>
+				<exclude name="**/META-INF/**"/>
+			</patternset>
+		</unjar>
+		<unjar dest="target" src="lib/log4j-1.2.16.jar">
+			<patternset>
+				<exclude name="**/META-INF/**"/>
+			</patternset>
+		</unjar>
 		
 		<jar basedir="target" destfile="lib/next.jar">
 			<manifest>
 				<attribute name="Premain-Class" value="de.andrena.next.internal.Agent"/>
-				<attribute name="Boot-Class-Path" value="javassist.jar log4j-1.2.16.jar"/>
 			</manifest>
 		</jar>
 		
