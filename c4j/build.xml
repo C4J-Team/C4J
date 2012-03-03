@@ -1,0 +1,58 @@
+<project default="build-c4j-jar">
+	<property name="VERSION" value="4.0-RC1"/>
+	<property name="C4J_JAR" value="dist/c4j-${VERSION}.jar"/>
+	<property name="C4J_ZIP" value="dist/c4j-${VERSION}.zip"/>
+	<property name="C4J_ALL_JAR" value="dist/c4j-${VERSION}-all.jar"/>
+	<property name="C4J_CURRENT_ALL_JAR" value="dist/c4j-current-all.jar"/>
+	
+	<target name="build-c4j-jar">
+		<delete dir="target"/>
+		<mkdir dir="target"/>
+		<mkdir dir="dist"/>
+		
+		<javac srcdir="src/main" destdir="target" debug="true">
+			<classpath>
+				<fileset dir="lib"/>
+			</classpath>
+		</javac>
+		<copy todir="target">
+			<fileset dir="src/main"/>
+		</copy>
+
+		<jar basedir="target" destfile="${C4J_JAR}">
+			<manifest>
+				<attribute name="Premain-Class" value="de.andrena.c4j.internal.Agent"/>
+				<attribute name="Boot-Class-Path" value="javassist.jar log4j-1.2.16.jar"/>
+			</manifest>
+		</jar>
+		
+		<zip destfile="${C4J_ZIP}">
+			<fileset file="${C4J_JAR}"/>
+			<fileset file="lib/javassist.jar"/>
+			<fileset file="lib/log4j-1.2.16.jar"/>
+		</zip>
+		
+		<unjar dest="target" src="lib/javassist.jar">
+			<patternset>
+				<exclude name="**/META-INF/**"/>
+			</patternset>
+		</unjar>
+		<unjar dest="target" src="lib/log4j-1.2.16.jar">
+			<patternset>
+				<exclude name="**/META-INF/**"/>
+			</patternset>
+		</unjar>
+		
+		<jar basedir="target" destfile="${C4J_ALL_JAR}">
+			<manifest>
+				<attribute name="Premain-Class" value="de.andrena.c4j.internal.Agent"/>
+			</manifest>
+		</jar>
+		
+		<copy file="${C4J_ALL_JAR}" tofile="${C4J_CURRENT_ALL_JAR}"/>
+		
+		<eclipse.refreshLocal resource="c4j/dist" depth="infinite"/>
+		<eclipse.incrementalBuild project="c4j-acceptancetest" kind="clean"/>
+		<eclipse.incrementalBuild project="c4j-systemtest" kind="clean"/>
+	</target>
+</project>
