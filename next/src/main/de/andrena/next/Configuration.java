@@ -1,6 +1,7 @@
 package de.andrena.next;
 
 import java.lang.reflect.Method;
+import java.util.Map;
 import java.util.Set;
 
 public interface Configuration {
@@ -15,6 +16,8 @@ public interface Configuration {
 	 * @return Packages as Strings, e.g. "java.lang.util".
 	 */
 	Set<String> getRootPackages();
+
+	Map<Class<?>, Class<?>> getExternalContracts();
 
 	/**
 	 * Define methods that are being assumed to be pure. Cannot contain methods from classes within one of the root

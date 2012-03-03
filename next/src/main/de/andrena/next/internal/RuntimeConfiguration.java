@@ -1,9 +1,12 @@
 package de.andrena.next.internal;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javassist.ClassPool;
+import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 import de.andrena.next.Configuration;
@@ -17,11 +20,20 @@ public class RuntimeConfiguration {
 	private Set<CtMethod> whitelistMethods;
 	private Configuration configuration;
 	private Set<String> rootPackages = new HashSet<String>();
+	private Map<String, String> externalContracts = new HashMap<String, String>();
 
 	public RuntimeConfiguration(Configuration configuration, WhitelistConverter whitelistConverter) throws Exception {
 		this.configuration = configuration;
 		whitelistMethods = whitelistConverter.convertWhitelist(configuration.getPureWhitelist());
 		normalizeRootPackages();
+		stringifyExternalContracts();
+	}
+
+	private void stringifyExternalContracts() {
+		for (Class<?> targetClass : configuration.getExternalContracts().keySet()) {
+			externalContracts.put(targetClass.getName(), configuration.getExternalContracts().get(targetClass)
+					.getName());
+		}
 	}
 
 	private void normalizeRootPackages() {
@@ -70,5 +82,12 @@ public class RuntimeConfiguration {
 
 	public Set<ContractViolationAction> getContractViolationActions() {
 		return configuration.getContractViolationActions();
+	}
+
+	public CtClass getExternalContract(ClassPool pool, CtClass type) throws NotFoundException {
+		if (externalContracts.containsKey(type.getName())) {
+			return pool.get(externalContracts.get(type.getName()));
+		}
+		return null;
 	}
 }

@@ -22,6 +22,7 @@ import de.andrena.next.internal.util.ContractRegistry;
 import de.andrena.next.internal.util.ContractRegistry.ContractInfo;
 import de.andrena.next.internal.util.InvolvedTypeInspector;
 import de.andrena.next.internal.util.ListOrderedSet;
+import de.andrena.next.internal.util.LocalClassLoader;
 
 public class RootTransformer implements ClassFileTransformer {
 	public static final RootTransformer INSTANCE = new RootTransformer();
@@ -63,24 +64,14 @@ public class RootTransformer implements ClassFileTransformer {
 			configuration = new ConfigurationManager(new DefaultConfiguration(), pool);
 		} else {
 			try {
-				Class<?> configurationClass = Class.forName(agentArgs);
+				Class<?> configurationClass = Class.forName(agentArgs, true, new LocalClassLoader(getClass()
+						.getClassLoader()));
 				configuration = new ConfigurationManager((Configuration) configurationClass.newInstance(), pool);
-				checkConfigurationLoadingRootClasses(agentArgs);
 				logger.info("loaded configuration from class '" + agentArgs + "'.");
 			} catch (Exception e) {
 				logger.error("could not load configuration from class '" + agentArgs
 						+ "'. using default configuration.", e);
 				configuration = new ConfigurationManager(new DefaultConfiguration(), pool);
-			}
-		}
-	}
-
-	private void checkConfigurationLoadingRootClasses(String agentArgs) throws NotFoundException {
-		for (String className : configuration.getInvolvedClassNames(pool)) {
-			if (configuration.isWithinRootPackages(className)) {
-				throw new RuntimeException(
-						"classes within root-packages must not be referenced by the configuration. offending class: '"
-								+ className + "'.");
 			}
 		}
 	}
@@ -163,14 +154,17 @@ public class RootTransformer implements ClassFileTransformer {
 	public ListOrderedSet<ContractInfo> getContractsForTypes(ListOrderedSet<CtClass> types) throws NotFoundException {
 		ListOrderedSet<ContractInfo> contracts = new ListOrderedSet<ContractInfo>();
 		for (CtClass type : types) {
-			if (type.hasAnnotation(Contract.class)) {
+			CtClass externalContract = configuration.getConfiguration(type).getExternalContract(pool, type);
+			if (type.hasAnnotation(Contract.class) || externalContract != null) {
 				if (contractRegistry.hasRegisteredContract(type)) {
 					contracts.add(contractRegistry.getContractInfoForTargetClass(type));
-				} else {
+				} else if (type.hasAnnotation(Contract.class)) {
 					String contractClassString = new BackdoorAnnotationLoader(type).getClassValue(Contract.class,
 							"value");
 					CtClass contractClass = pool.get(contractClassString);
 					contracts.add(contractRegistry.registerContract(type, contractClass));
+				} else {
+					contracts.add(contractRegistry.registerContract(type, externalContract));
 				}
 			}
 		}

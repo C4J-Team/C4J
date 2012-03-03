@@ -15,6 +15,7 @@ import de.andrena.next.Configuration;
 import de.andrena.next.DefaultConfiguration;
 import de.andrena.next.systemtest.config.AssertionErrorOnlyConfiguration;
 import de.andrena.next.systemtest.config.DefaultPreConditionTrueConfiguration;
+import de.andrena.next.systemtest.config.ExternalContractConfiguration;
 import de.andrena.next.systemtest.config.InvalidPreConditionBehaviorErrorConfiguration;
 import de.andrena.next.systemtest.config.LogOnlyConfiguration;
 
@@ -26,6 +27,7 @@ public class SystemTestConfiguration extends DefaultConfiguration {
 		configurations.add(new InvalidPreConditionBehaviorErrorConfiguration());
 		configurations.add(new LogOnlyConfiguration());
 		configurations.add(new AssertionErrorOnlyConfiguration());
+		configurations.add(new ExternalContractConfiguration());
 		return configurations;
 	}
 

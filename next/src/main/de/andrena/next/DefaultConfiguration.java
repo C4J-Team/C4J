@@ -3,6 +3,7 @@ package de.andrena.next;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class DefaultConfiguration implements Configuration {
@@ -14,6 +15,11 @@ public class DefaultConfiguration implements Configuration {
 	@Override
 	public Set<String> getRootPackages() {
 		return Collections.emptySet();
+	}
+
+	@Override
+	public Map<Class<?>, Class<?>> getExternalContracts() {
+		return Collections.emptyMap();
 	}
 
 	@Override
