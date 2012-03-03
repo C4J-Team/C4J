@@ -18,8 +18,8 @@ public interface Configuration {
 	Set<String> getRootPackages();
 
 	/**
-	 * Define external contracts, as an alternative to the @Contract annotation on the target class. Needed when the
-	 * target class cannot be modified with the @Contract annotation.
+	 * Define external contracts, as an alternative to the @{@link Contract} annotation on the target class. Needed when
+	 * the target class cannot be modified with the @{@link Contract} annotation.
 	 * 
 	 * @return A Map, mapping target classes to their corresponding contract class.
 	 */
@@ -57,7 +57,14 @@ public interface Configuration {
 	InvalidPreConditionBehavior getInvalidPreConditionBehavior();
 
 	public enum InvalidPreConditionBehavior {
-		IGNORE_AND_WARN, ABORT_AND_ERROR;
+		/**
+		 * Ignore a pre-condition redefinition and issue a warning.
+		 */
+		IGNORE_AND_WARN,
+		/**
+		 * Consider a pre-condition redefinition a contract violation and issue an error.
+		 */
+		ABORT_AND_ERROR;
 	}
 
 	/**
@@ -68,17 +75,32 @@ public interface Configuration {
 	Set<ContractViolationAction> getContractViolationActions();
 
 	public enum ContractViolationAction {
-		LOG, ASSERTION_ERROR;
+		/**
+		 * Log contract violations using Log4J.
+		 */
+		LOG,
+		/**
+		 * Throw an assertion error on contract violation.
+		 */
+		ASSERTION_ERROR;
 	}
 
 	/**
-	 * Defines the behaviors of the @Pure annotation on methods or the @PureTarget annotation on contract methods.
+	 * Defines the behaviors of the @{@link Pure} annotation on methods or the @{@link PureTarget} annotation on
+	 * contract methods.
 	 * 
 	 * @see PureBehavior
 	 */
 	Set<PureBehavior> getPureBehaviors();
 
 	public enum PureBehavior {
-		VALIDATE_PURE, SKIP_INVARIANTS;
+		/**
+		 * Full validation, issueing contract violations on unpure access.
+		 */
+		VALIDATE_PURE,
+		/**
+		 * Skip class-invariants for pure methods.
+		 */
+		SKIP_INVARIANTS;
 	}
 }

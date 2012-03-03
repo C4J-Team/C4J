@@ -8,6 +8,9 @@
 				<fileset dir="lib"/>
 			</classpath>
 		</javac>
+		<copy todir="target">
+			<fileset dir="src/main"/>
+		</copy>
 		
 		<jar basedir="target" destfile="lib/next.jar">
 			<manifest>

@@ -6,14 +6,12 @@ import static de.andrena.next.Condition.post;
 import static de.andrena.next.Condition.pre;
 import static de.andrena.next.Condition.result;
 import de.andrena.next.Target;
-import de.andrena.next.ThreadSafe;
 
 public class StackSpecContract<T> implements StackSpec<T> {
 
 	@Target
 	private StackSpec<T> target;
 
-	@ThreadSafe
 	private Object[] old_values;
 
 	@Override
