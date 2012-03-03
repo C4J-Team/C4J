@@ -20,6 +20,8 @@ public class ExternalContractConfiguration extends DefaultConfiguration {
 		Map<Class<?>, Class<?>> externalContracts = new HashMap<Class<?>, Class<?>>();
 		externalContracts.put(ExternalContractSystemTest.TargetClass.class,
 				ExternalContractSystemTest.ContractClass.class);
+		externalContracts.put(ExternalContractSystemTest.TargetClassWithLocalAndExternalContract.class,
+				ExternalContractSystemTest.ExternalContract.class);
 		return externalContracts;
 	}
 
