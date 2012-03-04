@@ -14,11 +14,12 @@ public class LocalClassLoader extends ClassLoader {
 		super(parent);
 	}
 
+	// stolen from http://www.javablogging.com/java-classloader-2-write-your-own-classloader/
+	// also interesting: http://dow.ngra.de/2009/06/15/classloaderlocal-how-to-avoid-classloader-leaks-on-application-redeploy/
 	@Override
 	protected Class<?> findClass(String name) throws ClassNotFoundException {
-		String fileName = name.replace('.', File.separatorChar) + ".class";
 		try {
-			byte[] classBytes = loadClassData(fileName);
+			byte[] classBytes = loadClassData(name);
 			Class<?> c = defineClass(name, classBytes, 0, classBytes.length);
 			resolveClass(c);
 			return c;
@@ -27,28 +28,8 @@ public class LocalClassLoader extends ClassLoader {
 		}
 	}
 
-	@Override
-	public Class<?> loadClass(String name) throws ClassNotFoundException {
-		Class<?> loadedClass = findLoadedClass(name);
-		if (loadedClass == null) {
-			try {
-				loadedClass = findClass(name);
-				logger.debug("locally loaded class " + name);
-			} catch (ClassNotFoundException e) {
-				// failed to load, try parent
-			}
-			if (loadedClass == null) {
-				loadedClass = super.loadClass(name);
-			}
-		}
-		return loadedClass;
-	}
-
 	private byte[] loadClassData(String name) throws IOException {
-		InputStream stream = getParent().getResourceAsStream(name);
-		if (stream == null) {
-			throw new IOException("resource " + name + " not found.");
-		}
+		InputStream stream = getResourceStream(name);
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 		int read;
 		byte[] data = new byte[4096];
@@ -57,5 +38,29 @@ public class LocalClassLoader extends ClassLoader {
 		}
 		buffer.flush();
 		return buffer.toByteArray();
+	}
+
+	private InputStream getResourceStream(String name) throws IOException {
+		String fileName = name.replace('.', File.separatorChar) + ".class";
+		InputStream stream = getParent().getResourceAsStream(fileName);
+		if (stream == null) {
+			throw new IOException("resource " + fileName + " not found.");
+		}
+		return stream;
+	}
+
+	// stolen from http://tech.puredanger.com/2006/11/09/classloader/
+	@Override
+	public Class<?> loadClass(String name) throws ClassNotFoundException {
+		Class<?> loadedClass = findLoadedClass(name);
+		if (loadedClass == null) {
+			try {
+				loadedClass = findClass(name);
+				logger.debug("locally loaded class " + name);
+			} catch (ClassNotFoundException e) {
+				loadedClass = super.loadClass(name);
+			}
+		}
+		return loadedClass;
 	}
 }
