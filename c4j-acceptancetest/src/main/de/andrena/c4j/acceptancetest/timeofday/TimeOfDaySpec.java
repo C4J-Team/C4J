@@ -1,7 +1,7 @@
 package de.andrena.c4j.acceptancetest.timeofday;
 
-import de.andrena.next.Contract;
-import de.andrena.next.Pure;
+import de.andrena.c4j.Contract;
+import de.andrena.c4j.Pure;
 
 @Contract(TimeOfDaySpecContract.class)
 public interface TimeOfDaySpec {

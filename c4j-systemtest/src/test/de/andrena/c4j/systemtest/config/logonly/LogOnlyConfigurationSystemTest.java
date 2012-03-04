@@ -1,15 +1,15 @@
 package de.andrena.c4j.systemtest.config.logonly;
 
-import static de.andrena.next.Condition.pre;
+import static de.andrena.c4j.Condition.pre;
 
 import org.apache.log4j.Level;
 import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.c4j.systemtest.TransformerAwareRule;
-import de.andrena.next.ClassInvariant;
-import de.andrena.next.Contract;
-import de.andrena.next.Target;
+import de.andrena.c4j.ClassInvariant;
+import de.andrena.c4j.Contract;
+import de.andrena.c4j.Target;
 
 public class LogOnlyConfigurationSystemTest {
 	@Rule

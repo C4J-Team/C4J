@@ -7,8 +7,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import de.andrena.c4j.systemtest.TransformerAwareRule;
-import de.andrena.next.Pure;
-import de.andrena.next.internal.evaluator.PureEvaluator;
+import de.andrena.c4j.Pure;
+import de.andrena.c4j.internal.evaluator.PureEvaluator;
 
 public class PurePassingParametersToUnpureMethodsSystemTest {
 	@Rule

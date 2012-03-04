@@ -9,7 +9,7 @@ import org.junit.rules.ExpectedException;
 
 import de.andrena.c4j.acceptancetest.subinterfaces.VeryBottom;
 import de.andrena.c4j.systemtest.TransformerAwareRule;
-import de.andrena.next.AllowPureAccess;
+import de.andrena.c4j.AllowPureAccess;
 
 public class NNUnchangedS5aTest {
 

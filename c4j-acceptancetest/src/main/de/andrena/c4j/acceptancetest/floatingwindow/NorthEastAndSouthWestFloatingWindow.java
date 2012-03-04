@@ -1,6 +1,6 @@
 package de.andrena.c4j.acceptancetest.floatingwindow;
 
-import de.andrena.next.Contract;
+import de.andrena.c4j.Contract;
 
 @Contract(NorthEastAndSouthWestFloatingWindowContract.class)
 public class NorthEastAndSouthWestFloatingWindow implements NorthEastFloatingWindowSpec, SouthWestFloatingWindowSpec {

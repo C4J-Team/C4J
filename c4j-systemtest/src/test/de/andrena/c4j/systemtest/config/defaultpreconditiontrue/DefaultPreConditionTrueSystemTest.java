@@ -1,13 +1,13 @@
 package de.andrena.c4j.systemtest.config.defaultpreconditiontrue;
 
-import static de.andrena.next.Condition.pre;
+import static de.andrena.c4j.Condition.pre;
 
 import org.apache.log4j.Level;
 import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.c4j.systemtest.TransformerAwareRule;
-import de.andrena.next.Contract;
+import de.andrena.c4j.Contract;
 
 public class DefaultPreConditionTrueSystemTest {
 	@Rule

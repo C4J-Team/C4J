@@ -1,16 +1,16 @@
 package de.andrena.c4j.systemtest.contractclassmagic;
 
-import static de.andrena.next.Condition.ignored;
-import static de.andrena.next.Condition.pre;
+import static de.andrena.c4j.Condition.ignored;
+import static de.andrena.c4j.Condition.pre;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.c4j.systemtest.TransformerAwareRule;
-import de.andrena.next.Contract;
-import de.andrena.next.Pure;
-import de.andrena.next.Target;
+import de.andrena.c4j.Contract;
+import de.andrena.c4j.Pure;
+import de.andrena.c4j.Target;
 
 public class MethodCallSystemTest {
 	@Rule

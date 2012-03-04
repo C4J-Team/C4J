@@ -1,6 +1,6 @@
 package de.andrena.c4j.acceptancetest.floatingwindow;
 
-import static de.andrena.next.Condition.pre;
+import static de.andrena.c4j.Condition.pre;
 
 public class NorthEastAndSouthWestFloatingWindowContract extends NorthEastAndSouthWestFloatingWindow {
 

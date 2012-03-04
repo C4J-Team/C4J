@@ -1,7 +1,7 @@
 package de.andrena.c4j.systemtest.postcondition;
 
-import static de.andrena.next.Condition.exceptionThrownOfType;
-import static de.andrena.next.Condition.post;
+import static de.andrena.c4j.Condition.exceptionThrownOfType;
+import static de.andrena.c4j.Condition.post;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -12,8 +12,8 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.c4j.systemtest.TransformerAwareRule;
-import de.andrena.next.AllowPureAccess;
-import de.andrena.next.Contract;
+import de.andrena.c4j.AllowPureAccess;
+import de.andrena.c4j.Contract;
 
 public class PostConditionWithExceptionThrownSystemTest {
 	@Rule

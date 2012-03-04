@@ -9,7 +9,7 @@ import org.junit.rules.ExpectedException;
 
 import de.andrena.c4j.acceptancetest.subclasses.Bottom;
 import de.andrena.c4j.systemtest.TransformerAwareRule;
-import de.andrena.next.AllowPureAccess;
+import de.andrena.c4j.AllowPureAccess;
 
 public class NNOldS5bTest {
 

@@ -1,6 +1,6 @@
 package de.andrena.c4j.acceptancetest.point;
 
-import de.andrena.next.Contract;
+import de.andrena.c4j.Contract;
 
 @Contract(PointContract.class)
 public class Point implements PointSpec {

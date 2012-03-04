@@ -1,9 +1,9 @@
 package de.andrena.c4j.acceptancetest.stack;
 
-import static de.andrena.next.Condition.post;
-import static de.andrena.next.Condition.pre;
-import de.andrena.next.ClassInvariant;
-import de.andrena.next.Target;
+import static de.andrena.c4j.Condition.post;
+import static de.andrena.c4j.Condition.pre;
+import de.andrena.c4j.ClassInvariant;
+import de.andrena.c4j.Target;
 
 public class StackContract<T> extends Stack<T> {
 

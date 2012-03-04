@@ -1,7 +1,7 @@
 package de.andrena.c4j.acceptancetest.point.pitfalls;
 
 import de.andrena.c4j.acceptancetest.object.ObjectSpec;
-import de.andrena.next.Pure;
+import de.andrena.c4j.Pure;
 
 public class PointPF2 implements ObjectSpec {
 

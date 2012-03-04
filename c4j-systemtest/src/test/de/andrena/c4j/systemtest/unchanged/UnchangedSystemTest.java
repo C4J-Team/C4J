@@ -1,16 +1,16 @@
 package de.andrena.c4j.systemtest.unchanged;
 
-import static de.andrena.next.Condition.post;
-import static de.andrena.next.Condition.unchanged;
+import static de.andrena.c4j.Condition.post;
+import static de.andrena.c4j.Condition.unchanged;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.c4j.systemtest.TransformerAwareRule;
-import de.andrena.next.Contract;
-import de.andrena.next.Pure;
-import de.andrena.next.Target;
+import de.andrena.c4j.Contract;
+import de.andrena.c4j.Pure;
+import de.andrena.c4j.Target;
 
 public class UnchangedSystemTest {
 	@Rule

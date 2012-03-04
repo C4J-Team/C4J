@@ -18,8 +18,8 @@ import de.andrena.c4j.systemtest.config.InvalidPreConditionBehaviorErrorConfigur
 import de.andrena.c4j.systemtest.config.LogOnlyConfiguration;
 import de.andrena.c4j.systemtest.config.PureBehaviorEmptyConfiguration;
 import de.andrena.c4j.systemtest.config.PureBehaviorSkipOnlyConfiguration;
-import de.andrena.next.Configuration;
-import de.andrena.next.DefaultConfiguration;
+import de.andrena.c4j.Configuration;
+import de.andrena.c4j.DefaultConfiguration;
 
 public class SystemTestConfiguration extends DefaultConfiguration {
 	@Override

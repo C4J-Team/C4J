@@ -1,14 +1,14 @@
 package de.andrena.c4j.systemtest.postcondition;
 
-import static de.andrena.next.Condition.ignored;
-import static de.andrena.next.Condition.post;
-import static de.andrena.next.Condition.result;
+import static de.andrena.c4j.Condition.ignored;
+import static de.andrena.c4j.Condition.post;
+import static de.andrena.c4j.Condition.result;
 
 import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.c4j.systemtest.TransformerAwareRule;
-import de.andrena.next.Contract;
+import de.andrena.c4j.Contract;
 
 public class PostConditionSystemTest {
 	@Rule

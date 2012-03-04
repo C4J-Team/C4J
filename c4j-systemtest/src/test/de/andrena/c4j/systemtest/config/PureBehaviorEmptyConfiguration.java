@@ -3,7 +3,7 @@ package de.andrena.c4j.systemtest.config;
 import java.util.Collections;
 import java.util.Set;
 
-import de.andrena.next.DefaultConfiguration;
+import de.andrena.c4j.DefaultConfiguration;
 
 public class PureBehaviorEmptyConfiguration extends DefaultConfiguration {
 	@Override

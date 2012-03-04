@@ -1,7 +1,7 @@
 package de.andrena.c4j.acceptancetest.s2;
 
-import static de.andrena.next.Condition.post;
-import static de.andrena.next.Condition.unchanged;
+import static de.andrena.c4j.Condition.post;
+import static de.andrena.c4j.Condition.unchanged;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -11,8 +11,8 @@ import de.andrena.c4j.acceptancetest.floatingwindow.Vector;
 import de.andrena.c4j.acceptancetest.floatingwindow.WindowStyle;
 import de.andrena.c4j.acceptancetest.point.Color;
 import de.andrena.c4j.systemtest.TransformerAwareRule;
-import de.andrena.next.Contract;
-import de.andrena.next.Target;
+import de.andrena.c4j.Contract;
+import de.andrena.c4j.Target;
 
 public class NNUnchangedS2Test {
 	

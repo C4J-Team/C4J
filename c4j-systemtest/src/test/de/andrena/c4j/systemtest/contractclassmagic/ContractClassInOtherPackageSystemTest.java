@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import de.andrena.c4j.systemtest.TransformerAwareRule;
 import de.andrena.c4j.systemtest.contractclassmagic.otherpackage.ContractClassInOtherPackage;
-import de.andrena.next.Contract;
+import de.andrena.c4j.Contract;
 
 public class ContractClassInOtherPackageSystemTest {
 	@Rule

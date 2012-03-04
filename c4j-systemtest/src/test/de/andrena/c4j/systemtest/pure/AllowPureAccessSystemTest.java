@@ -4,9 +4,9 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.c4j.systemtest.TransformerAwareRule;
-import de.andrena.next.AllowPureAccess;
-import de.andrena.next.Contract;
-import de.andrena.next.Pure;
+import de.andrena.c4j.AllowPureAccess;
+import de.andrena.c4j.Contract;
+import de.andrena.c4j.Pure;
 
 public class AllowPureAccessSystemTest {
 	@Rule

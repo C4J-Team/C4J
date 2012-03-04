@@ -1,6 +1,6 @@
 package de.andrena.c4j.acceptancetest.workingstudent;
 
-import de.andrena.next.Contract;
+import de.andrena.c4j.Contract;
 
 @Contract(StudentSpecContract.class)
 public interface StudentSpec {

@@ -1,6 +1,6 @@
 package de.andrena.c4j.acceptancetest.floatingwindow;
 
-import de.andrena.next.Contract;
+import de.andrena.c4j.Contract;
 
 @Contract(NorthEastFloatingWindowSpecContract.class)
 public interface NorthEastFloatingWindowSpec extends Window {

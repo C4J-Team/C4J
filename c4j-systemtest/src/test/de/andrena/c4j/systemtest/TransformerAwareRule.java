@@ -10,8 +10,8 @@ import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
-import de.andrena.next.internal.RootTransformer;
-import de.andrena.next.internal.transformer.TransformationException;
+import de.andrena.c4j.internal.RootTransformer;
+import de.andrena.c4j.internal.transformer.TransformationException;
 
 public class TransformerAwareRule implements TestRule {
 	private String expectedLogMessage;

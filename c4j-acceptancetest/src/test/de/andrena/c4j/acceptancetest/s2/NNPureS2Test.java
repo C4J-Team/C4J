@@ -11,7 +11,7 @@ import org.junit.rules.ExpectedException;
 import de.andrena.c4j.acceptancetest.floatingwindow.Vector;
 import de.andrena.c4j.acceptancetest.point.Color;
 import de.andrena.c4j.systemtest.TransformerAwareRule;
-import de.andrena.next.Pure;
+import de.andrena.c4j.Pure;
 
 public class NNPureS2Test {
 

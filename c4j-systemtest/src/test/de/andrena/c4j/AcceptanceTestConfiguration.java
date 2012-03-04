@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import de.andrena.next.DefaultConfiguration;
+import de.andrena.c4j.DefaultConfiguration;
 
 public class AcceptanceTestConfiguration extends DefaultConfiguration {
 	@Override

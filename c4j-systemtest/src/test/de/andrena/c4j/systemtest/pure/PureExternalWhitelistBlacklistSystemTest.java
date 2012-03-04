@@ -8,7 +8,7 @@ import org.junit.Test;
 import com.external.ExternalClass;
 
 import de.andrena.c4j.systemtest.TransformerAwareRule;
-import de.andrena.next.Pure;
+import de.andrena.c4j.Pure;
 
 public class PureExternalWhitelistBlacklistSystemTest {
 	@Rule

@@ -1,10 +1,10 @@
 package de.andrena.c4j.acceptancetest.subinterfaces;
 
-import static de.andrena.next.Condition.ignored;
-import static de.andrena.next.Condition.result;
-import de.andrena.next.ClassInvariant;
-import de.andrena.next.Condition;
-import de.andrena.next.Target;
+import static de.andrena.c4j.Condition.ignored;
+import static de.andrena.c4j.Condition.result;
+import de.andrena.c4j.ClassInvariant;
+import de.andrena.c4j.Condition;
+import de.andrena.c4j.Target;
 
 public class TopContract implements Top {
 

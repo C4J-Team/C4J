@@ -1,7 +1,7 @@
 package de.andrena.c4j.acceptancetest.workingstudent;
 
-import static de.andrena.next.Condition.ignored;
-import static de.andrena.next.Condition.pre;
+import static de.andrena.c4j.Condition.ignored;
+import static de.andrena.c4j.Condition.pre;
 
 public final class EmployeeSpecContract implements EmployeeSpec {
 

@@ -7,9 +7,9 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.c4j.systemtest.TransformerAwareRule;
-import de.andrena.next.ClassInvariant;
-import de.andrena.next.Contract;
-import de.andrena.next.Pure;
+import de.andrena.c4j.ClassInvariant;
+import de.andrena.c4j.Contract;
+import de.andrena.c4j.Pure;
 
 public class PureBehaviorEmptySystemTest {
 	@Rule

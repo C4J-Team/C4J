@@ -1,7 +1,7 @@
 package de.andrena.c4j.acceptancetest.point;
 
-import static de.andrena.next.Condition.post;
-import de.andrena.next.Target;
+import static de.andrena.c4j.Condition.post;
+import de.andrena.c4j.Target;
 
 public class PointContract extends Point {
 

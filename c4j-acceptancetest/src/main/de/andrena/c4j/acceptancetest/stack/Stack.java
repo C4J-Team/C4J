@@ -2,7 +2,7 @@ package de.andrena.c4j.acceptancetest.stack;
 
 import java.util.ArrayList;
 
-import de.andrena.next.Contract;
+import de.andrena.c4j.Contract;
 
 @Contract(StackContract.class)
 public class Stack<T> implements StackSpec<T> {

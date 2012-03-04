@@ -1,6 +1,6 @@
 package de.andrena.c4j.systemtest.contractclassmagic;
 
-import static de.andrena.next.Condition.pre;
+import static de.andrena.c4j.Condition.pre;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
@@ -8,8 +8,8 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.c4j.systemtest.TransformerAwareRule;
-import de.andrena.next.AllowPureAccess;
-import de.andrena.next.Contract;
+import de.andrena.c4j.AllowPureAccess;
+import de.andrena.c4j.Contract;
 
 public class ConstructorInInnerClassesSystemTest {
 	@Rule

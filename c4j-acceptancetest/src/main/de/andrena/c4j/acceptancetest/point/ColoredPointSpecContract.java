@@ -1,10 +1,10 @@
 package de.andrena.c4j.acceptancetest.point;
 
-import static de.andrena.next.Condition.ignored;
-import static de.andrena.next.Condition.post;
-import static de.andrena.next.Condition.pre;
-import static de.andrena.next.Condition.result;
-import de.andrena.next.Target;
+import static de.andrena.c4j.Condition.ignored;
+import static de.andrena.c4j.Condition.post;
+import static de.andrena.c4j.Condition.pre;
+import static de.andrena.c4j.Condition.result;
+import de.andrena.c4j.Target;
 
 public class ColoredPointSpecContract implements ColoredPointSpec {
 

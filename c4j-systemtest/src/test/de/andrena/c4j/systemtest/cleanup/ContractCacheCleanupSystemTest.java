@@ -1,8 +1,8 @@
 package de.andrena.c4j.systemtest.cleanup;
 
-import static de.andrena.next.Condition.old;
-import static de.andrena.next.Condition.post;
-import static de.andrena.next.Condition.pre;
+import static de.andrena.c4j.Condition.old;
+import static de.andrena.c4j.Condition.post;
+import static de.andrena.c4j.Condition.pre;
 import static org.junit.Assert.assertNull;
 
 import java.lang.ref.WeakReference;
@@ -12,8 +12,8 @@ import org.junit.Test;
 
 import de.andrena.c4j.systemtest.TestUtil;
 import de.andrena.c4j.systemtest.TransformerAwareRule;
-import de.andrena.next.Contract;
-import de.andrena.next.Target;
+import de.andrena.c4j.Contract;
+import de.andrena.c4j.Target;
 
 public class ContractCacheCleanupSystemTest {
 	@Rule

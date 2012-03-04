@@ -4,7 +4,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.c4j.systemtest.TransformerAwareRule;
-import de.andrena.next.Pure;
+import de.andrena.c4j.Pure;
 
 public class PureInConstructorSystemTest {
 	@Rule

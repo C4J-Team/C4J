@@ -1,6 +1,6 @@
 package de.andrena.c4j.acceptancetest.floatingwindow;
 
-import de.andrena.next.Pure;
+import de.andrena.c4j.Pure;
 
 public class Vector {
 	

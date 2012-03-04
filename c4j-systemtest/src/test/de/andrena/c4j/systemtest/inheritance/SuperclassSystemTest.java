@@ -1,6 +1,6 @@
 package de.andrena.c4j.systemtest.inheritance;
 
-import static de.andrena.next.Condition.post;
+import static de.andrena.c4j.Condition.post;
 
 import org.apache.log4j.Level;
 import org.junit.Before;
@@ -8,7 +8,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.c4j.systemtest.TransformerAwareRule;
-import de.andrena.next.Contract;
+import de.andrena.c4j.Contract;
 
 public class SuperclassSystemTest {
 	@Rule

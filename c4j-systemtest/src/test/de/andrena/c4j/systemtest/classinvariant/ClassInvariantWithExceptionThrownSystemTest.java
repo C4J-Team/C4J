@@ -10,9 +10,9 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.c4j.systemtest.TransformerAwareRule;
-import de.andrena.next.AllowPureAccess;
-import de.andrena.next.ClassInvariant;
-import de.andrena.next.Contract;
+import de.andrena.c4j.AllowPureAccess;
+import de.andrena.c4j.ClassInvariant;
+import de.andrena.c4j.Contract;
 
 public class ClassInvariantWithExceptionThrownSystemTest {
 	@Rule

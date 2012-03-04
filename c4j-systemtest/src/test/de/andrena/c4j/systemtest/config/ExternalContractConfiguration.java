@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.andrena.c4j.systemtest.config.externalcontract.ExternalContractSystemTest;
-import de.andrena.next.DefaultConfiguration;
+import de.andrena.c4j.DefaultConfiguration;
 
 public class ExternalContractConfiguration extends DefaultConfiguration {
 	@Override
