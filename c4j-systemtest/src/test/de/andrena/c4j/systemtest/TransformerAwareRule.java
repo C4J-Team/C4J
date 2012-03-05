@@ -11,14 +11,12 @@ import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
 import de.andrena.c4j.internal.RootTransformer;
-import de.andrena.c4j.internal.transformer.TransformationException;
 
 public class TransformerAwareRule implements TestRule {
 	private String expectedLogMessage;
 	private Level expectedLogLevel;
 	private Level bannedLogLevel;
 	private String bannedLogMessage;
-	private Class<?> expectedException;
 	private Map<String, Level> usedLogMap;
 
 	private static Map<String, Level> globalLogMap = new HashMap<String, Level>();
@@ -48,11 +46,6 @@ public class TransformerAwareRule implements TestRule {
 		bannedLogMessage = message;
 	}
 
-	public void expectTransformationException(String message) {
-		expectGlobalLog(Level.ERROR, message);
-		expectedException = TransformationException.class;
-	}
-
 	@Override
 	public Statement apply(final Statement base, final Description description) {
 		return new Statement() {
@@ -60,7 +53,6 @@ public class TransformerAwareRule implements TestRule {
 			public void evaluate() throws Throwable {
 				localLogMap.clear();
 				usedLogMap = null;
-				expectedException = null;
 				expectedLogLevel = null;
 				expectedLogMessage = null;
 				bannedLogLevel = null;
@@ -89,12 +81,7 @@ public class TransformerAwareRule implements TestRule {
 	}
 
 	private void verifyException() throws Exception, Throwable {
-		if (expectedException != null) {
-			if (RootTransformer.getLastException() == null
-					|| !RootTransformer.getLastException().getClass().equals(expectedException)) {
-				throw new Exception("expected a " + expectedException.getName() + " to be thrown");
-			}
-		} else if (RootTransformer.getLastException() != null) {
+		if (RootTransformer.getLastException() != null) {
 			throw RootTransformer.getLastException();
 		}
 	}

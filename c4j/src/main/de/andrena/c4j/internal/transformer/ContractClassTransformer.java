@@ -3,8 +3,8 @@ package de.andrena.c4j.internal.transformer;
 import javassist.CtClass;
 import de.andrena.c4j.internal.RootTransformer;
 import de.andrena.c4j.internal.Transformed;
-import de.andrena.c4j.internal.util.TransformationHelper;
 import de.andrena.c4j.internal.util.ContractRegistry.ContractInfo;
+import de.andrena.c4j.internal.util.TransformationHelper;
 
 public class ContractClassTransformer extends AbstractContractClassTransformer {
 	private AbstractContractClassTransformer[] transformers = new AbstractContractClassTransformer[] {

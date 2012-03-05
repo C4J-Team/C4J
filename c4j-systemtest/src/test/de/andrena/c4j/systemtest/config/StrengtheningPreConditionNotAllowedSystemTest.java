@@ -1,4 +1,4 @@
-package de.andrena.c4j.systemtest.config.defaultpreconditiontrue;
+package de.andrena.c4j.systemtest.config;
 
 import static de.andrena.c4j.Condition.pre;
 
@@ -9,17 +9,16 @@ import org.junit.Test;
 import de.andrena.c4j.Contract;
 import de.andrena.c4j.systemtest.TransformerAwareRule;
 
-public class DefaultPreConditionTrueSystemTest {
+public class StrengtheningPreConditionNotAllowedSystemTest {
 	@Rule
 	public TransformerAwareRule transformerAwareRule = new TransformerAwareRule();
 
 	@Test
 	public void testPreConditionUndefined() {
-		transformerAwareRule.expectGlobalLog(Level.ERROR,
-				"found strengthening pre-condition in" + " " + ContractClass.class.getName() + ".method(int)"
-						+ " which is already defined from " + SuperClass.class.getName()
-						+ " - ignoring the pre-condition");
-		new TargetClass().method(-1);
+		transformerAwareRule.expectGlobalLog(Level.ERROR, "found strengthening pre-condition in "
+						+ ContractClass.class.getName() + ".method(int)" + " which is already defined from" + " "
+						+ SuperClassContract.class.getName() + " - ignoring the pre-condition");
+		new TargetClass().method(0);
 	}
 
 	@Contract(ContractClass.class)
@@ -35,9 +34,18 @@ public class DefaultPreConditionTrueSystemTest {
 		}
 	}
 
+	@Contract(SuperClassContract.class)
 	public static class SuperClass {
 		public void method(int arg) {
 		}
 	}
 
+	public static class SuperClassContract extends SuperClass {
+		@Override
+		public void method(int arg) {
+			if (pre()) {
+				assert arg > -1;
+			}
+		}
+	}
 }

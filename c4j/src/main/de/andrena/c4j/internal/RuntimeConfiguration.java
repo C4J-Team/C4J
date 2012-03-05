@@ -12,7 +12,6 @@ import javassist.NotFoundException;
 import de.andrena.c4j.Configuration;
 import de.andrena.c4j.Configuration.ContractViolationAction;
 import de.andrena.c4j.Configuration.DefaultPreCondition;
-import de.andrena.c4j.Configuration.InvalidPreConditionBehavior;
 import de.andrena.c4j.Configuration.PureBehavior;
 import de.andrena.c4j.internal.util.WhitelistConverter;
 
@@ -83,8 +82,8 @@ public class RuntimeConfiguration {
 		return configuration.getDefaultPreCondition();
 	}
 
-	public InvalidPreConditionBehavior getInvalidPreConditionBehavior() {
-		return configuration.getInvalidPreConditionBehavior();
+	public boolean isStrengtheningPreConditionAllowed() {
+		return configuration.isStrengtheningPreConditionAllowed();
 	}
 
 	public Set<ContractViolationAction> getContractViolationActions() {

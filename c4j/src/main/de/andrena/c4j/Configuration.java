@@ -49,23 +49,11 @@ public interface Configuration {
 	}
 
 	/**
-	 * The behavior when an invalid pre-condition is detected.
+	 * If strengthening a pre-condition is allowed.
 	 * 
 	 * @see Configuration#getDefaultPreCondition
-	 * @see InvalidPreConditionBehavior
 	 */
-	InvalidPreConditionBehavior getInvalidPreConditionBehavior();
-
-	public enum InvalidPreConditionBehavior {
-		/**
-		 * Ignore a pre-condition redefinition and issue a warning.
-		 */
-		IGNORE_AND_WARN,
-		/**
-		 * Consider a pre-condition redefinition a contract violation and issue an error.
-		 */
-		ABORT_AND_ERROR;
-	}
+	boolean isStrengtheningPreConditionAllowed();
 
 	/**
 	 * The actions taken on a contract violation.

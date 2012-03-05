@@ -69,12 +69,12 @@ public class DefaultConfiguration implements Configuration {
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * @return Defaults to {@link InvalidPreConditionBehavior#IGNORE_AND_WARN}.
+	 * @return Defaults to false.
 	 */
 	@Override
-	public InvalidPreConditionBehavior getInvalidPreConditionBehavior() {
-		return InvalidPreConditionBehavior.IGNORE_AND_WARN;
-	}
+	public boolean isStrengtheningPreConditionAllowed() {
+		return false;
+	};
 
 	/**
 	 * {@inheritDoc}

@@ -1,22 +1,22 @@
-package de.andrena.c4j.systemtest.config.invalidpreconditionbehaviorerror;
+package de.andrena.c4j.systemtest.config.strengtheningpreconditionallowed;
 
 import static de.andrena.c4j.Condition.pre;
 
 import org.junit.Rule;
 import org.junit.Test;
 
-import de.andrena.c4j.systemtest.TransformerAwareRule;
 import de.andrena.c4j.Contract;
+import de.andrena.c4j.systemtest.TransformerAwareRule;
 
-public class InvalidPreConditionBehaviorErrorSystemTest {
+public class ContractClassOnlyTransformedOnce {
 	@Rule
 	public TransformerAwareRule transformerAwareRule = new TransformerAwareRule();
 
 	@Test
-	public void testPreConditionUndefined() {
-		transformerAwareRule.expectTransformationException("found strengthening pre-condition in "
-				+ ContractClass.class.getName() + ".method(int)" + " which is already defined from" + " "
-				+ SuperClassContract.class.getName());
+	public void testContractClassTransformationThrowingException() {
+		// loading ContractClass before TargetClass
+		// this will throw a strengthening pre-condition exception
+		ContractClass.class.getName();
 		new TargetClass().method(0);
 	}
 

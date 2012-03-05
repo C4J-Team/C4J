@@ -16,13 +16,12 @@ import de.andrena.c4j.Contract;
 import de.andrena.c4j.DefaultConfiguration;
 import de.andrena.c4j.internal.transformer.AffectedClassTransformer;
 import de.andrena.c4j.internal.transformer.ContractClassTransformer;
-import de.andrena.c4j.internal.transformer.TransformationException;
 import de.andrena.c4j.internal.util.BackdoorAnnotationLoader;
 import de.andrena.c4j.internal.util.ContractRegistry;
+import de.andrena.c4j.internal.util.ContractRegistry.ContractInfo;
 import de.andrena.c4j.internal.util.InvolvedTypeInspector;
 import de.andrena.c4j.internal.util.ListOrderedSet;
 import de.andrena.c4j.internal.util.LocalClassLoader;
-import de.andrena.c4j.internal.util.ContractRegistry.ContractInfo;
 
 public class RootTransformer implements ClassFileTransformer {
 	public static final RootTransformer INSTANCE = new RootTransformer();
@@ -92,10 +91,6 @@ public class RootTransformer implements ClassFileTransformer {
 		try {
 			updateClassPath(loader, classfileBuffer, className);
 			return transformClass(className);
-		} catch (TransformationException e) {
-			lastException = e;
-			logger.error(e.getMessage());
-			logger.debug(e);
 		} catch (Exception e) {
 			lastException = e;
 			logger.fatal("transformation failed for class '" + className + "'", e);

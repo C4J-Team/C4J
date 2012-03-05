@@ -6,8 +6,8 @@ import org.apache.log4j.Level;
 import org.junit.Rule;
 import org.junit.Test;
 
-import de.andrena.c4j.systemtest.TransformerAwareRule;
 import de.andrena.c4j.Contract;
+import de.andrena.c4j.systemtest.TransformerAwareRule;
 
 public class PreConditionStrengthenedSystemTest {
 	@Rule
@@ -15,7 +15,7 @@ public class PreConditionStrengthenedSystemTest {
 
 	@Test
 	public void testPreConditionUndefined() {
-		transformerAwareRule.expectGlobalLog(Level.WARN,
+		transformerAwareRule.expectGlobalLog(Level.ERROR,
 				"found strengthening pre-condition in " + ContractClass.class.getName() + ".method(int)"
 						+ " which is already defined from " + SuperClassContract.class.getName()
 						+ " - ignoring the pre-condition");

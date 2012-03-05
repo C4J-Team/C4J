@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtBehavior;
 import javassist.CtClass;
@@ -16,7 +17,6 @@ import de.andrena.c4j.ClassInvariant;
 import de.andrena.c4j.Contract;
 import de.andrena.c4j.internal.RootTransformer;
 import de.andrena.c4j.internal.transformer.ContractBehaviorTransformer;
-import de.andrena.c4j.internal.transformer.TransformationException;
 import de.andrena.c4j.internal.util.ContractRegistry.ContractInfo;
 
 public class AffectedBehaviorLocatorTest {
@@ -50,7 +50,7 @@ public class AffectedBehaviorLocatorTest {
 		assertNull(locator.getAffectedBehavior(null, null, contractClass.getDeclaredMethod("invariant")));
 	}
 
-	@Test(expected = TransformationException.class)
+	@Test(expected = CannotCompileException.class)
 	public void testGetAffectedBehaviorForNonMethodOrConstructor() throws Exception {
 		CtBehavior contractBehavior = mock(CtBehavior.class);
 		when(contractBehavior.getName()).thenReturn("contractBehavior");

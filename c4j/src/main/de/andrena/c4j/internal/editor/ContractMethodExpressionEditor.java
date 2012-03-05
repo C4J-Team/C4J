@@ -21,7 +21,6 @@ import org.apache.log4j.Logger;
 
 import de.andrena.c4j.Condition;
 import de.andrena.c4j.Configuration.DefaultPreCondition;
-import de.andrena.c4j.Configuration.InvalidPreConditionBehavior;
 import de.andrena.c4j.internal.RootTransformer;
 import de.andrena.c4j.internal.compiler.ArrayExp;
 import de.andrena.c4j.internal.compiler.AssignmentExp;
@@ -32,10 +31,9 @@ import de.andrena.c4j.internal.compiler.StandaloneExp;
 import de.andrena.c4j.internal.compiler.StaticCallExp;
 import de.andrena.c4j.internal.compiler.ValueExp;
 import de.andrena.c4j.internal.evaluator.Evaluator;
-import de.andrena.c4j.internal.transformer.TransformationException;
+import de.andrena.c4j.internal.util.ContractRegistry.ContractInfo;
 import de.andrena.c4j.internal.util.InvolvedTypeInspector;
 import de.andrena.c4j.internal.util.ListOrderedSet;
-import de.andrena.c4j.internal.util.ContractRegistry.ContractInfo;
 
 public class ContractMethodExpressionEditor extends ExprEditor {
 	private Logger logger = Logger.getLogger(getClass());
@@ -154,13 +152,11 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 
 	private void preConditionStrengthening(MethodCall methodCall, CtBehavior method, CtClass definingClass)
 			throws CannotCompileException, NotFoundException {
-		String message = "found strengthening pre-condition in " + method.getLongName()
-				+ " which is already defined from " + definingClass.getName();
-		if (rootTransformer.getConfigurationManager().getConfiguration(contract.getTargetClass())
-				.getInvalidPreConditionBehavior() == InvalidPreConditionBehavior.ABORT_AND_ERROR) {
-			throw new TransformationException(message);
+		if (!rootTransformer.getConfigurationManager().getConfiguration(contract.getTargetClass())
+				.isStrengtheningPreConditionAllowed()) {
+			logger.error(("found strengthening pre-condition in " + method.getLongName()
+					+ " which is already defined from " + definingClass.getName()) + " - ignoring the pre-condition");
 		}
-		logger.warn(message + " - ignoring the pre-condition");
 		AssignmentExp replacementExp = new AssignmentExp(NestedExp.RETURN_VALUE, BooleanExp.FALSE);
 		replacementExp.toStandalone().replace(methodCall);
 	}

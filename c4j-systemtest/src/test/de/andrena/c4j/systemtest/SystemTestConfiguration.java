@@ -13,7 +13,7 @@ import de.andrena.c4j.PureRegistryException;
 import de.andrena.c4j.systemtest.config.AssertionErrorOnlyConfiguration;
 import de.andrena.c4j.systemtest.config.DefaultPreConditionTrueConfiguration;
 import de.andrena.c4j.systemtest.config.ExternalContractConfiguration;
-import de.andrena.c4j.systemtest.config.InvalidPreConditionBehaviorErrorConfiguration;
+import de.andrena.c4j.systemtest.config.StrengtheningPreConditionAllowedConfiguration;
 import de.andrena.c4j.systemtest.config.LogOnlyConfiguration;
 import de.andrena.c4j.systemtest.config.PureBehaviorEmptyConfiguration;
 import de.andrena.c4j.systemtest.config.PureBehaviorSkipOnlyConfiguration;
@@ -23,7 +23,7 @@ public class SystemTestConfiguration extends DefaultConfiguration {
 	public Set<Configuration> getConfigurations() {
 		Set<Configuration> configurations = new HashSet<Configuration>();
 		configurations.add(new DefaultPreConditionTrueConfiguration());
-		configurations.add(new InvalidPreConditionBehaviorErrorConfiguration());
+		configurations.add(new StrengtheningPreConditionAllowedConfiguration());
 		configurations.add(new LogOnlyConfiguration());
 		configurations.add(new AssertionErrorOnlyConfiguration());
 		configurations.add(new ExternalContractConfiguration());

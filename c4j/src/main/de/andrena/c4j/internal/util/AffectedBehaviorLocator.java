@@ -14,7 +14,6 @@ import org.apache.log4j.Logger;
 import de.andrena.c4j.ClassInvariant;
 import de.andrena.c4j.internal.RootTransformer;
 import de.andrena.c4j.internal.transformer.ContractBehaviorTransformer;
-import de.andrena.c4j.internal.transformer.TransformationException;
 import de.andrena.c4j.internal.util.ContractRegistry.ContractInfo;
 
 public class AffectedBehaviorLocator {
@@ -42,7 +41,7 @@ public class AffectedBehaviorLocator {
 		} else if (contractBehavior instanceof CtMethod) {
 			affectedBehavior = getAffectedMethod(contractInfo, affectedClass, contractBehavior);
 		} else {
-			throw new TransformationException("contractBehavior " + contractBehavior.getLongName()
+			throw new CannotCompileException("contractBehavior " + contractBehavior.getLongName()
 					+ " is neither constructor nor method");
 		}
 		return affectedBehavior;
