@@ -12,6 +12,8 @@ public class PureEvaluator {
 	public static final StaticCall unregisterUnpure = new StaticCall(PureEvaluator.class, "unregisterUnpure");
 	public static final StaticCall checkUnpureAccess = new StaticCall(PureEvaluator.class, "checkUnpureAccess");
 	public static final StaticCall checkExternalAccess = new StaticCall(PureEvaluator.class, "checkExternalAccess");
+	public static final StaticCall checkExternalBlacklistAccess = new StaticCall(PureEvaluator.class,
+			"checkExternalBlacklistAccess");
 	public static final StaticCall checkUnpureStatic = new StaticCall(PureEvaluator.class, "checkUnpureStatic");
 
 	private static ThreadLocal<ObjectIdentitySet> unpureCache = new ThreadLocal<ObjectIdentitySet>() {
@@ -50,8 +52,17 @@ public class PureEvaluator {
 	}
 
 	public static void checkExternalAccess(Object target, String method) {
-		logger.warn("access on unpure method " + method
-				+ " outside the root-packages. add it to the white- or blacklist in the configuration.");
+		if (unpureCache.get().contains(target)) {
+			logger.warn("access on unknown method " + method
+					+ " outside the root-packages. add it to the pure-registry in the configuration.");
+		}
+	}
+
+	public static void checkExternalBlacklistAccess(Object target, String method) {
+		if (unpureCache.get().contains(target)) {
+			throw new AssertionError("illegal access on unpure method " + method
+					+ " outside the root-packages.");
+		}
 	}
 
 	public static void checkUnpureStatic() {

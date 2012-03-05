@@ -24,14 +24,15 @@ import de.andrena.c4j.internal.compiler.CastExp;
 import de.andrena.c4j.internal.compiler.ConstructorExp;
 import de.andrena.c4j.internal.compiler.NestedExp;
 import de.andrena.c4j.internal.compiler.StandaloneExp;
+import de.andrena.c4j.internal.compiler.StaticCall;
 import de.andrena.c4j.internal.compiler.StaticCallExp;
 import de.andrena.c4j.internal.compiler.ThrowExp;
 import de.andrena.c4j.internal.compiler.ValueExp;
 import de.andrena.c4j.internal.evaluator.PureEvaluator;
+import de.andrena.c4j.internal.util.ContractRegistry.ContractInfo;
 import de.andrena.c4j.internal.util.InvolvedTypeInspector;
 import de.andrena.c4j.internal.util.ListOrderedSet;
 import de.andrena.c4j.internal.util.PureInspector;
-import de.andrena.c4j.internal.util.ContractRegistry.ContractInfo;
 
 public class PureBehaviorExpressionEditor extends ExprEditor {
 
@@ -54,7 +55,12 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 
 	private void replaceWithPureCheck(MethodCall methodCall) throws NotFoundException, CannotCompileException {
 		CtMethod method = methodCall.getMethod();
-		StandaloneExp checkUnpureAccessExp = new StaticCallExp(PureEvaluator.checkExternalAccess,
+		StaticCall checkMethod = PureEvaluator.checkExternalAccess;
+		if (rootTransformer.getConfigurationManager().getConfiguration(affectedBehavior.getDeclaringClass())
+				.getBlacklistMethods().contains(method)) {
+			checkMethod = PureEvaluator.checkExternalBlacklistAccess;
+		}
+		StandaloneExp checkUnpureAccessExp = new StaticCallExp(checkMethod,
 				NestedExp.CALLING_OBJECT, new ValueExp(method.getLongName())).toStandalone();
 		StandaloneExp replacementExp = checkUnpureAccessExp.append(StandaloneExp.proceed);
 		logger.info("possible call to external unpure method " + method.getLongName());

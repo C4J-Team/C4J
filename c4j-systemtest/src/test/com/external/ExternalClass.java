@@ -1,15 +1,13 @@
 package com.external;
 
 public class ExternalClass {
-	public void unpureMethodUndefinedInConfig() {
+	public void methodUndefinedInConfig() {
 	}
 
-	public void unpureMethodWhitelistedInConfig() {
+	public void pureMethodWhitelistedInConfig() {
 	}
 
-	public static void main(String[] args) {
-		for (String key : System.getProperties().stringPropertyNames()) {
-			System.out.println(key + ": " + System.getProperty(key));
-		}
+	public void unpureMethodBlacklistedInConfig() {
 	}
+
 }
