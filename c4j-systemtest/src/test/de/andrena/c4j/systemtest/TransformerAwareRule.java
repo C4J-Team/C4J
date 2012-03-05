@@ -57,7 +57,6 @@ public class TransformerAwareRule implements TestRule {
 				expectedLogMessage = null;
 				bannedLogLevel = null;
 				bannedLogMessage = null;
-				RootTransformer.resetLastException();
 				base.evaluate();
 				verify();
 			}
@@ -82,7 +81,9 @@ public class TransformerAwareRule implements TestRule {
 
 	private void verifyException() throws Exception, Throwable {
 		if (RootTransformer.getLastException() != null) {
-			throw RootTransformer.getLastException();
+			Throwable lastException = RootTransformer.getLastException();
+			RootTransformer.resetLastException();
+			throw lastException;
 		}
 	}
 

@@ -12,7 +12,7 @@ import de.andrena.c4j.Contract;
 import de.andrena.c4j.Pure;
 import de.andrena.c4j.Target;
 
-public class UnchangedSystemTest {
+public class UnchangedForPrimitivesSystemTest {
 	@Rule
 	public TransformerAwareRule transformerAware = new TransformerAwareRule();
 

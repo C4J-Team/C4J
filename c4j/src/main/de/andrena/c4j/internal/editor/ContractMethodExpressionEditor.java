@@ -208,19 +208,25 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		methodCall.replace(replacementCall.getCode());
 	}
 
-	private CompareExp getReplacementCallForArrayMember(CtMember arrayMember) {
+	private CompareExp getReplacementCallForArrayMember(CtMember arrayMember) throws NotFoundException {
 		NestedExp equalExpLeft;
 		NestedExp equalExpRight;
+		CtClass memberType;
 		if (arrayMember instanceof CtField) {
 			storeLastFieldAccess((CtField) arrayMember);
+			memberType = ((CtField) arrayMember).getType();
 			equalExpLeft = new StaticCallExp(Evaluator.fieldAccess, new ValueExp(arrayMember.getName()));
 			equalExpRight = new StaticCallExp(Evaluator.oldFieldAccess, new ValueExp(arrayMember.getName()));
 		} else {
 			storeLastMethodCall((CtMethod) arrayMember);
+			memberType = ((CtMethod) arrayMember).getReturnType();
 			equalExpLeft = new StaticCallExp(Evaluator.methodCall, new ValueExp(arrayMember.getName()), new ArrayExp(
 					Class.class), new ArrayExp(Object.class));
 			equalExpRight = new StaticCallExp(Evaluator.oldMethodCall, new ValueExp(arrayMember.getName()));
 		}
-		return new CompareExp(equalExpLeft).isEqual(equalExpRight);
+		if (memberType.isPrimitive()) {
+			return new CompareExp(equalExpLeft).isEqual(equalExpRight);
+		}
+		return new CompareExp(equalExpLeft).eq(equalExpRight);
 	}
 }
