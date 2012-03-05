@@ -1,1 +1,1 @@
--ea -javaagent:../next/lib/next.jar=de.andrena.next.TestConfiguration
+-ea -javaagent:../c4j/dist/c4j-current-all.jar=de.andrena.c4j.TestConfiguration

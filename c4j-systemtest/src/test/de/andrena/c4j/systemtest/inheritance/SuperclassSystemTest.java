@@ -7,8 +7,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import de.andrena.c4j.systemtest.TransformerAwareRule;
 import de.andrena.c4j.Contract;
+import de.andrena.c4j.systemtest.TransformerAwareRule;
 
 public class SuperclassSystemTest {
 	@Rule
@@ -41,11 +41,9 @@ public class SuperclassSystemTest {
 
 	@Test
 	public void testNoWarningWhenContractMethodNotOverwritten() {
-		transformerAware
-				.banGlobalLog(
-						Level.WARN,
-						"could not find method method in affected class de.andrena.next.systemtest.inheritance.SuperclassSystemTest$NoWarningClass"
-								+ " for contract class de.andrena.next.systemtest.inheritance.SuperclassSystemTest$SuperContract - inserting an empty method");
+		transformerAware.banGlobalLog(Level.WARN, "could not find method method in affected class "
+				+ NoWarningClass.class.getName() + " for contract class " + SuperContract.class.getName()
+				+ " - inserting an empty method");
 		new NoWarningClass().method(3);
 	}
 
