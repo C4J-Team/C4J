@@ -22,10 +22,12 @@ public class RuntimeConfiguration {
 	private Configuration configuration;
 	private Set<String> rootPackages = new HashSet<String>();
 	private Map<String, String> externalContracts = new HashMap<String, String>();
+	private Set<CtMethod> blacklistMethods;
 
 	public RuntimeConfiguration(Configuration configuration, WhitelistConverter whitelistConverter) throws Exception {
 		this.configuration = configuration;
-		whitelistMethods = whitelistConverter.convertWhitelist(configuration.getPureWhitelist());
+		whitelistMethods = whitelistConverter.convertWhitelist(configuration.getPureRegistry().getPureMethods());
+		blacklistMethods = whitelistConverter.convertWhitelist(configuration.getPureRegistry().getUnpureMethods());
 		normalizeRootPackages();
 		stringifyExternalContracts();
 	}
@@ -63,6 +65,10 @@ public class RuntimeConfiguration {
 
 	public Set<CtMethod> getWhitelistMethods() {
 		return whitelistMethods;
+	}
+
+	public Set<CtMethod> getBlacklistMethods() {
+		return blacklistMethods;
 	}
 
 	public Set<String> getRootPackages() {

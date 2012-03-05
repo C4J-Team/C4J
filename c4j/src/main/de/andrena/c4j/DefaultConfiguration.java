@@ -1,6 +1,5 @@
 package de.andrena.c4j;
 
-import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
@@ -30,7 +29,7 @@ public class DefaultConfiguration implements Configuration {
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * @return Defaults to an epty map.
+	 * @return Defaults to an empty map.
 	 */
 	@Override
 	public Map<Class<?>, Class<?>> getExternalContracts() {
@@ -40,11 +39,11 @@ public class DefaultConfiguration implements Configuration {
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * @return Defaults to an empty set.
+	 * @return Defaults to an empty registry.
 	 */
 	@Override
-	public Set<Method> getPureWhitelist() throws NoSuchMethodException, SecurityException {
-		return Collections.emptySet();
+	public PureRegistry getPureRegistry() throws PureRegistryException {
+		return PureRegistry.union();
 	}
 
 	/**

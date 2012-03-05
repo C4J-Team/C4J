@@ -1,16 +1,15 @@
 package de.andrena.c4j.systemtest;
 
-import java.lang.reflect.Method;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.external.ExternalClass;
-
+import de.andrena.c4j.Configuration;
+import de.andrena.c4j.DefaultConfiguration;
+import de.andrena.c4j.PureRegistry;
+import de.andrena.c4j.PureRegistryException;
 import de.andrena.c4j.systemtest.config.AssertionErrorOnlyConfiguration;
 import de.andrena.c4j.systemtest.config.DefaultPreConditionTrueConfiguration;
 import de.andrena.c4j.systemtest.config.ExternalContractConfiguration;
@@ -18,8 +17,6 @@ import de.andrena.c4j.systemtest.config.InvalidPreConditionBehaviorErrorConfigur
 import de.andrena.c4j.systemtest.config.LogOnlyConfiguration;
 import de.andrena.c4j.systemtest.config.PureBehaviorEmptyConfiguration;
 import de.andrena.c4j.systemtest.config.PureBehaviorSkipOnlyConfiguration;
-import de.andrena.c4j.Configuration;
-import de.andrena.c4j.DefaultConfiguration;
 
 public class SystemTestConfiguration extends DefaultConfiguration {
 	@Override
@@ -46,57 +43,32 @@ public class SystemTestConfiguration extends DefaultConfiguration {
 	}
 
 	@Override
-	public Set<Method> getPureWhitelist() throws NoSuchMethodException, SecurityException {
-		Set<Method> pureWhitelist = new HashSet<Method>();
-		pureWhitelist.add(Boolean.class.getMethod("booleanValue"));
-		pureWhitelist.add(Class.class.getMethod("desiredAssertionStatus"));
-		pureWhitelist.add(Class.class.getMethod("getClass"));
-		pureWhitelist.add(Class.class.getMethod("getName"));
-		pureWhitelist.add(Collection.class.getMethod("size"));
-		pureWhitelist.add(Collection.class.getMethod("isEmpty"));
-		pureWhitelist.add(ExternalClass.class.getMethod("unpureMethodWhitelistedInConfig"));
-		pureWhitelist.add(Integer.class.getMethod("intValue"));
-		pureWhitelist.add(Integer.class.getMethod("valueOf", int.class));
-		pureWhitelist.add(List.class.getMethod("get", int.class));
-		pureWhitelist.add(Object.class.getMethod("equals", Object.class));
-		pureWhitelist.add(Object.class.getMethod("hashCode"));
-		pureWhitelist.add(Object.class.getMethod("toString"));
-		pureWhitelist.add(StackTraceElement.class.getMethod("getClassName"));
-		pureWhitelist.add(String.class.getMethod("valueOf", Object.class));
-		pureWhitelist.add(Throwable.class.getMethod("getStackTrace"));
-		return pureWhitelist;
+	public PureRegistry getPureRegistry() throws PureRegistryException {
+		return PureRegistry.union(
+				PureRegistry.register(Boolean.class)
+						.pureMethod("booleanValue"),
+				PureRegistry.register(Class.class)
+						.pureMethod("desiredAssertionStatus")
+						.pureMethod("getName"),
+				PureRegistry.register(Collection.class)
+						.pureMethod("size")
+						.pureMethod("isEmpty"),
+				PureRegistry.register(Integer.class)
+						.pureMethod("intValue")
+						.pureMethod("valueOf", int.class),
+				PureRegistry.register(List.class)
+						.pureMethod("get", int.class),
+				PureRegistry.register(Object.class)
+						.pureMethod("getClass")
+						.pureMethod("equals", Object.class)
+						.pureMethod("hashCode")
+						.pureMethod("toString"),
+				PureRegistry.register(StackTraceElement.class)
+						.pureMethod("getClassName"),
+				PureRegistry.register(String.class)
+						.pureMethod("valueOf", Object.class),
+				PureRegistry.register(Throwable.class)
+						.pureMethod("getStackTrace")
+				);
 	}
-
-	public void definePureWhitelist() throws Throwable {
-		pureWhitelist(ArrayList.class).size();
-		pureWhitelist(ArrayList.class).get(0);
-		pureWhitelist(ArrayList.class).isEmpty();
-		// aber:
-		pureWhitelist(String.class).regionMatches(false, 0, null, 0, 0);
-		// konstruktoren?
-		//		pureWhitelistConstructor(String.class).withArguments(byte[].class, Charset.class);
-		// oder:
-		pureWhitelistConstructor(new String(null, (Charset) null));
-		// statische methoden = warning
-		pureWhitelist(String.class).format(null);
-	}
-
-	protected <T> T pureWhitelist(Class<T> clazz) {
-		return null;
-	}
-
-	protected <T> void pureWhitelistConstructor(T constructorCall) {
-	}
-
-	/*	protected WhitelistConstructor pureWhitelistConstructor(Class<?> clazz) {
-			return new WhitelistConstructor();
-		}
-		
-		public static class WhitelistConstructor {
-			public void withNoArguments() {
-			}
-
-			public void withArguments(Class<?> firstArgument, Class<?>... additionalArguments) {
-			}
-		}*/
 }

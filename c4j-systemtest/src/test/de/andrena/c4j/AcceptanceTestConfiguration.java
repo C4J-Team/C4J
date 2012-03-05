@@ -1,13 +1,9 @@
 package de.andrena.c4j;
 
-import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import de.andrena.c4j.DefaultConfiguration;
 
 public class AcceptanceTestConfiguration extends DefaultConfiguration {
 	@Override
@@ -16,24 +12,33 @@ public class AcceptanceTestConfiguration extends DefaultConfiguration {
 	}
 
 	@Override
-	public Set<Method> getPureWhitelist() throws NoSuchMethodException, SecurityException {
-		Set<Method> pureWhitelist = new HashSet<Method>();
-		pureWhitelist.add(Boolean.class.getMethod("booleanValue"));
-		pureWhitelist.add(Class.class.getMethod("desiredAssertionStatus"));
-		pureWhitelist.add(Class.class.getMethod("getClass"));
-		pureWhitelist.add(Class.class.getMethod("getName"));
-		pureWhitelist.add(Collection.class.getMethod("size"));
-		pureWhitelist.add(Collection.class.getMethod("isEmpty"));
-		pureWhitelist.add(Integer.class.getMethod("intValue"));
-		pureWhitelist.add(Integer.class.getMethod("valueOf", int.class));
-		pureWhitelist.add(List.class.getMethod("get", int.class));
-		pureWhitelist.add(Object.class.getMethod("equals", Object.class));
-		pureWhitelist.add(Object.class.getMethod("hashCode"));
-		pureWhitelist.add(Object.class.getMethod("toString"));
-		pureWhitelist.add(StackTraceElement.class.getMethod("getClassName"));
-		pureWhitelist.add(String.class.getMethod("valueOf", Object.class));
-		pureWhitelist.add(Throwable.class.getMethod("getStackTrace"));
-		return pureWhitelist;
+	public PureRegistry getPureRegistry() throws PureRegistryException {
+		return PureRegistry.union(
+				PureRegistry.register(Boolean.class)
+						.pureMethod("booleanValue"),
+				PureRegistry.register(Class.class)
+						.pureMethod("desiredAssertionStatus")
+						.pureMethod("getName"),
+				PureRegistry.register(Collection.class)
+						.pureMethod("size")
+						.pureMethod("isEmpty"),
+				PureRegistry.register(Integer.class)
+						.pureMethod("intValue")
+						.pureMethod("valueOf", int.class),
+				PureRegistry.register(List.class)
+						.pureMethod("get", int.class),
+				PureRegistry.register(Object.class)
+						.pureMethod("getClass")
+						.pureMethod("equals", Object.class)
+						.pureMethod("hashCode")
+						.pureMethod("toString"),
+				PureRegistry.register(StackTraceElement.class)
+						.pureMethod("getClassName"),
+				PureRegistry.register(String.class)
+						.pureMethod("valueOf", Object.class),
+				PureRegistry.register(Throwable.class)
+						.pureMethod("getStackTrace")
+				);
 	}
 
 	@Override

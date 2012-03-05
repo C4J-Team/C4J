@@ -1,6 +1,5 @@
 package de.andrena.c4j;
 
-import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,10 +25,11 @@ public interface Configuration {
 	Map<Class<?>, Class<?>> getExternalContracts();
 
 	/**
-	 * Define methods that are being assumed to be pure. Cannot contain methods from classes within one of the root
-	 * packages.
+	 * Define methods that are being assumed to be pure or unpure outside of the specified root packages.
+	 * 
+	 * @return A {@link PureRegistry} with the specified pure and unpure methods.
 	 */
-	Set<Method> getPureWhitelist() throws NoSuchMethodException, SecurityException;
+	PureRegistry getPureRegistry() throws PureRegistryException;
 
 	/**
 	 * Whether transformed classes within root-packages are being written on disk after transformation.
