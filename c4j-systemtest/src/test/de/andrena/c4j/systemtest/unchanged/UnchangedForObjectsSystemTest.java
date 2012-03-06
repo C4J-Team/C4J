@@ -33,6 +33,11 @@ public class UnchangedForObjectsSystemTest {
 		target.methodRemainsUnchanged();
 	}
 
+	@Test
+	public void testParameterRemainsUnchanged() {
+		target.parameterRemainsUnchanged(new SetLike());
+	}
+
 	@Test(expected = AssertionError.class)
 	public void testFieldIsChanged() {
 		target.fieldIsChanged();
@@ -44,6 +49,16 @@ public class UnchangedForObjectsSystemTest {
 	}
 
 	@Test(expected = AssertionError.class)
+	public void testParameterIsChanged() {
+		target.parameterIsChanged(new SetLike());
+	}
+
+	@Test(expected = AssertionError.class)
+	public void testParameter5IsChanged() {
+		target.parameter5IsChanged(0, 0, 0, 0, new SetLike());
+	}
+
+	@Test(expected = AssertionError.class)
 	public void testFieldIsReplaced() {
 		target.fieldIsReplaced();
 	}
@@ -51,6 +66,11 @@ public class UnchangedForObjectsSystemTest {
 	@Test(expected = AssertionError.class)
 	public void testMethodIsReplaced() {
 		target.methodIsReplaced();
+	}
+
+	@Test
+	public void testParameterIsReplaced() {
+		target.parameterIsReplaced(new SetLike());
 	}
 
 	@Contract(ContractClass.class)
@@ -68,6 +88,9 @@ public class UnchangedForObjectsSystemTest {
 		public void methodRemainsUnchanged() {
 		}
 
+		public void parameterRemainsUnchanged(SetLike param) {
+		}
+
 		public void fieldIsChanged() {
 			field.setValue("abc");
 		}
@@ -76,12 +99,24 @@ public class UnchangedForObjectsSystemTest {
 			field.setValue("abc");
 		}
 
+		public void parameterIsChanged(SetLike param) {
+			param.setValue("abc");
+		}
+
+		public void parameter5IsChanged(int a, int b, int c, int d, SetLike param) {
+			param.setValue("abc");
+		}
+
 		public void fieldIsReplaced() {
 			field = new SetLike();
 		}
 
 		public void methodIsReplaced() {
 			field = new SetLike();
+		}
+
+		public void parameterIsReplaced(SetLike param) {
+			param = new SetLike();
 		}
 	}
 
@@ -104,6 +139,13 @@ public class UnchangedForObjectsSystemTest {
 		}
 
 		@Override
+		public void parameterRemainsUnchanged(SetLike param) {
+			if (post()) {
+				assert unchanged(param);
+			}
+		}
+
+		@Override
 		public void fieldIsChanged() {
 			if (post()) {
 				assert unchanged(target.field);
@@ -118,6 +160,20 @@ public class UnchangedForObjectsSystemTest {
 		}
 
 		@Override
+		public void parameterIsChanged(SetLike param) {
+			if (post()) {
+				assert unchanged(param);
+			}
+		}
+
+		@Override
+		public void parameter5IsChanged(int a, int b, int c, int d, SetLike param) {
+			if (post()) {
+				assert unchanged(param);
+			}
+		}
+
+		@Override
 		public void fieldIsReplaced() {
 			if (post()) {
 				assert unchanged(target.field);
@@ -128,6 +184,13 @@ public class UnchangedForObjectsSystemTest {
 		public void methodIsReplaced() {
 			if (post()) {
 				assert unchanged(target.method());
+			}
+		}
+
+		@Override
+		public void parameterIsReplaced(SetLike param) {
+			if (post()) {
+				assert unchanged(param);
 			}
 		}
 	}

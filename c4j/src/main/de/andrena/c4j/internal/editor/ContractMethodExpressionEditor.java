@@ -12,6 +12,10 @@ import javassist.CtField;
 import javassist.CtMember;
 import javassist.CtMethod;
 import javassist.NotFoundException;
+import javassist.bytecode.BadBytecode;
+import javassist.bytecode.CodeAttribute;
+import javassist.bytecode.CodeIterator;
+import javassist.bytecode.Opcode;
 import javassist.expr.ExprEditor;
 import javassist.expr.FieldAccess;
 import javassist.expr.MethodCall;
@@ -40,6 +44,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 	CtMethod lastMethodCall;
 	CtField lastFieldAccess;
 	List<CtMember> arrayMembers = new ArrayList<CtMember>();
+	private int arrayStartIndex;
 	Set<CtClass> nestedInnerClasses = new HashSet<CtClass>();
 	private List<StaticCallExp> storeExpressions = new ArrayList<StaticCallExp>();
 	private ContractInfo contract;
@@ -66,6 +71,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 	@Override
 	public void edit(NewArray newArray) throws CannotCompileException {
 		arrayMembers.clear();
+		arrayStartIndex = newArray.indexOfBytecode();
 	}
 
 	@Override
@@ -93,10 +99,12 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 			editMethodCall(methodCall);
 		} catch (NotFoundException e) {
 			throw new CannotCompileException(e);
+		} catch (BadBytecode e) {
+			throw new CannotCompileException(e);
 		}
 	}
 
-	void editMethodCall(MethodCall methodCall) throws NotFoundException, CannotCompileException {
+	void editMethodCall(MethodCall methodCall) throws NotFoundException, CannotCompileException, BadBytecode {
 		CtMethod method = methodCall.getMethod();
 		if (involvedTypeInspector.inspect(contract.getTargetClass()).contains(method.getDeclaringClass())) {
 			handleTargetMethodCall(methodCall);
@@ -198,15 +206,42 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		storeExpressions.add(new StaticCallExp(Evaluator.storeFieldAccess, new ValueExp(field.getName())));
 	}
 
-	private void handleUnchangedMethodCall(MethodCall methodCall) throws CannotCompileException, NotFoundException {
+	private void handleUnchangedMethodCall(MethodCall methodCall) throws CannotCompileException, NotFoundException,
+			BadBytecode {
 		logger.info("beginning to store fields and methods for unchanged");
 		BooleanExp conditions = BooleanExp.TRUE;
 		for (CtMember arrayMember : arrayMembers) {
 			conditions = conditions.and(getReplacementCallForArrayMember(arrayMember));
 		}
+		addUnchangeableParameterArrayMembers(methodCall.where(), methodCall.indexOfBytecode());
 		StandaloneExp replacementCall = new AssignmentExp(NestedExp.RETURN_VALUE, conditions).toStandalone();
 		logger.info("replacement code for unchanged: " + replacementCall.getCode());
 		methodCall.replace(replacementCall.getCode());
+	}
+
+	private void addUnchangeableParameterArrayMembers(CtBehavior contractBehavior, int maxIndex)
+			throws BadBytecode {
+		CodeAttribute ca = contractBehavior.getMethodInfo().getCodeAttribute();
+		CodeIterator ci = ca.iterator();
+		while (ci.hasNext()) {
+			int index = ci.next();
+			if (index <= arrayStartIndex) {
+				continue;
+			}
+			if (index >= maxIndex) {
+				return;
+			}
+			int op = ci.byteAt(index);
+			if (op == Opcode.ALOAD_1) {
+				unchangeableObjects.add(NestedExp.arg(1));
+			} else if (op == Opcode.ALOAD_2) {
+				unchangeableObjects.add(NestedExp.arg(2));
+			} else if (op == Opcode.ALOAD_3) {
+				unchangeableObjects.add(NestedExp.arg(3));
+			} else if (op == Opcode.ALOAD) {
+				unchangeableObjects.add(NestedExp.arg(ci.byteAt(index + 1)));
+			}
+		}
 	}
 
 	private BooleanExp getReplacementCallForArrayMember(CtMember arrayMember) throws NotFoundException {

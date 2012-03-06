@@ -22,7 +22,6 @@ import org.junit.Test;
 
 import de.andrena.c4j.Condition;
 import de.andrena.c4j.internal.RootTransformer;
-import de.andrena.c4j.internal.editor.ContractMethodExpressionEditor;
 import de.andrena.c4j.internal.util.ContractRegistry;
 import de.andrena.c4j.internal.util.ContractRegistry.ContractInfo;
 
@@ -37,7 +36,6 @@ public class ContractMethodExpressionEditorTest {
 	private CtClass contractClass;
 	private CtMethod oldMethod;
 	private CtClass innerContractClass;
-	private CtMethod unchangedMethod;
 
 	@Before
 	public void before() throws Exception {
@@ -53,7 +51,6 @@ public class ContractMethodExpressionEditorTest {
 		methodCall = mock(MethodCall.class);
 		CtClass conditionClass = pool.get(Condition.class.getName());
 		oldMethod = conditionClass.getDeclaredMethod("old");
-		unchangedMethod = conditionClass.getDeclaredMethod("unchanged");
 	}
 
 	@Test
@@ -132,34 +129,6 @@ public class ContractMethodExpressionEditorTest {
 		when(methodCall.getMethod()).thenReturn(oldMethod);
 		editor.lastMethodCall = targetClass.getDeclaredMethod("someMethodWithParameters");
 		editor.editMethodCall(methodCall);
-	}
-
-	@Test
-	public void testEditMethodCallToUnchangedWithField() throws Exception {
-		when(methodCall.getMethod()).thenReturn(unchangedMethod);
-		editor.arrayMembers.add(targetClass.getDeclaredField("someField"));
-		editor.editMethodCall(methodCall);
-		verify(methodCall).replace(anyString());
-		assertEquals(1, editor.getStoreExpressions().size());
-	}
-
-	@Test
-	public void testEditMethodCallToUnchangedWithMethod() throws Exception {
-		when(methodCall.getMethod()).thenReturn(unchangedMethod);
-		editor.arrayMembers.add(targetClass.getDeclaredMethod("someMethod"));
-		editor.editMethodCall(methodCall);
-		verify(methodCall).replace(anyString());
-		assertEquals(1, editor.getStoreExpressions().size());
-	}
-
-	@Test
-	public void testEditMethodCallToUnchangedWithFieldAndMethod() throws Exception {
-		when(methodCall.getMethod()).thenReturn(unchangedMethod);
-		editor.arrayMembers.add(targetClass.getDeclaredField("someField"));
-		editor.arrayMembers.add(targetClass.getDeclaredMethod("someMethod"));
-		editor.editMethodCall(methodCall);
-		verify(methodCall).replace(anyString());
-		assertEquals(2, editor.getStoreExpressions().size());
 	}
 
 	public static class TargetClass {

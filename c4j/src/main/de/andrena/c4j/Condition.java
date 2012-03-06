@@ -157,16 +157,19 @@ public class Condition {
 	}
 
 	/**
-	 * Usable within a post-condition to ensure, that a value (primitive types) or state (Objects) of a field or return
-	 * value of a method without parameters remains unchanged.
+	 * Usable within a post-condition to ensure, that a value (primitive types) or state (Objects) of a parameter, field
+	 * or return value of a method without parameters remains unchanged.
+	 * <p>
+	 * Note that reassignment of parameters is allowed, as it's only visible within the method. This also means that
+	 * parameters of primitive types are not affected.
 	 * 
-	 * @param fieldOrMethodWithoutParameters
-	 *            The target field or method without parameters.
-	 * @return Whether the value (primitive types) or reference (Objects) has been unchanged compared to the beginning
+	 * @param parameterOrFieldOrMethodWithoutParameters
+	 *            The method parameter, target field or method without parameters.
+	 * @return Whether the value (primitive types) or reference (Objects) has not been changed compared to the beginning
 	 *         of the method.
 	 */
 	@Pure
-	public static boolean unchanged(Object... fieldOrMethodWithoutParameters) {
+	public static boolean unchanged(Object... parameterOrFieldOrMethodWithoutParameters) {
 		return false;
 	}
 }
