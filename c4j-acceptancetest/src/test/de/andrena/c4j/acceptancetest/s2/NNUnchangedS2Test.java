@@ -7,15 +7,15 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import de.andrena.c4j.Contract;
+import de.andrena.c4j.Target;
 import de.andrena.c4j.acceptancetest.floatingwindow.Vector;
 import de.andrena.c4j.acceptancetest.floatingwindow.WindowStyle;
 import de.andrena.c4j.acceptancetest.point.Color;
 import de.andrena.c4j.systemtest.TransformerAwareRule;
-import de.andrena.c4j.Contract;
-import de.andrena.c4j.Target;
 
 public class NNUnchangedS2Test {
-	
+
 	@Rule
 	public TransformerAwareRule transformerAware = new TransformerAwareRule();
 
@@ -25,8 +25,8 @@ public class NNUnchangedS2Test {
 	@Test
 	public void testUnchangedViolation() {
 		thrown.expect(AssertionError.class);
-		thrown.expectMessage("upperLeftCorner unchanged");
-		
+		thrown.expectMessage("illegal access on unpure method or field");
+
 		Window window = new Window(new Vector(0, 0));
 		window.setStyleColor(Color.BLUE);
 	}

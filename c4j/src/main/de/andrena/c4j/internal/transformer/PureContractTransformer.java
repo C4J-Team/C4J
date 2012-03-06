@@ -1,8 +1,8 @@
 package de.andrena.c4j.internal.transformer;
 
 import javassist.CtBehavior;
-import de.andrena.c4j.internal.util.PureInspector;
 import de.andrena.c4j.internal.util.ContractRegistry.ContractInfo;
+import de.andrena.c4j.internal.util.PureInspector;
 
 public class PureContractTransformer extends ContractDeclaredBehaviorTransformer {
 

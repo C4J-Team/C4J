@@ -20,12 +20,18 @@ public class ContractExpressionTransformer extends ContractDeclaredBehaviorTrans
 		logger.info("transforming behavior " + contractBehavior.getLongName());
 		contractBehavior.instrument(expressionEditor);
 		additionalStoreExpressions(expressionEditor);
-		IfExp storeConditionalExp = new IfExp(new StaticCallExp(Evaluator.isBefore));
-		for (StaticCallExp storeExp : expressionEditor.getStoreExpressions()) {
-			storeConditionalExp.addIfBody(storeExp.toStandalone());
+		logger.fatal("adding unchangeables to " + contractBehavior.getName() + contractBehavior.getSignature());
+		contractInfo.getUnchangeables().put(contractBehavior.getName() + contractBehavior.getSignature(),
+				expressionEditor.getUnchangeableObjects());
+		if (expressionEditor.getStoreExpressions().isEmpty()) {
+			return;
 		}
-		logger.info("before: " + storeConditionalExp.getCode());
-		storeConditionalExp.insertBefore(contractBehavior);
+		IfExp preCalls = new IfExp(new StaticCallExp(Evaluator.isBefore));
+		for (StaticCallExp storeExp : expressionEditor.getStoreExpressions()) {
+			preCalls.addIfBody(storeExp.toStandalone());
+		}
+		logger.info("before: " + preCalls.getCode());
+		preCalls.insertBefore(contractBehavior);
 	}
 
 	private void additionalStoreExpressions(ContractMethodExpressionEditor expressionEditor) throws Exception {

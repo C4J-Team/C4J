@@ -3,9 +3,6 @@ package de.andrena.c4j.systemtest.unchanged;
 import static de.andrena.c4j.Condition.post;
 import static de.andrena.c4j.Condition.unchanged;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -58,10 +55,10 @@ public class UnchangedForObjectsSystemTest {
 
 	@Contract(ContractClass.class)
 	public static class TargetClass {
-		protected Set<String> field = new HashSet<String>();
+		protected SetLike field = new SetLike();
 
 		@Pure
-		public Set<String> method() {
+		public SetLike method() {
 			return field;
 		}
 
@@ -72,19 +69,19 @@ public class UnchangedForObjectsSystemTest {
 		}
 
 		public void fieldIsChanged() {
-			field.add("abc");
+			field.setValue("abc");
 		}
 
 		public void methodIsChanged() {
-			field.add("abc");
+			field.setValue("abc");
 		}
 
 		public void fieldIsReplaced() {
-			field = new HashSet<String>();
+			field = new SetLike();
 		}
 
 		public void methodIsReplaced() {
-			field = new HashSet<String>();
+			field = new SetLike();
 		}
 	}
 
@@ -134,4 +131,39 @@ public class UnchangedForObjectsSystemTest {
 			}
 		}
 	}
+
+	public static class SetLike {
+		private String value = "";
+
+		public void setValue(String value) {
+			this.value = value;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((value == null) ? 0 : value.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			SetLike other = (SetLike) obj;
+			if (value == null) {
+				if (other.value != null)
+					return false;
+			} else if (!value.equals(other.value))
+				return false;
+			return true;
+		}
+
+	}
+
 }

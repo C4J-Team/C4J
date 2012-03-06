@@ -6,14 +6,14 @@ import javassist.CtClass;
 import javassist.CtConstructor;
 import javassist.CtMethod;
 import javassist.NotFoundException;
-import de.andrena.c4j.Pure;
 import de.andrena.c4j.Configuration.PureBehavior;
+import de.andrena.c4j.Pure;
 import de.andrena.c4j.internal.RootTransformer;
+import de.andrena.c4j.internal.util.ContractRegistry.ContractInfo;
 import de.andrena.c4j.internal.util.ListOrderedSet;
 import de.andrena.c4j.internal.util.PureInspector;
 import de.andrena.c4j.internal.util.ReflectionHelper;
 import de.andrena.c4j.internal.util.TransformationHelper;
-import de.andrena.c4j.internal.util.ContractRegistry.ContractInfo;
 
 public class PureTransformer extends AbstractAffectedClassTransformer {
 	private PureInspector pureInspector = new PureInspector();
@@ -26,17 +26,19 @@ public class PureTransformer extends AbstractAffectedClassTransformer {
 			CtClass affectedClass) throws Exception {
 		for (CtBehavior affectedBehavior : reflectionHelper.getDeclaredModifiableBehaviors(affectedClass)) {
 			normalizePure(involvedClasses, contracts, affectedBehavior);
-			applyPure(affectedClass, affectedBehavior);
+			applyPure(affectedClass, affectedBehavior, contracts);
 		}
 	}
 
-	private void applyPure(CtClass affectedClass, CtBehavior affectedBehavior) throws CannotCompileException,
+	private void applyPure(CtClass affectedClass, CtBehavior affectedBehavior, ListOrderedSet<ContractInfo> contracts)
+			throws CannotCompileException,
 			NotFoundException {
 		if (rootTransformer.getConfigurationManager().getConfiguration(affectedClass).getPureBehaviors()
 				.contains(PureBehavior.VALIDATE_PURE)) {
 			if (affectedBehavior.hasAnnotation(Pure.class)) {
 				pureInspector.verify(affectedBehavior, false);
 			} else {
+				pureInspector.verifyUnchangeable(affectedBehavior, contracts);
 				pureInspector.checkUnpureAccess(affectedBehavior);
 			}
 		}

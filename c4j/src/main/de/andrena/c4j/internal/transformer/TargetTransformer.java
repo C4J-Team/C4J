@@ -27,7 +27,7 @@ import de.andrena.c4j.internal.util.ContractRegistry.ContractInfo;
 
 public class TargetTransformer extends AbstractContractClassTransformer {
 
-	private static final String TARGET_FIELD_PREFIX = "target$";
+	public static final String TARGET_FIELD_NAME = "target$";
 	private RootTransformer rootTransformer = RootTransformer.INSTANCE;
 
 	@Override
@@ -57,7 +57,7 @@ public class TargetTransformer extends AbstractContractClassTransformer {
 		Map<CtField, CtField> targetFieldMap = new HashMap<CtField, CtField>();
 		CtClass weakReferenceClass = rootTransformer.getPool().get(WeakReference.class.getName());
 		for (CtField targetField : getTargetFields(contractClass)) {
-			CtField weakTargetField = new CtField(weakReferenceClass, TARGET_FIELD_PREFIX, contractClass);
+			CtField weakTargetField = new CtField(weakReferenceClass, TARGET_FIELD_NAME, contractClass);
 			contractClass.addField(weakTargetField);
 			targetFieldMap.put(targetField, weakTargetField);
 		}

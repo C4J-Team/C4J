@@ -9,8 +9,8 @@ import de.andrena.c4j.internal.util.TransformationHelper;
 public class ContractClassTransformer extends AbstractContractClassTransformer {
 	private AbstractContractClassTransformer[] transformers = new AbstractContractClassTransformer[] {
 			// BEWARE: has to run in this exact order
-			new ContractBehaviorTransformer(), new PureContractTransformer(), new TargetTransformer(),
-			new ContractExpressionTransformer() };
+			new ContractBehaviorTransformer(), new PureContractTransformer(),
+			new ContractExpressionTransformer(), new TargetTransformer() };
 	private TransformationHelper transformationHelper = new TransformationHelper();
 
 	@Override

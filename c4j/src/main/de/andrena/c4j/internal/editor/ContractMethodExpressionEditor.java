@@ -45,6 +45,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 	private ContractInfo contract;
 	private RootTransformer rootTransformer;
 	private InvolvedTypeInspector involvedTypeInspector = new InvolvedTypeInspector();
+	List<NestedExp> unchangeableObjects = new ArrayList<NestedExp>();
 
 	public List<StaticCallExp> getStoreExpressions() {
 		return storeExpressions;
@@ -208,17 +209,20 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		methodCall.replace(replacementCall.getCode());
 	}
 
-	private CompareExp getReplacementCallForArrayMember(CtMember arrayMember) throws NotFoundException {
+	private BooleanExp getReplacementCallForArrayMember(CtMember arrayMember) throws NotFoundException {
 		NestedExp equalExpLeft;
 		NestedExp equalExpRight;
 		CtClass memberType;
+		NestedExp unchangeableObject;
 		if (arrayMember instanceof CtField) {
 			storeLastFieldAccess((CtField) arrayMember);
+			unchangeableObject = NestedExp.field((CtField) arrayMember);
 			memberType = ((CtField) arrayMember).getType();
 			equalExpLeft = new StaticCallExp(Evaluator.fieldAccess, new ValueExp(arrayMember.getName()));
 			equalExpRight = new StaticCallExp(Evaluator.oldFieldAccess, new ValueExp(arrayMember.getName()));
 		} else {
 			storeLastMethodCall((CtMethod) arrayMember);
+			unchangeableObject = NestedExp.THIS.appendCall(arrayMember.getName());
 			memberType = ((CtMethod) arrayMember).getReturnType();
 			equalExpLeft = new StaticCallExp(Evaluator.methodCall, new ValueExp(arrayMember.getName()), new ArrayExp(
 					Class.class), new ArrayExp(Object.class));
@@ -227,6 +231,11 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		if (memberType.isPrimitive()) {
 			return new CompareExp(equalExpLeft).isEqual(equalExpRight);
 		}
+		unchangeableObjects.add(unchangeableObject);
 		return new CompareExp(equalExpLeft).eq(equalExpRight);
+	}
+
+	public List<NestedExp> getUnchangeableObjects() {
+		return unchangeableObjects;
 	}
 }

@@ -82,6 +82,10 @@ public abstract class NestedExp extends Exp {
 		return appendCall(method, callParams.toArray(new NestedExp[0]));
 	}
 
+	public NestedExp appendAccess(String field) {
+		return new CodeNestedExp(getCode() + "." + field);
+	}
+
 	protected static class CodeNestedExp extends NestedExp {
 		private String code;
 
