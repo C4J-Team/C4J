@@ -20,7 +20,6 @@ public class ContractExpressionTransformer extends ContractDeclaredBehaviorTrans
 		logger.info("transforming behavior " + contractBehavior.getLongName());
 		contractBehavior.instrument(expressionEditor);
 		additionalStoreExpressions(expressionEditor);
-		logger.fatal("adding unchangeables to " + contractBehavior.getName() + contractBehavior.getSignature());
 		contractInfo.getUnchangeables().put(contractBehavior.getName() + contractBehavior.getSignature(),
 				expressionEditor.getUnchangeableObjects());
 		if (expressionEditor.getStoreExpressions().isEmpty()) {

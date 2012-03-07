@@ -59,6 +59,16 @@ public class UnchangedForObjectsSystemTest {
 	}
 
 	@Test(expected = AssertionError.class)
+	public void testParameterArrayIsChanged() {
+		target.parameterArrayIsChanged(new SetLike[] { new SetLike() });
+	}
+
+	@Test(expected = AssertionError.class)
+	public void testParameterArrayIsReplaced() {
+		target.parameterArrayIsReplaced(new SetLike[] { new SetLike() });
+	}
+
+	@Test(expected = AssertionError.class)
 	public void testFieldIsReplaced() {
 		target.fieldIsReplaced();
 	}
@@ -105,6 +115,14 @@ public class UnchangedForObjectsSystemTest {
 
 		public void parameter5IsChanged(int a, int b, int c, int d, SetLike param) {
 			param.setValue("abc");
+		}
+
+		public void parameterArrayIsChanged(SetLike[] param) {
+			param[0].setValue("abc");
+		}
+
+		public void parameterArrayIsReplaced(SetLike[] param) {
+			param[0] = new SetLike();
 		}
 
 		public void fieldIsReplaced() {
@@ -170,6 +188,20 @@ public class UnchangedForObjectsSystemTest {
 		public void parameter5IsChanged(int a, int b, int c, int d, SetLike param) {
 			if (post()) {
 				assert unchanged(param);
+			}
+		}
+
+		@Override
+		public void parameterArrayIsChanged(SetLike[] param) {
+			if (post()) {
+				assert unchanged((Object) param);
+			}
+		}
+
+		@Override
+		public void parameterArrayIsReplaced(SetLike[] param) {
+			if (post()) {
+				assert unchanged((Object) param);
 			}
 		}
 
