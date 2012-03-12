@@ -40,7 +40,7 @@ public class CashTerminal {
 
 A contract must be satisfied not only by the type for which it is declared, but also by all classes that are extending or implementing this type.
 
-![Inheritance rules for C4J Contracts](http://java-on-contracts.googlecode.com/svn/trunk/next/doc/inheritance.png)
+![Inheritance rules for C4J Contracts](/C4J-Team/C4J/raw/master/c4j/doc/inheritance.png)
 
 ## Defining Contracts
 A contract is defined in a _Contract Class_. This class can extend the _Target Class_ (or implement the _Target Interface_) for convenience and to allow easy refactoring in modern Java IDEs, but doesn't have to (for `final` classes, see chapter below).
