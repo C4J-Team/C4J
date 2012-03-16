@@ -3,17 +3,18 @@ package de.andrena.c4j;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
-
 import org.junit.Before;
 import org.junit.Test;
 
 public class PureRegistryTypeTest {
+	private static final int NUMBER_OF_METHODS_IN_NVESTIGATED_CLASS = 7;
+	@SuppressWarnings("rawtypes")
+	private static final Class<ArrayListDummyForPureRegistryTypeTest> INVESTIGATED_CLASS = ArrayListDummyForPureRegistryTypeTest.class;
 	private PureRegistryType pureType;
 
 	@Before
 	public void before() {
-		pureType = new PureRegistryType(ArrayList.class);
+		pureType = new PureRegistryType(INVESTIGATED_CLASS);
 	}
 
 	@Test
@@ -21,7 +22,8 @@ public class PureRegistryTypeTest {
 		pureType.pureMethod("size");
 		assertEquals(1, pureType.getPureMethods().size());
 		assertEquals(0, pureType.getUnpureMethods().size());
-		assertTrue(pureType.getPureMethods().contains(ArrayList.class.getMethod("size")));
+		assertTrue(pureType.getPureMethods().contains(
+				INVESTIGATED_CLASS.getMethod("size")));
 	}
 
 	@Test(expected = PureRegistryException.class)
@@ -40,7 +42,8 @@ public class PureRegistryTypeTest {
 		assertEquals(1, pureType.getPureMethods().size());
 		assertEquals(0, pureType.getUnpureMethods().size());
 		assertTrue(pureType.getPureMethods().contains(
-				ArrayList.class.getDeclaredMethod("removeRange", int.class, int.class)));
+				INVESTIGATED_CLASS.getDeclaredMethod("removeRange", int.class,
+						int.class)));
 	}
 
 	@Test
@@ -48,8 +51,10 @@ public class PureRegistryTypeTest {
 		pureType.pureMethods("toArray");
 		assertEquals(2, pureType.getPureMethods().size());
 		assertEquals(0, pureType.getUnpureMethods().size());
-		assertTrue(pureType.getPureMethods().contains(ArrayList.class.getMethod("toArray")));
-		assertTrue(pureType.getPureMethods().contains(ArrayList.class.getMethod("toArray", Object[].class)));
+		assertTrue(pureType.getPureMethods().contains(
+				INVESTIGATED_CLASS.getMethod("toArray")));
+		assertTrue(pureType.getPureMethods().contains(
+				INVESTIGATED_CLASS.getMethod("toArray", Object[].class)));
 	}
 
 	@Test(expected = PureRegistryException.class)
@@ -67,7 +72,8 @@ public class PureRegistryTypeTest {
 		pureType.pureMethods("fastRemove");
 		assertEquals(1, pureType.getPureMethods().size());
 		assertEquals(0, pureType.getUnpureMethods().size());
-		assertTrue(pureType.getPureMethods().contains(ArrayList.class.getDeclaredMethod("fastRemove", int.class)));
+		assertTrue(pureType.getPureMethods().contains(
+				INVESTIGATED_CLASS.getDeclaredMethod("fastRemove", int.class)));
 	}
 
 	@Test
@@ -75,7 +81,8 @@ public class PureRegistryTypeTest {
 		pureType.unpureMethod("add", Object.class);
 		assertEquals(0, pureType.getPureMethods().size());
 		assertEquals(1, pureType.getUnpureMethods().size());
-		assertTrue(pureType.getUnpureMethods().contains(ArrayList.class.getMethod("add", Object.class)));
+		assertTrue(pureType.getUnpureMethods().contains(
+				INVESTIGATED_CLASS.getMethod("add", Object.class)));
 	}
 
 	@Test(expected = PureRegistryException.class)
@@ -93,8 +100,10 @@ public class PureRegistryTypeTest {
 		pureType.unpureMethods("add");
 		assertEquals(0, pureType.getPureMethods().size());
 		assertEquals(2, pureType.getUnpureMethods().size());
-		assertTrue(pureType.getUnpureMethods().contains(ArrayList.class.getMethod("add", Object.class)));
-		assertTrue(pureType.getUnpureMethods().contains(ArrayList.class.getMethod("add", int.class, Object.class)));
+		assertTrue(pureType.getUnpureMethods().contains(
+				INVESTIGATED_CLASS.getMethod("add", Object.class)));
+		assertTrue(pureType.getUnpureMethods().contains(
+				INVESTIGATED_CLASS.getMethod("add", int.class, Object.class)));
 	}
 
 	@Test(expected = PureRegistryException.class)
@@ -110,7 +119,8 @@ public class PureRegistryTypeTest {
 	@Test
 	public void testOnlyPureMethods() throws Throwable {
 		pureType.onlyPureMethods();
-		assertEquals(24, pureType.getPureMethods().size());
+		assertEquals(NUMBER_OF_METHODS_IN_NVESTIGATED_CLASS, pureType
+				.getPureMethods().size());
 		assertEquals(0, pureType.getUnpureMethods().size());
 	}
 
@@ -127,7 +137,8 @@ public class PureRegistryTypeTest {
 	}
 
 	@Test(expected = PureRegistryException.class)
-	public void testOnlyPureMethodsAndThenOnlyPureMethodsCall() throws Throwable {
+	public void testOnlyPureMethodsAndThenOnlyPureMethodsCall()
+			throws Throwable {
 		pureType.onlyPureMethods();
 		pureType.onlyPureMethods();
 	}
@@ -145,7 +156,8 @@ public class PureRegistryTypeTest {
 	}
 
 	@Test(expected = PureRegistryException.class)
-	public void testOnlyPureMethodsAndThenOnlyUnpureMethodsCall() throws Throwable {
+	public void testOnlyPureMethodsAndThenOnlyUnpureMethodsCall()
+			throws Throwable {
 		pureType.onlyPureMethods();
 		pureType.onlyUnpureMethods();
 	}
@@ -154,7 +166,8 @@ public class PureRegistryTypeTest {
 	public void testOnlyUnpureMethods() throws Throwable {
 		pureType.onlyUnpureMethods();
 		assertEquals(0, pureType.getPureMethods().size());
-		assertEquals(24, pureType.getUnpureMethods().size());
+		assertEquals(NUMBER_OF_METHODS_IN_NVESTIGATED_CLASS, pureType
+				.getUnpureMethods().size());
 	}
 
 }
