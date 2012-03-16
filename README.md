@@ -118,7 +118,7 @@ public class TimeOfDayContract implements TimeOfDay {
 
 For primitive types, unchanged checks if the value at the end of the method call is the same as in the beginning of the method call. For reference types, it ensures that the object's state is not being modified while the method is running.
 
-In addition to fields and methods without parameters, method parameters can also be used with `unchanged`. As parameters act as local variables, a redefinition is not being checked and thus unchanged does not have any effect at all, if the method argument is of a primitive type.
+In addition to fields and methods without parameters, method parameters can also be used with `unchanged`. As parameters act as local variables, a redefinition is not being checked and thus unchanged does not have any effect at all, if the method parameter is of primitive type.
 
 ## Class-Invariants
 Sometimes, a set of conditions can be defined for a class, that always must be satisfied. These conditions can then be defined in a so-called _Class-Invariant_.
