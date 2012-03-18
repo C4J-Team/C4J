@@ -1,3 +1,6 @@
+* [Downloads](https://github.com/C4J-Team/C4J/downloads)
+* [Installation](https://github.com/C4J-Team/C4J/wiki/Installation)
+
 The C4J Design by Contract Framework for Java is, since version 4.0, using inheritance to provide classes and interfaces with contracts.
 
 So let's start with some easy code-examples:
