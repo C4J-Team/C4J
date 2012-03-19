@@ -7,7 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class PureRegistryTypeTest {
-	private static final int NUMBER_OF_METHODS_IN_NVESTIGATED_CLASS = 7;
+	private static final int NUMBER_OF_METHODS_IN_INVESTIGATED_CLASS = 7;
 	@SuppressWarnings("rawtypes")
 	private static final Class<ArrayListDummyForPureRegistryTypeTest> INVESTIGATED_CLASS = ArrayListDummyForPureRegistryTypeTest.class;
 	private PureRegistryType pureType;
@@ -119,7 +119,7 @@ public class PureRegistryTypeTest {
 	@Test
 	public void testOnlyPureMethods() throws Throwable {
 		pureType.onlyPureMethods();
-		assertEquals(NUMBER_OF_METHODS_IN_NVESTIGATED_CLASS, pureType
+		assertEquals(NUMBER_OF_METHODS_IN_INVESTIGATED_CLASS, pureType
 				.getPureMethods().size());
 		assertEquals(0, pureType.getUnpureMethods().size());
 	}
@@ -166,7 +166,7 @@ public class PureRegistryTypeTest {
 	public void testOnlyUnpureMethods() throws Throwable {
 		pureType.onlyUnpureMethods();
 		assertEquals(0, pureType.getPureMethods().size());
-		assertEquals(NUMBER_OF_METHODS_IN_NVESTIGATED_CLASS, pureType
+		assertEquals(NUMBER_OF_METHODS_IN_INVESTIGATED_CLASS, pureType
 				.getUnpureMethods().size());
 	}
 
