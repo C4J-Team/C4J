@@ -25,6 +25,8 @@ public class LocalClassLoader extends ClassLoader {
 			return c;
 		} catch (IOException e) {
 			throw new ClassNotFoundException("class not found: " + name, e);
+		} catch (SecurityException e) {
+			throw new ClassNotFoundException("class not loadable: " + name, e);
 		}
 	}
 
