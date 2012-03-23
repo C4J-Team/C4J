@@ -39,6 +39,11 @@ A Contract is declared by using the `@Contract` annotation on the _Target_ class
 public class CashTerminal {
   // target class body
 }
+
+@Contract(InterfaceContract.class)
+public interface Interface {
+  // interface declarations
+}
 ```
 
 A contract must be satisfied not only by the type for which it is declared, but also by all classes that are extending or implementing this type.
@@ -51,6 +56,10 @@ A contract is defined in a _Contract Class_. This class can extend the _Target C
 ```java
 public class CashTerminalContract extends CashTerminal {
   // contract class body
+}
+
+public class InterfaceContract implements Interface {
+  // contract class body for an interface
 }
 ```
 
