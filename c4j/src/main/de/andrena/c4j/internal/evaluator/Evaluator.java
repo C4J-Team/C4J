@@ -231,12 +231,15 @@ public class Evaluator {
 	}
 
 	public static void afterContractMethod(Class<?> contractClass) {
-		logger.info("afterContractMethod");
-		returnValue.set(null);
-		exceptionValue.set(null);
-		oldStore.get()
-				.get(new Pair<Integer, Class<?>>(Integer.valueOf(new Exception().getStackTrace().length), contractClass))
-				.clear();
+		if (evaluationPhase.get() == EvaluationPhase.NONE) {
+			logger.info("afterContractMethod");
+			returnValue.set(null);
+			exceptionValue.set(null);
+			oldStore.get()
+					.get(new Pair<Integer, Class<?>>(Integer.valueOf(new Exception().getStackTrace().length),
+							contractClass))
+					.clear();
+		}
 	}
 
 	public static Object getContractFromCache(Object target, Class<?> contractClass, Class<?> callingClass)

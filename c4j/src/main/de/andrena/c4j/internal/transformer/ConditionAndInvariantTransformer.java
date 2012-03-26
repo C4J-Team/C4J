@@ -11,8 +11,8 @@ import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 import de.andrena.c4j.ClassInvariant;
-import de.andrena.c4j.Pure;
 import de.andrena.c4j.Configuration.PureBehavior;
+import de.andrena.c4j.Pure;
 import de.andrena.c4j.internal.ContractViolationHandler;
 import de.andrena.c4j.internal.RootTransformer;
 import de.andrena.c4j.internal.compiler.EmptyExp;
@@ -25,21 +25,23 @@ import de.andrena.c4j.internal.compiler.TryExp;
 import de.andrena.c4j.internal.compiler.ValueExp;
 import de.andrena.c4j.internal.evaluator.Evaluator;
 import de.andrena.c4j.internal.util.AffectedBehaviorLocator;
+import de.andrena.c4j.internal.util.ContractRegistry.ContractInfo;
 import de.andrena.c4j.internal.util.ObjectConverter;
 import de.andrena.c4j.internal.util.ReflectionHelper;
-import de.andrena.c4j.internal.util.ContractRegistry.ContractInfo;
 
 /**
  * Transforming a method to look like the following block-comment:
  */
 /*
 try {
-	try {
-		pre();
-	} catch (Throwable e) {
-		handleContractException(e);
-	} finally {
-		afterContract();
+	if (inPre()) {
+		try {
+			pre();
+		} catch (Throwable e) {
+			handleContractException(e);
+		} finally {
+			afterContract();
+		}
 	}
 	try {
 		code();
@@ -47,23 +49,30 @@ try {
 		setException(e);
 		throw e;
 	} finally {
+		if (inPost()) {
+			try {
+				post();
+			} catch (Throwable e) {
+				handleContractException(e);
+			} finally {
+				afterContract();
+			}
+		}
+	}
+} finally {
+// mit Invariante:
+	if (inInvariant()) {
 		try {
-			post();
+			invariant();
 		} catch (Throwable e) {
 			handleContractException(e);
 		} finally {
 			afterContract();
+			afterContractMethod();
 		}
 	}
-} finally {
-	try {
-		invariant();
-	} catch (Throwable e) {
-		handleContractException(e);
-	} finally {
-		afterContract();
-		afterContractMethod();
-	}
+// ohne Invariante (if inContract() in der Methode selbst):
+	afterContractMethod();
 }
 */
 public class ConditionAndInvariantTransformer extends AffectedClassTransformerForSingleContract {
