@@ -5,7 +5,6 @@ import java.lang.reflect.Modifier;
 import javassist.CannotCompileException;
 import javassist.CtBehavior;
 import javassist.CtClass;
-import javassist.CtConstructor;
 import javassist.CtField;
 import javassist.CtMember;
 import javassist.CtMethod;
@@ -37,7 +36,7 @@ import de.andrena.c4j.internal.util.PureInspector;
 public class PureBehaviorExpressionEditor extends ExprEditor {
 
 	private Logger logger = Logger.getLogger(getClass());
-	private CtBehavior affectedBehavior;
+	private CtMethod affectedMethod;
 	private RootTransformer rootTransformer;
 	private PureInspector pureInspector;
 	private boolean allowOwnStateChange;
@@ -45,9 +44,9 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 	private ThrowExp pureError = null;
 	private InvolvedTypeInspector involvedTypeInspector = new InvolvedTypeInspector();
 
-	public PureBehaviorExpressionEditor(CtBehavior affectedBehavior, RootTransformer rootTransformer,
+	public PureBehaviorExpressionEditor(CtMethod affectedMethod, RootTransformer rootTransformer,
 			PureInspector pureInspector, boolean allowOwnStateChange) {
-		this.affectedBehavior = affectedBehavior;
+		this.affectedMethod = affectedMethod;
 		this.rootTransformer = rootTransformer;
 		this.pureInspector = pureInspector;
 		this.allowOwnStateChange = allowOwnStateChange;
@@ -60,7 +59,7 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 	private void replaceWithPureCheck(MethodCall methodCall) throws NotFoundException, CannotCompileException {
 		CtMethod method = methodCall.getMethod();
 		StaticCall checkMethod = PureEvaluator.checkExternalAccess;
-		if (rootTransformer.getConfigurationManager().getConfiguration(affectedBehavior.getDeclaringClass())
+		if (rootTransformer.getConfigurationManager().getConfiguration(affectedMethod.getDeclaringClass())
 				.getBlacklistMethods().contains(method)) {
 			checkMethod = PureEvaluator.checkExternalBlacklistAccess;
 		}
@@ -86,13 +85,10 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 	}
 
 	private void editFieldAccess(FieldAccess fieldAccess) throws CannotCompileException, NotFoundException {
-		CtField field = fieldAccess.getField();
-		if (constructorModifyingOwnClass(field)) {
-			return;
-		}
 		if (!fieldAccess.isWriter()) {
 			return;
 		}
+		CtField field = fieldAccess.getField();
 		if (isAllowedOwnStateChange(field)) {
 			return;
 		}
@@ -100,7 +96,7 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 			return;
 		}
 		String errorMsg = "illegal write access on field " + field.getName() + " in pure method "
-				+ affectedBehavior.getLongName() + " on line " + fieldAccess.getLineNumber();
+				+ affectedMethod.getLongName() + " on line " + fieldAccess.getLineNumber();
 		pureError(errorMsg);
 	}
 
@@ -111,7 +107,7 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 	}
 
 	private boolean isAllowedOwnStateChange(CtMember member) throws NotFoundException {
-		return allowOwnStateChange && affectedBehavior.getDeclaringClass().equals(member.getDeclaringClass());
+		return allowOwnStateChange && affectedMethod.getDeclaringClass().equals(member.getDeclaringClass());
 	}
 
 	@Override
@@ -129,10 +125,7 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 		if (isSynthetic(method)) {
 			return;
 		}
-		if (constructorModifyingOwnClass(method)) {
-			return;
-		}
-		if (rootTransformer.getConfigurationManager().getConfiguration(affectedBehavior.getDeclaringClass())
+		if (rootTransformer.getConfigurationManager().getConfiguration(affectedMethod.getDeclaringClass())
 				.getWhitelistMethods().contains(method)) {
 			return;
 		}
@@ -142,7 +135,7 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 		if (Modifier.isStatic(method.getModifiers())) {
 			if (rootTransformer.getConfigurationManager().isWithinRootPackages(method.getDeclaringClass())) {
 				String errorMsg = "illegal access on static method " + method.getLongName() + " in pure method "
-						+ affectedBehavior.getLongName() + " on line " + methodCall.getLineNumber();
+						+ affectedMethod.getLongName() + " on line " + methodCall.getLineNumber();
 				pureError(errorMsg);
 			} else {
 				PureEvaluator.warnExternalAccess(method.getLongName());
@@ -158,11 +151,6 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 			return;
 		}
 		replaceWithPureCheck(methodCall);
-	}
-
-	private boolean constructorModifyingOwnClass(CtMember member) {
-		return affectedBehavior instanceof CtConstructor
-				&& member.getDeclaringClass().equals(affectedBehavior.getDeclaringClass());
 	}
 
 	private boolean isSynthetic(CtBehavior behavior) {

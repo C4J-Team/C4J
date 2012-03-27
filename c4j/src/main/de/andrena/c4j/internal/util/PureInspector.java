@@ -76,7 +76,7 @@ public class PureInspector {
 		}
 	}
 
-	public void verify(CtBehavior affectedBehavior, boolean allowOwnStateChange)
+	public void verify(CtMethod affectedBehavior, boolean allowOwnStateChange)
 			throws CannotCompileException,
 			NotFoundException {
 		PureBehaviorExpressionEditor editor = new PureBehaviorExpressionEditor(affectedBehavior, rootTransformer, this,
