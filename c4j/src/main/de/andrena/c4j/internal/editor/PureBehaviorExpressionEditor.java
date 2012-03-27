@@ -133,15 +133,14 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 			return;
 		}
 		if (Modifier.isStatic(method.getModifiers())) {
-			if (rootTransformer.getConfigurationManager().isWithinRootPackages(method.getDeclaringClass())) {
-				String errorMsg = "illegal access on static method " + method.getLongName() + " in pure method "
-						+ affectedMethod.getLongName() + " on line " + methodCall.getLineNumber();
-				pureError(errorMsg);
-			} else {
-				PureEvaluator.warnExternalAccess(method.getLongName());
-			}
+			editStaticMethodCall(methodCall, method);
 			return;
 		}
+		editNonStaticMethodCall(methodCall, method);
+	}
+
+	private void editNonStaticMethodCall(MethodCall methodCall, CtMethod method) throws NotFoundException,
+			CannotCompileException {
 		ListOrderedSet<CtClass> involvedTypes = involvedTypeInspector.inspect(method.getDeclaringClass());
 		ListOrderedSet<ContractInfo> contracts = RootTransformer.INSTANCE.getContractsForTypes(involvedTypes);
 		if (pureInspector.getPureOrigin(involvedTypes, contracts, method) != null) {
@@ -151,6 +150,16 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 			return;
 		}
 		replaceWithPureCheck(methodCall);
+	}
+
+	private void editStaticMethodCall(MethodCall methodCall, CtMethod method) throws CannotCompileException {
+		if (rootTransformer.getConfigurationManager().isWithinRootPackages(method.getDeclaringClass())) {
+			String errorMsg = "illegal access on static method " + method.getLongName() + " in pure method "
+					+ affectedMethod.getLongName() + " on line " + methodCall.getLineNumber();
+			pureError(errorMsg);
+		} else {
+			PureEvaluator.warnExternalAccess(method.getLongName());
+		}
 	}
 
 	private boolean isSynthetic(CtBehavior behavior) {
