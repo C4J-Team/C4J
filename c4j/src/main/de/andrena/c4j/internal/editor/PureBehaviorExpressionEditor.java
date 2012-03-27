@@ -42,7 +42,7 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 	private PureInspector pureInspector;
 	private boolean allowOwnStateChange;
 	// necessary to work around bug https://issues.jboss.org/browse/JASSIST-149
-	private boolean exceptionThrown;
+	private ThrowExp pureError = null;
 	private InvolvedTypeInspector involvedTypeInspector = new InvolvedTypeInspector();
 
 	public PureBehaviorExpressionEditor(CtBehavior affectedBehavior, RootTransformer rootTransformer,
@@ -51,6 +51,10 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 		this.rootTransformer = rootTransformer;
 		this.pureInspector = pureInspector;
 		this.allowOwnStateChange = allowOwnStateChange;
+	}
+
+	public ThrowExp getPureError() {
+		return pureError;
 	}
 
 	private void replaceWithPureCheck(MethodCall methodCall) throws NotFoundException, CannotCompileException {
@@ -82,9 +86,6 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 	}
 
 	private void editFieldAccess(FieldAccess fieldAccess) throws CannotCompileException, NotFoundException {
-		if (exceptionThrown) {
-			return;
-		}
 		CtField field = fieldAccess.getField();
 		if (constructorModifyingOwnClass(field)) {
 			return;
@@ -105,10 +106,8 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 
 	private void pureError(String errorMsg) throws CannotCompileException {
 		logger.error(errorMsg);
-		ThrowExp throwExp = getThrowable(errorMsg);
-		logger.info("pure error replacement code: " + throwExp.getCode());
-		throwExp.insertBefore(affectedBehavior);
-		exceptionThrown = true;
+		pureError = getThrowable(errorMsg);
+		logger.info("pure error replacement code: " + pureError.getCode());
 	}
 
 	private boolean isAllowedOwnStateChange(CtMember member) throws NotFoundException {
@@ -126,9 +125,6 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 
 	private void editMethodCall(MethodCall methodCall) throws NotFoundException, CannotCompileException,
 			SecurityException, NoSuchMethodException {
-		if (exceptionThrown) {
-			return;
-		}
 		CtMethod method = methodCall.getMethod();
 		if (isSynthetic(method)) {
 			return;
@@ -144,9 +140,13 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 			return;
 		}
 		if (Modifier.isStatic(method.getModifiers())) {
-			String errorMsg = "illegal access on static method " + method.getLongName() + " in pure method "
-					+ affectedBehavior.getLongName() + " on line " + methodCall.getLineNumber();
-			pureError(errorMsg);
+			if (rootTransformer.getConfigurationManager().isWithinRootPackages(method.getDeclaringClass())) {
+				String errorMsg = "illegal access on static method " + method.getLongName() + " in pure method "
+						+ affectedBehavior.getLongName() + " on line " + methodCall.getLineNumber();
+				pureError(errorMsg);
+			} else {
+				PureEvaluator.warnExternalAccess(method.getLongName());
+			}
 			return;
 		}
 		ListOrderedSet<CtClass> involvedTypes = involvedTypeInspector.inspect(method.getDeclaringClass());

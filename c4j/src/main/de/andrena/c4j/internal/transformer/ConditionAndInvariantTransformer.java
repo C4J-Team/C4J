@@ -60,7 +60,7 @@ try {
 		}
 	}
 } finally {
-// mit Invariante:
+// with Invariant:
 	if (inInvariant()) {
 		try {
 			invariant();
@@ -71,7 +71,7 @@ try {
 			afterContractMethod();
 		}
 	}
-// ohne Invariante (if inContract() in der Methode selbst):
+// without Invariant (if inContract() is necessary and checked within afterContractMethod()):
 	afterContractMethod();
 }
 */

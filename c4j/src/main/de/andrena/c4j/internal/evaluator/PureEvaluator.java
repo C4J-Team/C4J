@@ -53,9 +53,13 @@ public class PureEvaluator {
 
 	public static void checkExternalAccess(Object target, String method) {
 		if (unpureCache.get().contains(target)) {
-			logger.warn("access on unknown method " + method
-					+ " outside the root-packages. add it to the pure-registry in the configuration.");
+			warnExternalAccess(method);
 		}
+	}
+
+	public static void warnExternalAccess(String method) {
+		logger.warn("access on unknown method " + method
+				+ " outside the root-packages. add it to the pure-registry in the configuration.");
 	}
 
 	public static void checkExternalBlacklistAccess(Object target, String method) {

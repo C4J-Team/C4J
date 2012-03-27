@@ -66,7 +66,7 @@ public class PureInspector {
 			List<NestedExp> contractUnchangeables = contract.getUnchangeables().get(
 						affectedBehavior.getName() + affectedBehavior.getSignature());
 			if (contractUnchangeables != null) {
-				logger.fatal("reading unchangeables from " + affectedBehavior.getName()
+				logger.debug("reading unchangeables from " + affectedBehavior.getName()
 						+ affectedBehavior.getSignature());
 				unpureObjects.addAll(contractUnchangeables);
 			}
@@ -79,8 +79,12 @@ public class PureInspector {
 	public void verify(CtBehavior affectedBehavior, boolean allowOwnStateChange)
 			throws CannotCompileException,
 			NotFoundException {
-		affectedBehavior.instrument(new PureBehaviorExpressionEditor(affectedBehavior, rootTransformer, this,
-				allowOwnStateChange));
+		PureBehaviorExpressionEditor editor = new PureBehaviorExpressionEditor(affectedBehavior, rootTransformer, this,
+						allowOwnStateChange);
+		affectedBehavior.instrument(editor);
+		if (editor.getPureError() != null) {
+			editor.getPureError().insertBefore(affectedBehavior);
+		}
 		List<NestedExp> unpureObjects = new ArrayList<NestedExp>();
 		boolean methodIsStatic = Modifier.isStatic(affectedBehavior.getModifiers());
 		if (!methodIsStatic) {

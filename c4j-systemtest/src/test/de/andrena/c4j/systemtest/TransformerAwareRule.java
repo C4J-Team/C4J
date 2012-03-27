@@ -22,6 +22,8 @@ public class TransformerAwareRule implements TestRule {
 	private static Map<String, Level> globalLogMap = new HashMap<String, Level>();
 	private static Map<String, Level> localLogMap = new HashMap<String, Level>();
 
+	private static boolean hasFatalLogMessage = false;
+
 	public void expectGlobalLog(Level level, String message) {
 		usedLogMap = globalLogMap;
 		expectedLogLevel = level;
@@ -77,6 +79,10 @@ public class TransformerAwareRule implements TestRule {
 				&& logMap.get(bannedLogMessage).equals(bannedLogLevel)) {
 			throw new Exception("noticed banned " + bannedLogLevel + " with message '" + bannedLogMessage + "'");
 		}
+		if (hasFatalLogMessage) {
+			hasFatalLogMessage = false;
+			throw new Exception("encountered FATAL log message");
+		}
 	}
 
 	private void verifyException() throws Exception, Throwable {
@@ -101,6 +107,9 @@ public class TransformerAwareRule implements TestRule {
 		protected void append(LoggingEvent event) {
 			globalLogMap.put(event.getMessage().toString(), event.getLevel());
 			localLogMap.put(event.getMessage().toString(), event.getLevel());
+			if (event.getLevel().equals(Level.FATAL)) {
+				hasFatalLogMessage = true;
+			}
 		}
 	}
 }
