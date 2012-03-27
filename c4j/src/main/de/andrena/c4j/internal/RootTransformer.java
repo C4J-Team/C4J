@@ -59,7 +59,7 @@ public class RootTransformer implements ClassFileTransformer {
 
 	private void loadConfiguration(String agentArgs) throws Exception {
 		if (agentArgs == null || agentArgs.isEmpty()) {
-			logger.warn("no configuration given - errors from @Pure are completely disabled. using default configuration.");
+			logger.warn("no configuration given. using default configuration.");
 			configuration = new ConfigurationManager(new DefaultConfiguration(), pool);
 		} else {
 			try {
@@ -87,7 +87,7 @@ public class RootTransformer implements ClassFileTransformer {
 	public byte[] transform(ClassLoader loader, String classNameWithSlashes, Class<?> classBeingRedefined,
 			ProtectionDomain protectionDomain, byte[] classfileBuffer) {
 		String className = classNameWithSlashes.replace('/', '.');
-		logger.debug("transformation started for class " + className);
+		logger.trace("transformation started for class " + className);
 		try {
 			updateClassPath(loader, classfileBuffer, className);
 			return transformClass(className);
@@ -101,7 +101,7 @@ public class RootTransformer implements ClassFileTransformer {
 	byte[] transformClass(String className) throws Exception {
 		CtClass affectedClass = pool.get(className);
 		if (affectedClass.isInterface()) {
-			logger.debug("transformation aborted, as class is an interface");
+			logger.trace("transformation aborted, as class is an interface");
 			return null;
 		}
 		if (!affectedClass.hasAnnotation(Transformed.class)) {
@@ -142,7 +142,6 @@ public class RootTransformer implements ClassFileTransformer {
 	}
 
 	private void transformContractClass(CtClass contractClass, ContractInfo contractInfo) throws Exception {
-		logger.info("transforming contract " + contractClass.getName());
 		contractClassTransformer.transform(contractInfo, contractClass);
 	}
 

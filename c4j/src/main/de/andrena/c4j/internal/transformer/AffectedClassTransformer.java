@@ -20,7 +20,7 @@ public class AffectedClassTransformer extends AbstractAffectedClassTransformer {
 	@Override
 	public void transform(ListOrderedSet<CtClass> involvedClasses, ListOrderedSet<ContractInfo> contracts,
 			CtClass affectedClass) throws Exception {
-		logger.info("transforming class " + affectedClass.getName());
+		logger.debug("transforming class " + affectedClass.getName());
 		for (AbstractAffectedClassTransformer transformer : transformers) {
 			transformer.transform(involvedClasses, contracts, affectedClass);
 		}

@@ -66,7 +66,7 @@ public class PureInspector {
 			List<NestedExp> contractUnchangeables = contract.getUnchangeables().get(
 						affectedBehavior.getName() + affectedBehavior.getSignature());
 			if (contractUnchangeables != null) {
-				logger.debug("reading unchangeables from " + affectedBehavior.getName()
+				logger.trace("reading unchangeables from " + affectedBehavior.getName()
 						+ affectedBehavior.getSignature());
 				unpureObjects.addAll(contractUnchangeables);
 			}
@@ -113,8 +113,8 @@ public class PureInspector {
 		StandaloneExp registerUnpureExp = new StaticCallExp(PureEvaluator.registerUnpure, unpureArray).toStandalone();
 		StandaloneExp unregisterUnpureExp = new StaticCallExp(PureEvaluator.unregisterUnpure, unpureArray)
 				.toStandalone();
-		logger.info("puremagic.insertBefore " + affectedBehavior.getLongName() + ": \n" + registerUnpureExp.getCode());
-		logger.info("puremagic.insertFinally " + affectedBehavior.getLongName() + ": \n"
+		logger.trace("puremagic.insertBefore " + affectedBehavior.getLongName() + ": \n" + registerUnpureExp.getCode());
+		logger.trace("puremagic.insertFinally " + affectedBehavior.getLongName() + ": \n"
 				+ unregisterUnpureExp.getCode());
 		registerUnpureExp.insertBefore(affectedBehavior);
 		unregisterUnpureExp.insertFinally(affectedBehavior);
@@ -137,7 +137,7 @@ public class PureInspector {
 		}
 		StandaloneExp checkUnpureAccessExp = new StaticCallExp(PureEvaluator.checkUnpureAccess, NestedExp.THIS)
 				.toStandalone();
-		logger.info("puremagic.checkUnpureAccess insertBefore " + affectedBehavior.getLongName() + ": \n"
+		logger.trace("puremagic.checkUnpureAccess insertBefore " + affectedBehavior.getLongName() + ": \n"
 				+ checkUnpureAccessExp.getCode());
 		checkUnpureAccessExp.insertBefore(affectedBehavior);
 	}

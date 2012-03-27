@@ -12,9 +12,9 @@ import de.andrena.c4j.internal.compiler.StandaloneExp;
 import de.andrena.c4j.internal.compiler.StaticCallExp;
 import de.andrena.c4j.internal.compiler.ValueExp;
 import de.andrena.c4j.internal.evaluator.Evaluator;
+import de.andrena.c4j.internal.util.ContractRegistry.ContractInfo;
 import de.andrena.c4j.internal.util.ListOrderedSet;
 import de.andrena.c4j.internal.util.ReflectionHelper;
-import de.andrena.c4j.internal.util.ContractRegistry.ContractInfo;
 
 public abstract class AffectedClassTransformerForSingleContract extends AbstractAffectedClassTransformer {
 	private ReflectionHelper reflectionHelper = new ReflectionHelper();

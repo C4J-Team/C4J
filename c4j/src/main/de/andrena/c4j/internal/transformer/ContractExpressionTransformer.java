@@ -17,7 +17,7 @@ public class ContractExpressionTransformer extends ContractDeclaredBehaviorTrans
 	public void transform(ContractInfo contractInfo, CtBehavior contractBehavior) throws Exception {
 		ContractMethodExpressionEditor expressionEditor = new ContractMethodExpressionEditor(rootTransformer,
 				contractInfo);
-		logger.info("transforming behavior " + contractBehavior.getLongName());
+		logger.trace("transforming behavior " + contractBehavior.getLongName());
 		contractBehavior.instrument(expressionEditor);
 		additionalStoreExpressions(expressionEditor);
 		contractInfo.getUnchangeables().put(contractBehavior.getName() + contractBehavior.getSignature(),
@@ -29,7 +29,7 @@ public class ContractExpressionTransformer extends ContractDeclaredBehaviorTrans
 		for (StaticCallExp storeExp : expressionEditor.getStoreExpressions()) {
 			preCalls.addIfBody(storeExp.toStandalone());
 		}
-		logger.info("before: " + preCalls.getCode());
+		logger.trace("before: " + preCalls.getCode());
 		preCalls.insertBefore(contractBehavior);
 	}
 

@@ -91,7 +91,7 @@ public class ConditionAndInvariantTransformer extends AffectedClassTransformerFo
 		StandaloneExp callInvariantExpression = null;
 		if (!classInvariantMethods.isEmpty()) {
 			callInvariantExpression = getInvariantCall(contractInfo, affectedClass, classInvariantMethods);
-			logger.info("classInvariant after: " + callInvariantExpression.getCode());
+			logger.trace("classInvariant after: " + callInvariantExpression.getCode());
 		}
 
 		Map<CtBehavior, CtBehavior> contractMap = new HashMap<CtBehavior, CtBehavior>();
@@ -126,7 +126,7 @@ public class ConditionAndInvariantTransformer extends AffectedClassTransformerFo
 
 	private void insertPreAndPostCondition(ContractInfo contractInfo, CtClass affectedClass,
 			CtBehavior affectedBehavior, CtBehavior contractBehavior) throws NotFoundException, CannotCompileException {
-		logger.info("transforming behavior " + affectedBehavior.getLongName() + " for contract behavior "
+		logger.trace("transforming behavior " + affectedBehavior.getLongName() + " for contract behavior "
 				+ contractBehavior.getLongName());
 
 		IfExp callPreCondition = getPreConditionCall(contractInfo, affectedClass, contractBehavior);
@@ -134,11 +134,11 @@ public class ConditionAndInvariantTransformer extends AffectedClassTransformerFo
 				affectedBehavior);
 		StandaloneExp catchExceptionCall = getCatchExceptionCall();
 
-		logger.info("insertCatch: " + catchExceptionCall.getCode());
+		logger.trace("insertCatch: " + catchExceptionCall.getCode());
 		catchExceptionCall.insertCatch(rootTransformer.getPool().get(Throwable.class.getName()), affectedBehavior);
-		logger.info("insertFinally: " + callPostCondition);
+		logger.trace("insertFinally: " + callPostCondition);
 		callPostCondition.insertFinally(affectedBehavior);
-		logger.info("insertBefore: " + callPreCondition.getCode());
+		logger.trace("insertBefore: " + callPreCondition.getCode());
 		callPreCondition.insertBefore(affectedBehavior);
 	}
 

@@ -92,18 +92,18 @@ public class Evaluator {
 	}
 
 	public static boolean isBefore() {
-		logger.info("isBefore returning " + (evaluationPhase.get() == EvaluationPhase.BEFORE));
+		logger.trace("isBefore returning " + (evaluationPhase.get() == EvaluationPhase.BEFORE));
 		return evaluationPhase.get() == EvaluationPhase.BEFORE;
 	}
 
 	public static boolean isAfter() {
-		logger.info("isAfter returning " + (evaluationPhase.get() == EvaluationPhase.AFTER));
+		logger.trace("isAfter returning " + (evaluationPhase.get() == EvaluationPhase.AFTER));
 		return evaluationPhase.get() == EvaluationPhase.AFTER;
 	}
 
 	public static Object oldFieldAccess(String fieldName) {
 		Object oldValue = getCurrentOldCache().get(fieldName);
-		logger.info("oldFieldAccess for field '" + fieldName + "' with " + currentOldCacheEnvironment.get().getFirst()
+		logger.trace("oldFieldAccess for field '" + fieldName + "' with " + currentOldCacheEnvironment.get().getFirst()
 				+ " " + currentOldCacheEnvironment.get().getSecond() + " returning " + oldValue);
 		return oldValue;
 	}
@@ -114,14 +114,15 @@ public class Evaluator {
 
 	public static Object oldMethodCall(String methodName) {
 		Object oldValue = getCurrentOldCache().get(methodName);
-		logger.info("oldMethodCall for method '" + methodName + "' with " + currentOldCacheEnvironment.get().getFirst()
+		logger.trace("oldMethodCall for method '" + methodName + "' with "
+				+ currentOldCacheEnvironment.get().getFirst()
 				+ " " + currentOldCacheEnvironment.get().getSecond() + " returning " + oldValue);
 		return oldValue;
 	}
 
 	public static void storeFieldAccess(String fieldName) {
 		Object storedValue = fieldAccess(fieldName);
-		logger.info("storeFieldAccess for field '" + fieldName + "' with "
+		logger.trace("storeFieldAccess for field '" + fieldName + "' with "
 				+ currentOldCacheEnvironment.get().getFirst() + " " + currentOldCacheEnvironment.get().getSecond()
 				+ " storing " + storedValue);
 		getCurrentOldCache().put(fieldName, storedValue);
@@ -129,7 +130,7 @@ public class Evaluator {
 
 	public static void storeMethodCall(String methodName) {
 		Object storedValue = methodCall(methodName, new Class<?>[0], new Object[0]);
-		logger.info("storeMethodCall for method '" + methodName + "' with "
+		logger.trace("storeMethodCall for method '" + methodName + "' with "
 				+ currentOldCacheEnvironment.get().getFirst() + " " + currentOldCacheEnvironment.get().getSecond()
 				+ " storing " + storedValue);
 		getCurrentOldCache().put(methodName, storedValue);
@@ -141,7 +142,7 @@ public class Evaluator {
 			Field field = getInheritedField(fieldName, target.getClass());
 			field.setAccessible(true);
 			Object value = field.get(target);
-			logger.info("fieldAccess returning " + value);
+			logger.trace("fieldAccess returning " + value);
 			return value;
 		} catch (Exception e) {
 			throw new EvaluationException("could not access field " + fieldName, e);
@@ -165,7 +166,7 @@ public class Evaluator {
 			Method method = getInheritedMethod(methodName, target.getClass(), argTypes);
 			method.setAccessible(true);
 			Object value = method.invoke(target, args);
-			logger.info("methodCall returning " + value);
+			logger.trace("methodCall returning " + value);
 			return value;
 		} catch (Exception e) {
 			throw new EvaluationException("could not call method " + methodName, e);
@@ -232,7 +233,7 @@ public class Evaluator {
 
 	public static void afterContractMethod(Class<?> contractClass) {
 		if (evaluationPhase.get() == EvaluationPhase.NONE) {
-			logger.info("afterContractMethod");
+			logger.trace("afterContractMethod");
 			returnValue.set(null);
 			exceptionValue.set(null);
 			oldStore.get()

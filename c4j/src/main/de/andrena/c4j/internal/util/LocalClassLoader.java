@@ -58,7 +58,7 @@ public class LocalClassLoader extends ClassLoader {
 		if (loadedClass == null) {
 			try {
 				loadedClass = findClass(name);
-				logger.debug("locally loaded class " + name);
+				logger.trace("locally loaded class " + name);
 			} catch (ClassNotFoundException e) {
 				loadedClass = super.loadClass(name);
 			}

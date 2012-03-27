@@ -67,8 +67,8 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 		StandaloneExp checkUnpureAccessExp = new StaticCallExp(checkMethod,
 				NestedExp.CALLING_OBJECT, new ValueExp(method.getLongName())).toStandalone();
 		StandaloneExp replacementExp = checkUnpureAccessExp.append(StandaloneExp.proceed);
-		logger.info("possible call to external unpure method " + method.getLongName());
-		logger.info("replacement-code: " + replacementExp.getCode());
+		logger.debug("possible call to external unpure method " + method.getLongName());
+		logger.trace("replacement-code: " + replacementExp.getCode());
 		replacementExp.replace(methodCall);
 	}
 
@@ -107,7 +107,7 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 	private void pureError(String errorMsg) throws CannotCompileException {
 		logger.error(errorMsg);
 		pureError = getThrowable(errorMsg);
-		logger.info("pure error replacement code: " + pureError.getCode());
+		logger.trace("pure error replacement code: " + pureError.getCode());
 	}
 
 	private boolean isAllowedOwnStateChange(CtMember member) throws NotFoundException {

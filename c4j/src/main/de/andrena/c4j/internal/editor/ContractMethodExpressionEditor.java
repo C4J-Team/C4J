@@ -89,7 +89,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 			lastFieldAccess = field;
 			arrayMembers.add(field);
 			lastMethodCall = null;
-			logger.info("last field access: " + field.getName());
+			logger.trace("last field access: " + field.getName());
 		}
 	}
 
@@ -175,7 +175,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		lastMethodCall = method;
 		arrayMembers.add(method);
 		lastFieldAccess = null;
-		logger.info("last method call: " + method.getLongName());
+		logger.trace("last method call: " + method.getLongName());
 	}
 
 	private void handleOldMethodCall(MethodCall methodCall) throws NotFoundException, CannotCompileException {
@@ -197,25 +197,25 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 	}
 
 	private void storeLastMethodCall(CtMethod method) {
-		logger.info("storing method call to " + method);
+		logger.trace("storing method call to " + method);
 		storeExpressions.add(new StaticCallExp(Evaluator.storeMethodCall, new ValueExp(method.getName())));
 	}
 
 	private void storeLastFieldAccess(CtField field) {
-		logger.info("storing field access to " + field);
+		logger.trace("storing field access to " + field);
 		storeExpressions.add(new StaticCallExp(Evaluator.storeFieldAccess, new ValueExp(field.getName())));
 	}
 
 	private void handleUnchangedMethodCall(MethodCall methodCall) throws CannotCompileException, NotFoundException,
 			BadBytecode {
-		logger.info("beginning to store fields and methods for unchanged");
+		logger.trace("beginning to store fields and methods for unchanged");
 		BooleanExp conditions = BooleanExp.TRUE;
 		for (CtMember arrayMember : arrayMembers) {
 			conditions = conditions.and(getReplacementCallForArrayMember(arrayMember));
 		}
 		addUnchangeableParameterArrayMembers(methodCall.where(), methodCall.indexOfBytecode());
 		StandaloneExp replacementCall = new AssignmentExp(NestedExp.RETURN_VALUE, conditions).toStandalone();
-		logger.info("replacement code for unchanged: " + replacementCall.getCode());
+		logger.trace("replacement code for unchanged: " + replacementCall.getCode());
 		methodCall.replace(replacementCall.getCode());
 	}
 

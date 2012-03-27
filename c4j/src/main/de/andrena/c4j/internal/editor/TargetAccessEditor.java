@@ -43,7 +43,7 @@ public class TargetAccessEditor extends ExprEditor {
 			} else {
 				replacementExp = NestedExp.field(weakField).appendCall("set", NestedExp.arg(1)).toStandalone();
 			}
-			logger.info("target field access replacement: " + replacementExp.getCode());
+			logger.trace("target field access replacement: " + replacementExp.getCode());
 			replacementExp.replace(fieldAccess);
 		}
 	}
