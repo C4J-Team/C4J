@@ -10,9 +10,6 @@ import javassist.CtMethod;
 
 import org.junit.Test;
 
-import de.andrena.c4j.internal.compiler.BooleanExp;
-import de.andrena.c4j.internal.compiler.IfExp;
-import de.andrena.c4j.internal.compiler.StandaloneExp;
 import de.andrena.c4j.internal.compiler.StandaloneExp.CodeStandaloneExp;
 
 public class StandaloneExpTest {

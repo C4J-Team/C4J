@@ -5,6 +5,6 @@
 	<classpathentry kind="lib" path="/c4j/dist/c4j-current-all.jar"/>
 	<classpathentry kind="lib" path="/c4j/lib/junit-4.10.jar"/>
 	<classpathentry kind="lib" path="/c4j/lib/log4j-1.2.16.jar"/>
-	<classpathentry kind="lib" path="/c4j/lib/mockito-all-1.8.5.jar"/>
+	<classpathentry kind="lib" path="/c4j/lib/mockito-all-1.9.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
