@@ -23,9 +23,6 @@ public abstract class AffectedClassTransformerForSingleContract extends Abstract
 	public void transform(ListOrderedSet<CtClass> involvedClasses, ListOrderedSet<ContractInfo> contracts,
 			CtClass affectedClass) throws Exception {
 		for (ContractInfo contractInfo : contracts) {
-			logger.info("transforming class " + affectedClass.getName() + " with contract-class "
-					+ contractInfo.getContractClass().getName() + " from target-class "
-					+ contractInfo.getTargetClass().getName());
 			transform(contractInfo, affectedClass);
 		}
 	}

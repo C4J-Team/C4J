@@ -37,9 +37,9 @@ public class NNPreS7aTest {
 
 	@Test
 	public void testErrorMessageByStrengtheningOfPrecondition() {
-		transformerAware.expectGlobalLog(Level.ERROR, "found strengthening pre-condition in "
+		transformerAware.expectGlobalLog(Level.ERROR, "Found strengthening pre-condition in "
 				+ YoungWorkingStudentContract.class.getName() + ".setAge(int)" + " which is already defined from "
-				+ StudentSpecContract.class.getName() + " - ignoring the pre-condition");
+				+ StudentSpecContract.class.getName() + " - ignoring the pre-condition.");
 
 		youngWorkingStudent = new YoungWorkingStudent();
 		youngWorkingStudent.setAge(60);

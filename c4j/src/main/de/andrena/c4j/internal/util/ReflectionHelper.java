@@ -9,6 +9,8 @@ import javassist.CtClass;
 import javassist.CtConstructor;
 import javassist.CtMethod;
 import javassist.NotFoundException;
+import javassist.bytecode.Descriptor;
+import javassist.bytecode.MethodInfo;
 import de.andrena.c4j.internal.transformer.ContractBehaviorTransformer;
 
 public class ReflectionHelper {
@@ -81,5 +83,16 @@ public class ReflectionHelper {
 			contractBehaviorName = contractBehavior.getName();
 		}
 		return contractBehaviorName;
+	}
+
+	public String getSimpleName(CtBehavior behavior) {
+		if (behavior instanceof CtConstructor) {
+			CtConstructor constructor = (CtConstructor) behavior;
+			return constructor.getDeclaringClass().getSimpleName()
+					+ (constructor.isConstructor() ? Descriptor.toString(constructor.getSignature()) : ("."
+							+ MethodInfo.nameClinit + "()"));
+		}
+		return behavior.getDeclaringClass().getSimpleName() + "." + behavior.getName()
+				+ Descriptor.toString(behavior.getSignature());
 	}
 }

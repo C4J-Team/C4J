@@ -58,8 +58,8 @@ public class PureEvaluator {
 	}
 
 	public static void warnExternalAccess(String method) {
-		logger.warn("access on unknown method " + method
-				+ " outside the root-packages. add it to the pure-registry in the configuration.");
+		logger.warn("Access on unknown method " + method
+				+ " outside the root-packages. Add it to the pure-registry in the configuration.");
 	}
 
 	public static void checkExternalBlacklistAccess(Object target, String method) {

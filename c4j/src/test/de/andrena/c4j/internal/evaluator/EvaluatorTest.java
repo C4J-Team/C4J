@@ -9,7 +9,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.andrena.c4j.internal.evaluator.Evaluator;
 import de.andrena.c4j.internal.evaluator.Evaluator.EvaluationPhase;
 import de.andrena.c4j.internal.util.Pair;
 
@@ -79,7 +78,7 @@ public class EvaluatorTest {
 
 	@Test
 	public void testPreCondition() {
-		Evaluator.beforePre(currentTarget, ContractClass.class, void.class);
+		Evaluator.beforePre(currentTarget, "SomeClass", ContractClass.class, void.class);
 		assertEquals(EvaluationPhase.BEFORE, Evaluator.evaluationPhase.get());
 		assertEquals(currentTarget, Evaluator.currentTarget.get());
 		Evaluator.afterContract();
@@ -94,7 +93,7 @@ public class EvaluatorTest {
 
 	@Test
 	public void testPostCondition() {
-		Evaluator.beforePost(currentTarget, ContractClass.class, int.class, Integer.valueOf(4));
+		Evaluator.beforePost(currentTarget, "SomeClass", ContractClass.class, int.class, Integer.valueOf(4));
 		assertEquals(EvaluationPhase.AFTER, Evaluator.evaluationPhase.get());
 		assertEquals(currentTarget, Evaluator.currentTarget.get());
 		assertEquals(Integer.valueOf(4), Evaluator.returnValue.get());
@@ -104,7 +103,7 @@ public class EvaluatorTest {
 
 	@Test
 	public void testCallInvariant() {
-		Evaluator.beforeInvariant(currentTarget, ContractClass.class);
+		Evaluator.beforeInvariant(currentTarget, "SomeClass", ContractClass.class);
 		assertEquals(EvaluationPhase.INVARIANT, Evaluator.evaluationPhase.get());
 		assertEquals(currentTarget, Evaluator.currentTarget.get());
 		Evaluator.afterContract();

@@ -2,6 +2,7 @@ package de.andrena.c4j.internal;
 
 import java.lang.instrument.ClassFileTransformer;
 import java.security.ProtectionDomain;
+import java.util.Enumeration;
 
 import javassist.ByteArrayClassPath;
 import javassist.ClassPool;
@@ -9,7 +10,11 @@ import javassist.CtClass;
 import javassist.LoaderClassPath;
 import javassist.NotFoundException;
 
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Layout;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 
 import de.andrena.c4j.Configuration;
 import de.andrena.c4j.ContractReference;
@@ -54,22 +59,33 @@ public class RootTransformer implements ClassFileTransformer {
 	public void init(String agentArgs) throws Exception {
 		targetClassTransformer = new AffectedClassTransformer();
 		contractClassTransformer = new ContractClassTransformer();
+		loadLogger();
 		loadConfiguration(agentArgs);
+	}
+
+	private void loadLogger() {
+		Enumeration<?> allAppenders = Logger.getRootLogger().getAllAppenders();
+		if (!allAppenders.hasMoreElements()) {
+			Layout layout = new PatternLayout("C4J %-5p - %m%n");
+			Logger.getRootLogger().addAppender(new ConsoleAppender(layout));
+			Logger.getRootLogger().setLevel(Level.INFO);
+			logger.info("No Appender on RootLogger found, added a new ConsoleAppender on Level INFO.");
+		}
 	}
 
 	private void loadConfiguration(String agentArgs) throws Exception {
 		if (agentArgs == null || agentArgs.isEmpty()) {
-			logger.warn("no configuration given. using default configuration.");
+			logger.info("No configuration given, using DefaultConfiguration.");
 			configuration = new ConfigurationManager(new DefaultConfiguration(), pool);
 		} else {
 			try {
 				Class<?> configurationClass = Class.forName(agentArgs, true, new LocalClassLoader(getClass()
 						.getClassLoader()));
 				configuration = new ConfigurationManager((Configuration) configurationClass.newInstance(), pool);
-				logger.info("loaded configuration from class '" + agentArgs + "'.");
+				logger.info("Loaded configuration from class '" + agentArgs + "'.");
 			} catch (Exception e) {
-				logger.error("could not load configuration from class '" + agentArgs
-						+ "'. using default configuration.", e);
+				logger.error("Could not load configuration from class '" + agentArgs
+						+ "'. Using DefaultConfiguration.", e);
 				configuration = new ConfigurationManager(new DefaultConfiguration(), pool);
 			}
 		}
@@ -93,7 +109,7 @@ public class RootTransformer implements ClassFileTransformer {
 			return transformClass(className);
 		} catch (Exception e) {
 			lastException = e;
-			logger.fatal("transformation failed for class '" + className + "'", e);
+			logger.fatal("Transformation failed for class '" + className + "'.", e);
 		}
 		return null;
 	}
@@ -125,6 +141,11 @@ public class RootTransformer implements ClassFileTransformer {
 	private void transformAffectedClass(CtClass affectedClass) throws NotFoundException, Exception {
 		ListOrderedSet<CtClass> involvedTypes = involvedTypeInspector.inspect(affectedClass);
 		ListOrderedSet<ContractInfo> contracts = transformInvolvedContracts(affectedClass, involvedTypes);
+		for (ContractInfo contract : contracts) {
+			logger.info(affectedClass.getSimpleName() + " must fulfill contract "
+					+ contract.getContractClass().getSimpleName() + " (defined on "
+					+ contract.getTargetClass().getSimpleName() + ").");
+		}
 		targetClassTransformer.transform(involvedTypes, contracts, affectedClass);
 	}
 
@@ -153,7 +174,8 @@ public class RootTransformer implements ClassFileTransformer {
 				if (contractRegistry.hasRegisteredContract(type)) {
 					contracts.add(contractRegistry.getContractInfoForTargetClass(type));
 				} else if (type.hasAnnotation(ContractReference.class)) {
-					String contractClassString = new BackdoorAnnotationLoader(type).getClassValue(ContractReference.class,
+					String contractClassString = new BackdoorAnnotationLoader(type).getClassValue(
+							ContractReference.class,
 							"value");
 					CtClass contractClass = pool.get(contractClassString);
 					contracts.add(contractRegistry.registerContract(type, contractClass));

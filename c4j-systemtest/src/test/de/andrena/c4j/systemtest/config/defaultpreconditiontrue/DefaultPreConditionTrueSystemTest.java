@@ -16,9 +16,9 @@ public class DefaultPreConditionTrueSystemTest {
 	@Test
 	public void testPreConditionUndefined() {
 		transformerAwareRule.expectGlobalLog(Level.ERROR,
-				"found strengthening pre-condition in" + " " + ContractClass.class.getName() + ".method(int)"
+				"Found strengthening pre-condition in" + " " + ContractClass.class.getName() + ".method(int)"
 						+ " which is already defined from " + SuperClass.class.getName()
-						+ " - ignoring the pre-condition");
+						+ " - ignoring the pre-condition.");
 		new TargetClass().method(-1);
 	}
 

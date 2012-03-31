@@ -190,19 +190,22 @@ public class Evaluator {
 		return (T) returnValue.get();
 	}
 
-	public static boolean beforePre(Object target, Class<?> contractClass, Class<?> returnType) {
+	public static boolean beforePre(Object target, String methodName, Class<?> contractClass, Class<?> returnType) {
 		if (evaluationPhase.get() == EvaluationPhase.NONE) {
 			evaluationPhase.set(EvaluationPhase.BEFORE);
 			beforeContract(target, contractClass, returnType, new Exception().getStackTrace().length);
+			logger.info("Calling pre-condition for " + methodName + " in contract " + contractClass.getSimpleName()
+					+ ".");
 			return true;
 		}
 		return false;
 	}
 
-	public static boolean beforeInvariant(Object target, Class<?> contractClass) {
+	public static boolean beforeInvariant(Object target, String className, Class<?> contractClass) {
 		if (evaluationPhase.get() == EvaluationPhase.NONE) {
 			evaluationPhase.set(EvaluationPhase.INVARIANT);
 			beforeContract(target, contractClass, void.class, new Exception().getStackTrace().length);
+			logger.info("Calling invariant for " + className + " in contract " + contractClass.getSimpleName() + ".");
 			return true;
 		}
 		return false;
@@ -214,12 +217,14 @@ public class Evaluator {
 		contractReturnType.set(returnType);
 	}
 
-	public static boolean beforePost(Object target, Class<?> contractClass, Class<?> returnType,
+	public static boolean beforePost(Object target, String methodName, Class<?> contractClass, Class<?> returnType,
 			Object actualReturnValue) {
 		if (evaluationPhase.get() == EvaluationPhase.NONE) {
 			evaluationPhase.set(EvaluationPhase.AFTER);
 			beforeContract(target, contractClass, returnType, new Exception().getStackTrace().length);
 			returnValue.set(actualReturnValue);
+			logger.info("Calling post-condition for " + methodName + " in contract " + contractClass.getSimpleName()
+					+ ".");
 			return true;
 		}
 		return false;

@@ -129,7 +129,7 @@ public class ConditionAndInvariantTransformer extends AffectedClassTransformerFo
 		logger.trace("transforming behavior " + affectedBehavior.getLongName() + " for contract behavior "
 				+ contractBehavior.getLongName());
 
-		IfExp callPreCondition = getPreConditionCall(contractInfo, affectedClass, contractBehavior);
+		IfExp callPreCondition = getPreConditionCall(contractInfo, affectedClass, contractBehavior, affectedBehavior);
 		StandaloneExp callPostCondition = getPostConditionCall(contractInfo, affectedClass, contractBehavior,
 				affectedBehavior);
 		StandaloneExp catchExceptionCall = getCatchExceptionCall();
@@ -153,7 +153,7 @@ public class ConditionAndInvariantTransformer extends AffectedClassTransformerFo
 		catchWithHandleContractException(affectedClass, tryInvariants);
 		tryInvariants.addFinally(getAfterContractCall().append(getAfterContractMethodCall(contractInfo)));
 		IfExp invariantCondition = new IfExp(new StaticCallExp(Evaluator.beforeInvariant, NestedExp.THIS, new ValueExp(
-				contractInfo.getContractClass())));
+				affectedClass.getSimpleName()), new ValueExp(contractInfo.getContractClass())));
 		invariantCondition.addIfBody(tryInvariants);
 		return invariantCondition;
 	}
@@ -172,8 +172,8 @@ public class ConditionAndInvariantTransformer extends AffectedClassTransformerFo
 		callContractPost.addFinally(getAfterContractCall());
 
 		IfExp callPostCondition = new IfExp(new StaticCallExp(Evaluator.beforePost, NestedExp.THIS, new ValueExp(
-				contractInfo.getContractClass()), getReturnTypeExp(contractBehavior),
-				getReturnValueExp(affectedBehavior)));
+				reflectionHelper.getSimpleName(affectedBehavior)), new ValueExp(contractInfo.getContractClass()),
+				getReturnTypeExp(contractBehavior), getReturnValueExp(affectedBehavior)));
 		callPostCondition.addIfBody(callContractPost);
 		return callPostCondition;
 	}
@@ -183,14 +183,16 @@ public class ConditionAndInvariantTransformer extends AffectedClassTransformerFo
 				contractCallExp.getCatchClauseVar(1), new ValueExp(affectedClass)).toStandalone());
 	}
 
-	private IfExp getPreConditionCall(ContractInfo contractInfo, CtClass affectedClass, CtBehavior contractBehavior)
+	private IfExp getPreConditionCall(ContractInfo contractInfo, CtClass affectedClass, CtBehavior contractBehavior,
+			CtBehavior affectedBehavior)
 			throws NotFoundException {
 		TryExp callContractPre = new TryExp(getContractCallExp(contractInfo.getContractClass(), affectedClass,
 				contractBehavior));
 		catchWithHandleContractException(affectedClass, callContractPre);
 		callContractPre.addFinally(getAfterContractCall());
 		IfExp callPreCondition = new IfExp(new StaticCallExp(Evaluator.beforePre, NestedExp.THIS, new ValueExp(
-				contractInfo.getContractClass()), getReturnTypeExp(contractBehavior)));
+				reflectionHelper.getSimpleName(affectedBehavior)), new ValueExp(contractInfo.getContractClass()),
+				getReturnTypeExp(contractBehavior)));
 		callPreCondition.addIfBody(callContractPre);
 		return callPreCondition;
 	}

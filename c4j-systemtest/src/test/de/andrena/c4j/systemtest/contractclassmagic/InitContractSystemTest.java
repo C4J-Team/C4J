@@ -6,11 +6,11 @@ import org.apache.log4j.Level;
 import org.junit.Rule;
 import org.junit.Test;
 
-import de.andrena.c4j.systemtest.TransformerAwareRule;
 import de.andrena.c4j.AllowPureAccess;
 import de.andrena.c4j.ContractReference;
 import de.andrena.c4j.InitializeContract;
 import de.andrena.c4j.Target;
+import de.andrena.c4j.systemtest.TransformerAwareRule;
 
 public class InitContractSystemTest {
 	@Rule
@@ -60,7 +60,7 @@ public class InitContractSystemTest {
 
 	@Test
 	public void testInitContractWithParam() {
-		transformerAware.expectLocalLog(Level.WARN, "Ignoring @InitializeContract method "
+		transformerAware.expectGlobalLog(Level.WARN, "Ignoring @InitializeContract method "
 				+ ContractClassForInitContractWithParam.class.getName() + ".init(int)" + " as it expects parameters.");
 		new TargetClassForInitContractWithParam();
 	}
