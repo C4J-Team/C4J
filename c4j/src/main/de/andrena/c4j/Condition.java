@@ -157,6 +157,8 @@ public class Condition {
 	}
 
 	/**
+	 * EXPERIMENTAL! Usable only if PureBehavior.VALIDATE_PURE is enabled for the class being validated.
+	 * <p>
 	 * Usable within a post-condition to ensure, that a value (primitive types) or state (Objects) of a parameter, field
 	 * or return value of a method without parameters remains unchanged.
 	 * <p>

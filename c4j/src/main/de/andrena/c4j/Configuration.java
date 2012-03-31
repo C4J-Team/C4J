@@ -85,6 +85,8 @@ public interface Configuration {
 
 	public enum PureBehavior {
 		/**
+		 * EXPERIMENTAL!
+		 * <p>
 		 * Full validation, issueing contract violations on unpure access.
 		 */
 		VALIDATE_PURE,
