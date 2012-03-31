@@ -20,7 +20,8 @@ public interface Configuration {
 	 * Define external contracts, as an alternative to the @{@link Contract} annotation on the target class. Needed when
 	 * the target class cannot be modified with the @{@link Contract} annotation.
 	 * 
-	 * @return A Map, mapping target classes to their corresponding contract class.
+	 * @return A Map, mapping target classes (keys of the Map) to their corresponding contract class (values of the
+	 *         Map).
 	 */
 	Map<Class<?>, Class<?>> getExternalContracts();
 
