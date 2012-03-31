@@ -220,7 +220,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 	}
 
 	private void addUnchangeableParameterArrayMembers(CtBehavior contractBehavior, int maxIndex)
-			throws BadBytecode {
+			throws BadBytecode, NotFoundException {
 		CodeAttribute ca = contractBehavior.getMethodInfo().getCodeAttribute();
 		CodeIterator ci = ca.iterator();
 		while (ci.hasNext()) {
@@ -233,14 +233,20 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 			}
 			int op = ci.byteAt(index);
 			if (op == Opcode.ALOAD_1) {
-				unchangeableObjects.add(NestedExp.arg(1));
+				addUnchangeableParameter(contractBehavior, 1);
 			} else if (op == Opcode.ALOAD_2) {
-				unchangeableObjects.add(NestedExp.arg(2));
+				addUnchangeableParameter(contractBehavior, 2);
 			} else if (op == Opcode.ALOAD_3) {
-				unchangeableObjects.add(NestedExp.arg(3));
+				addUnchangeableParameter(contractBehavior, 3);
 			} else if (op == Opcode.ALOAD) {
-				unchangeableObjects.add(NestedExp.arg(ci.byteAt(index + 1)));
+				addUnchangeableParameter(contractBehavior, ci.byteAt(index + 1));
 			}
+		}
+	}
+
+	private void addUnchangeableParameter(CtBehavior contractBehavior, int parameterIndex) throws NotFoundException {
+		if (parameterIndex <= contractBehavior.getParameterTypes().length) {
+			unchangeableObjects.add(NestedExp.arg(parameterIndex));
 		}
 	}
 
