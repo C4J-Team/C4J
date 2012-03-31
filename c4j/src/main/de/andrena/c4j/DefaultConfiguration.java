@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public final class DefaultConfiguration implements Configuration {
+public class DefaultConfiguration implements Configuration {
 	/**
 	 * {@inheritDoc}
 	 * 
