@@ -81,7 +81,12 @@ public class RootTransformer implements ClassFileTransformer {
 			try {
 				Class<?> configurationClass = Class.forName(agentArgs, true, new LocalClassLoader(getClass()
 						.getClassLoader()));
-				configuration = new ConfigurationManager((Configuration) configurationClass.newInstance(), pool);
+				Configuration loadedConfig = (Configuration) configurationClass.newInstance();
+				if (loadedConfig.getRootPackages().isEmpty()) {
+					throw new IllegalArgumentException(
+							"RootPackages of a custom Configuration must contain at least 1 element.");
+				}
+				configuration = new ConfigurationManager(loadedConfig, pool);
 				logger.info("Loaded configuration from class '" + agentArgs + "'.");
 			} catch (Exception e) {
 				logger.error("Could not load configuration from class '" + agentArgs

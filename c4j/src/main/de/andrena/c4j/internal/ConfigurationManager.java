@@ -1,11 +1,12 @@
 package de.andrena.c4j.internal;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javassist.ClassPool;
 import javassist.CtClass;
-import javassist.NotFoundException;
 import de.andrena.c4j.Configuration;
 import de.andrena.c4j.DefaultConfiguration;
 import de.andrena.c4j.internal.util.WhitelistConverter;
@@ -13,12 +14,28 @@ import de.andrena.c4j.internal.util.WhitelistConverter;
 public class ConfigurationManager {
 	private Set<RuntimeConfiguration> configurations = new HashSet<RuntimeConfiguration>();
 	private RuntimeConfiguration defaultConfiguration;
+	private Map<String, RuntimeConfiguration> rootPackageToConfigurationMap = new HashMap<String, RuntimeConfiguration>();
 
 	public ConfigurationManager(Configuration configuration, ClassPool pool) throws Exception {
 		WhitelistConverter whitelistConverter = new WhitelistConverter(pool);
 		configurations.add(new RuntimeConfiguration(configuration, whitelistConverter));
 		addSubConfigurations(configuration, whitelistConverter);
 		defaultConfiguration = new RuntimeConfiguration(new DefaultConfiguration(), whitelistConverter);
+		initRootPackages();
+	}
+
+	private void initRootPackages() {
+		for (RuntimeConfiguration configuration : configurations) {
+			for (String rootPackage : configuration.getRootPackages()) {
+				if (rootPackageToConfigurationMap.containsKey(rootPackage)) {
+					throw new IllegalArgumentException("Two Configurations '" + configuration.getClass().getName()
+							+ "' and '"
+							+ rootPackageToConfigurationMap.get(rootPackage).getConfigurationClass().getName()
+							+ "' contain the same RootPackage '" + rootPackage + "'.");
+				}
+				rootPackageToConfigurationMap.put(rootPackage, configuration);
+			}
+		}
 	}
 
 	private void addSubConfigurations(Configuration configuration, WhitelistConverter whitelistConverter)
@@ -38,46 +55,21 @@ public class ConfigurationManager {
 	}
 
 	public RuntimeConfiguration getConfiguration(String className) {
-		RuntimeConfiguration responsibleConfiguration = null;
-		String longestRootPackage = "";
-		for (RuntimeConfiguration configuration : configurations) {
-			for (String rootPackage : configuration.getRootPackages()) {
-				if (className.startsWith(rootPackage) && rootPackage.length() > longestRootPackage.length()) {
-					responsibleConfiguration = configuration;
-					longestRootPackage = rootPackage;
-				}
+		String currentPackage = className;
+		while (currentPackage.lastIndexOf('.') > -1) {
+			currentPackage = className.substring(0, currentPackage.lastIndexOf('.'));
+			if (rootPackageToConfigurationMap.containsKey(currentPackage)) {
+				return rootPackageToConfigurationMap.get(currentPackage);
 			}
 		}
-		if (responsibleConfiguration == null) {
-			return defaultConfiguration;
-		}
-		return responsibleConfiguration;
+		return defaultConfiguration;
 	}
 
 	public boolean isWithinRootPackages(String className) {
-		for (RuntimeConfiguration configuration : configurations) {
-			for (String rootPackage : configuration.getRootPackages()) {
-				if (className.startsWith(rootPackage)) {
-					return true;
-				}
-			}
-		}
-		return false;
+		return getConfiguration(className) != defaultConfiguration;
 	}
 
 	public boolean isWithinRootPackages(CtClass clazz) {
 		return isWithinRootPackages(clazz.getName());
 	}
-
-	public Set<String> getInvolvedClassNames(ClassPool pool) throws NotFoundException {
-		Set<String> involvedClassNames = new HashSet<String>();
-		for (RuntimeConfiguration configuration : configurations) {
-			involvedClassNames.addAll(configuration.getInvolvedClassNames(pool));
-		}
-		for (RuntimeConfiguration configuration : configurations) {
-			involvedClassNames.remove(configuration.getConfigurationClass().getName());
-		}
-		return involvedClassNames;
-	}
-
 }

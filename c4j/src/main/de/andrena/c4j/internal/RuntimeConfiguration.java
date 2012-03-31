@@ -19,7 +19,6 @@ public class RuntimeConfiguration {
 
 	private Set<CtMethod> whitelistMethods;
 	private Configuration configuration;
-	private Set<String> rootPackages = new HashSet<String>();
 	private Map<String, String> externalContracts = new HashMap<String, String>();
 	private Set<CtMethod> blacklistMethods;
 
@@ -27,7 +26,6 @@ public class RuntimeConfiguration {
 		this.configuration = configuration;
 		whitelistMethods = whitelistConverter.convertWhitelist(configuration.getPureRegistry().getPureMethods());
 		blacklistMethods = whitelistConverter.convertWhitelist(configuration.getPureRegistry().getUnpureMethods());
-		normalizeRootPackages();
 		stringifyExternalContracts();
 	}
 
@@ -35,15 +33,6 @@ public class RuntimeConfiguration {
 		for (Class<?> targetClass : configuration.getExternalContracts().keySet()) {
 			externalContracts.put(targetClass.getName(), configuration.getExternalContracts().get(targetClass)
 					.getName());
-		}
-	}
-
-	private void normalizeRootPackages() {
-		for (String rootPackage : configuration.getRootPackages()) {
-			if (!rootPackage.endsWith(".")) {
-				rootPackage += ".";
-			}
-			rootPackages.add(rootPackage);
 		}
 	}
 
@@ -71,7 +60,7 @@ public class RuntimeConfiguration {
 	}
 
 	public Set<String> getRootPackages() {
-		return rootPackages;
+		return configuration.getRootPackages();
 	}
 
 	public boolean writeTransformedClasses() {

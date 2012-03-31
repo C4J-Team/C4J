@@ -40,6 +40,14 @@ public class SystemTestConfiguration extends DefaultConfiguration {
 	}
 
 	@Override
+	public Set<PureBehavior> getPureBehaviors() {
+		Set<PureBehavior> pureBehaviors = new HashSet<PureBehavior>();
+		pureBehaviors.add(PureBehavior.SKIP_INVARIANTS);
+		pureBehaviors.add(PureBehavior.VALIDATE_PURE);
+		return pureBehaviors;
+	}
+
+	@Override
 	public boolean writeTransformedClasses() {
 		return false;
 	}

@@ -2,6 +2,7 @@ package de.andrena.c4j;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -39,6 +40,14 @@ public class AcceptanceTestConfiguration extends DefaultConfiguration {
 				PureRegistry.register(Throwable.class)
 						.pureMethod("getStackTrace")
 				);
+	}
+
+	@Override
+	public Set<PureBehavior> getPureBehaviors() {
+		Set<PureBehavior> pureBehaviors = new HashSet<PureBehavior>();
+		pureBehaviors.add(PureBehavior.SKIP_INVARIANTS);
+		pureBehaviors.add(PureBehavior.VALIDATE_PURE);
+		return pureBehaviors;
 	}
 
 	@Override

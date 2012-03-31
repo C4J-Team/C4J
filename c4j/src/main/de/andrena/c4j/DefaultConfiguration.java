@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class DefaultConfiguration implements Configuration {
+public final class DefaultConfiguration implements Configuration {
 	/**
 	 * {@inheritDoc}
 	 * 
@@ -93,14 +93,10 @@ public class DefaultConfiguration implements Configuration {
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * @return Defaults to a set including both {@link PureBehavior#SKIP_INVARIANTS} and
-	 *         {@link PureBehavior#VALIDATE_PURE}.
+	 * @return Defaults to a set including only {@link PureBehavior#SKIP_INVARIANTS}.
 	 */
 	@Override
 	public Set<PureBehavior> getPureBehaviors() {
-		Set<PureBehavior> pureBehaviors = new HashSet<PureBehavior>();
-		pureBehaviors.add(PureBehavior.SKIP_INVARIANTS);
-		pureBehaviors.add(PureBehavior.VALIDATE_PURE);
-		return pureBehaviors;
+		return Collections.singleton(PureBehavior.SKIP_INVARIANTS);
 	}
 }
