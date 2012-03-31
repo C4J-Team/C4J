@@ -7,7 +7,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.c4j.systemtest.TransformerAwareRule;
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 
 public class InterfaceSystemTest {
 	@Rule
@@ -36,7 +36,7 @@ public class InterfaceSystemTest {
 		}
 	}
 
-	@Contract(ContractedInterfaceContract.class)
+	@ContractReference(ContractedInterfaceContract.class)
 	public interface ContractedInterface {
 		void method(int value);
 	}

@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import de.andrena.c4j.systemtest.TransformerAwareRule;
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 
 public class NNPreS2Test {
 
@@ -37,7 +37,7 @@ public class NNPreS2Test {
 		dummy.get(0);
 	}
 
-	@Contract(MiniStackContract.class)
+	@ContractReference(MiniStackContract.class)
 	public static interface MiniStack<T> {
 		public T get(int index);
 	}

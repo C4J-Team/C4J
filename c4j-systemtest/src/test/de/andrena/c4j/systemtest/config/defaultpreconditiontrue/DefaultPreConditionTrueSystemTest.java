@@ -6,7 +6,7 @@ import org.apache.log4j.Level;
 import org.junit.Rule;
 import org.junit.Test;
 
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 import de.andrena.c4j.systemtest.TransformerAwareRule;
 
 public class DefaultPreConditionTrueSystemTest {
@@ -22,7 +22,7 @@ public class DefaultPreConditionTrueSystemTest {
 		new TargetClass().method(-1);
 	}
 
-	@Contract(ContractClass.class)
+	@ContractReference(ContractClass.class)
 	public static class TargetClass extends SuperClass {
 	}
 

@@ -8,7 +8,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Rule;
 import org.junit.Test;
 
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 import de.andrena.c4j.Pure;
 import de.andrena.c4j.Target;
 import de.andrena.c4j.systemtest.TransformerAwareRule;
@@ -42,7 +42,7 @@ public class UnchangedParamOutOfBoundsSystemTest {
 		}
 	}
 
-	@Contract(ContractClass.class)
+	@ContractReference(ContractClass.class)
 	public static class TargetClass {
 		private int hour;
 		private int minute;

@@ -1,8 +1,8 @@
 package de.andrena.c4j.acceptancetest.workingstudent;
 
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 
-@Contract(StudentSpecContract.class)
+@ContractReference(StudentSpecContract.class)
 public interface StudentSpec {
 	
 	String getMatriculationNumber();

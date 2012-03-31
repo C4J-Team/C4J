@@ -10,7 +10,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.c4j.systemtest.TransformerAwareRule;
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 import de.andrena.c4j.Pure;
 import de.andrena.c4j.Target;
 
@@ -37,7 +37,7 @@ public class OldSystemTest {
 		dummy.incrementValueCheckMethod();
 	}
 
-	@Contract(DummyContract.class)
+	@ContractReference(DummyContract.class)
 	public static class DummyClass {
 		protected int value;
 		protected OtherClass otherValue;
@@ -92,7 +92,7 @@ public class OldSystemTest {
 		new SubClass().method();
 	}
 
-	@Contract(SubClassContract.class)
+	@ContractReference(SubClassContract.class)
 	public static class SubClass extends SuperClass {
 	}
 
@@ -124,14 +124,14 @@ public class OldSystemTest {
 		new SubClassWithoutMethod().method();
 	}
 
-	@Contract(SubClassWithoutMethodContract.class)
+	@ContractReference(SubClassWithoutMethodContract.class)
 	public static class SubClassWithoutMethod extends SuperClassWithOld {
 	}
 
 	public static class SubClassWithoutMethodContract extends SubClassWithoutMethod {
 	}
 
-	@Contract(SuperClassWithOldContract.class)
+	@ContractReference(SuperClassWithOldContract.class)
 	public static class SuperClassWithOld {
 		@Pure
 		public int method() {

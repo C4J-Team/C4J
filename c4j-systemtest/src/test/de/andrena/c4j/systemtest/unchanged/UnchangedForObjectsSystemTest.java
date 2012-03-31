@@ -7,7 +7,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 import de.andrena.c4j.Pure;
 import de.andrena.c4j.Target;
 import de.andrena.c4j.systemtest.TransformerAwareRule;
@@ -85,7 +85,7 @@ public class UnchangedForObjectsSystemTest {
 		target.parameterIsReplaced(new SetLike());
 	}
 
-	@Contract(ContractClass.class)
+	@ContractReference(ContractClass.class)
 	public static class TargetClass {
 		protected SetLike field = new SetLike();
 

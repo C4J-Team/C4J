@@ -1,8 +1,8 @@
 package de.andrena.c4j.acceptancetest.timeofday;
 
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 
-@Contract(TimeOfDayContract.class)
+@ContractReference(TimeOfDayContract.class)
 public class TimeOfDay implements TimeOfDaySpec {
 	
 	private int hour;

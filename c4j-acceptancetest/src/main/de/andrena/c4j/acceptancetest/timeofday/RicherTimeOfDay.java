@@ -1,8 +1,8 @@
 package de.andrena.c4j.acceptancetest.timeofday;
 
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 
-@Contract(RicherTimeOfDayContract.class)
+@ContractReference(RicherTimeOfDayContract.class)
 public class RicherTimeOfDay extends TimeOfDay implements RicherTimeOfDaySpec {
 	
 	@Override

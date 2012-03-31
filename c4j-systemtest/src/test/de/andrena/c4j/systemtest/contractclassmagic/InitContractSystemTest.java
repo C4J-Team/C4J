@@ -8,7 +8,7 @@ import org.junit.Test;
 
 import de.andrena.c4j.systemtest.TransformerAwareRule;
 import de.andrena.c4j.AllowPureAccess;
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 import de.andrena.c4j.InitializeContract;
 import de.andrena.c4j.Target;
 
@@ -22,7 +22,7 @@ public class InitContractSystemTest {
 		assertTrue(target.initContractCalled);
 	}
 
-	@Contract(ContractClass.class)
+	@ContractReference(ContractClass.class)
 	public static class TargetClass {
 		@AllowPureAccess
 		protected boolean initContractCalled;
@@ -43,7 +43,7 @@ public class InitContractSystemTest {
 		new TargetClassForUnpureInitContract();
 	}
 
-	@Contract(ContractClassForUnpureInitContract.class)
+	@ContractReference(ContractClassForUnpureInitContract.class)
 	public static class TargetClassForUnpureInitContract {
 		protected int value;
 	}
@@ -65,7 +65,7 @@ public class InitContractSystemTest {
 		new TargetClassForInitContractWithParam();
 	}
 
-	@Contract(ContractClassForInitContractWithParam.class)
+	@ContractReference(ContractClassForInitContractWithParam.class)
 	public static class TargetClassForInitContractWithParam {
 	}
 

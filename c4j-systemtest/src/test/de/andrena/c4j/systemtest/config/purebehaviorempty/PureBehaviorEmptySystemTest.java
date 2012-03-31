@@ -8,7 +8,7 @@ import org.junit.Test;
 
 import de.andrena.c4j.systemtest.TransformerAwareRule;
 import de.andrena.c4j.ClassInvariant;
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 import de.andrena.c4j.Pure;
 
 public class PureBehaviorEmptySystemTest {
@@ -33,7 +33,7 @@ public class PureBehaviorEmptySystemTest {
 		assertTrue(ContractClass.invariantCalled);
 	}
 
-	@Contract(ContractClass.class)
+	@ContractReference(ContractClass.class)
 	public static class TargetClass {
 		protected int value;
 

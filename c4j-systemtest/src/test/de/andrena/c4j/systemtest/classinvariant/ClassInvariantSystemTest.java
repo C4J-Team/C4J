@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import de.andrena.c4j.systemtest.TransformerAwareRule;
 import de.andrena.c4j.ClassInvariant;
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 import de.andrena.c4j.Pure;
 import de.andrena.c4j.Target;
 
@@ -37,7 +37,7 @@ public class ClassInvariantSystemTest {
 		dummy.setHour(-1);
 	}
 
-	@Contract(DummyClassContract.class)
+	@ContractReference(DummyClassContract.class)
 	public static class DummyClass {
 		private int hour;
 

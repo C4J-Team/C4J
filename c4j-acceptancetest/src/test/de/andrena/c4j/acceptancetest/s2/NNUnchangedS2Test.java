@@ -7,7 +7,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 import de.andrena.c4j.Target;
 import de.andrena.c4j.acceptancetest.floatingwindow.Vector;
 import de.andrena.c4j.acceptancetest.floatingwindow.WindowStyle;
@@ -31,7 +31,7 @@ public class NNUnchangedS2Test {
 		window.setStyleColor(Color.BLUE);
 	}
 
-	@Contract(WindowContract.class)
+	@ContractReference(WindowContract.class)
 	public class Window {
 		public Vector upperLeftCorner;
 		public WindowStyle style;

@@ -12,7 +12,7 @@ import org.junit.Test;
 
 import de.andrena.c4j.systemtest.TestUtil;
 import de.andrena.c4j.systemtest.TransformerAwareRule;
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 import de.andrena.c4j.Target;
 
 public class ContractCacheCleanupSystemTest {
@@ -29,7 +29,7 @@ public class ContractCacheCleanupSystemTest {
 		assertNull(targetWeakReference.get());
 	}
 
-	@Contract(ContractClass.class)
+	@ContractReference(ContractClass.class)
 	public static class TargetClass {
 		public void method(int value) {
 		}
@@ -54,7 +54,7 @@ public class ContractCacheCleanupSystemTest {
 		assertNull(targetWeakReference.get());
 	}
 
-	@Contract(OldClassContract.class)
+	@ContractReference(OldClassContract.class)
 	public static class OldClass {
 		protected int value;
 

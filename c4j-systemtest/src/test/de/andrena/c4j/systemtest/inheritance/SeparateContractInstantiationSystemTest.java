@@ -7,7 +7,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.c4j.systemtest.TransformerAwareRule;
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 
 public class SeparateContractInstantiationSystemTest {
 	@Rule
@@ -18,7 +18,7 @@ public class SeparateContractInstantiationSystemTest {
 		new SubClass().interfaceMethod();
 	}
 
-	@Contract(InterfaceContract.class)
+	@ContractReference(InterfaceContract.class)
 	public interface Interface {
 		public String interfaceMethod();
 	}

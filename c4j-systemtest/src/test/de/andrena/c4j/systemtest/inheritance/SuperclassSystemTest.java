@@ -7,7 +7,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 import de.andrena.c4j.systemtest.TransformerAwareRule;
 
 public class SuperclassSystemTest {
@@ -52,14 +52,14 @@ public class SuperclassSystemTest {
 		new DummyClassDeclaringMethod().method(0);
 	}
 
-	@Contract(NoWarningClassContract.class)
+	@ContractReference(NoWarningClassContract.class)
 	public static class NoWarningClass extends SuperClass {
 	}
 
 	public static class NoWarningClassContract extends NoWarningClass {
 	}
 
-	@Contract(DummyContract.class)
+	@ContractReference(DummyContract.class)
 	public static class DummyClass extends SuperClass {
 	}
 
@@ -72,7 +72,7 @@ public class SuperclassSystemTest {
 		}
 	}
 
-	@Contract(DummyContractDeclaringMethod.class)
+	@ContractReference(DummyContractDeclaringMethod.class)
 	public static class DummyClassDeclaringMethod extends SuperClass {
 		@Override
 		public void method(int arg) {
@@ -88,7 +88,7 @@ public class SuperclassSystemTest {
 		}
 	}
 
-	@Contract(SuperContract.class)
+	@ContractReference(SuperContract.class)
 	public static class SuperClass {
 		public void method(int arg) {
 		}

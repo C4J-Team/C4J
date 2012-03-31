@@ -1,8 +1,8 @@
 package de.andrena.c4j.acceptancetest.point;
 
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 
-@Contract(ColoredPointContract.class)
+@ContractReference(ColoredPointContract.class)
 public class ColoredPoint extends Point implements ColoredPointSpec {
 
 	private Color color;

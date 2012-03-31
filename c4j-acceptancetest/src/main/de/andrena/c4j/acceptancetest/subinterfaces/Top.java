@@ -1,9 +1,9 @@
 package de.andrena.c4j.acceptancetest.subinterfaces;
 
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 import de.andrena.c4j.Pure;
 
-@Contract(TopContract.class)
+@ContractReference(TopContract.class)
 public interface Top {
 
 	@Pure

@@ -17,8 +17,8 @@ public interface Configuration {
 	Set<String> getRootPackages();
 
 	/**
-	 * Define external contracts, as an alternative to the @{@link Contract} annotation on the target class. Needed when
-	 * the target class cannot be modified with the @{@link Contract} annotation.
+	 * Define external contracts, as an alternative to the @{@link ContractReference} annotation on the target class. Needed when
+	 * the target class cannot be modified with the @{@link ContractReference} annotation.
 	 * 
 	 * @return A Map, mapping target classes (keys of the Map) to their corresponding contract class (values of the
 	 *         Map).

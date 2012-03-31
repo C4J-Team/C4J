@@ -14,6 +14,6 @@ import java.lang.annotation.Target;
  */
 @Documented
 @Target(ElementType.TYPE)
-public @interface Contract {
+public @interface ContractReference {
 	Class<?> value();
 }

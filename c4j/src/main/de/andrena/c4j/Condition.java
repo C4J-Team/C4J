@@ -116,7 +116,7 @@ public class Condition {
 	 * </p>
 	 * 
 	 * <pre>
-	 * &#064;{@link Contract}(ContractClass.class)
+	 * &#064;{@link ContractReference}(ContractClass.class)
 	 * class TargetClass {
 	 * 	protected int intValue;
 	 * 	private String stringValue = &quot;sample&quot;;

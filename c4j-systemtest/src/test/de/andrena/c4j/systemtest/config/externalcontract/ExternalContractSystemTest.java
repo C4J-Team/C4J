@@ -6,7 +6,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.c4j.systemtest.TransformerAwareRule;
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 
 public class ExternalContractSystemTest {
 	@Rule
@@ -41,7 +41,7 @@ public class ExternalContractSystemTest {
 		new TargetClassWithLocalAndExternalContract().method(0);
 	}
 
-	@Contract(LocalContract.class)
+	@ContractReference(LocalContract.class)
 	public static class TargetClassWithLocalAndExternalContract {
 		public void method(int arg) {
 		}

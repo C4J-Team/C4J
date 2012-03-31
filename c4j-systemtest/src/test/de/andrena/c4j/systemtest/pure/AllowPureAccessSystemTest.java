@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import de.andrena.c4j.systemtest.TransformerAwareRule;
 import de.andrena.c4j.AllowPureAccess;
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 import de.andrena.c4j.Pure;
 
 public class AllowPureAccessSystemTest {
@@ -22,7 +22,7 @@ public class AllowPureAccessSystemTest {
 		new TargetClass().incrementValueInContract();
 	}
 
-	@Contract(TargetClassContract.class)
+	@ContractReference(TargetClassContract.class)
 	public static class TargetClass {
 		@AllowPureAccess
 		protected int value;

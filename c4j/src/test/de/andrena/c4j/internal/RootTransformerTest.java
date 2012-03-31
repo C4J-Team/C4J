@@ -17,7 +17,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 import de.andrena.c4j.internal.RootTransformer;
 import de.andrena.c4j.internal.transformer.AffectedClassTransformer;
 import de.andrena.c4j.internal.transformer.ContractClassTransformer;
@@ -113,7 +113,7 @@ public class RootTransformerTest {
 	public interface EmptyInterface {
 	}
 
-	@Contract(ContractClass.class)
+	@ContractReference(ContractClass.class)
 	public static class TargetClass {
 	}
 
@@ -123,28 +123,28 @@ public class RootTransformerTest {
 	public static class UninvolvedClass {
 	}
 
-	@Contract(SuperClassContract.class)
+	@ContractReference(SuperClassContract.class)
 	public static class SuperClass implements HasContract {
 	}
 
 	public static class SuperClassContract extends SuperClass {
 	}
 
-	@Contract(HasContractContract.class)
+	@ContractReference(HasContractContract.class)
 	public interface HasContract extends SuperInterface1, SuperInterface2 {
 	}
 
 	public static class HasContractContract implements HasContract {
 	}
 
-	@Contract(SuperInterface1Contract.class)
+	@ContractReference(SuperInterface1Contract.class)
 	public interface SuperInterface1 {
 	}
 
 	public static class SuperInterface1Contract implements SuperInterface1 {
 	}
 
-	@Contract(SuperInterface2Contract.class)
+	@ContractReference(SuperInterface2Contract.class)
 	public interface SuperInterface2 {
 	}
 

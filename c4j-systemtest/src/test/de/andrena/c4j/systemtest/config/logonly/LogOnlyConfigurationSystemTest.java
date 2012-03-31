@@ -8,7 +8,7 @@ import org.junit.Test;
 
 import de.andrena.c4j.systemtest.TransformerAwareRule;
 import de.andrena.c4j.ClassInvariant;
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 import de.andrena.c4j.Target;
 
 public class LogOnlyConfigurationSystemTest {
@@ -27,7 +27,7 @@ public class LogOnlyConfigurationSystemTest {
 		new TargetClass().method(10);
 	}
 
-	@Contract(ContractClass.class)
+	@ContractReference(ContractClass.class)
 	public static class TargetClass {
 		protected int value;
 

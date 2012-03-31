@@ -13,7 +13,7 @@ import org.junit.Test;
 
 import de.andrena.c4j.systemtest.TransformerAwareRule;
 import de.andrena.c4j.AllowPureAccess;
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 
 public class PostConditionWithExceptionThrownSystemTest {
 	@Rule
@@ -46,7 +46,7 @@ public class PostConditionWithExceptionThrownSystemTest {
 		assertTrue(postConditionRan);
 	}
 
-	@Contract(SampleClassContract.class)
+	@ContractReference(SampleClassContract.class)
 	public static class SampleClass {
 		public void methodThrowingException(boolean throwException) throws IOException {
 			if (throwException) {

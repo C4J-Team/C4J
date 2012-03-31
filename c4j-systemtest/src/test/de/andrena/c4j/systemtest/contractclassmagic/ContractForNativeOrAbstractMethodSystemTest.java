@@ -4,7 +4,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.c4j.systemtest.TransformerAwareRule;
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 
 public class ContractForNativeOrAbstractMethodSystemTest {
 	@Rule
@@ -18,7 +18,7 @@ public class ContractForNativeOrAbstractMethodSystemTest {
 	public static class TargetClass implements ObjectSpec {
 	}
 
-	@Contract(ObjectSpecContract.class)
+	@ContractReference(ObjectSpecContract.class)
 	public interface ObjectSpec {
 		// Object.hashCode() is native
 		@Override
@@ -43,7 +43,7 @@ public class ContractForNativeOrAbstractMethodSystemTest {
 		}
 	}
 
-	@Contract(AbstractClassExtendingAbstractContract.class)
+	@ContractReference(AbstractClassExtendingAbstractContract.class)
 	public static abstract class AbstractClassExtendingAbstract extends AbstractClass {
 	}
 
@@ -53,7 +53,7 @@ public class ContractForNativeOrAbstractMethodSystemTest {
 		}
 	}
 
-	@Contract(AbstractClassContract.class)
+	@ContractReference(AbstractClassContract.class)
 	public static abstract class AbstractClass {
 		public abstract void abstractMethod();
 	}

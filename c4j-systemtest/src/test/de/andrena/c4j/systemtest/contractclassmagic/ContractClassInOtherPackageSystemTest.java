@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import de.andrena.c4j.systemtest.TransformerAwareRule;
 import de.andrena.c4j.systemtest.contractclassmagic.otherpackage.ContractClassInOtherPackage;
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 
 public class ContractClassInOtherPackageSystemTest {
 	@Rule
@@ -21,7 +21,7 @@ public class ContractClassInOtherPackageSystemTest {
 		new TargetClass().method(0);
 	}
 
-	@Contract(ContractClassInOtherPackage.class)
+	@ContractReference(ContractClassInOtherPackage.class)
 	public static class TargetClass {
 		protected void method(int arg) {
 		}

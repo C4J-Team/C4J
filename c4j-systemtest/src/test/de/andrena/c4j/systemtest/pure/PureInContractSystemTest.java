@@ -7,7 +7,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.c4j.systemtest.TransformerAwareRule;
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 import de.andrena.c4j.Pure;
 import de.andrena.c4j.Target;
 
@@ -20,7 +20,7 @@ public class PureInContractSystemTest {
 		new TargetClassForPureMethod().method();
 	}
 
-	@Contract(ContractClassForPureMethod.class)
+	@ContractReference(ContractClassForPureMethod.class)
 	public static class TargetClassForPureMethod {
 		public void method() {
 		}
@@ -51,7 +51,7 @@ public class PureInContractSystemTest {
 		new TargetClassForUnpureMethod().method();
 	}
 
-	@Contract(ContractClassForUnpureMethod.class)
+	@ContractReference(ContractClassForUnpureMethod.class)
 	public static class TargetClassForUnpureMethod {
 		public void method() {
 		}
@@ -81,7 +81,7 @@ public class PureInContractSystemTest {
 		new TargetClassForChangingState().method();
 	}
 
-	@Contract(ContractClassForChangingState.class)
+	@ContractReference(ContractClassForChangingState.class)
 	public static class TargetClassForChangingState {
 		public void method() {
 		}

@@ -12,7 +12,7 @@ import org.junit.Test;
 import de.andrena.c4j.systemtest.TransformerAwareRule;
 import de.andrena.c4j.AllowPureAccess;
 import de.andrena.c4j.ClassInvariant;
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 
 public class ClassInvariantWithExceptionThrownSystemTest {
 	@Rule
@@ -45,7 +45,7 @@ public class ClassInvariantWithExceptionThrownSystemTest {
 		assertTrue(invariantRan);
 	}
 
-	@Contract(SampleClassContract.class)
+	@ContractReference(SampleClassContract.class)
 	public static class SampleClass {
 		public void methodThrowingException(boolean throwException) throws IOException {
 			if (throwException) {

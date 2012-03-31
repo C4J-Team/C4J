@@ -7,7 +7,7 @@ import javassist.CtClass;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 import de.andrena.c4j.internal.RootTransformerTest.SuperClass;
 import de.andrena.c4j.internal.util.InvolvedTypeInspector;
 
@@ -30,14 +30,14 @@ public class InvolvedTypeInspectorTest {
 		assertEquals(6, inspector.inspect(subClass).size());
 	}
 
-	@Contract(NoSuperClassContract.class)
+	@ContractReference(NoSuperClassContract.class)
 	public static class NoSuperClass {
 	}
 
 	public static class NoSuperClassContract {
 	}
 
-	@Contract(SubClassContract.class)
+	@ContractReference(SubClassContract.class)
 	public static class SubClass extends SuperClass {
 	}
 

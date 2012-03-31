@@ -5,7 +5,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.c4j.systemtest.TransformerAwareRule;
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 import de.andrena.c4j.PureTarget;
 
 public class PureTargetSystemTest {
@@ -54,7 +54,7 @@ public class PureTargetSystemTest {
 		target.unpureMethodCallingUnpureMethodInOtherClass(new OtherClass());
 	}
 
-	@Contract(ContractClass.class)
+	@ContractReference(ContractClass.class)
 	public static class TargetClass {
 		private String field = "sample";
 
@@ -135,7 +135,7 @@ public class PureTargetSystemTest {
 		}
 	}
 
-	@Contract(OtherClassContract.class)
+	@ContractReference(OtherClassContract.class)
 	public static class OtherClass {
 		public void pureMethodInOtherClass() {
 		}

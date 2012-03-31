@@ -6,7 +6,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.c4j.systemtest.TransformerAwareRule;
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 import de.andrena.c4j.Pure;
 import de.andrena.c4j.Target;
 
@@ -19,7 +19,7 @@ public class RecursiveSystemTest {
 		new TargetClassWithCorrectEquals().equals(new TargetClassWithCorrectEquals());
 	}
 
-	@Contract(ContractClassWithCorrectEquals.class)
+	@ContractReference(ContractClassWithCorrectEquals.class)
 	public static class TargetClassWithCorrectEquals {
 		@Pure
 		@Override
@@ -48,7 +48,7 @@ public class RecursiveSystemTest {
 		target.equals(target);
 	}
 
-	@Contract(ContractClassWithUnreflexiveEquals.class)
+	@ContractReference(ContractClassWithUnreflexiveEquals.class)
 	public static class TargetClassWithUnreflexiveEquals {
 		@Override
 		public boolean equals(Object obj) {
@@ -75,7 +75,7 @@ public class RecursiveSystemTest {
 		new TargetClassWithUnsymmetricEquals(3).equals(new TargetClassWithUnsymmetricEquals(4));
 	}
 
-	@Contract(ContractClassWithUnsymmetricEquals.class)
+	@ContractReference(ContractClassWithUnsymmetricEquals.class)
 	public static class TargetClassWithUnsymmetricEquals {
 		private int value;
 

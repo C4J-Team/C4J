@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import de.andrena.c4j.systemtest.TransformerAwareRule;
 import de.andrena.c4j.AllowPureAccess;
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 
 public class ConstructorInInnerClassesSystemTest {
 	@Rule
@@ -62,7 +62,7 @@ public class ConstructorInInnerClassesSystemTest {
 		}
 	}
 
-	@Contract(SuperClassWithParameterContract.class)
+	@ContractReference(SuperClassWithParameterContract.class)
 	public static class SuperClassWithParameter {
 		public SuperClassWithParameter(int value) {
 		}
@@ -83,7 +83,7 @@ public class ConstructorInInnerClassesSystemTest {
 	public class InnerClass extends SuperClass {
 	}
 
-	@Contract(SuperClassContract.class)
+	@ContractReference(SuperClassContract.class)
 	public static class SuperClass {
 	}
 

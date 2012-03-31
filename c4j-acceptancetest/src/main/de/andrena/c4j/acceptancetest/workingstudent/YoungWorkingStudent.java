@@ -1,8 +1,8 @@
 package de.andrena.c4j.acceptancetest.workingstudent;
 
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 
-@Contract(YoungWorkingStudentContract.class)
+@ContractReference(YoungWorkingStudentContract.class)
 public class YoungWorkingStudent implements StudentSpec, EmployeeSpec {
 
 	private int age;

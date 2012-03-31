@@ -5,7 +5,7 @@ import static de.andrena.c4j.Condition.pre;
 import org.junit.Rule;
 import org.junit.Test;
 
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 import de.andrena.c4j.systemtest.TransformerAwareRule;
 
 public class ContractClassOnlyTransformedOnce {
@@ -20,7 +20,7 @@ public class ContractClassOnlyTransformedOnce {
 		new TargetClass().method(0);
 	}
 
-	@Contract(ContractClass.class)
+	@ContractReference(ContractClass.class)
 	public static class TargetClass extends SuperClass {
 	}
 
@@ -33,7 +33,7 @@ public class ContractClassOnlyTransformedOnce {
 		}
 	}
 
-	@Contract(SuperClassContract.class)
+	@ContractReference(SuperClassContract.class)
 	public static class SuperClass {
 		public void method(int arg) {
 		}

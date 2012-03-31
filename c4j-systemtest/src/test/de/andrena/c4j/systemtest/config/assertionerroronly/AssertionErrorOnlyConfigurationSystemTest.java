@@ -7,7 +7,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.c4j.systemtest.TransformerAwareRule;
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 
 public class AssertionErrorOnlyConfigurationSystemTest {
 	@Rule
@@ -22,7 +22,7 @@ public class AssertionErrorOnlyConfigurationSystemTest {
 		}
 	}
 
-	@Contract(ContractClass.class)
+	@ContractReference(ContractClass.class)
 	public static class TargetClass {
 		public void method(int value) {
 		}

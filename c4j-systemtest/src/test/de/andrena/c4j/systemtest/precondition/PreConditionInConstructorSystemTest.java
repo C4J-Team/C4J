@@ -6,7 +6,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.c4j.systemtest.TransformerAwareRule;
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 
 public class PreConditionInConstructorSystemTest {
 	@Rule
@@ -22,7 +22,7 @@ public class PreConditionInConstructorSystemTest {
 		new DummyClass(0);
 	}
 
-	@Contract(DummyContract.class)
+	@ContractReference(DummyContract.class)
 	public static class DummyClass {
 		public DummyClass(int arg) {
 		}

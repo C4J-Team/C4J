@@ -2,9 +2,9 @@ package de.andrena.c4j.acceptancetest.stack;
 
 import java.util.ArrayList;
 
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 
-@Contract(StackContract.class)
+@ContractReference(StackContract.class)
 public class Stack<T> implements StackSpec<T> {
 
 	private int capacity;

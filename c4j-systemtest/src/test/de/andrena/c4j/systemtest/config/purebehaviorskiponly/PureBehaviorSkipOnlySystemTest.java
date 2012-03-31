@@ -8,7 +8,7 @@ import org.junit.Test;
 
 import de.andrena.c4j.systemtest.TransformerAwareRule;
 import de.andrena.c4j.ClassInvariant;
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 import de.andrena.c4j.Pure;
 import de.andrena.c4j.PureTarget;
 
@@ -34,7 +34,7 @@ public class PureBehaviorSkipOnlySystemTest {
 		assertFalse(ContractClass.invariantCalled);
 	}
 
-	@Contract(ContractClass.class)
+	@ContractReference(ContractClass.class)
 	public static class TargetClass {
 		protected int value;
 
@@ -61,7 +61,7 @@ public class PureBehaviorSkipOnlySystemTest {
 		assertFalse(ContractClassWithPureInContract.invariantCalled);
 	}
 
-	@Contract(ContractClassWithPureInContract.class)
+	@ContractReference(ContractClassWithPureInContract.class)
 	public static class TargetClassWithPureInContract {
 		protected int value;
 

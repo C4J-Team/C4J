@@ -12,7 +12,7 @@ import javassist.NotFoundException;
 import org.apache.log4j.Logger;
 
 import de.andrena.c4j.Configuration;
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 import de.andrena.c4j.DefaultConfiguration;
 import de.andrena.c4j.internal.transformer.AffectedClassTransformer;
 import de.andrena.c4j.internal.transformer.ContractClassTransformer;
@@ -149,11 +149,11 @@ public class RootTransformer implements ClassFileTransformer {
 		ListOrderedSet<ContractInfo> contracts = new ListOrderedSet<ContractInfo>();
 		for (CtClass type : types) {
 			CtClass externalContract = configuration.getConfiguration(type).getExternalContract(pool, type);
-			if (type.hasAnnotation(Contract.class) || externalContract != null) {
+			if (type.hasAnnotation(ContractReference.class) || externalContract != null) {
 				if (contractRegistry.hasRegisteredContract(type)) {
 					contracts.add(contractRegistry.getContractInfoForTargetClass(type));
-				} else if (type.hasAnnotation(Contract.class)) {
-					String contractClassString = new BackdoorAnnotationLoader(type).getClassValue(Contract.class,
+				} else if (type.hasAnnotation(ContractReference.class)) {
+					String contractClassString = new BackdoorAnnotationLoader(type).getClassValue(ContractReference.class,
 							"value");
 					CtClass contractClass = pool.get(contractClassString);
 					contracts.add(contractRegistry.registerContract(type, contractClass));

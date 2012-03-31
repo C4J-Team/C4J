@@ -8,7 +8,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.c4j.Condition;
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 import de.andrena.c4j.Pure;
 import de.andrena.c4j.Target;
 import de.andrena.c4j.systemtest.TransformerAwareRule;
@@ -23,7 +23,7 @@ public class PureSystemTest {
 		a.mA(4, 6);
 	}
 
-	@Contract(AContract.class)
+	@ContractReference(AContract.class)
 	public static class A {
 		private int z;
 

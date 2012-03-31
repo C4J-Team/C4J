@@ -7,7 +7,7 @@ import static de.andrena.c4j.Condition.result;
 import org.junit.Rule;
 import org.junit.Test;
 
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 import de.andrena.c4j.Pure;
 import de.andrena.c4j.Target;
 import de.andrena.c4j.systemtest.TransformerAwareRule;
@@ -22,7 +22,7 @@ public class PostConditionAccessingTargetSystemTest {
 		target.method(3, 4);
 	}
 
-	@Contract(ContractClass.class)
+	@ContractReference(ContractClass.class)
 	public static class TargetClass {
 		private int z;
 

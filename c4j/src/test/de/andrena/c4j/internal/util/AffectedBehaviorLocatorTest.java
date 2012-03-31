@@ -14,7 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.andrena.c4j.ClassInvariant;
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 import de.andrena.c4j.internal.RootTransformer;
 import de.andrena.c4j.internal.transformer.ContractBehaviorTransformer;
 import de.andrena.c4j.internal.util.ContractRegistry.ContractInfo;
@@ -148,7 +148,7 @@ public class AffectedBehaviorLocatorTest {
 		}
 	}
 
-	@Contract(TargetInterfaceContract.class)
+	@ContractReference(TargetInterfaceContract.class)
 	public interface TargetInterface {
 	}
 

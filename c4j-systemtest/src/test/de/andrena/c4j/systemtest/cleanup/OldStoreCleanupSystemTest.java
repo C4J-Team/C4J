@@ -9,7 +9,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.c4j.systemtest.TransformerAwareRule;
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 import de.andrena.c4j.Target;
 import de.andrena.c4j.internal.evaluator.Evaluator;
 
@@ -41,7 +41,7 @@ public class OldStoreCleanupSystemTest {
 		assertEquals(0, Evaluator.getOldStoreSize());
 	}
 
-	@Contract(OldClassContract.class)
+	@ContractReference(OldClassContract.class)
 	public static class OldClass {
 		protected int value;
 
@@ -92,7 +92,7 @@ public class OldStoreCleanupSystemTest {
 		new TargetClass().method();
 	}
 
-	@Contract(TargetClassContract.class)
+	@ContractReference(TargetClassContract.class)
 	public static class TargetClass extends SuperClass {
 		@Override
 		public void method() {
@@ -111,7 +111,7 @@ public class OldStoreCleanupSystemTest {
 		}
 	}
 
-	@Contract(SuperClassContract.class)
+	@ContractReference(SuperClassContract.class)
 	public static class SuperClass {
 		protected int field = 1;
 

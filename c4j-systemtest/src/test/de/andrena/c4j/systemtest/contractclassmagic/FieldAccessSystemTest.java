@@ -7,7 +7,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.c4j.systemtest.TransformerAwareRule;
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 import de.andrena.c4j.Target;
 
 public class FieldAccessSystemTest {
@@ -27,7 +27,7 @@ public class FieldAccessSystemTest {
 		dummy.methodContractHasFieldAccess();
 	}
 
-	@Contract(DummyContract.class)
+	@ContractReference(DummyContract.class)
 	public static class DummyClass {
 		protected int value;
 
@@ -56,7 +56,7 @@ public class FieldAccessSystemTest {
 		new TargetClass().method();
 	}
 
-	@Contract(TargetClassContract.class)
+	@ContractReference(TargetClassContract.class)
 	public static class TargetClass extends SuperClass {
 		@Override
 		public void method() {
@@ -75,7 +75,7 @@ public class FieldAccessSystemTest {
 		}
 	}
 
-	@Contract(SuperClassContract.class)
+	@ContractReference(SuperClassContract.class)
 	public static class SuperClass {
 		protected int field;
 

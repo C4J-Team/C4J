@@ -6,7 +6,7 @@ import org.apache.log4j.Level;
 import org.junit.Rule;
 import org.junit.Test;
 
-import de.andrena.c4j.Contract;
+import de.andrena.c4j.ContractReference;
 import de.andrena.c4j.systemtest.TransformerAwareRule;
 
 public class StrengtheningPreConditionNotAllowedSystemTest {
@@ -21,7 +21,7 @@ public class StrengtheningPreConditionNotAllowedSystemTest {
 		new TargetClass().method(0);
 	}
 
-	@Contract(ContractClass.class)
+	@ContractReference(ContractClass.class)
 	public static class TargetClass extends SuperClass {
 	}
 
@@ -34,7 +34,7 @@ public class StrengtheningPreConditionNotAllowedSystemTest {
 		}
 	}
 
-	@Contract(SuperClassContract.class)
+	@ContractReference(SuperClassContract.class)
 	public static class SuperClass {
 		public void method(int arg) {
 		}
