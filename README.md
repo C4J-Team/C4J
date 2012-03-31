@@ -81,7 +81,7 @@ public class CashTerminal {
 
 public class CashTerminalContract extends CashTerminal {
   @Override
-  public void withdraw(final int amount) {
+  public void withdraw(int amount) {
     if (pre()) {
       assert amount > 0;
     }
