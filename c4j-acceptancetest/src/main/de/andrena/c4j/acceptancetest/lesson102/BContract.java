@@ -3,8 +3,14 @@ package de.andrena.c4j.acceptancetest.lesson102;
 import static de.andrena.c4j.Condition.ignored;
 import static de.andrena.c4j.Condition.post;
 import static de.andrena.c4j.Condition.pre;
+import de.andrena.c4j.ClassInvariant;
 
 public class BContract extends B {
+
+	@ClassInvariant
+	public void classInvariant() {
+		System.out.println("ClassInvariant class B");
+	}
 
 	@Override
 	public int queryB() {
