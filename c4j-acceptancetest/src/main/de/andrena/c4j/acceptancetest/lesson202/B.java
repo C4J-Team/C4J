@@ -1,5 +1,8 @@
 package de.andrena.c4j.acceptancetest.lesson202;
 
+import de.andrena.c4j.ContractReference;
+
+@ContractReference(BContract.class)
 public class B implements BSpec {
 
 	private int b;
