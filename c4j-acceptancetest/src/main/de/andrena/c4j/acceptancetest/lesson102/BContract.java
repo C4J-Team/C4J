@@ -44,4 +44,14 @@ public class BContract extends B {
 		return ignored();
 	}
 
+	@Override
+	public void command(int value) {
+		if (pre()) {
+			System.out.println("Pre-Condition command class B");
+		}
+		if (post()) {
+			System.out.println("Post-Condition command class B");
+		}
+	}
+
 }
