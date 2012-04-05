@@ -19,6 +19,7 @@ public class C extends B {
 	}
 
 	@Override
+	@Pure
 	public int query(int x, int y) {
 		int result = super.query(x, y);
 		result = result + x - y;

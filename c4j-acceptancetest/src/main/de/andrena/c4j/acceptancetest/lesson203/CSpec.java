@@ -13,6 +13,7 @@ public interface CSpec extends BSpec {
 	void commandC(int value);
 
 	@Override
+	@Pure
 	int query(int x, int y);
 
 	@Override
