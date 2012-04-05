@@ -15,21 +15,21 @@ public class AContract extends A {
 	@Override
 	public int query(int x, int y) {
 		if (pre()) {
-			System.out.println("Pre-Condition query");
+			System.out.println("Pre-Condition query class A");
 		}
 		if (post()) {
-			System.out.println("Post-Condition query");
+			System.out.println("Post-Condition query class A");
 		}
 		return ignored();
 	}
 
 	@Override
-	public void command(int wert) {
+	public void command(int value) {
 		if (pre()) {
-			System.out.println("Pre-Condition command");
+			System.out.println("Pre-Condition command class A");
 		}
 		if (post()) {
-			System.out.println("Post-Condition command");
+			System.out.println("Post-Condition command class A");
 		}
 	}
 

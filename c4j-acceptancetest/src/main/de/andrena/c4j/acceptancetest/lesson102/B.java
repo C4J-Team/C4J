@@ -2,6 +2,7 @@ package de.andrena.c4j.acceptancetest.lesson102;
 
 import de.andrena.c4j.ContractReference;
 import de.andrena.c4j.Pure;
+import de.andrena.c4j.acceptancetest.lesson101.A;
 
 @ContractReference(BContract.class)
 public class B extends A {
@@ -19,13 +20,14 @@ public class B extends A {
 
 	@Override
 	public int query(int x, int y) {
-		int result = 0;
-		result = x * y;
+		int result = super.query(x, y);
+		result = result + x * y;
 		return result;
 	}
 
 	@Override
 	public void command(int value) {
+		super.command(value);
 		b = value;
 	}
 

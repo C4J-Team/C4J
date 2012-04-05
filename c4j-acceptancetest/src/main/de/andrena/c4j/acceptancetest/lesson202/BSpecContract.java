@@ -30,10 +30,10 @@ public class BSpecContract implements BSpec {
 	@Override
 	public int query(int x, int y) {
 		if (pre()) {
-			System.out.println("Pre-Condition query class B");
+			System.out.println("Pre-Condition query interface BSpec");
 		}
 		if (post()) {
-			System.out.println("Post-Condition query class B");
+			System.out.println("Post-Condition query interface BSpec");
 		}
 		return ignored();
 	}
@@ -41,10 +41,10 @@ public class BSpecContract implements BSpec {
 	@Override
 	public void command(int value) {
 		if (pre()) {
-			System.out.println("Pre-Condition command class B");
+			System.out.println("Pre-Condition command interface BSpec");
 		}
 		if (post()) {
-			System.out.println("Post-Condition command class B");
+			System.out.println("Post-Condition command interface BSpec");
 		}
 	}
 
