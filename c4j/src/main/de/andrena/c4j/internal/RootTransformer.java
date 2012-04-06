@@ -194,9 +194,11 @@ public class RootTransformer implements ClassFileTransformer {
 
 	void updateClassPath(ClassLoader loader, byte[] classfileBuffer, String className) {
 		if (loader != null) {
+			logger.trace("updating classpath with loader " + loader.getClass() + ", parent " + loader.getParent());
 			pool.insertClassPath(new LoaderClassPath(loader));
 		}
 		if (classfileBuffer != null) {
+			logger.trace("updating classpath with classfileBuffer for class " + className);
 			pool.insertClassPath(new ByteArrayClassPath(className, classfileBuffer));
 		}
 	}

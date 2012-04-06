@@ -10,7 +10,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.andrena.c4j.internal.evaluator.Evaluator.EvaluationPhase;
-import de.andrena.c4j.internal.util.Pair;
 
 public class EvaluatorTest {
 
@@ -48,7 +47,7 @@ public class EvaluatorTest {
 	@Test
 	public void testOldFieldAccess() {
 		Evaluator.currentTarget.set(currentTarget);
-		Evaluator.currentOldCacheEnvironment.set(new Pair<Integer, Class<?>>(Integer.valueOf(42), ContractClass.class));
+		Evaluator.currentOldCacheEnvironment.set(Integer.valueOf(42));
 		Evaluator.storeFieldAccess("dummyField");
 		assertEquals("someValue", Evaluator.oldFieldAccess("dummyField"));
 	}
@@ -56,7 +55,7 @@ public class EvaluatorTest {
 	@Test
 	public void testOldMethodCall() {
 		Evaluator.currentTarget.set(currentTarget);
-		Evaluator.currentOldCacheEnvironment.set(new Pair<Integer, Class<?>>(Integer.valueOf(42), ContractClass.class));
+		Evaluator.currentOldCacheEnvironment.set(Integer.valueOf(42));
 		Evaluator.storeMethodCall("dummyMethod");
 		assertEquals("someReturnValue", Evaluator.oldMethodCall("dummyMethod"));
 	}
@@ -77,8 +76,8 @@ public class EvaluatorTest {
 	}
 
 	@Test
-	public void testPreCondition() {
-		Evaluator.beforePre(currentTarget, "SomeClass", ContractClass.class, void.class);
+	public void testPreCondition() throws Throwable {
+		Evaluator.getPreCondition(currentTarget, "SomeClass", ContractClass.class, DummyClass.class, void.class);
 		assertEquals(EvaluationPhase.BEFORE, Evaluator.evaluationPhase.get());
 		assertEquals(currentTarget, Evaluator.currentTarget.get());
 		Evaluator.afterContract();
@@ -92,8 +91,9 @@ public class EvaluatorTest {
 	}
 
 	@Test
-	public void testPostCondition() {
-		Evaluator.beforePost(currentTarget, "SomeClass", ContractClass.class, int.class, Integer.valueOf(4));
+	public void testPostCondition() throws Throwable {
+		Evaluator.getPostCondition(currentTarget, "SomeClass", ContractClass.class, DummyClass.class, int.class,
+				Integer.valueOf(4));
 		assertEquals(EvaluationPhase.AFTER, Evaluator.evaluationPhase.get());
 		assertEquals(currentTarget, Evaluator.currentTarget.get());
 		assertEquals(Integer.valueOf(4), Evaluator.returnValue.get());
@@ -102,8 +102,8 @@ public class EvaluatorTest {
 	}
 
 	@Test
-	public void testCallInvariant() {
-		Evaluator.beforeInvariant(currentTarget, "SomeClass", ContractClass.class);
+	public void testCallInvariant() throws Throwable {
+		Evaluator.getInvariant(currentTarget, "SomeClass", ContractClass.class, DummyClass.class);
 		assertEquals(EvaluationPhase.INVARIANT, Evaluator.evaluationPhase.get());
 		assertEquals(currentTarget, Evaluator.currentTarget.get());
 		Evaluator.afterContract();

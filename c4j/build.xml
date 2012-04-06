@@ -55,7 +55,5 @@
 		<copy file="${C4J_ALL_JAR}" tofile="${C4J_CURRENT_ALL_JAR}"/>
 		
 		<eclipse.refreshLocal resource="c4j/dist" depth="infinite"/>
-		<eclipse.incrementalBuild project="c4j-acceptancetest" kind="clean"/>
-		<eclipse.incrementalBuild project="c4j-systemtest" kind="clean"/>
 	</target>
 </project>

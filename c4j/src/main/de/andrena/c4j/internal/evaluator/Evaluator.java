@@ -23,12 +23,12 @@ public class Evaluator {
 	public static final StaticCall storeFieldAccess = new StaticCall(Evaluator.class, "storeFieldAccess");
 	public static final StaticCall storeMethodCall = new StaticCall(Evaluator.class, "storeMethodCall");
 	public static final StaticCall getCurrentTarget = new StaticCall(Evaluator.class, "getCurrentTarget");
-	public static final StaticCall beforePre = new StaticCall(Evaluator.class, "beforePre");
-	public static final StaticCall beforePost = new StaticCall(Evaluator.class, "beforePost");
-	public static final StaticCall beforeInvariant = new StaticCall(Evaluator.class, "beforeInvariant");
+	public static final StaticCall getPreCondition = new StaticCall(Evaluator.class, "getPreCondition");
+	public static final StaticCall getPostCondition = new StaticCall(Evaluator.class, "getPostCondition");
+	public static final StaticCall getInvariant = new StaticCall(Evaluator.class, "getInvariant");
+	public static final StaticCall canExecuteCondition = new StaticCall(Evaluator.class, "canExecuteCondition");
 	public static final StaticCall afterContract = new StaticCall(Evaluator.class, "afterContract");
 	public static final StaticCall afterContractMethod = new StaticCall(Evaluator.class, "afterContractMethod");
-	public static final StaticCall getContractFromCache = new StaticCall(Evaluator.class, "getContractFromCache");
 	public static final StaticCall setException = new StaticCall(Evaluator.class, "setException");
 
 	private static final Logger logger = Logger.getLogger(Evaluator.class);
@@ -68,11 +68,11 @@ public class Evaluator {
 	/**
 	 * Integer = stack trace depth, class = contract class
 	 */
-	static final ThreadLocal<Pair<Integer, Class<?>>> currentOldCacheEnvironment = new ThreadLocal<Pair<Integer, Class<?>>>();
-	private static final ThreadLocal<SelfInitializingMap<Pair<Integer, Class<?>>, Map<String, Object>>> oldStore = new ThreadLocal<SelfInitializingMap<Pair<Integer, Class<?>>, Map<String, Object>>>() {
+	static final ThreadLocal<Integer> currentOldCacheEnvironment = new ThreadLocal<Integer>();
+	private static final ThreadLocal<SelfInitializingMap<Integer, Map<String, Object>>> oldStore = new ThreadLocal<SelfInitializingMap<Integer, Map<String, Object>>>() {
 		@Override
-		protected SelfInitializingMap<Pair<Integer, Class<?>>, Map<String, Object>> initialValue() {
-			return new SelfInitializingMap<Pair<Integer, Class<?>>, Map<String, Object>>() {
+		protected SelfInitializingMap<Integer, Map<String, Object>> initialValue() {
+			return new SelfInitializingMap<Integer, Map<String, Object>>() {
 				@Override
 				protected Map<String, Object> initialValue() {
 					return new HashMap<String, Object>();
@@ -103,8 +103,8 @@ public class Evaluator {
 
 	public static Object oldFieldAccess(String fieldName) {
 		Object oldValue = getCurrentOldCache().get(fieldName);
-		logger.trace("oldFieldAccess for field '" + fieldName + "' with " + currentOldCacheEnvironment.get().getFirst()
-				+ " " + currentOldCacheEnvironment.get().getSecond() + " returning " + oldValue);
+		logger.trace("oldFieldAccess for field '" + fieldName + "' with " + currentOldCacheEnvironment.get()
+				+ " returning " + oldValue);
 		return oldValue;
 	}
 
@@ -115,15 +115,14 @@ public class Evaluator {
 	public static Object oldMethodCall(String methodName) {
 		Object oldValue = getCurrentOldCache().get(methodName);
 		logger.trace("oldMethodCall for method '" + methodName + "' with "
-				+ currentOldCacheEnvironment.get().getFirst()
-				+ " " + currentOldCacheEnvironment.get().getSecond() + " returning " + oldValue);
+				+ currentOldCacheEnvironment.get() + " returning " + oldValue);
 		return oldValue;
 	}
 
 	public static void storeFieldAccess(String fieldName) {
 		Object storedValue = fieldAccess(fieldName);
 		logger.trace("storeFieldAccess for field '" + fieldName + "' with "
-				+ currentOldCacheEnvironment.get().getFirst() + " " + currentOldCacheEnvironment.get().getSecond()
+				+ currentOldCacheEnvironment.get()
 				+ " storing " + storedValue);
 		getCurrentOldCache().put(fieldName, storedValue);
 	}
@@ -131,7 +130,7 @@ public class Evaluator {
 	public static void storeMethodCall(String methodName) {
 		Object storedValue = methodCall(methodName, new Class<?>[0], new Object[0]);
 		logger.trace("storeMethodCall for method '" + methodName + "' with "
-				+ currentOldCacheEnvironment.get().getFirst() + " " + currentOldCacheEnvironment.get().getSecond()
+				+ currentOldCacheEnvironment.get()
 				+ " storing " + storedValue);
 		getCurrentOldCache().put(methodName, storedValue);
 	}
@@ -190,65 +189,61 @@ public class Evaluator {
 		return (T) returnValue.get();
 	}
 
-	public static boolean beforePre(Object target, String methodName, Class<?> contractClass, Class<?> returnType) {
-		if (evaluationPhase.get() == EvaluationPhase.NONE) {
-			evaluationPhase.set(EvaluationPhase.BEFORE);
-			beforeContract(target, contractClass, returnType, new Exception().getStackTrace().length);
-			logger.info("Calling pre-condition for " + methodName + " in contract " + contractClass.getSimpleName()
-					+ ".");
-			return true;
-		}
-		return false;
+	public static Object getPreCondition(Object target, String methodName, Class<?> contractClass,
+			Class<?> callingClass, Class<?> returnType) throws InstantiationException, IllegalAccessException {
+		evaluationPhase.set(EvaluationPhase.BEFORE);
+		beforeContract(target, returnType, new Exception().getStackTrace().length);
+		logger.info("Calling pre-condition for " + methodName + " in contract " + contractClass.getSimpleName() + ".");
+		return getContractFromCache(target, contractClass, callingClass);
 	}
 
-	public static boolean beforeInvariant(Object target, String className, Class<?> contractClass) {
-		if (evaluationPhase.get() == EvaluationPhase.NONE) {
-			evaluationPhase.set(EvaluationPhase.INVARIANT);
-			beforeContract(target, contractClass, void.class, new Exception().getStackTrace().length);
-			logger.info("Calling invariant for " + className + " in contract " + contractClass.getSimpleName() + ".");
-			return true;
-		}
-		return false;
+	public static boolean canExecuteCondition() {
+		return evaluationPhase.get() == EvaluationPhase.NONE;
 	}
 
-	private static void beforeContract(Object target, Class<?> contractClass, Class<?> returnType, int stackTraceDepth) {
+	public static Object getInvariant(Object target, String className, Class<?> contractClass, Class<?> callingClass)
+			throws InstantiationException, IllegalAccessException {
+		evaluationPhase.set(EvaluationPhase.INVARIANT);
+		beforeContract(target, void.class, new Exception().getStackTrace().length);
+		logger.info("Calling invariant for " + className + " in contract " + contractClass.getSimpleName() + ".");
+		return getContractFromCache(target, contractClass, callingClass);
+	}
+
+	private static void beforeContract(Object target, Class<?> returnType, int stackTraceDepth) {
 		currentTarget.set(target);
-		currentOldCacheEnvironment.set(new Pair<Integer, Class<?>>(Integer.valueOf(stackTraceDepth), contractClass));
+		currentOldCacheEnvironment.set(Integer.valueOf(stackTraceDepth));
 		contractReturnType.set(returnType);
 	}
 
-	public static boolean beforePost(Object target, String methodName, Class<?> contractClass, Class<?> returnType,
-			Object actualReturnValue) {
-		if (evaluationPhase.get() == EvaluationPhase.NONE) {
-			evaluationPhase.set(EvaluationPhase.AFTER);
-			beforeContract(target, contractClass, returnType, new Exception().getStackTrace().length);
-			returnValue.set(actualReturnValue);
-			logger.info("Calling post-condition for " + methodName + " in contract " + contractClass.getSimpleName()
-					+ ".");
-			return true;
-		}
-		return false;
+	public static Object getPostCondition(Object target, String methodName, Class<?> contractClass,
+			Class<?> callingClass, Class<?> returnType, Object actualReturnValue) throws InstantiationException,
+			IllegalAccessException {
+		evaluationPhase.set(EvaluationPhase.AFTER);
+		beforeContract(target, returnType, new Exception().getStackTrace().length);
+		returnValue.set(actualReturnValue);
+		logger.info("Calling post-condition for " + methodName + " in contract " + contractClass.getSimpleName() + ".");
+		return getContractFromCache(target, contractClass, callingClass);
 	}
 
 	public static void afterContract() {
+		logger.trace("afterContract");
 		contractReturnType.set(null);
 		currentTarget.set(null);
 		evaluationPhase.set(EvaluationPhase.NONE);
 	}
 
-	public static void afterContractMethod(Class<?> contractClass) {
+	public static void afterContractMethod() {
 		if (evaluationPhase.get() == EvaluationPhase.NONE) {
 			logger.trace("afterContractMethod");
 			returnValue.set(null);
 			exceptionValue.set(null);
 			oldStore.get()
-					.get(new Pair<Integer, Class<?>>(Integer.valueOf(new Exception().getStackTrace().length),
-							contractClass))
+					.get(Integer.valueOf(new Exception().getStackTrace().length))
 					.clear();
 		}
 	}
 
-	public static Object getContractFromCache(Object target, Class<?> contractClass, Class<?> callingClass)
+	private static Object getContractFromCache(Object target, Class<?> contractClass, Class<?> callingClass)
 			throws InstantiationException, IllegalAccessException {
 		Object contract;
 		Pair<Class<?>, Class<?>> classPair = new Pair<Class<?>, Class<?>>(contractClass, callingClass);
