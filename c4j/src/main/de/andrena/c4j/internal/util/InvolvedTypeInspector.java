@@ -13,6 +13,7 @@ public class InvolvedTypeInspector {
 		for (CtClass interfaze : type.getInterfaces()) {
 			inheritedTypes.addAll(inspect(interfaze));
 		}
+		inheritedTypes.reverseOrder();
 		return inheritedTypes;
 	}
 }

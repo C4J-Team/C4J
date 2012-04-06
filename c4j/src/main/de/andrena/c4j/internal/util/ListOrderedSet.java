@@ -2,6 +2,7 @@ package de.andrena.c4j.internal.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -10,6 +11,10 @@ import java.util.Set;
 public class ListOrderedSet<T> implements Set<T> {
 	private List<T> list = new ArrayList<T>();
 	private Set<T> set = new HashSet<T>();
+
+	public void reverseOrder() {
+		Collections.reverse(list);
+	}
 
 	@Override
 	public int size() {
