@@ -1,10 +1,15 @@
-package de.andrena.c4j;
+package de.andrena.c4j.systemtest;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import de.andrena.c4j.DefaultConfiguration;
+import de.andrena.c4j.PureRegistry;
+import de.andrena.c4j.PureRegistryException;
+import de.andrena.c4j.Configuration.PureBehavior;
 
 public class AcceptanceTestConfiguration extends DefaultConfiguration {
 	@Override

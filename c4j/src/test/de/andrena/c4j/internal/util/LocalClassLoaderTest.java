@@ -8,11 +8,8 @@ public class LocalClassLoaderTest {
 	@Test
 	public void testClassLoading() throws Throwable {
 		ClassLoader loader = new LocalClassLoader(getClass().getClassLoader());
-		Class<?> localClass = Class.forName(getClass().getName() + "$LoadedClass", true, loader);
-		Class<?> contextClass = Class.forName(getClass().getName() + "$LoadedClass");
+		Class<?> localClass = Class.forName("de.andrena.localclassloader.LoadedClass", true, loader);
+		Class<?> contextClass = Class.forName("de.andrena.localclassloader.LoadedClass");
 		assertTrue(localClass != contextClass);
-	}
-
-	public static class LoadedClass {
 	}
 }

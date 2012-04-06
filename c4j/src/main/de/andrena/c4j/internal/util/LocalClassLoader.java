@@ -1,9 +1,9 @@
 package de.andrena.c4j.internal.util;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
@@ -19,6 +19,10 @@ public class LocalClassLoader extends ClassLoader {
 	@Override
 	protected Class<?> findClass(String name) throws ClassNotFoundException {
 		try {
+			if (name.matches(Pattern.quote("de.andrena.c4j.") + "[^\\.]+")) {
+				throw new ClassNotFoundException(
+						"Framework classes have to be loaded by parent to avoid ClassCastExceptions and LinkageErrors.");
+			}
 			byte[] classBytes = loadClassData(name);
 			Class<?> c = defineClass(name, classBytes, 0, classBytes.length);
 			resolveClass(c);
@@ -43,7 +47,7 @@ public class LocalClassLoader extends ClassLoader {
 	}
 
 	private InputStream getResourceStream(String name) throws IOException {
-		String fileName = name.replace('.', File.separatorChar) + ".class";
+		String fileName = name.replace('.', '/') + ".class";
 		InputStream stream = getParent().getResourceAsStream(fileName);
 		if (stream == null) {
 			throw new IOException("resource " + fileName + " not found.");
@@ -58,9 +62,10 @@ public class LocalClassLoader extends ClassLoader {
 		if (loadedClass == null) {
 			try {
 				loadedClass = findClass(name);
-				logger.trace("locally loaded class " + name);
+				logger.trace("LocalClassLoader loads " + name);
 			} catch (ClassNotFoundException e) {
 				loadedClass = super.loadClass(name);
+				logger.trace("LocalClassLoader skips " + name, e);
 			}
 		}
 		return loadedClass;
