@@ -9,10 +9,10 @@ public class ASpecContract implements ASpec {
 	@Override
 	public int query(int x, int y) {
 		if (pre()) {
-			System.out.println("Pre-Condition query");
+			System.out.println("Pre-Condition query interface ASpec");
 		}
 		if (post()) {
-			System.out.println("Post-Condition query");
+			System.out.println("Post-Condition query interface ASpec");
 		}
 		return ignored();
 	}
@@ -20,10 +20,10 @@ public class ASpecContract implements ASpec {
 	@Override
 	public void command(int wert) {
 		if (pre()) {
-			System.out.println("Pre-Condition command");
+			System.out.println("Pre-Condition command interface ASpec");
 		}
 		if (post()) {
-			System.out.println("Post-Condition command");
+			System.out.println("Post-Condition command interface ASpec");
 		}
 	}
 

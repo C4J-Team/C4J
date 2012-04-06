@@ -1,16 +1,10 @@
-package de.andrena.c4j.acceptancetest.lesson102;
+package de.andrena.c4j.acceptancetest.lesson202;
 
 import static de.andrena.c4j.Condition.ignored;
 import static de.andrena.c4j.Condition.post;
 import static de.andrena.c4j.Condition.pre;
-import de.andrena.c4j.ClassInvariant;
 
-public class BContract extends B {
-
-	@ClassInvariant
-	public void classInvariant() {
-		System.out.println("ClassInvariant class B");
-	}
+public class BSpecContract implements BSpec {
 
 	@Override
 	public int queryB() {
@@ -36,10 +30,10 @@ public class BContract extends B {
 	@Override
 	public int query(int x, int y) {
 		if (pre()) {
-			System.out.println("Pre-Condition query class B");
+			System.out.println("Pre-Condition query interface BSpec");
 		}
 		if (post()) {
-			System.out.println("Post-Condition query class B");
+			System.out.println("Post-Condition query interface BSpec");
 		}
 		return ignored();
 	}
@@ -47,10 +41,10 @@ public class BContract extends B {
 	@Override
 	public void command(int value) {
 		if (pre()) {
-			System.out.println("Pre-Condition command class B");
+			System.out.println("Pre-Condition command interface BSpec");
 		}
 		if (post()) {
-			System.out.println("Post-Condition command class B");
+			System.out.println("Post-Condition command interface BSpec");
 		}
 	}
 

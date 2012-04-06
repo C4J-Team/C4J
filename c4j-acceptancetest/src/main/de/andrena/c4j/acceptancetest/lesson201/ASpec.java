@@ -9,6 +9,6 @@ public interface ASpec {
 	@Pure
 	int query(int x, int y);
 
-	void command(int wert);
+	void command(int value);
 
 }

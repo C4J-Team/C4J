@@ -6,7 +6,7 @@ import de.andrena.c4j.Pure;
 @ContractReference(AContract.class)
 public class A {
 
-	private int wert;
+	private int a;
 
 	@Pure
 	public int query(int x, int y) {
@@ -15,8 +15,8 @@ public class A {
 		return result;
 	}
 
-	public void command(int wert) {
-		this.wert = wert;
+	public void command(int value) {
+		a = value;
 	}
 
 }

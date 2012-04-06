@@ -1,34 +1,31 @@
-package de.andrena.c4j.acceptancetest.lesson102;
+package de.andrena.c4j.acceptancetest.lesson202;
 
 import de.andrena.c4j.ContractReference;
-import de.andrena.c4j.Pure;
-import de.andrena.c4j.acceptancetest.lesson101.A;
 
 @ContractReference(BContract.class)
-public class B extends A {
+public class B implements BSpec {
 
 	private int b;
 
-	@Pure
+	@Override
 	public int queryB() {
 		return b;
 	}
 
+	@Override
 	public void commandB(int value) {
 		b = value;
 	}
 
 	@Override
-	@Pure
 	public int query(int x, int y) {
-		int result = super.query(x, y);
-		result = result + x * y;
+		int result = 0;
+		result = x * y;
 		return result;
 	}
 
 	@Override
 	public void command(int value) {
-		super.command(value);
 		b = value;
 	}
 
