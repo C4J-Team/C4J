@@ -19,6 +19,8 @@ public class CashTerminal {
 Our contract `CashTerminalContract` could ensure that only a positive amount of money can be withdrawn from a `CashTerminal`:
 
 ```java
+import static de.andrena.c4j.Condition.*;
+
 public class CashTerminalContract extends CashTerminal {
   @Override
   public void withdraw(final int amount) {
@@ -79,6 +81,8 @@ public class CashTerminal {
   }
 }
 
+import static de.andrena.c4j.Condition.*;
+
 public class CashTerminalContract extends CashTerminal {
   @Override
   public void withdraw(int amount) {
@@ -94,43 +98,13 @@ public class CashTerminalContract extends CashTerminal {
 
 The Pre-Condition of `withdraw(int)` requires, that the parameter `amount` is greater than 0. The Post-Condition ensures, that the balance (after execution of method `withdraw(int)`) is equal to the old balance (before execution) substracted by the parameter `amount`.
 
-## old and unchanged
-There are two utility methods available, that help defining post-conditions in a short and elegant manner.
-
+## old
 `old`, as seen in the example above, can be used to access the value of a field or parameter-less method before the execution of the method in question. There can be no calculations, method-calls or even local variables inside the parameter being passed to `old`.
 
 ```java
   assert getBalance() == old(getBalance() - amount); // won't work
   assert getBalance() == old(getBalance()) - old(amount); // won't work
 ```
-
-As methods should often only modify a particular set of attributes of a class, many post-conditions ensure that the other attributes stay unchanged.
-
-```java
-@Contract(TimeOfDayContract.class)
-public interface TimeOfDay {
-  int getHour();
-  int getMinute();
-  int getSecond();
-  void setHour(int hour);
-  void setMinute(int minute);
-  void setSecond(int second);
-}
-
-public class TimeOfDayContract implements TimeOfDay {
-  @Override
-  public void setHour(final int hour) {
-    if (post()) {
-      unchanged(getMinute(), getSecond());
-    }
-  }
-  // etc.
-}
-```
-
-For primitive types, unchanged checks if the value at the end of the method call is the same as in the beginning of the method call. For reference types, it ensures that the object's state is not being modified while the method is running.
-
-In addition to fields and methods without parameters, method parameters can also be used with `unchanged`. As parameters act as local variables, a redefinition is not being checked and thus unchanged does not have any effect at all, if the method parameter is of primitive type.
 
 ## Class-Invariants
 Sometimes, a set of conditions can be defined for a class, that always must be satisfied. These conditions can then be defined in a so-called _Class-Invariant_.
@@ -194,3 +168,47 @@ public class FinalClassInterfaceContract implements FinalClassInterface {
   }
 }
 ```
+
+# The concept of Pure Methods.
+The following will only work with a custom `Configuration` which includes `PureBehavior.VALIDATE_PURE` (details below). This functionality is experimental and has not yet been fully tested.
+
+## Setting up a custom Configuration
+
+* Implement a class implementing `Configuration` or extending `DefaultConfiguration`, declaring at least one package in `getRootPackages()` and adding `PureBehavior.VALIDATE_PURE` to `getPureBehaviors()`.
+* Add the fully qualified class name of your `Configuration` as a javaagent-Parameter in the VM Arguments, e.g. `-ea -javaagent:/path/to/c4j-[version].jar=package.with.the.CustomConfiguration`.
+
+## Method purity
+There's a very good introduction to method purity for Microsoft's Code Contracts on [this blog](http://www.minddriven.de/index.php/technology/dot-net/code-contracts/code-contracts-method-purity). In C4J 4.0, all contract methods are implicitly declared pure. If you want to declare methods pure in target classes, you can either use the `@Pure` annotation on the method directly, or use the `@PureTarget` annotation on the corresponding contract method (especially handy when using external contracts). When referencing methods outside the root packages, a warning is issued, asking you to declare the method either pure or unpure using `Configuration.getPureRegistry()`.
+
+## unchanged
+This feature can only be used when `PureBehavior.VALIDATE_PURE` is turned on, as it's relying on the same implementation as pure methods.
+
+As methods should often only modify a particular set of attributes of a class, many post-conditions ensure that the other attributes stay unchanged.
+
+```java
+@Contract(TimeOfDayContract.class)
+public interface TimeOfDay {
+  int getHour();
+  int getMinute();
+  int getSecond();
+  void setHour(int hour);
+  void setMinute(int minute);
+  void setSecond(int second);
+}
+
+import static de.andrena.c4j.Condition.*;
+
+public class TimeOfDayContract implements TimeOfDay {
+  @Override
+  public void setHour(final int hour) {
+    if (post()) {
+      unchanged(getMinute(), getSecond());
+    }
+  }
+  // etc.
+}
+```
+
+For primitive types, unchanged checks if the value at the end of the method call is the same as in the beginning of the method call. For reference types, it ensures that the object's state is not being modified while the method is running.
+
+In addition to fields and methods without parameters, method parameters can also be used with `unchanged`. As parameters act as local variables, a redefinition is not being checked and thus unchanged does not have any effect at all, if the method parameter is of primitive type.
