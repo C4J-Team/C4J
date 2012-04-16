@@ -85,6 +85,10 @@ public class PureInspector {
 		if (editor.getPureError() != null) {
 			editor.getPureError().insertBefore(affectedBehavior);
 		}
+		verifyUnpureObjects(affectedBehavior);
+	}
+
+	private void verifyUnpureObjects(CtMethod affectedBehavior) throws NotFoundException, CannotCompileException {
 		List<NestedExp> unpureObjects = new ArrayList<NestedExp>();
 		boolean methodIsStatic = Modifier.isStatic(affectedBehavior.getModifiers());
 		if (!methodIsStatic) {

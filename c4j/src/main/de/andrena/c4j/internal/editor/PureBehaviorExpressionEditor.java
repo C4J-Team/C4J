@@ -95,9 +95,8 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 		if (field.hasAnnotation(AllowPureAccess.class)) {
 			return;
 		}
-		String errorMsg = "illegal write access on field " + field.getName() + " in pure method "
-				+ affectedMethod.getLongName() + " on line " + fieldAccess.getLineNumber();
-		pureError(errorMsg);
+		pureError("illegal write access on field " + field.getName() + " in pure method "
+				+ affectedMethod.getLongName() + " on line " + fieldAccess.getLineNumber());
 	}
 
 	private void pureError(String errorMsg) throws CannotCompileException {
@@ -154,9 +153,8 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 
 	private void editStaticMethodCall(MethodCall methodCall, CtMethod method) throws CannotCompileException {
 		if (rootTransformer.getConfigurationManager().isWithinRootPackages(method.getDeclaringClass())) {
-			String errorMsg = "illegal access on static method " + method.getLongName() + " in pure method "
-					+ affectedMethod.getLongName() + " on line " + methodCall.getLineNumber();
-			pureError(errorMsg);
+			pureError("illegal access on static method " + method.getLongName() + " in pure method "
+					+ affectedMethod.getLongName() + " on line " + methodCall.getLineNumber());
 			return;
 		}
 		PureEvaluator.warnExternalAccess(method.getLongName());
