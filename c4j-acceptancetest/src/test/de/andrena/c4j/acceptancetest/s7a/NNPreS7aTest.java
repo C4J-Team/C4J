@@ -8,7 +8,7 @@ import org.junit.rules.ExpectedException;
 import de.andrena.c4j.acceptancetest.floatingwindow.NorthEastAndSouthWestFloatingWindow;
 import de.andrena.c4j.acceptancetest.floatingwindow.NorthEastFloatingWindowSpec;
 import de.andrena.c4j.acceptancetest.floatingwindow.Vector;
-import de.andrena.c4j.acceptancetest.workingstudent.StudentSpecContract;
+import de.andrena.c4j.acceptancetest.workingstudent.EmployeeSpecContract;
 import de.andrena.c4j.acceptancetest.workingstudent.WorkingStudent;
 import de.andrena.c4j.acceptancetest.workingstudent.YoungWorkingStudent;
 import de.andrena.c4j.acceptancetest.workingstudent.YoungWorkingStudentContract;
@@ -39,7 +39,7 @@ public class NNPreS7aTest {
 	public void testErrorMessageByStrengtheningOfPrecondition() {
 		transformerAware.expectGlobalLog(Level.ERROR, "Found strengthening pre-condition in "
 				+ YoungWorkingStudentContract.class.getName() + ".setAge(int)" + " which is already defined from "
-				+ StudentSpecContract.class.getName() + " - ignoring the pre-condition.");
+				+ EmployeeSpecContract.class.getName() + " - ignoring the pre-condition.");
 
 		youngWorkingStudent = new YoungWorkingStudent();
 		youngWorkingStudent.setAge(60);
