@@ -38,11 +38,21 @@ public class PureEvaluator {
 	public static void registerUnpure(Object[] objects) {
 		pureCallDepth.set(Integer.valueOf(pureCallDepth.get().intValue() + 1));
 		unpureCache.get().addAll(Arrays.asList(objects));
+		for (Object obj : objects) {
+			if (obj instanceof Object[]) {
+				registerUnpure((Object[]) obj);
+			}
+		}
 	}
 
 	public static void unregisterUnpure(Object[] objects) {
 		pureCallDepth.set(Integer.valueOf(pureCallDepth.get().intValue() - 1));
 		unpureCache.get().removeAll(Arrays.asList(objects));
+		for (Object obj : objects) {
+			if (obj instanceof Object[]) {
+				unregisterUnpure((Object[]) obj);
+			}
+		}
 	}
 
 	public static void checkUnpureAccess(Object target) {
