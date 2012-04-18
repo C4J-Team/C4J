@@ -58,7 +58,6 @@ public class UnchangedForObjectsSystemTest {
 		target.parameter5IsChanged(0, 0, 0, 0, new SetLike());
 	}
 
-	// failing, see https://github.com/C4J-Team/C4J/issues/1
 	@Test(expected = AssertionError.class)
 	public void testParameterArrayIsChanged() {
 		target.parameterArrayIsChanged(new SetLike[] { new SetLike() });
