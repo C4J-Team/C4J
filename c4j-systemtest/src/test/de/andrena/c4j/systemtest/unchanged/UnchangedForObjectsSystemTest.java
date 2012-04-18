@@ -10,6 +10,7 @@ import org.junit.Test;
 import de.andrena.c4j.ContractReference;
 import de.andrena.c4j.Pure;
 import de.andrena.c4j.Target;
+import de.andrena.c4j.systemtest.MutableString;
 import de.andrena.c4j.systemtest.TransformerAwareRule;
 
 public class UnchangedForObjectsSystemTest {
@@ -35,7 +36,7 @@ public class UnchangedForObjectsSystemTest {
 
 	@Test
 	public void testParameterRemainsUnchanged() {
-		target.parameterRemainsUnchanged(new SetLike());
+		target.parameterRemainsUnchanged(new MutableString());
 	}
 
 	@Test(expected = AssertionError.class)
@@ -50,24 +51,24 @@ public class UnchangedForObjectsSystemTest {
 
 	@Test(expected = AssertionError.class)
 	public void testParameterIsChanged() {
-		target.parameterIsChanged(new SetLike());
+		target.parameterIsChanged(new MutableString());
 	}
 
 	@Test(expected = AssertionError.class)
 	public void testParameter5IsChanged() {
-		target.parameter5IsChanged(0, 0, 0, 0, new SetLike());
+		target.parameter5IsChanged(0, 0, 0, 0, new MutableString());
 	}
 
 	// failing, see https://github.com/C4J-Team/C4J/issues/1
 	@Test(expected = AssertionError.class)
 	public void testParameterArrayIsChanged() {
-		target.parameterArrayIsChanged(new SetLike[] { new SetLike() });
+		target.parameterArrayIsChanged(new MutableString[] { new MutableString() });
 	}
 
 	// failing, see https://github.com/C4J-Team/C4J/issues/1
 	@Test(expected = AssertionError.class)
 	public void testParameterArrayIsReplaced() {
-		target.parameterArrayIsReplaced(new SetLike[] { new SetLike() });
+		target.parameterArrayIsReplaced(new MutableString[] { new MutableString() });
 	}
 
 	@Test(expected = AssertionError.class)
@@ -82,15 +83,15 @@ public class UnchangedForObjectsSystemTest {
 
 	@Test
 	public void testParameterIsReplaced() {
-		target.parameterIsReplaced(new SetLike());
+		target.parameterIsReplaced(new MutableString());
 	}
 
 	@ContractReference(ContractClass.class)
 	public static class TargetClass {
-		protected SetLike field = new SetLike();
+		protected MutableString field = new MutableString();
 
 		@Pure
-		public SetLike method() {
+		public MutableString method() {
 			return field;
 		}
 
@@ -100,7 +101,7 @@ public class UnchangedForObjectsSystemTest {
 		public void methodRemainsUnchanged() {
 		}
 
-		public void parameterRemainsUnchanged(SetLike param) {
+		public void parameterRemainsUnchanged(MutableString param) {
 		}
 
 		public void fieldIsChanged() {
@@ -111,32 +112,32 @@ public class UnchangedForObjectsSystemTest {
 			field.setValue("abc");
 		}
 
-		public void parameterIsChanged(SetLike param) {
+		public void parameterIsChanged(MutableString param) {
 			param.setValue("abc");
 		}
 
-		public void parameter5IsChanged(int a, int b, int c, int d, SetLike param) {
+		public void parameter5IsChanged(int a, int b, int c, int d, MutableString param) {
 			param.setValue("abc");
 		}
 
-		public void parameterArrayIsChanged(SetLike[] param) {
+		public void parameterArrayIsChanged(MutableString[] param) {
 			param[0].setValue("abc");
 		}
 
-		public void parameterArrayIsReplaced(SetLike[] param) {
-			param[0] = new SetLike();
+		public void parameterArrayIsReplaced(MutableString[] param) {
+			param[0] = new MutableString();
 		}
 
 		public void fieldIsReplaced() {
-			field = new SetLike();
+			field = new MutableString();
 		}
 
 		public void methodIsReplaced() {
-			field = new SetLike();
+			field = new MutableString();
 		}
 
-		public void parameterIsReplaced(SetLike param) {
-			param = new SetLike();
+		public void parameterIsReplaced(MutableString param) {
+			param = new MutableString();
 		}
 	}
 
@@ -159,7 +160,7 @@ public class UnchangedForObjectsSystemTest {
 		}
 
 		@Override
-		public void parameterRemainsUnchanged(SetLike param) {
+		public void parameterRemainsUnchanged(MutableString param) {
 			if (post()) {
 				assert unchanged(param);
 			}
@@ -180,28 +181,28 @@ public class UnchangedForObjectsSystemTest {
 		}
 
 		@Override
-		public void parameterIsChanged(SetLike param) {
+		public void parameterIsChanged(MutableString param) {
 			if (post()) {
 				assert unchanged(param);
 			}
 		}
 
 		@Override
-		public void parameter5IsChanged(int a, int b, int c, int d, SetLike param) {
+		public void parameter5IsChanged(int a, int b, int c, int d, MutableString param) {
 			if (post()) {
 				assert unchanged(param);
 			}
 		}
 
 		@Override
-		public void parameterArrayIsChanged(SetLike[] param) {
+		public void parameterArrayIsChanged(MutableString[] param) {
 			if (post()) {
 				assert unchanged((Object) param);
 			}
 		}
 
 		@Override
-		public void parameterArrayIsReplaced(SetLike[] param) {
+		public void parameterArrayIsReplaced(MutableString[] param) {
 			if (post()) {
 				assert unchanged((Object) param);
 			}
@@ -222,45 +223,11 @@ public class UnchangedForObjectsSystemTest {
 		}
 
 		@Override
-		public void parameterIsReplaced(SetLike param) {
+		public void parameterIsReplaced(MutableString param) {
 			if (post()) {
 				assert unchanged(param);
 			}
 		}
-	}
-
-	public static class SetLike {
-		private String value = "";
-
-		public void setValue(String value) {
-			this.value = value;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((value == null) ? 0 : value.hashCode());
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			SetLike other = (SetLike) obj;
-			if (value == null) {
-				if (other.value != null)
-					return false;
-			} else if (!value.equals(other.value))
-				return false;
-			return true;
-		}
-
 	}
 
 }
