@@ -8,8 +8,8 @@ import java.util.Set;
 
 import com.external.ExternalClass;
 
+import de.andrena.c4j.AbstractConfiguration;
 import de.andrena.c4j.Configuration;
-import de.andrena.c4j.DefaultConfiguration;
 import de.andrena.c4j.PureRegistry;
 import de.andrena.c4j.PureRegistryException;
 import de.andrena.c4j.systemtest.config.AssertionErrorOnlyConfiguration;
@@ -20,7 +20,7 @@ import de.andrena.c4j.systemtest.config.PureBehaviorEmptyConfiguration;
 import de.andrena.c4j.systemtest.config.PureBehaviorSkipOnlyConfiguration;
 import de.andrena.c4j.systemtest.config.StrengtheningPreConditionAllowedConfiguration;
 
-public class SystemTestConfiguration extends DefaultConfiguration {
+public class SystemTestConfiguration extends AbstractConfiguration {
 	@Override
 	public Set<Configuration> getConfigurations() {
 		Set<Configuration> configurations = new HashSet<Configuration>();

@@ -6,12 +6,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import de.andrena.c4j.DefaultConfiguration;
+import de.andrena.c4j.AbstractConfiguration;
 import de.andrena.c4j.PureRegistry;
 import de.andrena.c4j.PureRegistryException;
-import de.andrena.c4j.Configuration.PureBehavior;
 
-public class AcceptanceTestConfiguration extends DefaultConfiguration {
+public class AcceptanceTestConfiguration extends AbstractConfiguration {
 	@Override
 	public Set<String> getRootPackages() {
 		return Collections.singleton("de.andrena.c4j.acceptancetest");

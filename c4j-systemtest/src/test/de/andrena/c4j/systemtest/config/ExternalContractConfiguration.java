@@ -5,10 +5,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import de.andrena.c4j.AbstractConfiguration;
 import de.andrena.c4j.systemtest.config.externalcontract.ExternalContractSystemTest;
-import de.andrena.c4j.DefaultConfiguration;
 
-public class ExternalContractConfiguration extends DefaultConfiguration {
+public class ExternalContractConfiguration extends AbstractConfiguration {
 	@Override
 	public Set<String> getRootPackages() {
 		new ExternalContractSystemTest.TargetClass();

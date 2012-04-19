@@ -10,7 +10,6 @@ import org.junit.Test;
 import de.andrena.c4j.Condition;
 import de.andrena.c4j.ContractReference;
 import de.andrena.c4j.Pure;
-import de.andrena.c4j.Target;
 import de.andrena.c4j.systemtest.TransformerAwareRule;
 
 public class PureSystemTest {
@@ -40,19 +39,13 @@ public class PureSystemTest {
 	}
 
 	public static class AContract extends A {
-
-		@Target
-		private A target;
-
 		@Override
 		public int mA(int x, int y) {
 			if (pre()) {
-				// System.out.println("pre z = " + target.getZ());
 				assert x > 3 : "x > 3";
 				assert y > 4 : "y > 4";
 			}
 			if (post()) {
-				// System.out.println("post z = " + target.getZ());
 				Integer result = Condition.result(Integer.class);
 				assert result.intValue() == (x + y) : "result == x + y";
 			}

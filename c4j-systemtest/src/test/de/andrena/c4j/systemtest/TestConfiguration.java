@@ -4,10 +4,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import de.andrena.c4j.AbstractConfiguration;
 import de.andrena.c4j.Configuration;
-import de.andrena.c4j.DefaultConfiguration;
 
-public class TestConfiguration extends DefaultConfiguration {
+public class TestConfiguration extends AbstractConfiguration {
 
 	@Override
 	public Set<String> getRootPackages() {
