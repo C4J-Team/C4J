@@ -1,6 +1,8 @@
 package de.andrena.c4j.internal.compiler;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -21,8 +23,16 @@ public class StandaloneExpTest {
 
 	@Test
 	public void testAppendStandalone() {
-		assertEquals("\nif (true) {\n}\nif (true) {\n}", new IfExp(BooleanExp.TRUE).append(new IfExp(BooleanExp.TRUE))
-				.getCode());
+		StandaloneExp standaloneExp = new IfExp(BooleanExp.TRUE).append(new IfExp(BooleanExp.TRUE));
+		assertEquals("\nif (true) {\n}\nif (true) {\n}", standaloneExp.getCode());
+		assertFalse(standaloneExp.isEmpty());
+	}
+
+	@Test
+	public void testAppendStandaloneEmpty() {
+		StandaloneExp standaloneExp = new EmptyExp().append(new EmptyExp());
+		assertEquals("", standaloneExp.getCode());
+		assertTrue(standaloneExp.isEmpty());
 	}
 
 	@Test
@@ -66,7 +76,8 @@ public class StandaloneExpTest {
 
 	@Test
 	public void testCodeStandaloneExpFromStandalone() {
-		assertEquals("someCode", CodeStandaloneExp.fromStandalone("someCode").getCode());
+		StandaloneExp standaloneExp = CodeStandaloneExp.fromStandalone("someCode", false);
+		assertEquals("someCode", standaloneExp.getCode());
 	}
 
 	@Test

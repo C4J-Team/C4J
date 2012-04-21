@@ -6,4 +6,9 @@ public class EmptyExp extends StandaloneExp {
 		return "";
 	}
 
+	@Override
+	public boolean isEmpty() {
+		return true;
+	}
+
 }

@@ -130,8 +130,7 @@ public class ConditionAndInvariantTransformer extends AbstractAffectedClassTrans
 		}
 	}
 
-	private Map<CtBehavior, List<CtBehavior>> getContractMap(
-			ListOrderedSet<ContractInfo> contracts,
+	private Map<CtBehavior, List<CtBehavior>> getContractMap(ListOrderedSet<ContractInfo> contracts,
 			CtClass affectedClass) throws NotFoundException, CannotCompileException {
 		Map<CtBehavior, List<CtBehavior>> contractMap = new HashMap<CtBehavior, List<CtBehavior>>();
 		for (ContractInfo contractInfo : contracts) {
@@ -184,27 +183,34 @@ public class ConditionAndInvariantTransformer extends AbstractAffectedClassTrans
 
 	private IfExp getInvariantCall(ListOrderedSet<ContractInfo> contracts, CtClass affectedClass)
 			throws NotFoundException {
-		StandaloneExp invariantCalls = new EmptyExp();
-		boolean invariantFound = false;
-		for (ContractInfo contractInfo : contracts) {
-			for (CtMethod contractMethod : contractInfo.getContractClass().getDeclaredMethods()) {
-				if (contractMethod.hasAnnotation(ClassInvariant.class)) {
-					StaticCallExp invariantCall = new StaticCallExp(Evaluator.getInvariant, NestedExp.THIS,
-							new ValueExp(affectedClass.getSimpleName()), new ValueExp(contractInfo.getContractClass()),
-							new ValueExp(affectedClass));
-					invariantCalls = invariantCalls.append(getContractCallExp(affectedClass,
-							contractMethod, invariantCall));
-					invariantFound = true;
-				}
-			}
-		}
-		if (!invariantFound) {
+		StandaloneExp invariantCalls = getInvariantContractCalls(contracts, affectedClass);
+		if (invariantCalls.isEmpty()) {
 			return null;
 		}
 		TryExp tryInvariants = new TryExp(invariantCalls);
 		catchWithHandleContractException(affectedClass, tryInvariants);
 		tryInvariants.addFinally(getAfterContractCall().append(getAfterContractMethodCall()));
 		return getCanExecuteConditionCall(tryInvariants);
+	}
+
+	private StandaloneExp getInvariantContractCalls(ListOrderedSet<ContractInfo> contracts, CtClass affectedClass)
+			throws NotFoundException {
+		StandaloneExp invariantCalls = new EmptyExp();
+		for (ContractInfo contractInfo : contracts) {
+			for (CtMethod contractMethod : contractInfo.getContractClass().getDeclaredMethods()) {
+				if (contractMethod.hasAnnotation(ClassInvariant.class)) {
+					invariantCalls = invariantCalls.append(getContractCallExp(affectedClass,
+							contractMethod, getInvariantConditionCall(affectedClass, contractInfo)));
+				}
+			}
+		}
+		return invariantCalls;
+	}
+
+	private StaticCallExp getInvariantConditionCall(CtClass affectedClass, ContractInfo contractInfo) {
+		return new StaticCallExp(Evaluator.getInvariant, NestedExp.THIS,
+				new ValueExp(affectedClass.getSimpleName()), new ValueExp(contractInfo.getContractClass()),
+				new ValueExp(affectedClass));
 	}
 
 	private StandaloneExp getCatchExceptionCall() {
