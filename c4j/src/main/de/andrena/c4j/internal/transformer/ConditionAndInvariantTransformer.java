@@ -13,7 +13,8 @@ import javassist.NotFoundException;
 import de.andrena.c4j.ClassInvariant;
 import de.andrena.c4j.Configuration.PureBehavior;
 import de.andrena.c4j.Pure;
-import de.andrena.c4j.internal.ContractViolationHandler;
+import de.andrena.c4j.internal.ContractErrorHandler;
+import de.andrena.c4j.internal.ContractErrorHandler.ContractErrorSource;
 import de.andrena.c4j.internal.RootTransformer;
 import de.andrena.c4j.internal.compiler.CastExp;
 import de.andrena.c4j.internal.compiler.EmptyExp;
@@ -95,6 +96,11 @@ public class ConditionAndInvariantTransformer extends AbstractAffectedClassTrans
 					.getDeclaringClass()), new ValueExp(affectedBehavior.getDeclaringClass()),
 					getReturnTypeExp(contractBehavior));
 		}
+
+		@Override
+		public ContractErrorSource getContractErrorSource() {
+			return ContractErrorSource.PRE_CONDITION;
+		}
 	};
 	private BeforeConditionCallProvider beforePostConditionCallProvider = new BeforeConditionCallProvider() {
 		@Override
@@ -105,11 +111,18 @@ public class ConditionAndInvariantTransformer extends AbstractAffectedClassTrans
 					.getDeclaringClass()), new ValueExp(affectedBehavior.getDeclaringClass()),
 					getReturnTypeExp(contractBehavior), getReturnValueExp(affectedBehavior));
 		}
+
+		@Override
+		public ContractErrorSource getContractErrorSource() {
+			return ContractErrorSource.POST_CONDITION;
+		}
 	};
 
 	private interface BeforeConditionCallProvider {
 		StaticCallExp conditionCall(CtBehavior affectedBehavior, CtBehavior contractBehavior)
 				throws NotFoundException;
+
+		ContractErrorSource getContractErrorSource();
 	}
 
 	@Override
@@ -199,7 +212,7 @@ public class ConditionAndInvariantTransformer extends AbstractAffectedClassTrans
 			return null;
 		}
 		TryExp tryInvariants = new TryExp(invariantCalls);
-		catchWithHandleContractException(affectedClass, tryInvariants);
+		catchWithHandleContractException(affectedClass, tryInvariants, ContractErrorSource.CLASS_INVARIANT);
 		tryInvariants.addFinally(getAfterContractCall().append(getAfterContractMethodCall()));
 		return getCanExecuteConditionCall(tryInvariants);
 	}
@@ -230,9 +243,12 @@ public class ConditionAndInvariantTransformer extends AbstractAffectedClassTrans
 		return setExceptionCall.append(new ThrowExp(NestedExp.EXCEPTION_VALUE));
 	}
 
-	private void catchWithHandleContractException(CtClass affectedClass, TryExp contractCallExp) {
-		contractCallExp.addCatch(Throwable.class, new StaticCallExp(ContractViolationHandler.handleContractException,
-				contractCallExp.getCatchClauseVar(1), new ValueExp(affectedClass)).toStandalone());
+	private void catchWithHandleContractException(CtClass affectedClass, TryExp contractCallExp,
+			ContractErrorSource source) {
+		contractCallExp
+				.addCatch(Throwable.class, new StaticCallExp(ContractErrorHandler.handleContractException,
+						new ValueExp(source), contractCallExp.getCatchClauseVar(1), new ValueExp(affectedClass))
+						.toStandalone());
 	}
 
 	private IfExp getConditionCall(List<CtBehavior> contractList, CtClass affectedClass,
@@ -246,7 +262,8 @@ public class ConditionAndInvariantTransformer extends AbstractAffectedClassTrans
 					.append(getContractCallExp(affectedClass, contractBehavior, getConditionCall));
 		}
 		TryExp tryPreCondition = new TryExp(conditionCalls);
-		catchWithHandleContractException(affectedClass, tryPreCondition);
+		catchWithHandleContractException(affectedClass, tryPreCondition, beforeConditionCallProvider
+				.getContractErrorSource());
 		tryPreCondition.addFinally(getAfterContractCall());
 		return getCanExecuteConditionCall(tryPreCondition);
 	}
