@@ -6,8 +6,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import de.andrena.c4j.systemtest.TransformerAwareRule;
 import de.andrena.c4j.ContractReference;
+import de.andrena.c4j.systemtest.TransformerAwareRule;
 
 public class PreConditionSystemTest {
 	@Rule
@@ -38,7 +38,7 @@ public class PreConditionSystemTest {
 
 	public static class DummyContract extends DummyClass {
 		@Override
-		public void method(final int arg) {
+		public void method(int arg) {
 			if (pre()) {
 				assert arg > 0;
 			}
