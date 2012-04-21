@@ -33,9 +33,7 @@ public class IfExp extends StandaloneExp {
 		}
 		code += "\n}";
 		if (elseBody != null) {
-			code += " else {";
-			code += elseBody.getCode();
-			code += "\n}";
+			code += " else {" + elseBody.getCode() + "\n}";
 		}
 		return code;
 	}

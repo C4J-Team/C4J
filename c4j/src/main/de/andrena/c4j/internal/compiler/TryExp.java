@@ -24,17 +24,17 @@ public class TryExp extends StandaloneExp {
 
 	@Override
 	public String getCode() {
-		String code = "\n" + "try {" + tryExp.getCode() + "\n" + "}";
+		StringBuilder code = new StringBuilder("\n").append("try {").append(tryExp.getCode()).append("\n").append("}");
 		int i = 1;
 		for (Pair<Class<?>, StandaloneExp> catchClause : catchClauses) {
-			code += " catch (" + catchClause.getFirst().getName() + " e" + i + ") {"
-					+ catchClause.getSecond().getCode() + "\n" + "}";
+			code.append(" catch (").append(catchClause.getFirst().getName()).append(" e").append(i).append(") {")
+					.append(catchClause.getSecond().getCode()).append("\n").append("}");
 			i++;
 		}
 		if (finallyExp != null) {
-			code += " finally {" + finallyExp.getCode() + "\n" + "}";
+			code.append(" finally {").append(finallyExp.getCode()).append("\n").append("}");
 		}
-		return code;
+		return code.toString();
 	}
 
 	public NestedExp getCatchClauseVar(int num) {

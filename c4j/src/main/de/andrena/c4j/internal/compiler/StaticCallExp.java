@@ -4,8 +4,7 @@ public class StaticCallExp extends NestedExp {
 	private String code;
 
 	public StaticCallExp(StaticCall call, NestedExp... params) {
-		code = call.getCode();
-		code += getCodeForParams(params);
+		code = call.getCode() + getCodeForParams(params);
 	}
 
 	@Override

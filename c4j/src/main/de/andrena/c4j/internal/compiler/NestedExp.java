@@ -48,8 +48,7 @@ public abstract class NestedExp extends Exp {
 	}
 
 	public static NestedExp method(String name, NestedExp... params) {
-		CodeNestedExp exp = new CodeNestedExp(name);
-		exp.append(exp.getCodeForParams(params));
+		CodeNestedExp exp = new CodeNestedExp(name + getCodeForParams(params));
 		return exp;
 	}
 
@@ -57,21 +56,21 @@ public abstract class NestedExp extends Exp {
 		return CodeStandaloneExp.fromNested(getCode());
 	}
 
-	protected String getCodeForParams(NestedExp... params) {
+	protected static String getCodeForParams(NestedExp... params) {
 		return "(" + getCodeForValues(params) + ")";
 	}
 
-	protected String getCodeForValues(NestedExp... values) {
+	protected static String getCodeForValues(NestedExp... values) {
 		boolean firstValue = true;
-		String valueCode = "";
+		StringBuilder valueCode = new StringBuilder();
 		for (Exp value : values) {
 			if (!firstValue) {
-				valueCode += ", ";
+				valueCode.append(", ");
 			}
 			firstValue = false;
-			valueCode += value.getCode();
+			valueCode.append(value.getCode());
 		}
-		return valueCode;
+		return valueCode.toString();
 	}
 
 	public NestedExp appendCall(String method, NestedExp... params) {
@@ -91,10 +90,6 @@ public abstract class NestedExp extends Exp {
 
 		public CodeNestedExp(String code) {
 			this.code = code;
-		}
-
-		public void append(String code) {
-			this.code += code;
 		}
 
 		@Override
