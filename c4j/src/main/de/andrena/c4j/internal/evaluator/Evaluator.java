@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import de.andrena.c4j.internal.compiler.StaticCall;
 import de.andrena.c4j.internal.util.ObjectMapper;
 import de.andrena.c4j.internal.util.Pair;
+import de.andrena.c4j.internal.util.ReflectionHelper;
 import de.andrena.c4j.internal.util.SelfInitializingMap;
 
 public class Evaluator {
@@ -32,6 +33,7 @@ public class Evaluator {
 	public static final StaticCall setException = new StaticCall(Evaluator.class, "setException");
 
 	private static final Logger logger = Logger.getLogger(Evaluator.class);
+	private static final ReflectionHelper reflectionHelper = new ReflectionHelper();
 
 	private static final ObjectMapper<Pair<Class<?>, Class<?>>, Object> contractCache = new ObjectMapper<Pair<Class<?>, Class<?>>, Object>();
 
@@ -193,7 +195,8 @@ public class Evaluator {
 			Class<?> callingClass, Class<?> returnType) throws InstantiationException, IllegalAccessException {
 		evaluationPhase.set(EvaluationPhase.BEFORE);
 		beforeContract(target, returnType, new Exception().getStackTrace().length);
-		logger.info("Calling pre-condition for " + methodName + " in contract " + contractClass.getSimpleName() + ".");
+		logger.info("Calling pre-condition for " + methodName + " in contract "
+				+ reflectionHelper.getSimplerName(contractClass) + ".");
 		return getContractFromCache(target, contractClass, callingClass);
 	}
 
@@ -205,7 +208,8 @@ public class Evaluator {
 			throws InstantiationException, IllegalAccessException {
 		evaluationPhase.set(EvaluationPhase.INVARIANT);
 		beforeContract(target, void.class, new Exception().getStackTrace().length);
-		logger.info("Calling invariant for " + className + " in contract " + contractClass.getSimpleName() + ".");
+		logger.info("Calling invariant for " + className + " in contract "
+				+ reflectionHelper.getSimplerName(contractClass) + ".");
 		return getContractFromCache(target, contractClass, callingClass);
 	}
 
@@ -221,7 +225,8 @@ public class Evaluator {
 		evaluationPhase.set(EvaluationPhase.AFTER);
 		beforeContract(target, returnType, new Exception().getStackTrace().length);
 		returnValue.set(actualReturnValue);
-		logger.info("Calling post-condition for " + methodName + " in contract " + contractClass.getSimpleName() + ".");
+		logger.info("Calling post-condition for " + methodName + " in contract "
+				+ reflectionHelper.getSimplerName(contractClass) + ".");
 		return getContractFromCache(target, contractClass, callingClass);
 	}
 

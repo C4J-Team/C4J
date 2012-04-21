@@ -95,4 +95,17 @@ public class ReflectionHelper {
 		return behavior.getDeclaringClass().getSimpleName() + "." + behavior.getName()
 				+ Descriptor.toString(behavior.getSignature());
 	}
+
+	/**
+	 * Calling Class.getSimpleName() in Sun-JDK 1.6.0_24 (and possibly many other versions) for some reason loads all
+	 * the other classes being defined in the class, thus possibly loading contract-classes before their corresponding
+	 * target-classes are being loaded. Also, Class.getSimpleName() is empty for anonymous and local classes.
+	 * <p>
+	 * This is why we need our own alternative.
+	 */
+	public String getSimplerName(Class<?> clazz) {
+		// because of lastIndexOf() returning -1 when nothing is found and the addition of 1, this even works
+		// for classes in the default package
+		return clazz.getName().substring(clazz.getName().lastIndexOf('.') + 1);
+	}
 }
