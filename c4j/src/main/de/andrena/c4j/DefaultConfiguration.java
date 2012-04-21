@@ -7,7 +7,9 @@ public final class DefaultConfiguration extends AbstractConfiguration {
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * @return Defaults to an empty set. Only the DefaultConfiguration can have empty root packages.
+	 * @return {@inheritDoc}
+	 *         <p>
+	 *         Defaults to an empty set. Only the DefaultConfiguration can have empty root packages.
 	 */
 	@Override
 	public Set<String> getRootPackages() {

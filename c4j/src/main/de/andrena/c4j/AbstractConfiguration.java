@@ -1,5 +1,6 @@
 package de.andrena.c4j;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
@@ -19,7 +20,9 @@ public abstract class AbstractConfiguration implements Configuration {
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * @return Defaults to an empty map.
+	 * @return {@inheritDoc}
+	 *         <p>
+	 *         Defaults to an empty map.
 	 */
 	@Override
 	public Map<Class<?>, Class<?>> getExternalContracts() {
@@ -29,7 +32,9 @@ public abstract class AbstractConfiguration implements Configuration {
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * @return Defaults to an empty registry.
+	 * @return {@inheritDoc}
+	 *         <p>
+	 *         Defaults to an empty registry.
 	 */
 	@Override
 	public PureRegistry getPureRegistry() throws PureRegistryException {
@@ -44,6 +49,18 @@ public abstract class AbstractConfiguration implements Configuration {
 	@Override
 	public boolean writeTransformedClasses() {
 		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @return {@inheritDoc}
+	 *         <p>
+	 *         Defaults to null.
+	 */
+	@Override
+	public File getContractsDirectory() {
+		return null;
 	}
 
 	/**

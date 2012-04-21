@@ -133,9 +133,6 @@ public class RootTransformer implements ClassFileTransformer {
 			return null;
 		}
 		if (!affectedClass.hasAnnotation(Transformed.class)) {
-			if (className.contains("ContractClassForFinalTargetClass")) {
-				System.out.println("stop!");
-			}
 			transformClass(affectedClass);
 		}
 		if (configuration.getConfiguration(affectedClass).writeTransformedClasses()) {
@@ -242,7 +239,7 @@ public class RootTransformer implements ClassFileTransformer {
 				logWarnContractNotInheritingFromTarget(targetClass, contractClass);
 			}
 		} else {
-			if (targetClass.getSuperclass() != targetClass && !Modifier.isFinal(targetClass.getModifiers())) {
+			if (!contractClass.getSuperclass().equals(targetClass) && !Modifier.isFinal(targetClass.getModifiers())) {
 				logWarnContractNotInheritingFromTarget(targetClass, contractClass);
 			}
 		}

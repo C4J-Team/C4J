@@ -1,6 +1,5 @@
 package de.andrena.c4j.internal.util;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.regex.Pattern;
@@ -9,6 +8,7 @@ import org.apache.log4j.Logger;
 
 public class LocalClassLoader extends ClassLoader {
 	private Logger logger = Logger.getLogger(LocalClassLoader.class);
+	private IOUtil ioUtil = new IOUtil();
 
 	public LocalClassLoader(ClassLoader parent) {
 		super(parent);
@@ -23,7 +23,7 @@ public class LocalClassLoader extends ClassLoader {
 				throw new ClassNotFoundException(
 						"Framework classes have to be loaded by parent to avoid ClassCastExceptions and LinkageErrors.");
 			}
-			byte[] classBytes = loadClassData(name);
+			byte[] classBytes = ioUtil.readInputStream(getResourceStream(name));
 			Class<?> c = defineClass(name, classBytes, 0, classBytes.length);
 			resolveClass(c);
 			return c;
@@ -32,18 +32,6 @@ public class LocalClassLoader extends ClassLoader {
 		} catch (SecurityException e) {
 			throw new ClassNotFoundException("class not loadable: " + name, e);
 		}
-	}
-
-	private byte[] loadClassData(String name) throws IOException {
-		InputStream stream = getResourceStream(name);
-		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-		int read;
-		byte[] data = new byte[4096];
-		while ((read = stream.read(data, 0, data.length)) != -1) {
-			buffer.write(data, 0, read);
-		}
-		buffer.flush();
-		return buffer.toByteArray();
 	}
 
 	private InputStream getResourceStream(String name) throws IOException {
