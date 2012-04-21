@@ -147,7 +147,8 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 
 	private void handleUndefinedDefaultPreCondition(MethodCall methodCall, CtBehavior method,
 			ListOrderedSet<CtClass> involvedTypes) throws NotFoundException, CannotCompileException {
-		ListOrderedSet<ContractInfo> contracts = rootTransformer.getContractsForTypes(involvedTypes);
+		ListOrderedSet<ContractInfo> contracts = rootTransformer.getContractsForTypes(involvedTypes, contract
+				.getTargetClass());
 		contracts.remove(contract);
 		for (ContractInfo otherContract : contracts) {
 			try {

@@ -141,7 +141,8 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 	private void editNonStaticMethodCall(MethodCall methodCall, CtMethod method) throws NotFoundException,
 			CannotCompileException {
 		ListOrderedSet<CtClass> involvedTypes = involvedTypeInspector.inspect(method.getDeclaringClass());
-		ListOrderedSet<ContractInfo> contracts = RootTransformer.INSTANCE.getContractsForTypes(involvedTypes);
+		ListOrderedSet<ContractInfo> contracts = RootTransformer.INSTANCE.getContractsForTypes(involvedTypes, method
+				.getDeclaringClass());
 		if (pureInspector.getPureOrigin(involvedTypes, contracts, method) != null) {
 			return;
 		}

@@ -7,6 +7,7 @@ import java.util.Set;
 
 import de.andrena.c4j.AbstractConfiguration;
 import de.andrena.c4j.systemtest.config.externalcontract.ExternalContractSystemTest;
+import de.andrena.c4j.systemtest.config.externalcontract.ObjectContractSystemTest.ObjectContract;
 
 public class ExternalContractConfiguration extends AbstractConfiguration {
 	@Override
@@ -22,7 +23,7 @@ public class ExternalContractConfiguration extends AbstractConfiguration {
 				ExternalContractSystemTest.ContractClass.class);
 		externalContracts.put(ExternalContractSystemTest.TargetClassWithLocalAndExternalContract.class,
 				ExternalContractSystemTest.ExternalContract.class);
+		externalContracts.put(Object.class, ObjectContract.class);
 		return externalContracts;
 	}
-
 }

@@ -83,7 +83,7 @@ public class AffectedBehaviorLocator {
 
 	private boolean hasContract(CtClass clazz, ContractInfo contractInfo) throws NotFoundException {
 		ListOrderedSet<CtClass> involvedTypes = involvedTypeInspector.inspect(clazz);
-		ListOrderedSet<ContractInfo> contracts = RootTransformer.INSTANCE.getContractsForTypes(involvedTypes);
+		ListOrderedSet<ContractInfo> contracts = RootTransformer.INSTANCE.getContractsForTypes(involvedTypes, clazz);
 		return contracts.contains(contractInfo);
 	}
 

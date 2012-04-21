@@ -156,7 +156,7 @@ public class RootTransformer implements ClassFileTransformer {
 
 	private ListOrderedSet<ContractInfo> transformInvolvedContracts(CtClass affectedClass,
 			ListOrderedSet<CtClass> involvedTypes) throws NotFoundException, Exception {
-		ListOrderedSet<ContractInfo> contracts = getContractsForTypes(involvedTypes);
+		ListOrderedSet<ContractInfo> contracts = getContractsForTypes(involvedTypes, affectedClass);
 		for (ContractInfo contract : contracts) {
 			for (CtClass contractClass : contract.getAllContractClasses()) {
 				if (!contractClass.hasAnnotation(Transformed.class)) {
@@ -171,10 +171,11 @@ public class RootTransformer implements ClassFileTransformer {
 		contractClassTransformer.transform(contractInfo, contractClass);
 	}
 
-	public ListOrderedSet<ContractInfo> getContractsForTypes(ListOrderedSet<CtClass> types) throws NotFoundException {
+	public ListOrderedSet<ContractInfo> getContractsForTypes(ListOrderedSet<CtClass> types, CtClass affectedClass)
+			throws NotFoundException {
 		ListOrderedSet<ContractInfo> contracts = new ListOrderedSet<ContractInfo>();
 		for (CtClass type : types) {
-			CtClass externalContract = configuration.getConfiguration(type).getExternalContract(pool, type);
+			CtClass externalContract = configuration.getConfiguration(affectedClass).getExternalContract(pool, type);
 			if (type.hasAnnotation(ContractReference.class) || externalContract != null) {
 				if (contractRegistry.hasRegisteredContract(type)) {
 					contracts.add(contractRegistry.getContractInfoForTargetClass(type));
