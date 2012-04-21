@@ -89,7 +89,9 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 			lastFieldAccess = field;
 			arrayMembers.add(field);
 			lastMethodCall = null;
-			logger.trace("last field access: " + field.getName());
+			if (logger.isTraceEnabled()) {
+				logger.trace("last field access: " + field.getName());
+			}
 		}
 	}
 
@@ -176,7 +178,9 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		lastMethodCall = method;
 		arrayMembers.add(method);
 		lastFieldAccess = null;
-		logger.trace("last method call: " + method.getLongName());
+		if (logger.isTraceEnabled()) {
+			logger.trace("last method call: " + method.getLongName());
+		}
 	}
 
 	private void handleOldMethodCall(MethodCall methodCall) throws NotFoundException, CannotCompileException {
@@ -198,25 +202,33 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 	}
 
 	private void storeLastMethodCall(CtMethod method) {
-		logger.trace("storing method call to " + method);
+		if (logger.isTraceEnabled()) {
+			logger.trace("storing method call to " + method);
+		}
 		storeExpressions.add(new StaticCallExp(Evaluator.storeMethodCall, new ValueExp(method.getName())));
 	}
 
 	private void storeLastFieldAccess(CtField field) {
-		logger.trace("storing field access to " + field);
+		if (logger.isTraceEnabled()) {
+			logger.trace("storing field access to " + field);
+		}
 		storeExpressions.add(new StaticCallExp(Evaluator.storeFieldAccess, new ValueExp(field.getName())));
 	}
 
 	private void handleUnchangedMethodCall(MethodCall methodCall) throws CannotCompileException, NotFoundException,
 			BadBytecode {
-		logger.trace("beginning to store fields and methods for unchanged");
+		if (logger.isTraceEnabled()) {
+			logger.trace("beginning to store fields and methods for unchanged");
+		}
 		BooleanExp conditions = BooleanExp.TRUE;
 		for (CtMember arrayMember : arrayMembers) {
 			conditions = conditions.and(getReplacementCallForArrayMember(arrayMember));
 		}
 		addUnchangeableParameterArrayMembers(methodCall.where(), methodCall.indexOfBytecode());
 		StandaloneExp replacementCall = new AssignmentExp(NestedExp.RETURN_VALUE, conditions).toStandalone();
-		logger.trace("replacement code for unchanged: " + replacementCall.getCode());
+		if (logger.isTraceEnabled()) {
+			logger.trace("replacement code for unchanged: " + replacementCall.getCode());
+		}
 		methodCall.replace(replacementCall.getCode());
 	}
 

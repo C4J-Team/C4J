@@ -111,7 +111,9 @@ public class RootTransformer implements ClassFileTransformer {
 	public byte[] transform(ClassLoader loader, String classNameWithSlashes, Class<?> classBeingRedefined,
 			ProtectionDomain protectionDomain, byte[] classfileBuffer) {
 		String className = classNameWithSlashes.replace('/', '.');
-		logger.trace("transformation started for class " + className);
+		if (logger.isTraceEnabled()) {
+			logger.trace("transformation started for class " + className);
+		}
 		try {
 			updateClassPath(loader, classfileBuffer, className);
 			return transformClass(className);
@@ -125,7 +127,9 @@ public class RootTransformer implements ClassFileTransformer {
 	byte[] transformClass(String className) throws Exception {
 		CtClass affectedClass = pool.get(className);
 		if (affectedClass.isInterface()) {
-			logger.trace("transformation aborted, as class is an interface");
+			if (logger.isTraceEnabled()) {
+				logger.trace("transformation aborted, as class is an interface");
+			}
 			return null;
 		}
 		if (!affectedClass.hasAnnotation(Transformed.class)) {
@@ -251,11 +255,15 @@ public class RootTransformer implements ClassFileTransformer {
 
 	void updateClassPath(ClassLoader loader, byte[] classfileBuffer, String className) {
 		if (loader != null) {
-			logger.trace("updating classpath with loader " + loader.getClass() + ", parent " + loader.getParent());
+			if (logger.isTraceEnabled()) {
+				logger.trace("updating classpath with loader " + loader.getClass() + ", parent " + loader.getParent());
+			}
 			pool.insertClassPath(new LoaderClassPath(loader));
 		}
 		if (classfileBuffer != null) {
-			logger.trace("updating classpath with classfileBuffer for class " + className);
+			if (logger.isTraceEnabled()) {
+				logger.trace("updating classpath with classfileBuffer for class " + className);
+			}
 			pool.insertClassPath(new ByteArrayClassPath(className, classfileBuffer));
 		}
 	}

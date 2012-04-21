@@ -62,10 +62,14 @@ public class LocalClassLoader extends ClassLoader {
 		if (loadedClass == null) {
 			try {
 				loadedClass = findClass(name);
-				logger.trace("LocalClassLoader loads " + name);
+				if (logger.isTraceEnabled()) {
+					logger.trace("LocalClassLoader loads " + name);
+				}
 			} catch (ClassNotFoundException e) {
 				loadedClass = super.loadClass(name);
-				logger.trace("LocalClassLoader skips " + name, e);
+				if (logger.isTraceEnabled()) {
+					logger.trace("LocalClassLoader skips " + name, e);
+				}
 			}
 		}
 		return loadedClass;

@@ -6,9 +6,9 @@ import org.apache.log4j.Logger;
 
 import de.andrena.c4j.internal.RootTransformer;
 import de.andrena.c4j.internal.Transformed;
+import de.andrena.c4j.internal.util.ContractRegistry.ContractInfo;
 import de.andrena.c4j.internal.util.ListOrderedSet;
 import de.andrena.c4j.internal.util.TransformationHelper;
-import de.andrena.c4j.internal.util.ContractRegistry.ContractInfo;
 
 public class AffectedClassTransformer extends AbstractAffectedClassTransformer {
 	private Logger logger = Logger.getLogger(getClass());
@@ -20,7 +20,9 @@ public class AffectedClassTransformer extends AbstractAffectedClassTransformer {
 	@Override
 	public void transform(ListOrderedSet<CtClass> involvedClasses, ListOrderedSet<ContractInfo> contracts,
 			CtClass affectedClass) throws Exception {
-		logger.debug("transforming class " + affectedClass.getName());
+		if (logger.isDebugEnabled()) {
+			logger.debug("transforming class " + affectedClass.getName());
+		}
 		for (AbstractAffectedClassTransformer transformer : transformers) {
 			transformer.transform(involvedClasses, contracts, affectedClass);
 		}

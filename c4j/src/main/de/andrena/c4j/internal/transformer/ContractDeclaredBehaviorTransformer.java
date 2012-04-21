@@ -9,7 +9,9 @@ public abstract class ContractDeclaredBehaviorTransformer extends AbstractContra
 	@Override
 	public void transform(ContractInfo contractInfo, CtClass currentContractClass) throws Exception {
 		for (CtBehavior contractBehavior : currentContractClass.getDeclaredBehaviors()) {
-			logger.trace("transforming behavior " + contractBehavior.getLongName());
+			if (logger.isTraceEnabled()) {
+				logger.trace("transforming behavior " + contractBehavior.getLongName());
+			}
 			transform(contractInfo, contractBehavior);
 		}
 	}

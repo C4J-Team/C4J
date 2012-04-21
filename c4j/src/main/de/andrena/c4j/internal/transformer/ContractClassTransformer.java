@@ -15,7 +15,9 @@ public class ContractClassTransformer extends AbstractContractClassTransformer {
 
 	@Override
 	public void transform(ContractInfo contractInfo, CtClass contractClass) throws Exception {
-		logger.debug("transforming contract " + contractClass.getName());
+		if (logger.isDebugEnabled()) {
+			logger.debug("transforming contract " + contractClass.getName());
+		}
 		for (AbstractContractClassTransformer transformer : transformers) {
 			transformer.transform(contractInfo, contractClass);
 		}

@@ -94,19 +94,25 @@ public class Evaluator {
 	}
 
 	public static boolean isBefore() {
-		logger.trace("isBefore returning " + (evaluationPhase.get() == EvaluationPhase.BEFORE));
+		if (logger.isTraceEnabled()) {
+			logger.trace("isBefore returning " + (evaluationPhase.get() == EvaluationPhase.BEFORE));
+		}
 		return evaluationPhase.get() == EvaluationPhase.BEFORE;
 	}
 
 	public static boolean isAfter() {
-		logger.trace("isAfter returning " + (evaluationPhase.get() == EvaluationPhase.AFTER));
+		if (logger.isTraceEnabled()) {
+			logger.trace("isAfter returning " + (evaluationPhase.get() == EvaluationPhase.AFTER));
+		}
 		return evaluationPhase.get() == EvaluationPhase.AFTER;
 	}
 
 	public static Object oldFieldAccess(String fieldName) {
 		Object oldValue = getCurrentOldCache().get(fieldName);
-		logger.trace("oldFieldAccess for field '" + fieldName + "' with " + currentOldCacheEnvironment.get()
-				+ " returning " + oldValue);
+		if (logger.isTraceEnabled()) {
+			logger.trace("oldFieldAccess for field '" + fieldName + "' with " + currentOldCacheEnvironment.get()
+					+ " returning " + oldValue);
+		}
 		return oldValue;
 	}
 
@@ -116,24 +122,30 @@ public class Evaluator {
 
 	public static Object oldMethodCall(String methodName) {
 		Object oldValue = getCurrentOldCache().get(methodName);
-		logger.trace("oldMethodCall for method '" + methodName + "' with "
-				+ currentOldCacheEnvironment.get() + " returning " + oldValue);
+		if (logger.isTraceEnabled()) {
+			logger.trace("oldMethodCall for method '" + methodName + "' with "
+					+ currentOldCacheEnvironment.get() + " returning " + oldValue);
+		}
 		return oldValue;
 	}
 
 	public static void storeFieldAccess(String fieldName) {
 		Object storedValue = fieldAccess(fieldName);
-		logger.trace("storeFieldAccess for field '" + fieldName + "' with "
-				+ currentOldCacheEnvironment.get()
-				+ " storing " + storedValue);
+		if (logger.isTraceEnabled()) {
+			logger.trace("storeFieldAccess for field '" + fieldName + "' with "
+					+ currentOldCacheEnvironment.get()
+					+ " storing " + storedValue);
+		}
 		getCurrentOldCache().put(fieldName, storedValue);
 	}
 
 	public static void storeMethodCall(String methodName) {
 		Object storedValue = methodCall(methodName, new Class<?>[0], new Object[0]);
-		logger.trace("storeMethodCall for method '" + methodName + "' with "
-				+ currentOldCacheEnvironment.get()
-				+ " storing " + storedValue);
+		if (logger.isTraceEnabled()) {
+			logger.trace("storeMethodCall for method '" + methodName + "' with "
+					+ currentOldCacheEnvironment.get()
+					+ " storing " + storedValue);
+		}
 		getCurrentOldCache().put(methodName, storedValue);
 	}
 
@@ -143,7 +155,9 @@ public class Evaluator {
 			Field field = getInheritedField(fieldName, target.getClass());
 			field.setAccessible(true);
 			Object value = field.get(target);
-			logger.trace("fieldAccess returning " + value);
+			if (logger.isTraceEnabled()) {
+				logger.trace("fieldAccess returning " + value);
+			}
 			return value;
 		} catch (Exception e) {
 			throw new EvaluationException("could not access field " + fieldName, e);
@@ -167,7 +181,9 @@ public class Evaluator {
 			Method method = getInheritedMethod(methodName, target.getClass(), argTypes);
 			method.setAccessible(true);
 			Object value = method.invoke(target, args);
-			logger.trace("methodCall returning " + value);
+			if (logger.isTraceEnabled()) {
+				logger.trace("methodCall returning " + value);
+			}
 			return value;
 		} catch (Exception e) {
 			throw new EvaluationException("could not call method " + methodName, e);
@@ -231,7 +247,9 @@ public class Evaluator {
 	}
 
 	public static void afterContract() {
-		logger.trace("afterContract");
+		if (logger.isTraceEnabled()) {
+			logger.trace("afterContract");
+		}
 		contractReturnType.set(null);
 		currentTarget.set(null);
 		evaluationPhase.set(EvaluationPhase.NONE);
@@ -239,7 +257,9 @@ public class Evaluator {
 
 	public static void afterContractMethod() {
 		if (evaluationPhase.get() == EvaluationPhase.NONE) {
-			logger.trace("afterContractMethod");
+			if (logger.isTraceEnabled()) {
+				logger.trace("afterContractMethod");
+			}
 			returnValue.set(null);
 			exceptionValue.set(null);
 			oldStore.get()

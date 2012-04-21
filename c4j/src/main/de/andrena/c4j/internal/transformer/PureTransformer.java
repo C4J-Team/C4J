@@ -54,7 +54,9 @@ public class PureTransformer extends AbstractAffectedClassTransformer {
 		if (pureOrigin != null) {
 			transformationHelper.addBehaviorAnnotation(method,
 					RootTransformer.INSTANCE.getPool().get(Pure.class.getName()));
-			logger.debug("added @Pure from " + pureOrigin.getLongName() + " to " + method.getLongName());
+			if (logger.isDebugEnabled()) {
+				logger.debug("added @Pure from " + pureOrigin.getLongName() + " to " + method.getLongName());
+			}
 		}
 	}
 

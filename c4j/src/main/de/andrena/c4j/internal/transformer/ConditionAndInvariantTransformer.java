@@ -150,7 +150,9 @@ public class ConditionAndInvariantTransformer extends AbstractAffectedClassTrans
 
 	public void transform(CtClass affectedClass, CtBehavior affectedBehavior,
 			List<CtBehavior> contractList, StandaloneExp invariantCall) throws Exception {
-		logger.trace("transforming behavior " + affectedBehavior.getLongName());
+		if (logger.isTraceEnabled()) {
+			logger.trace("transforming behavior " + affectedBehavior.getLongName());
+		}
 		if (contractList != null) {
 			insertPreAndPostCondition(contractList, affectedClass, affectedBehavior);
 			if (invariantCall == null) {
@@ -164,8 +166,11 @@ public class ConditionAndInvariantTransformer extends AbstractAffectedClassTrans
 
 	private void insertPreAndPostCondition(List<CtBehavior> contractList, CtClass affectedClass,
 			CtBehavior affectedBehavior) throws NotFoundException, CannotCompileException {
-		logger.trace("transforming behavior " + affectedBehavior.getLongName() + " for pre- and post-conditions with "
-				+ contractList.size() + " contract-method calls");
+		if (logger.isTraceEnabled()) {
+			logger.trace("transforming behavior " + affectedBehavior.getLongName()
+					+ " for pre- and post-conditions with "
+					+ contractList.size() + " contract-method calls");
+		}
 
 		StandaloneExp callPreCondition = getConditionCall(contractList, affectedClass, affectedBehavior,
 				beforePreConditionCallProvider);
@@ -173,11 +178,17 @@ public class ConditionAndInvariantTransformer extends AbstractAffectedClassTrans
 				beforePostConditionCallProvider);
 		StandaloneExp catchExceptionCall = getCatchExceptionCall();
 
-		logger.trace("insertCatch: " + catchExceptionCall.getCode());
+		if (logger.isTraceEnabled()) {
+			logger.trace("insertCatch: " + catchExceptionCall.getCode());
+		}
 		catchExceptionCall.insertCatch(rootTransformer.getPool().get(Throwable.class.getName()), affectedBehavior);
-		logger.trace("insertFinally: " + callPostCondition);
+		if (logger.isTraceEnabled()) {
+			logger.trace("insertFinally: " + callPostCondition);
+		}
 		callPostCondition.insertFinally(affectedBehavior);
-		logger.trace("insertBefore: " + callPreCondition.getCode());
+		if (logger.isTraceEnabled()) {
+			logger.trace("insertBefore: " + callPreCondition.getCode());
+		}
 		callPreCondition.insertBefore(affectedBehavior);
 	}
 
