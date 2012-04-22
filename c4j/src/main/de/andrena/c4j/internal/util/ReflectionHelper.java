@@ -7,6 +7,7 @@ import java.util.List;
 import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.CtConstructor;
+import javassist.CtField;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 import javassist.bytecode.Descriptor;
@@ -94,6 +95,10 @@ public class ReflectionHelper {
 		}
 		return behavior.getDeclaringClass().getSimpleName() + "." + behavior.getName()
 				+ Descriptor.toString(behavior.getSignature());
+	}
+
+	public String getSimpleName(CtField field) {
+		return field.getDeclaringClass().getSimpleName() + "." + field.getName();
 	}
 
 	/**

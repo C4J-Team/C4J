@@ -1,11 +1,6 @@
 package de.andrena.c4j.internal.transformer;
 
 import java.lang.ref.WeakReference;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 import javassist.CannotCompileException;
 import javassist.CtBehavior;
@@ -17,61 +12,81 @@ import de.andrena.c4j.Target;
 import de.andrena.c4j.internal.RootTransformer;
 import de.andrena.c4j.internal.compiler.AssignmentExp;
 import de.andrena.c4j.internal.compiler.ConstructorExp;
-import de.andrena.c4j.internal.compiler.EmptyExp;
 import de.andrena.c4j.internal.compiler.NestedExp;
 import de.andrena.c4j.internal.compiler.StandaloneExp;
 import de.andrena.c4j.internal.compiler.StaticCallExp;
 import de.andrena.c4j.internal.editor.TargetAccessEditor;
 import de.andrena.c4j.internal.evaluator.Evaluator;
 import de.andrena.c4j.internal.util.ContractRegistry.ContractInfo;
+import de.andrena.c4j.internal.util.Pair;
+import de.andrena.c4j.internal.util.ReflectionHelper;
 
 public class TargetTransformer extends AbstractContractClassTransformer {
 
 	public static final String TARGET_FIELD_NAME = "target$";
+	private static final String EXPECTED_TARGET_FIELD_NAME = "target";
 	private RootTransformer rootTransformer = RootTransformer.INSTANCE;
+	private ReflectionHelper reflectionHelper = new ReflectionHelper();
 
 	@Override
 	public void transform(ContractInfo contractInfo, CtClass contractClass) throws Exception {
-		Map<CtField, CtField> targetFieldMap = createWeakFields(contractClass);
-		TargetAccessEditor targetAccessEditor = new TargetAccessEditor(targetFieldMap);
+		Pair<CtField, CtField> targetField = createWeakField(contractClass);
+		if (targetField == null) {
+			return;
+		}
+		if (!contractInfo.getTargetClass().subtypeOf(targetField.getFirst().getType())) {
+			logger.error("Target reference " + reflectionHelper.getSimpleName(targetField.getFirst())
+					+ " has incompatible type.");
+			return;
+		}
+		if (!contractInfo.getTargetClass().equals(targetField.getFirst().getType())) {
+			logger.warn("Target reference " + reflectionHelper.getSimpleName(targetField.getFirst())
+					+ " has weaker type than the target type would allow.");
+		}
+		TargetAccessEditor targetAccessEditor = new TargetAccessEditor(targetField);
 		for (CtBehavior contractBehavior : contractClass.getDeclaredBehaviors()) {
 			contractBehavior.instrument(targetAccessEditor);
 		}
-		initWeakFields(contractClass, targetFieldMap.values());
+		initWeakField(contractClass, targetField.getSecond());
 	}
 
-	private void initWeakFields(CtClass contractClass, Collection<CtField> weakFields) throws NotFoundException,
+	private void initWeakField(CtClass contractClass, CtField weakField) throws NotFoundException,
 			CannotCompileException {
 		CtConstructor defaultConstructor = contractClass.getDeclaredConstructor(new CtClass[0]);
-		StandaloneExp initExp = new EmptyExp();
-		for (CtField weakField : weakFields) {
-			ConstructorExp weakConstructorCall = new ConstructorExp(WeakReference.class, new StaticCallExp(
+		ConstructorExp weakConstructorCall = new ConstructorExp(WeakReference.class, new StaticCallExp(
 					Evaluator.getCurrentTarget));
-			initExp = initExp.append(new AssignmentExp(NestedExp.field(weakField), weakConstructorCall));
-		}
+		StandaloneExp initExp = new AssignmentExp(NestedExp.field(weakField), weakConstructorCall).toStandalone();
 		initExp.insertBefore(defaultConstructor);
 	}
 
-	private Map<CtField, CtField> createWeakFields(CtClass contractClass) throws NotFoundException,
+	private Pair<CtField, CtField> createWeakField(CtClass contractClass) throws NotFoundException,
 			CannotCompileException {
-		Map<CtField, CtField> targetFieldMap = new HashMap<CtField, CtField>();
 		CtClass weakReferenceClass = rootTransformer.getPool().get(WeakReference.class.getName());
-		for (CtField targetField : getTargetFields(contractClass)) {
-			CtField weakTargetField = new CtField(weakReferenceClass, TARGET_FIELD_NAME, contractClass);
-			contractClass.addField(weakTargetField);
-			targetFieldMap.put(targetField, weakTargetField);
+		CtField targetField = getTargetField(contractClass);
+		if (targetField == null) {
+			return null;
 		}
-		return targetFieldMap;
+		CtField weakTargetField = new CtField(weakReferenceClass, TARGET_FIELD_NAME, contractClass);
+		contractClass.addField(weakTargetField);
+		return new Pair<CtField, CtField>(targetField, weakTargetField);
 	}
 
-	private Set<CtField> getTargetFields(CtClass contractClass) {
-		Set<CtField> targetFields = new HashSet<CtField>();
+	private CtField getTargetField(CtClass contractClass) {
+		CtField targetField = null;
 		for (CtField field : contractClass.getDeclaredFields()) {
 			if (field.hasAnnotation(Target.class)) {
-				targetFields.add(field);
+				if (targetField != null) {
+					logger.error("Contract " + contractClass.getSimpleName()
+							+ " has multiple fields annotated with @Target, only the first one is being set.");
+				} else {
+					targetField = field;
+				}
+			} else if (field.getName().equals(EXPECTED_TARGET_FIELD_NAME)) {
+				logger.warn("Field " + reflectionHelper.getSimpleName(field)
+						+ " is possibly missing annotation @Target.");
 			}
 		}
-		return targetFields;
+		return targetField;
 	}
 
 }

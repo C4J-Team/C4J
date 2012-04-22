@@ -1,7 +1,5 @@
 package de.andrena.c4j.internal.editor;
 
-import java.util.Map;
-
 import javassist.CannotCompileException;
 import javassist.CtField;
 import javassist.NotFoundException;
@@ -14,13 +12,14 @@ import de.andrena.c4j.internal.compiler.AssignmentExp;
 import de.andrena.c4j.internal.compiler.CastExp;
 import de.andrena.c4j.internal.compiler.NestedExp;
 import de.andrena.c4j.internal.compiler.StandaloneExp;
+import de.andrena.c4j.internal.util.Pair;
 
 public class TargetAccessEditor extends ExprEditor {
-	private Map<CtField, CtField> targetFieldMap;
+	private Pair<CtField, CtField> targetField;
 	private Logger logger = Logger.getLogger(getClass());
 
-	public TargetAccessEditor(Map<CtField, CtField> targetFieldMap) {
-		this.targetFieldMap = targetFieldMap;
+	public TargetAccessEditor(Pair<CtField, CtField> targetField) {
+		this.targetField = targetField;
 	}
 
 	@Override
@@ -34,8 +33,8 @@ public class TargetAccessEditor extends ExprEditor {
 
 	private void editFieldAccess(FieldAccess fieldAccess) throws NotFoundException, CannotCompileException {
 		CtField field = fieldAccess.getField();
-		if (targetFieldMap.keySet().contains(field)) {
-			CtField weakField = targetFieldMap.get(field);
+		if (targetField.getFirst().equals(field)) {
+			CtField weakField = targetField.getSecond();
 			StandaloneExp replacementExp;
 			if (fieldAccess.isReader()) {
 				NestedExp getTargetExp = new CastExp(field.getType(), NestedExp.field(weakField).appendCall("get"));

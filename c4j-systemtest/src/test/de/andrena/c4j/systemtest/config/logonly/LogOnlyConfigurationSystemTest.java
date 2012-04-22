@@ -6,10 +6,10 @@ import org.apache.log4j.Level;
 import org.junit.Rule;
 import org.junit.Test;
 
-import de.andrena.c4j.systemtest.TransformerAwareRule;
 import de.andrena.c4j.ClassInvariant;
 import de.andrena.c4j.ContractReference;
 import de.andrena.c4j.Target;
+import de.andrena.c4j.systemtest.TransformerAwareRule;
 
 public class LogOnlyConfigurationSystemTest {
 	@Rule
@@ -17,13 +17,13 @@ public class LogOnlyConfigurationSystemTest {
 
 	@Test
 	public void testLogOnly() {
-		transformerAwareRule.expectLocalLog(Level.ERROR, "Contract Violation.");
+		transformerAwareRule.expectLocalLog(Level.ERROR, "Contract Violation in pre-condition.");
 		new TargetClass().method(0);
 	}
 
 	@Test
 	public void testLogOnlyForInvariant() {
-		transformerAwareRule.expectLocalLog(Level.ERROR, "Contract Violation.");
+		transformerAwareRule.expectLocalLog(Level.ERROR, "Contract Violation in class-invariant.");
 		new TargetClass().method(10);
 	}
 
