@@ -159,7 +159,9 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 	}
 
 	private void editStaticMethodCall(MethodCall methodCall, CtMethod method) throws CannotCompileException {
-		if (rootTransformer.getConfigurationManager().isWithinRootPackages(method.getDeclaringClass())) {
+		if (rootTransformer.getConfigurationManager().isWithinRootPackages(method.getDeclaringClass())
+				|| rootTransformer.getConfigurationManager().getConfiguration(affectedMethod.getDeclaringClass())
+						.getBlacklistMethods().contains(method)) {
 			pureError("illegal access on static method " + method.getLongName() + " in pure method "
 					+ affectedMethod.getLongName() + " on line " + methodCall.getLineNumber());
 			return;

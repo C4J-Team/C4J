@@ -67,7 +67,9 @@ public class SystemTestConfiguration extends AbstractConfiguration {
 						.pureMethod("isEmpty"),
 				PureRegistry.register(ExternalClass.class)
 						.pureMethod("pureMethodWhitelistedInConfig")
-						.unpureMethod("unpureMethodBlacklistedInConfig"),
+						.pureMethod("pureStaticMethodWhitelistedInConfig")
+						.unpureMethod("unpureMethodBlacklistedInConfig")
+						.unpureMethod("unpureStaticMethodBlacklistedInConfig"),
 				PureRegistry.register(Integer.class)
 						.pureMethod("intValue")
 						.pureMethod("valueOf", int.class),
