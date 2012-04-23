@@ -23,7 +23,7 @@ import static de.andrena.c4j.Condition.*;
 
 public class CashTerminalContract extends CashTerminal {
   @Override
-  public void withdraw(final int amount) {
+  public void withdraw(int amount) {
     if (pre()) {
       assert amount > 0;
     }
@@ -84,13 +84,16 @@ public class CashTerminal {
 import static de.andrena.c4j.Condition.*;
 
 public class CashTerminalContract extends CashTerminal {
+  @Target
+  private CashTerminal target;
+
   @Override
   public void withdraw(int amount) {
     if (pre()) {
       assert amount > 0;
     }
     if (post()) {
-      assert getBalance() == old(getBalance()) - amount;
+      assert target.getBalance() == old(target.getBalance()) - amount;
     }
   }
 }
@@ -98,12 +101,14 @@ public class CashTerminalContract extends CashTerminal {
 
 The Pre-Condition of `withdraw(int)` requires, that the parameter `amount` is greater than 0. The Post-Condition ensures, that the balance (after execution of method `withdraw(int)`) is equal to the old balance (before execution) substracted by the parameter `amount`.
 
+Each instance of a target class being protected by a contract has its corresponding instance of the contract class. In order to access the target instance from within the contract, a field having the type of the target class can be annotated with the `@Target` annotation.
+
 ## old
 `old`, as seen in the example above, can be used to access the value of a field or parameter-less method before the execution of the method in question. There can be no calculations, method-calls or even local variables inside the parameter being passed to `old`.
 
 ```java
-  assert getBalance() == old(getBalance() - amount); // won't work
-  assert getBalance() == old(getBalance()) - old(amount); // won't work
+  assert target.getBalance() == old(target.getBalance() - amount); // won't work
+  assert target.getBalance() == old(target.getBalance()) - old(amount); // won't work
 ```
 
 ## Class-Invariants
@@ -118,9 +123,12 @@ public class CashTerminal {
 }
 
 public class CashTerminalContract extends CashTerminal {
+  @Target
+  private CashTerminal target;
+
   @ClassInvariant
   public void invariant() {
-    assert getBalance() >= 0;
+    assert target.getBalance() >= 0;
   }
 }
 ```
@@ -199,10 +207,13 @@ public interface TimeOfDay {
 import static de.andrena.c4j.Condition.*;
 
 public class TimeOfDayContract implements TimeOfDay {
+  @Target
+  private TimeOfDay target;
+
   @Override
   public void setHour(final int hour) {
     if (post()) {
-      unchanged(getMinute(), getSecond());
+      unchanged(target.getMinute(), target.getSecond());
     }
   }
   // etc.
