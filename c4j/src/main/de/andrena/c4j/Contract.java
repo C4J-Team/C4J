@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
  * <p>
  * Note that defining a contract relation on the contract-class itself (and not on the target-type using @
  * {@link ContractReference}) only works when the contract directory is declared in
- * {@link Configuration#getContractsDirectory} and is found during runtime.
+ * {@link Configuration#getContractsDirectory()} and is found during runtime.
  * <p>
  * As another alternative to this annotation, an external contract can be defined using
  * {@link Configuration#getExternalContracts()}.
