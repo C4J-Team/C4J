@@ -165,7 +165,7 @@ public class FinalClassContract {
 
 In this example, renaming `finalMethod()` in `FinalClass` would not rename `finalMethod()` in `FinalClassContract` and a warning would be issued on class-loading.
 
-There is one way to avoid the refactoring-trouble: By introducing an interface. Assuming that target and contract class are located within the same package, the interface can even be made package-private and thus can be located within the same source-file as the final class. This avoids confusion and hides the synthetic interface from clients. The contract declaration can even move from the final class to the interface.
+There is one way to avoid the refactoring-trouble: By introducing an interface. Assuming that target and contract class are located within the same package, the interface can even be made package-private and thus can be located within the same source-file as the final class. This avoids confusion and hides the synthetic interface from clients. The contract declaration thus moves from the final class to the interface.
 
 ```java
 @ContractReference(FinalClassInterfaceContract.class)
