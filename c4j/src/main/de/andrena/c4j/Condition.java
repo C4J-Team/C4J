@@ -49,6 +49,14 @@ public class Condition {
 	}
 
 	/**
+	 * Usable within a pre- or post-condition to communicate that no pre- or post-condition has been identified yet. Has
+	 * no actual effect.
+	 */
+	@Pure
+	public static void noneIdentifiedYet() {
+	}
+
+	/**
 	 * Usable within a post-condition to get the actual return value of a method.
 	 * 
 	 * @param returnType
