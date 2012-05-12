@@ -41,7 +41,9 @@ A Contract is declared by using the `@Contract` annotation on the _Target_ class
 public class CashTerminal {
   // target class body
 }
+```
 
+```java
 @ContractReference(InterfaceContract.class)
 public interface Interface {
   // interface declarations
@@ -59,7 +61,9 @@ A contract is defined in a _Contract Class_. This class can extend the _Target C
 public class CashTerminalContract extends CashTerminal {
   // contract class body
 }
+```
 
+```java
 public class InterfaceContract implements Interface {
   // contract class body for an interface
 }
@@ -80,7 +84,9 @@ public class CashTerminal {
     // impl
   }
 }
+```
 
+```java
 import static de.andrena.c4j.Condition.*;
 
 public class CashTerminalContract extends CashTerminal {
@@ -121,7 +127,9 @@ public class CashTerminal {
     // impl
   }
 }
+```
 
+```java
 public class CashTerminalContract extends CashTerminal {
   @Target
   private CashTerminal target;
@@ -145,7 +153,9 @@ public final class FinalClass {
     // impl
   }
 }
+```
 
+```java
 public class FinalClassContract {
   public void finalMethod() {
     // contract impl
@@ -155,7 +165,7 @@ public class FinalClassContract {
 
 In this example, renaming `finalMethod()` in `FinalClass` would not rename `finalMethod()` in `FinalClassContract` and a warning would be issued on class-loading.
 
-There is one way to avoid the refactoring-trouble: By introducing an interface. Assuming that target and contract class are located within the same package, the interface can even be made package-private. This avoids confusion and hides the synthetic interface from clients. The contract declaration can even move from the final class to the interface.
+There is one way to avoid the refactoring-trouble: By introducing an interface. Assuming that target and contract class are located within the same package, the interface can even be made package-private and thus can be located within the same source-file as the final class. This avoids confusion and hides the synthetic interface from clients. The contract declaration can even move from the final class to the interface.
 
 ```java
 @ContractReference(FinalClassInterfaceContract.class)
@@ -168,7 +178,9 @@ public final class FinalClass implements FinalClassInterface {
     // impl
   }
 }
+```
 
+```java
 public class FinalClassInterfaceContract implements FinalClassInterface {
   @Override
   public void finalMethod() {
@@ -203,7 +215,9 @@ public interface TimeOfDay {
   void setMinute(int minute);
   void setSecond(int second);
 }
+```
 
+```java
 import static de.andrena.c4j.Condition.*;
 
 public class TimeOfDayContract implements TimeOfDay {
