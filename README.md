@@ -8,7 +8,7 @@ So let's start with some easy code-examples:
 Let's assume having a class `CashTerminal` that has to satisfy the contract `CashTerminalContract`:
 
 ```java
-@Contract(CashTerminalContract.class)
+@ContractReference(CashTerminalContract.class)
 public class CashTerminal {
   public void withdraw(int amount) {
     // withdraw money from customer's bank account
@@ -37,12 +37,12 @@ Let's look at this code example in more detail, step by step.
 A Contract is declared by using the `@Contract` annotation on the _Target_ class or interface, providing the class defining the contract:
 
 ```java
-@Contract(CashTerminalContract.class)
+@ContractReference(CashTerminalContract.class)
 public class CashTerminal {
   // target class body
 }
 
-@Contract(InterfaceContract.class)
+@ContractReference(InterfaceContract.class)
 public interface Interface {
   // interface declarations
 }
@@ -71,7 +71,7 @@ Within the contract class, the methods of the target class can be "overridden", 
 Pre- and Post-Conditions for a method can be defined within the contract class as follows:
 
 ```java
-@Contract(CashTerminalContract.class)
+@ContractReference(CashTerminalContract.class)
 public class CashTerminal {
   public void withdraw(int amount) {
     // impl
@@ -115,7 +115,7 @@ Each instance of a target class being protected by a contract has its correspond
 Sometimes, a set of conditions can be defined for a class, that always must be satisfied. These conditions can then be defined in a so-called _Class-Invariant_.
 
 ```java
-@Contract(CashTerminalContract.class)
+@ContractReference(CashTerminalContract.class)
 public class CashTerminal {
   public int getBalance() {
     // impl
@@ -139,7 +139,7 @@ The class-invariant is introduced by defining a non-overridden method in the con
 Defining contracts for `final` classes and methods can be tricky, as the contract class cannot extend a final target class or override a final method an thus, no refactoring-support is available.
 
 ```java
-@Contract(FinalClassContract.class)
+@ContractReference(FinalClassContract.class)
 public final class FinalClass {
   public final void finalMethod() {
     // impl
@@ -158,7 +158,7 @@ In this example, renaming `finalMethod()` in `FinalClass` would not rename `fina
 There is one way to avoid the refactoring-trouble: By introducing an interface. Assuming that target and contract class are located within the same package, the interface can even be made package-private. This avoids confusion and hides the synthetic interface from clients. The contract declaration can even move from the final class to the interface.
 
 ```java
-@Contract(FinalClassInterfaceContract.class)
+@ContractReference(FinalClassInterfaceContract.class)
 interface FinalClassInterface {
   void finalMethod();
 }
@@ -194,7 +194,7 @@ This feature can only be used when `PureBehavior.VALIDATE_PURE` is turned on, as
 As methods should often only modify a particular set of attributes of a class, many post-conditions ensure that the other attributes stay unchanged.
 
 ```java
-@Contract(TimeOfDayContract.class)
+@ContractReference(TimeOfDayContract.class)
 public interface TimeOfDay {
   int getHour();
   int getMinute();
