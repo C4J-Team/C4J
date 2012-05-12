@@ -28,6 +28,17 @@ public interface Configuration {
 	Map<Class<?>, Class<?>> getExternalContracts();
 
 	/**
+	 * Define external contracts, as an alternative to the @{@link ContractReference} annotation on the target class or
+	 * the @{@link Contract} annotation on the contract class.
+	 * 
+	 * @return A Map, mapping target classes (keys of the Map) to their corresponding contract class (values of the
+	 *         Map). The map contains Strings, which is useful if the bootstrap class-loader cannot yet locate the
+	 *         mapped classes. If possible, {@link Configuration#getExternalContracts()} should be used as it is safe
+	 *         when refactoring classes.
+	 */
+	Map<String, String> getExternalContractsAsStrings();
+
+	/**
 	 * Define methods that are being assumed to be pure or unpure outside of the specified root packages.
 	 * 
 	 * @return A {@link PureRegistry} with the specified pure and unpure methods.

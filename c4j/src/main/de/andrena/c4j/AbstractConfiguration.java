@@ -34,6 +34,18 @@ public abstract class AbstractConfiguration implements Configuration {
 	 * 
 	 * @return {@inheritDoc}
 	 *         <p>
+	 *         Defaults to an empty map.
+	 */
+	@Override
+	public Map<String, String> getExternalContractsAsStrings() {
+		return Collections.emptyMap();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @return {@inheritDoc}
+	 *         <p>
 	 *         Defaults to an empty registry.
 	 */
 	@Override

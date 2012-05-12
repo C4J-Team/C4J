@@ -35,6 +35,7 @@ public class RuntimeConfiguration {
 		whitelistMethods = whitelistConverter.convertWhitelist(configuration.getPureRegistry().getPureMethods());
 		blacklistMethods = whitelistConverter.convertWhitelist(configuration.getPureRegistry().getUnpureMethods());
 		stringifyExternalContracts();
+		loadExternalContractsAsStrings();
 		searchContractsDirectory();
 	}
 
@@ -65,13 +66,14 @@ public class RuntimeConfiguration {
 		CtClass loadedClass = RootTransformer.INSTANCE.getPool().makeClassIfNew(new FileInputStream(file));
 		if (loadedClass.hasAnnotation(Contract.class)) {
 			Class<?> targetFromAnnotation = ((Contract) loadedClass.getAnnotation(Contract.class)).forTarget();
+			String contractClass = loadedClass.getName();
 			if (!targetFromAnnotation.equals(InheritedType.class)) {
-				externalContracts.put(targetFromAnnotation.getName(), loadedClass.getName());
+				addExternalContract(targetFromAnnotation.getName(), contractClass);
 			} else {
 				if (!loadedClass.getSuperclass().equals(RootTransformer.INSTANCE.getPool().get(Object.class.getName()))) {
-					externalContracts.put(loadedClass.getSuperclass().getName(), loadedClass.getName());
+					addExternalContract(loadedClass.getSuperclass().getName(), contractClass);
 				} else if (loadedClass.getInterfaces().length == 1) {
-					externalContracts.put(loadedClass.getInterfaces()[0].getName(), loadedClass.getName());
+					addExternalContract(loadedClass.getInterfaces()[0].getName(), contractClass);
 				} else {
 					logger.error("Contract "
 							+ loadedClass.getSimpleName()
@@ -83,10 +85,21 @@ public class RuntimeConfiguration {
 		}
 	}
 
+	private void addExternalContract(String targetClass, String contractClass) {
+		logger.info("Found external Contract " + contractClass + " for target class " + targetClass);
+		externalContracts.put(targetClass, contractClass);
+	}
+
 	private void stringifyExternalContracts() {
 		for (Class<?> targetClass : configuration.getExternalContracts().keySet()) {
-			externalContracts.put(targetClass.getName(), configuration.getExternalContracts().get(targetClass)
+			addExternalContract(targetClass.getName(), configuration.getExternalContracts().get(targetClass)
 					.getName());
+		}
+	}
+
+	private void loadExternalContractsAsStrings() {
+		for (String targetClass : configuration.getExternalContractsAsStrings().keySet()) {
+			addExternalContract(targetClass, configuration.getExternalContractsAsStrings().get(targetClass));
 		}
 	}
 
