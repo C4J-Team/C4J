@@ -24,7 +24,7 @@ import static de.andrena.c4j.Condition.*;
 public class CashTerminalContract extends CashTerminal {
   @Override
   public void withdraw(int amount) {
-    if (pre()) {
+    if (preCondition()) {
       assert amount > 0;
     }
   }
@@ -89,10 +89,10 @@ public class CashTerminalContract extends CashTerminal {
 
   @Override
   public void withdraw(int amount) {
-    if (pre()) {
+    if (preCondition()) {
       assert amount > 0;
     }
-    if (post()) {
+    if (postCondition()) {
       assert target.getBalance() == old(target.getBalance()) - amount;
     }
   }
@@ -212,7 +212,7 @@ public class TimeOfDayContract implements TimeOfDay {
 
   @Override
   public void setHour(final int hour) {
-    if (post()) {
+    if (postCondition()) {
       unchanged(target.getMinute(), target.getSecond());
     }
   }

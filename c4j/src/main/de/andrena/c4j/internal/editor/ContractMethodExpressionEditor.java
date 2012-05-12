@@ -115,7 +115,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 				handleOldMethodCall(methodCall);
 			} else if (method.getName().equals("unchanged")) {
 				handleUnchangedMethodCall(methodCall);
-			} else if (method.getName().equals("pre")) {
+			} else if (method.getName().equals("pre") || method.getName().equals("preCondition")) {
 				handlePreConditionMethodCall(methodCall);
 			}
 		}
