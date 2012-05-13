@@ -34,7 +34,7 @@ public class CashTerminalContract extends CashTerminal {
 Let's look at this code example in more detail, step by step.
 
 ## Declaring Contracts
-A Contract is declared by using the `@Contract` annotation on the _Target_ class or interface, providing the class defining the contract:
+A Contract is declared by using the `@ContractReference` annotation on the _Target_ class or interface, providing the class defining the contract:
 
 ```java
 @ContractReference(CashTerminalContract.class)
