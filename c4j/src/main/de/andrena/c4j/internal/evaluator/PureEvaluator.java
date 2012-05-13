@@ -9,6 +9,7 @@ import de.andrena.c4j.internal.util.ObjectIdentitySet;
 
 public class PureEvaluator {
 	public static final StaticCall registerUnpure = new StaticCall(PureEvaluator.class, "registerUnpure");
+	public static final StaticCall registerUnchangeable = new StaticCall(PureEvaluator.class, "registerUnchangeable");
 	public static final StaticCall unregisterUnpure = new StaticCall(PureEvaluator.class, "unregisterUnpure");
 	public static final StaticCall checkUnpureAccess = new StaticCall(PureEvaluator.class, "checkUnpureAccess");
 	public static final StaticCall checkExternalAccess = new StaticCall(PureEvaluator.class, "checkExternalAccess");
@@ -43,6 +44,15 @@ public class PureEvaluator {
 				registerUnpure((Object[]) obj);
 			}
 		}
+	}
+
+	public static void registerUnchangeable(Object object) {
+		if (object instanceof Boolean || object instanceof Byte || object instanceof Character
+				|| object instanceof Double || object instanceof Float
+				|| object instanceof Integer || object instanceof Long || object instanceof Short) {
+			return;
+		}
+		registerUnpure(new Object[] { object });
 	}
 
 	public static void unregisterUnpure(Object[] objects) {

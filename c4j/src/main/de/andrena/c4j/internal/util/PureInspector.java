@@ -59,25 +59,6 @@ public class PureInspector {
 		}
 	}
 
-	public void verifyUnchangeable(CtBehavior affectedBehavior,
-			ListOrderedSet<ContractInfo> contracts) throws CannotCompileException {
-		List<NestedExp> unpureObjects = new ArrayList<NestedExp>();
-		for (ContractInfo contract : contracts) {
-			List<NestedExp> contractUnchangeables = contract.getUnchangeables().get(
-						affectedBehavior.getName() + affectedBehavior.getSignature());
-			if (contractUnchangeables != null) {
-				if (logger.isTraceEnabled()) {
-					logger.trace("reading unchangeables from " + affectedBehavior.getName()
-							+ affectedBehavior.getSignature());
-				}
-				unpureObjects.addAll(contractUnchangeables);
-			}
-		}
-		if (!unpureObjects.isEmpty()) {
-			registerUnpureObjects(affectedBehavior, unpureObjects);
-		}
-	}
-
 	public void verify(CtMethod affectedBehavior, boolean allowOwnStateChange)
 			throws CannotCompileException,
 			NotFoundException {

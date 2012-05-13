@@ -35,9 +35,8 @@ public class UnchangedParamOutOfBoundsSystemTest {
 				assert hour >= 0 && hour <= 23;
 			}
 			if (post()) {
-				Object a = null;
 				assert hour == target.getHour();
-				assert unchanged(a, target.getMinute());
+				assert unchanged(target.getMinute());
 			}
 		}
 	}

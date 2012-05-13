@@ -15,6 +15,7 @@ public abstract class NestedExp extends Exp {
 	public static final NestedExp RETURN_VALUE = new CodeNestedExp("$_");
 	public static final NestedExp EXCEPTION_VALUE = new CodeNestedExp("$e");
 	public static final NestedExp CALLING_OBJECT = new CodeNestedExp("$0");
+	public static final NestedExp PROCEED = new CodeNestedExp("$proceed($$)");
 
 	public static NestedExp arg(int num) {
 		return new CodeNestedExp("$" + num);

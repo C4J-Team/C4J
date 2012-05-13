@@ -79,7 +79,7 @@ public class UnchangedForObjectsSystemTest {
 		target.methodIsReplaced();
 	}
 
-	@Test
+	@Test(expected = AssertionError.class)
 	public void testParameterIsReplaced() {
 		target.parameterIsReplaced(new SetLike());
 	}
@@ -195,14 +195,14 @@ public class UnchangedForObjectsSystemTest {
 		@Override
 		public void parameterArrayIsChanged(SetLike[] param) {
 			if (post()) {
-				assert unchanged((Object) param);
+				assert unchanged(param);
 			}
 		}
 
 		@Override
 		public void parameterArrayIsReplaced(SetLike[] param) {
 			if (post()) {
-				assert unchanged((Object) param);
+				assert unchanged(param);
 			}
 		}
 

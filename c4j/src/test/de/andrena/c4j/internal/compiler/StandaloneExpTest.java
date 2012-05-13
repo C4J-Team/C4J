@@ -18,7 +18,7 @@ public class StandaloneExpTest {
 
 	@Test
 	public void testProceed() {
-		assertEquals("\n$_ = $proceed($$);", StandaloneExp.proceed.getCode());
+		assertEquals("\n$_ = $proceed($$);", StandaloneExp.PROCEED_AND_ASSIGN.getCode());
 	}
 
 	@Test

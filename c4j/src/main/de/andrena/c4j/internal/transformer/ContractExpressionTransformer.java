@@ -1,12 +1,18 @@
 package de.andrena.c4j.internal.transformer;
 
+import java.util.List;
+
 import javassist.CtBehavior;
 import javassist.CtClass;
+import javassist.bytecode.BadBytecode;
+import javassist.bytecode.CodeIterator;
+import javassist.bytecode.ConstPool;
+import javassist.bytecode.Opcode;
 import de.andrena.c4j.internal.RootTransformer;
-import de.andrena.c4j.internal.compiler.IfExp;
-import de.andrena.c4j.internal.compiler.StaticCallExp;
+import de.andrena.c4j.internal.compiler.StaticCall;
 import de.andrena.c4j.internal.editor.ContractMethodExpressionEditor;
 import de.andrena.c4j.internal.evaluator.Evaluator;
+import de.andrena.c4j.internal.evaluator.PureEvaluator;
 import de.andrena.c4j.internal.util.ContractRegistry.ContractInfo;
 
 public class ContractExpressionTransformer extends ContractDeclaredBehaviorTransformer {
@@ -16,25 +22,85 @@ public class ContractExpressionTransformer extends ContractDeclaredBehaviorTrans
 	@Override
 	public void transform(ContractInfo contractInfo, CtBehavior contractBehavior) throws Exception {
 		ContractMethodExpressionEditor expressionEditor = new ContractMethodExpressionEditor(rootTransformer,
-				contractInfo);
+				contractInfo, contractBehavior);
 		if (logger.isTraceEnabled()) {
 			logger.trace("transforming behavior " + contractBehavior.getLongName());
 		}
 		contractBehavior.instrument(expressionEditor);
 		additionalStoreExpressions(expressionEditor);
-		contractInfo.getUnchangeables().put(contractBehavior.getName() + contractBehavior.getSignature(),
-				expressionEditor.getUnchangeableObjects());
-		if (expressionEditor.getStoreExpressions().isEmpty()) {
+		if (expressionEditor.getStoreDependencies().isEmpty()
+				&& expressionEditor.getUnchangeableStoreDependencies().isEmpty()) {
 			return;
 		}
-		IfExp preCalls = new IfExp(new StaticCallExp(Evaluator.isBefore));
-		for (StaticCallExp storeExp : expressionEditor.getStoreExpressions()) {
-			preCalls.addIfBody(storeExp.toStandalone());
+		insertStoreDependencies(contractBehavior, expressionEditor);
+	}
+
+	private void insertStoreDependencies(CtBehavior contractBehavior, ContractMethodExpressionEditor expressionEditor)
+			throws BadBytecode {
+		ConstPool constPool = contractBehavior.getMethodInfo().getConstPool();
+		CodeIterator iterator = contractBehavior.getMethodInfo().getCodeAttribute().iterator();
+		int ifBlockLength = insertOldStoreCalls(iterator, expressionEditor.getStoreDependencies(), constPool, false);
+		ifBlockLength += insertOldStoreCalls(iterator, expressionEditor.getUnchangeableStoreDependencies(), constPool,
+				true);
+		insertJump(iterator, ifBlockLength, constPool);
+	}
+
+	private void insertJump(CodeIterator iterator, int ifBlockLength, ConstPool constPool) throws BadBytecode {
+		int jumpLength = ifBlockLength + 3;
+		byte[] ifBytes = new byte[6];
+		ifBytes[0] = (byte) Opcode.INVOKESTATIC;
+		setMethodIndex(constPool, ifBytes, 1, Evaluator.isBefore, "()Z");
+		ifBytes[3] = (byte) Opcode.IFEQ;
+		ifBytes[4] = (byte) (jumpLength >> 8);
+		ifBytes[5] = (byte) jumpLength;
+		iterator.insert(0, ifBytes);
+	}
+
+	private int insertOldStoreCalls(CodeIterator iterator, List<byte[]> storeDependencies, ConstPool constPool,
+			boolean isUnchangeable)
+			throws BadBytecode {
+		int ifBlockLength = 0;
+		byte[] oldStoreBytes = getOldStoreBytes(constPool);
+		for (int i = 0; i < storeDependencies.size(); i++) {
+			byte[] iloadBytes = new byte[2];
+			iloadBytes[0] = Opcode.BIPUSH;
+			iloadBytes[1] = (byte) i;
+			iterator.insert(iloadBytes);
+			byte[] storeDependency = storeDependencies.get(i);
+			iterator.insert(storeDependency);
+			if (isUnchangeable) {
+				byte[] registerUnchangeableBytes = getRegisterUnchangeableBytes(constPool);
+				iterator.insert(registerUnchangeableBytes);
+				ifBlockLength += registerUnchangeableBytes.length;
+			}
+			iterator.insert(oldStoreBytes);
+			ifBlockLength += storeDependency.length + oldStoreBytes.length + iloadBytes.length;
 		}
-		if (logger.isTraceEnabled()) {
-			logger.trace("before: " + preCalls.getCode());
-		}
-		preCalls.insertBefore(contractBehavior);
+		return ifBlockLength;
+	}
+
+	private byte[] getRegisterUnchangeableBytes(ConstPool constPool) {
+		byte[] registerUnchangeableBytes = new byte[4];
+		registerUnchangeableBytes[0] = (byte) Opcode.DUP;
+		registerUnchangeableBytes[1] = (byte) Opcode.INVOKESTATIC;
+		setMethodIndex(constPool, registerUnchangeableBytes, 2, PureEvaluator.registerUnchangeable,
+				"(Ljava/lang/Object;)V");
+		return registerUnchangeableBytes;
+	}
+
+	private void setMethodIndex(ConstPool constPool, byte[] bytes, int index, StaticCall staticCall, String descriptor) {
+		int classIndex = constPool.addClassInfo(staticCall.getCallClass().getName());
+		int methodInfoIndex = constPool.addMethodrefInfo(classIndex,
+				staticCall.getCallMethod(), descriptor);
+		bytes[index] = (byte) (methodInfoIndex >>> 8);
+		bytes[index + 1] = (byte) methodInfoIndex;
+	}
+
+	private byte[] getOldStoreBytes(ConstPool constPool) {
+		byte[] oldStoreBytes = new byte[3];
+		oldStoreBytes[0] = (byte) Opcode.INVOKESTATIC;
+		setMethodIndex(constPool, oldStoreBytes, 1, Evaluator.oldStore, "(ILjava/lang/Object;)V");
+		return oldStoreBytes;
 	}
 
 	private void additionalStoreExpressions(ContractMethodExpressionEditor expressionEditor) throws Exception {

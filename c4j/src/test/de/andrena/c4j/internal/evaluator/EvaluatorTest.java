@@ -45,37 +45,6 @@ public class EvaluatorTest {
 	}
 
 	@Test
-	public void testOldFieldAccess() {
-		Evaluator.currentTarget.set(currentTarget);
-		Evaluator.currentOldCacheEnvironment.set(Integer.valueOf(42));
-		Evaluator.storeFieldAccess("dummyField");
-		assertEquals("someValue", Evaluator.oldFieldAccess("dummyField"));
-	}
-
-	@Test
-	public void testOldMethodCall() {
-		Evaluator.currentTarget.set(currentTarget);
-		Evaluator.currentOldCacheEnvironment.set(Integer.valueOf(42));
-		Evaluator.storeMethodCall("dummyMethod");
-		assertEquals("someReturnValue", Evaluator.oldMethodCall("dummyMethod"));
-	}
-
-	@Test
-	public void testFieldAccess() {
-		Evaluator.currentTarget.set(currentTarget);
-		assertEquals("someValue", Evaluator.fieldAccess("dummyField"));
-	}
-
-	@Test
-	public void testMethodCall() {
-		Evaluator.currentTarget.set(currentTarget);
-		assertEquals(
-				7,
-				Evaluator.methodCall("dummyMethodWithParameters", new Class[] { int.class, int.class }, new Object[] {
-						Integer.valueOf(3), Integer.valueOf(4) }));
-	}
-
-	@Test
 	public void testPreCondition() throws Throwable {
 		Evaluator.getPreCondition(currentTarget, "SomeClass", ContractClass.class, DummyClass.class, void.class);
 		assertEquals(EvaluationPhase.BEFORE, Evaluator.evaluationPhase.get());

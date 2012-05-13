@@ -3,12 +3,10 @@ package de.andrena.c4j.internal.util;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javassist.CtClass;
-import de.andrena.c4j.internal.compiler.NestedExp;
 
 public class ContractRegistry {
 	private Map<CtClass, ContractInfo> contractMap = new HashMap<CtClass, ContractInfo>();
@@ -44,7 +42,6 @@ public class ContractRegistry {
 		private CtClass targetClass;
 		private CtClass contractClass;
 		private Set<CtClass> innerContractClasses = new HashSet<CtClass>();
-		private Map<String, List<NestedExp>> unchangeables = new HashMap<String, List<NestedExp>>();
 
 		private ContractInfo(CtClass targetClass, CtClass contractClass) {
 			this.targetClass = targetClass;
@@ -66,10 +63,6 @@ public class ContractRegistry {
 
 		public Set<CtClass> getInnerContractClasses() {
 			return Collections.unmodifiableSet(innerContractClasses);
-		}
-
-		public Map<String, List<NestedExp>> getUnchangeables() {
-			return unchangeables;
 		}
 
 		public Set<CtClass> getAllContractClasses() {

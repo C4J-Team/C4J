@@ -39,7 +39,7 @@ public class UnpureBehaviorExpressionEditor extends ExprEditor {
 			checkUnpureExp = new StaticCallExp(PureEvaluator.checkUnpureAccess, NestedExp.CALLING_OBJECT)
 					.toStandalone();
 		}
-		StandaloneExp replacementExp = checkUnpureExp.append(StandaloneExp.proceed);
+		StandaloneExp replacementExp = checkUnpureExp.append(StandaloneExp.PROCEED_AND_ASSIGN);
 		replacementExp.replace(fieldAccess);
 	}
 }

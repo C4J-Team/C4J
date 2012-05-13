@@ -38,7 +38,6 @@ public class PureTransformer extends AbstractAffectedClassTransformer {
 			if (affectedBehavior.hasAnnotation(Pure.class)) {
 				pureInspector.verify((CtMethod) affectedBehavior, false);
 			} else {
-				pureInspector.verifyUnchangeable(affectedBehavior, contracts);
 				pureInspector.checkUnpureAccess(affectedBehavior);
 			}
 		}

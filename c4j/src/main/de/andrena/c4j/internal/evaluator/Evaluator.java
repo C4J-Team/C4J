@@ -1,7 +1,5 @@
 package de.andrena.c4j.internal.evaluator;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,12 +15,8 @@ public class Evaluator {
 	public static final StaticCall isBefore = new StaticCall(Evaluator.class, "isBefore");
 	public static final StaticCall isAfter = new StaticCall(Evaluator.class, "isAfter");
 	public static final StaticCall getReturnValue = new StaticCall(Evaluator.class, "getReturnValue");
-	public static final StaticCall fieldAccess = new StaticCall(Evaluator.class, "fieldAccess");
-	public static final StaticCall methodCall = new StaticCall(Evaluator.class, "methodCall");
-	public static final StaticCall oldFieldAccess = new StaticCall(Evaluator.class, "oldFieldAccess");
-	public static final StaticCall oldMethodCall = new StaticCall(Evaluator.class, "oldMethodCall");
-	public static final StaticCall storeFieldAccess = new StaticCall(Evaluator.class, "storeFieldAccess");
-	public static final StaticCall storeMethodCall = new StaticCall(Evaluator.class, "storeMethodCall");
+	public static final StaticCall oldRetrieve = new StaticCall(Evaluator.class, "oldRetrieve");
+	public static final StaticCall oldStore = new StaticCall(Evaluator.class, "oldStore");
 	public static final StaticCall getCurrentTarget = new StaticCall(Evaluator.class, "getCurrentTarget");
 	public static final StaticCall getPreCondition = new StaticCall(Evaluator.class, "getPreCondition");
 	public static final StaticCall getPostCondition = new StaticCall(Evaluator.class, "getPostCondition");
@@ -31,6 +25,7 @@ public class Evaluator {
 	public static final StaticCall afterContract = new StaticCall(Evaluator.class, "afterContract");
 	public static final StaticCall afterContractMethod = new StaticCall(Evaluator.class, "afterContractMethod");
 	public static final StaticCall setException = new StaticCall(Evaluator.class, "setException");
+	public static final StaticCall isUnchanged = new StaticCall(Evaluator.class, "isUnchanged");
 
 	private static final Logger logger = Logger.getLogger(Evaluator.class);
 	private static final ReflectionHelper reflectionHelper = new ReflectionHelper();
@@ -40,14 +35,14 @@ public class Evaluator {
 	private static final Map<Class<?>, Object> primitiveReturnValues = new HashMap<Class<?>, Object>() {
 		private static final long serialVersionUID = 5365905181961089260L;
 		{
-			put(long.class, Long.valueOf(0));
-			put(int.class, Integer.valueOf(0));
-			put(short.class, Short.valueOf((short) 0));
-			put(char.class, Character.valueOf((char) 0));
+			put(boolean.class, Boolean.FALSE);
 			put(byte.class, Byte.valueOf((byte) 0));
+			put(char.class, Character.valueOf((char) 0));
 			put(double.class, Double.valueOf(0));
 			put(float.class, Float.valueOf(0));
-			put(boolean.class, Boolean.FALSE);
+			put(int.class, Integer.valueOf(0));
+			put(long.class, Long.valueOf(0));
+			put(short.class, Short.valueOf((short) 0));
 		}
 	};
 
@@ -71,18 +66,34 @@ public class Evaluator {
 	 * Integer = stack trace depth, class = contract class
 	 */
 	static final ThreadLocal<Integer> currentOldCacheEnvironment = new ThreadLocal<Integer>();
-	private static final ThreadLocal<SelfInitializingMap<Integer, Map<String, Object>>> oldStore = new ThreadLocal<SelfInitializingMap<Integer, Map<String, Object>>>() {
+	private static final ThreadLocal<SelfInitializingMap<Integer, Map<Integer, Object>>> oldCache = new ThreadLocal<SelfInitializingMap<Integer, Map<Integer, Object>>>() {
 		@Override
-		protected SelfInitializingMap<Integer, Map<String, Object>> initialValue() {
-			return new SelfInitializingMap<Integer, Map<String, Object>>() {
+		protected SelfInitializingMap<Integer, Map<Integer, Object>> initialValue() {
+			return new SelfInitializingMap<Integer, Map<Integer, Object>>() {
 				@Override
-				protected Map<String, Object> initialValue() {
-					return new HashMap<String, Object>();
+				protected Map<Integer, Object> initialValue() {
+					return new HashMap<Integer, Object>();
 				}
-
 			};
 		}
 	};
+
+	private final static ThreadLocal<Object> unchangedCache = new ThreadLocal<Object>();
+
+	public static boolean isUnchanged(Object compareObject, boolean triggerSetUnchangedCache) {
+		// auto-boxing is evil, requires equals instead of ==
+		if (compareObject instanceof Boolean || compareObject instanceof Byte || compareObject instanceof Character
+				|| compareObject instanceof Double || compareObject instanceof Float
+				|| compareObject instanceof Integer || compareObject instanceof Long || compareObject instanceof Short) {
+			return compareObject.equals(unchangedCache.get());
+		}
+		PureEvaluator.unregisterUnpure(new Object[] { compareObject });
+		return compareObject == unchangedCache.get();
+	}
+
+	public static void setUnchangedCache(Object value) {
+		unchangedCache.set(value);
+	}
 
 	@SuppressWarnings("unchecked")
 	public static <T> T getCurrentTarget() {
@@ -90,7 +101,7 @@ public class Evaluator {
 	}
 
 	public static int getOldStoreSize() {
-		return oldStore.get().size();
+		return oldCache.get().size();
 	}
 
 	public static boolean isBefore() {
@@ -107,99 +118,26 @@ public class Evaluator {
 		return evaluationPhase.get() == EvaluationPhase.AFTER;
 	}
 
-	public static Object oldFieldAccess(String fieldName) {
-		Object oldValue = getCurrentOldCache().get(fieldName);
+	public static Object oldRetrieve(int index) {
+		Object oldValue = getCurrentOldCache().get(Integer.valueOf(index));
 		if (logger.isTraceEnabled()) {
-			logger.trace("oldFieldAccess for field '" + fieldName + "' with " + currentOldCacheEnvironment.get()
+			logger.trace("oldRetrieve for index '" + index + "' with " + currentOldCacheEnvironment.get()
 					+ " returning " + oldValue);
 		}
 		return oldValue;
 	}
 
-	private static Map<String, Object> getCurrentOldCache() {
-		return oldStore.get().get(currentOldCacheEnvironment.get());
+	private static Map<Integer, Object> getCurrentOldCache() {
+		return oldCache.get().get(currentOldCacheEnvironment.get());
 	}
 
-	public static Object oldMethodCall(String methodName) {
-		Object oldValue = getCurrentOldCache().get(methodName);
+	public static void oldStore(int index, Object value) {
 		if (logger.isTraceEnabled()) {
-			logger.trace("oldMethodCall for method '" + methodName + "' with "
-					+ currentOldCacheEnvironment.get() + " returning " + oldValue);
-		}
-		return oldValue;
-	}
-
-	public static void storeFieldAccess(String fieldName) {
-		Object storedValue = fieldAccess(fieldName);
-		if (logger.isTraceEnabled()) {
-			logger.trace("storeFieldAccess for field '" + fieldName + "' with "
+			logger.trace("oldStore for index '" + index + "' with "
 					+ currentOldCacheEnvironment.get()
-					+ " storing " + storedValue);
+					+ " storing " + value);
 		}
-		getCurrentOldCache().put(fieldName, storedValue);
-	}
-
-	public static void storeMethodCall(String methodName) {
-		Object storedValue = methodCall(methodName, new Class<?>[0], new Object[0]);
-		if (logger.isTraceEnabled()) {
-			logger.trace("storeMethodCall for method '" + methodName + "' with "
-					+ currentOldCacheEnvironment.get()
-					+ " storing " + storedValue);
-		}
-		getCurrentOldCache().put(methodName, storedValue);
-	}
-
-	public static Object fieldAccess(String fieldName) {
-		try {
-			Object target = currentTarget.get();
-			Field field = getInheritedField(fieldName, target.getClass());
-			field.setAccessible(true);
-			Object value = field.get(target);
-			if (logger.isTraceEnabled()) {
-				logger.trace("fieldAccess returning " + value);
-			}
-			return value;
-		} catch (Exception e) {
-			throw new EvaluationException("could not access field " + fieldName, e);
-		}
-	}
-
-	private static Field getInheritedField(String fieldName, Class<?> clazz) throws NoSuchFieldException {
-		try {
-			return clazz.getDeclaredField(fieldName);
-		} catch (NoSuchFieldException e) {
-			if (clazz.getSuperclass() != null) {
-				return getInheritedField(fieldName, clazz.getSuperclass());
-			}
-			throw e;
-		}
-	}
-
-	public static Object methodCall(String methodName, Class<?>[] argTypes, Object[] args) {
-		try {
-			Object target = currentTarget.get();
-			Method method = getInheritedMethod(methodName, target.getClass(), argTypes);
-			method.setAccessible(true);
-			Object value = method.invoke(target, args);
-			if (logger.isTraceEnabled()) {
-				logger.trace("methodCall returning " + value);
-			}
-			return value;
-		} catch (Exception e) {
-			throw new EvaluationException("could not call method " + methodName, e);
-		}
-	}
-
-	private static Method getInheritedMethod(String methodName, Class<? extends Object> clazz, Class<?>[] argTypes)
-			throws NoSuchMethodException {
-		try {
-			return clazz.getDeclaredMethod(methodName, argTypes);
-		} catch (NoSuchMethodException e) {
-			if (clazz.getSuperclass() != null) {
-				return getInheritedMethod(methodName, clazz.getSuperclass(), argTypes);
-			}
-			throw e;
-		}
+		getCurrentOldCache().put(index, value);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -262,7 +200,7 @@ public class Evaluator {
 			}
 			returnValue.set(null);
 			exceptionValue.set(null);
-			oldStore.get()
+			oldCache.get()
 					.get(Integer.valueOf(new Exception().getStackTrace().length))
 					.clear();
 		}

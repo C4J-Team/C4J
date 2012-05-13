@@ -1,7 +1,6 @@
 package de.andrena.c4j.internal.editor;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -10,7 +9,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.Set;
 
-import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
@@ -45,7 +43,8 @@ public class ContractMethodExpressionEditorTest {
 		contract = new ContractRegistry().registerContract(targetClass, contractClass);
 		innerContractClass = pool.get(DummyInnerContractClass.class.getName());
 		contract.addInnerContractClass(innerContractClass);
-		editor = new ContractMethodExpressionEditor(RootTransformer.INSTANCE, contract);
+		editor = new ContractMethodExpressionEditor(RootTransformer.INSTANCE, contract, contractClass
+				.getDeclaredMethod("someMethod"));
 		fieldAccess = mock(FieldAccess.class);
 		when(fieldAccess.getField()).thenReturn(targetClass.getDeclaredField("someField"));
 		methodCall = mock(MethodCall.class);
@@ -64,13 +63,6 @@ public class ContractMethodExpressionEditorTest {
 		editor.nestedInnerClasses.add(targetClass);
 		Set<CtClass> nestedInnerClasses = editor.getAndClearNestedInnerClasses();
 		assertEquals(1, nestedInnerClasses.size());
-	}
-
-	@Test
-	public void testEditFieldAccess() throws Exception {
-		editor.editFieldAccess(fieldAccess);
-		assertEquals(targetClass.getDeclaredField("someField"), editor.lastFieldAccess);
-		assertNull(editor.lastMethodCall);
 	}
 
 	@Test
@@ -95,40 +87,6 @@ public class ContractMethodExpressionEditorTest {
 		when(fieldAccess.isStatic()).thenReturn(Boolean.FALSE);
 		when(fieldAccess.isWriter()).thenReturn(Boolean.TRUE);
 		editor.editFieldAccess(fieldAccess);
-	}
-
-	@Test
-	public void testEditMethodCallToOldWithField() throws Exception {
-		when(methodCall.getMethod()).thenReturn(oldMethod);
-		editor.lastFieldAccess = targetClass.getDeclaredField("someField");
-		editor.editMethodCall(methodCall);
-		verify(methodCall).replace(anyString());
-		assertEquals(1, editor.getStoreExpressions().size());
-	}
-
-	@Test
-	public void testEditMethodCallToOldWithMethod() throws Exception {
-		when(methodCall.getMethod()).thenReturn(oldMethod);
-		editor.lastMethodCall = targetClass.getDeclaredMethod("someMethod");
-		editor.editMethodCall(methodCall);
-		verify(methodCall).replace(anyString());
-		assertEquals(1, editor.getStoreExpressions().size());
-	}
-
-	@Test
-	public void testEditMethodCallToOldWithOverriddenMethod() throws Exception {
-		when(methodCall.getMethod()).thenReturn(oldMethod);
-		editor.lastMethodCall = contractClass.getDeclaredMethod("someMethod");
-		editor.editMethodCall(methodCall);
-		verify(methodCall).replace(anyString());
-		assertEquals(1, editor.getStoreExpressions().size());
-	}
-
-	@Test(expected = CannotCompileException.class)
-	public void testEditMethodCallToOldWithMethodAndParameters() throws Exception {
-		when(methodCall.getMethod()).thenReturn(oldMethod);
-		editor.lastMethodCall = targetClass.getDeclaredMethod("someMethodWithParameters");
-		editor.editMethodCall(methodCall);
 	}
 
 	public static class TargetClass {

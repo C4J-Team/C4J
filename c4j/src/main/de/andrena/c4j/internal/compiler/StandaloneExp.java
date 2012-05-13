@@ -8,7 +8,7 @@ import javassist.expr.Expr;
 
 public abstract class StandaloneExp extends Exp {
 
-	public static final StandaloneExp proceed = CodeStandaloneExp.fromNested("$_ = $proceed($$)");
+	public static final StandaloneExp PROCEED_AND_ASSIGN = CodeStandaloneExp.fromNested("$_ = $proceed($$)");
 
 	public StandaloneExp append(StandaloneExp other) {
 		return CodeStandaloneExp.fromStandalone(getCode() + other.getCode(), isEmpty() && other.isEmpty());

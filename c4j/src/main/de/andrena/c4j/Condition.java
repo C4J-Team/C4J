@@ -139,8 +139,8 @@ public class Condition {
 	}
 
 	/**
-	 * Usable within a post-condition to get the value (primitive types) or reference (Objects) to a field or return
-	 * value of a method without parameters at the beginning of the target method.
+	 * Usable within a post-condition to get the value (primitive types) or reference (Objects) of an expression at the
+	 * beginning of the target method. May contain any expression except local variables.
 	 * <p>
 	 * Example:
 	 * </p>
@@ -176,32 +176,30 @@ public class Condition {
 	 * }
 	 * </pre>
 	 * 
-	 * @param fieldOrMethodWithoutParameters
-	 *            The target field or method without parameters.
-	 * @return The value (primitive types) or reference (Objects) to the field or method at the beginning of the target
+	 * @param expressionWithoutLocalVariables
+	 *            An expression without local variables.
+	 * @return The value (primitive types) or reference (Objects) to the expression at the beginning of the target
 	 *         method.
 	 */
 	@Pure
-	public static <T> T old(T fieldOrMethodWithoutParameters) {
-		return fieldOrMethodWithoutParameters;
+	public static <T> T old(T expressionWithoutLocalVariables) {
+		return expressionWithoutLocalVariables;
 	}
 
 	/**
 	 * EXPERIMENTAL! Usable only if PureBehavior.VALIDATE_PURE is enabled for the class being validated.
 	 * <p>
-	 * Usable within a post-condition to ensure, that a value (primitive types) or state (Objects) of a parameter, field
-	 * or return value of a method without parameters remains unchanged.
-	 * <p>
-	 * Note that reassignment of parameters is allowed, as it's only visible within the method. This also means that
-	 * parameters of primitive types are not affected.
+	 * Usable within a post-condition to ensure, that a value (primitive types) or state (Objects) of an expression
+	 * remains unchanged.
 	 * 
-	 * @param parameterOrFieldOrMethodWithoutParameters
-	 *            The method parameter, target field or method without parameters.
+	 * @param expressionWithoutLocalVariables
+	 *            An expression without local variables.
 	 * @return Whether the value (primitive types) or reference (Objects) has not been changed compared to the beginning
 	 *         of the method.
 	 */
 	@Pure
-	public static boolean unchanged(Object... parameterOrFieldOrMethodWithoutParameters) {
+	public static boolean unchanged(Object expressionWithoutLocalVariables) {
+		Evaluator.setUnchangedCache(expressionWithoutLocalVariables);
 		return false;
 	}
 }
