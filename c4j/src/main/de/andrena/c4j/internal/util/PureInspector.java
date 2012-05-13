@@ -1,5 +1,6 @@
 package de.andrena.c4j.internal.util;
 
+import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -65,6 +66,15 @@ public class PureInspector {
 		PureBehaviorExpressionEditor editor = new PureBehaviorExpressionEditor(affectedBehavior, rootTransformer, this,
 						allowOwnStateChange);
 		affectedBehavior.instrument(editor);
+		editor.instrumentArrayAccesses();
+		try {
+			System.out.println("wrote for " + affectedBehavior.getLongName());
+			affectedBehavior.getDeclaringClass().writeFile();
+			affectedBehavior.getDeclaringClass().defrost();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		if (editor.getPureError() != null) {
 			editor.getPureError().insertBefore(affectedBehavior);
 		}
