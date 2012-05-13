@@ -185,5 +185,6 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 				new ValueExp(storeIndex)), NestedExp.PROCEED);
 		AssignmentExp assignmentExp = new AssignmentExp(NestedExp.RETURN_VALUE, oldCall);
 		methodCall.replace(assignmentExp.toStandalone().getCode());
+		contract.getMethodsContainingUnchanged().add(methodCall.where().getName() + methodCall.where().getSignature());
 	}
 }

@@ -39,6 +39,7 @@ public class PureTransformer extends AbstractAffectedClassTransformer {
 				pureInspector.verify((CtMethod) affectedBehavior, false);
 			} else {
 				pureInspector.checkUnpureAccess(affectedBehavior);
+				pureInspector.verifyUnchangeable(affectedBehavior, contracts);
 			}
 		}
 	}

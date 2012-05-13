@@ -4,6 +4,8 @@ import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.NotFoundException;
 import javassist.bytecode.AnnotationsAttribute;
+import javassist.bytecode.ConstPool;
+import de.andrena.c4j.internal.compiler.StaticCall;
 
 public class TransformationHelper {
 	public void addClassAnnotation(CtClass targetClass, CtClass annotationClass) throws NotFoundException {
@@ -28,5 +30,13 @@ public class TransformationHelper {
 		}
 		targetAttribute.addAnnotation(new javassist.bytecode.annotation.Annotation(targetBehavior.getMethodInfo()
 				.getConstPool(), annotationClass));
+	}
+
+	public void setMethodIndex(ConstPool constPool, byte[] bytes, int index, StaticCall staticCall, String descriptor) {
+		int classIndex = constPool.addClassInfo(staticCall.getCallClass().getName());
+		int methodInfoIndex = constPool.addMethodrefInfo(classIndex,
+				staticCall.getCallMethod(), descriptor);
+		bytes[index] = (byte) (methodInfoIndex >>> 8);
+		bytes[index + 1] = (byte) methodInfoIndex;
 	}
 }

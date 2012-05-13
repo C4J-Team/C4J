@@ -9,15 +9,16 @@ import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import javassist.bytecode.Opcode;
 import de.andrena.c4j.internal.RootTransformer;
-import de.andrena.c4j.internal.compiler.StaticCall;
 import de.andrena.c4j.internal.editor.ContractMethodExpressionEditor;
 import de.andrena.c4j.internal.evaluator.Evaluator;
 import de.andrena.c4j.internal.evaluator.PureEvaluator;
 import de.andrena.c4j.internal.util.ContractRegistry.ContractInfo;
+import de.andrena.c4j.internal.util.TransformationHelper;
 
 public class ContractExpressionTransformer extends ContractDeclaredBehaviorTransformer {
 
 	private RootTransformer rootTransformer = RootTransformer.INSTANCE;
+	private TransformationHelper transformationHelper = new TransformationHelper();
 
 	@Override
 	public void transform(ContractInfo contractInfo, CtBehavior contractBehavior) throws Exception {
@@ -49,7 +50,7 @@ public class ContractExpressionTransformer extends ContractDeclaredBehaviorTrans
 		int jumpLength = ifBlockLength + 3;
 		byte[] ifBytes = new byte[6];
 		ifBytes[0] = (byte) Opcode.INVOKESTATIC;
-		setMethodIndex(constPool, ifBytes, 1, Evaluator.isBefore, "()Z");
+		transformationHelper.setMethodIndex(constPool, ifBytes, 1, Evaluator.isBefore, "()Z");
 		ifBytes[3] = (byte) Opcode.IFEQ;
 		ifBytes[4] = (byte) (jumpLength >> 8);
 		ifBytes[5] = (byte) jumpLength;
@@ -83,23 +84,16 @@ public class ContractExpressionTransformer extends ContractDeclaredBehaviorTrans
 		byte[] registerUnchangeableBytes = new byte[4];
 		registerUnchangeableBytes[0] = (byte) Opcode.DUP;
 		registerUnchangeableBytes[1] = (byte) Opcode.INVOKESTATIC;
-		setMethodIndex(constPool, registerUnchangeableBytes, 2, PureEvaluator.registerUnchangeable,
+		transformationHelper.setMethodIndex(constPool, registerUnchangeableBytes, 2,
+				PureEvaluator.registerUnchangeable,
 				"(Ljava/lang/Object;)V");
 		return registerUnchangeableBytes;
-	}
-
-	private void setMethodIndex(ConstPool constPool, byte[] bytes, int index, StaticCall staticCall, String descriptor) {
-		int classIndex = constPool.addClassInfo(staticCall.getCallClass().getName());
-		int methodInfoIndex = constPool.addMethodrefInfo(classIndex,
-				staticCall.getCallMethod(), descriptor);
-		bytes[index] = (byte) (methodInfoIndex >>> 8);
-		bytes[index + 1] = (byte) methodInfoIndex;
 	}
 
 	private byte[] getOldStoreBytes(ConstPool constPool) {
 		byte[] oldStoreBytes = new byte[3];
 		oldStoreBytes[0] = (byte) Opcode.INVOKESTATIC;
-		setMethodIndex(constPool, oldStoreBytes, 1, Evaluator.oldStore, "(ILjava/lang/Object;)V");
+		transformationHelper.setMethodIndex(constPool, oldStoreBytes, 1, Evaluator.oldStore, "(ILjava/lang/Object;)V");
 		return oldStoreBytes;
 	}
 

@@ -10,11 +10,6 @@ import javassist.CtMember;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 import javassist.bytecode.AccessFlag;
-import javassist.bytecode.BadBytecode;
-import javassist.bytecode.CodeAttribute;
-import javassist.bytecode.CodeIterator;
-import javassist.bytecode.Opcode;
-import javassist.expr.ArrayWriteAccess;
 import javassist.expr.ExprEditor;
 import javassist.expr.FieldAccess;
 import javassist.expr.MethodCall;
@@ -40,6 +35,7 @@ import de.andrena.c4j.internal.util.PureInspector;
 
 public class PureBehaviorExpressionEditor extends ExprEditor {
 
+	private static final String C4J_INTERNAL_PACKAGE = "de.andrena.c4j.internal";
 	private Logger logger = Logger.getLogger(getClass());
 	private CtMethod affectedMethod;
 	private RootTransformer rootTransformer;
@@ -55,32 +51,6 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 		this.rootTransformer = rootTransformer;
 		this.pureInspector = pureInspector;
 		this.allowOwnStateChange = allowOwnStateChange;
-	}
-
-	public void instrumentArrayAccesses() throws CannotCompileException {
-		try {
-			CodeAttribute ca = affectedMethod.getMethodInfo().getCodeAttribute();
-			CodeIterator ci = ca.iterator();
-			while (ci.hasNext()) {
-				int index = ci.next();
-				int op = ci.byteAt(index);
-				if (op == Opcode.AASTORE) {
-					editArrayAccess(new ArrayWriteAccess(index, ci, affectedMethod.getDeclaringClass(), affectedMethod
-							.getMethodInfo()));
-				}
-			}
-		} catch (BadBytecode e) {
-			throw new CannotCompileException(e);
-		}
-	}
-
-	private void editArrayAccess(ArrayWriteAccess arrayWriteAccess) throws CannotCompileException {
-		StandaloneExp checkUnpureAccessExp = new StaticCallExp(PureEvaluator.checkUnpureAccess,
-				NestedExp.CALLING_OBJECT).toStandalone();
-		StandaloneExp replacementExp = checkUnpureAccessExp.append(StandaloneExp.proceed);
-		logger.debug("possible reassignment on pure array element");
-		logger.trace("replacement-code: " + replacementExp.getCode());
-		replacementExp.replace(arrayWriteAccess);
 	}
 
 	public ThrowExp getPureError() {
@@ -190,6 +160,9 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 	}
 
 	private void editStaticMethodCall(MethodCall methodCall, CtMethod method) throws CannotCompileException {
+		if (method.getDeclaringClass().getPackageName().startsWith(C4J_INTERNAL_PACKAGE)) {
+			return;
+		}
 		if (rootTransformer.getConfigurationManager().isWithinRootPackages(method.getDeclaringClass())
 				|| rootTransformer.getConfigurationManager().getConfiguration(affectedMethod.getDeclaringClass())
 						.getBlacklistMethods().contains(method)) {

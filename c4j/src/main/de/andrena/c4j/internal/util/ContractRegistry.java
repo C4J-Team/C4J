@@ -42,6 +42,7 @@ public class ContractRegistry {
 		private CtClass targetClass;
 		private CtClass contractClass;
 		private Set<CtClass> innerContractClasses = new HashSet<CtClass>();
+		private Set<String> methodsContainingUnchanged = new HashSet<String>();
 
 		private ContractInfo(CtClass targetClass, CtClass contractClass) {
 			this.targetClass = targetClass;
@@ -71,5 +72,8 @@ public class ContractRegistry {
 			return Collections.unmodifiableSet(allContractClasses);
 		}
 
+		public Set<String> getMethodsContainingUnchanged() {
+			return methodsContainingUnchanged;
+		}
 	}
 }

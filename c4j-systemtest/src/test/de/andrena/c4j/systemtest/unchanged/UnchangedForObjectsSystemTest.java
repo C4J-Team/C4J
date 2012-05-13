@@ -67,7 +67,7 @@ public class UnchangedForObjectsSystemTest {
 	// failing, see https://github.com/C4J-Team/C4J/issues/1
 	@Test(expected = AssertionError.class)
 	public void testParameterArrayIsReplaced() {
-		target.parameterArrayIsReplaced(new MutableString[] { new MutableString() });
+		target.parameterArrayIsReplaced(new MutableString[] { new MutableString("original") });
 	}
 
 	@Test(expected = AssertionError.class)
@@ -124,7 +124,7 @@ public class UnchangedForObjectsSystemTest {
 		}
 
 		public void parameterArrayIsReplaced(MutableString[] param) {
-			param[0] = new MutableString();
+			param[0] = new MutableString("replacement");
 		}
 
 		public void fieldIsReplaced() {

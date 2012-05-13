@@ -1,6 +1,5 @@
 package de.andrena.c4j.internal.util;
 
-import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,6 +23,7 @@ import de.andrena.c4j.internal.compiler.ArrayExp;
 import de.andrena.c4j.internal.compiler.NestedExp;
 import de.andrena.c4j.internal.compiler.StandaloneExp;
 import de.andrena.c4j.internal.compiler.StaticCallExp;
+import de.andrena.c4j.internal.editor.ArrayAccessEditor;
 import de.andrena.c4j.internal.editor.PureBehaviorExpressionEditor;
 import de.andrena.c4j.internal.editor.UnpureBehaviorExpressionEditor;
 import de.andrena.c4j.internal.evaluator.PureEvaluator;
@@ -34,6 +34,7 @@ public class PureInspector {
 	private RootTransformer rootTransformer = RootTransformer.INSTANCE;
 	private UnpureBehaviorExpressionEditor unpureBehaviorExpressionEditor = new UnpureBehaviorExpressionEditor();
 	private AffectedBehaviorLocator affectedBehaviorLocator = new AffectedBehaviorLocator();
+	private ArrayAccessEditor arrayAccessEditor = new ArrayAccessEditor();
 
 	public CtMethod getPureOrigin(ListOrderedSet<CtClass> involvedClasses, ListOrderedSet<ContractInfo> contracts,
 			CtMethod method) {
@@ -66,15 +67,7 @@ public class PureInspector {
 		PureBehaviorExpressionEditor editor = new PureBehaviorExpressionEditor(affectedBehavior, rootTransformer, this,
 						allowOwnStateChange);
 		affectedBehavior.instrument(editor);
-		editor.instrumentArrayAccesses();
-		try {
-			System.out.println("wrote for " + affectedBehavior.getLongName());
-			affectedBehavior.getDeclaringClass().writeFile();
-			affectedBehavior.getDeclaringClass().defrost();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		arrayAccessEditor.instrumentArrayAccesses(affectedBehavior);
 		if (editor.getPureError() != null) {
 			editor.getPureError().insertBefore(affectedBehavior);
 		}
@@ -142,5 +135,20 @@ public class PureInspector {
 					+ checkUnpureAccessExp.getCode());
 		}
 		checkUnpureAccessExp.insertBefore(affectedBehavior);
+	}
+
+	public void verifyUnchangeable(CtBehavior affectedBehavior, ListOrderedSet<ContractInfo> contracts)
+			throws CannotCompileException {
+		boolean containsUnchanged = false;
+		for (ContractInfo contract : contracts) {
+			if (contract.getMethodsContainingUnchanged().contains(
+					affectedBehavior.getName() + affectedBehavior.getSignature())) {
+				containsUnchanged = true;
+				break;
+			}
+		}
+		if (containsUnchanged) {
+			arrayAccessEditor.instrumentArrayAccesses(affectedBehavior);
+		}
 	}
 }
