@@ -110,11 +110,19 @@ The Pre-Condition of `withdraw(int)` requires, that the parameter `amount` is gr
 Each instance of a target class being protected by a contract has its corresponding instance of the contract class. In order to access the target instance from within the contract, a field having the type of the target class can be annotated with the `@Target` annotation.
 
 ## old
-`old`, as seen in the example above, can be used to access the value of a field or parameter-less method before the execution of the method in question. There can be no calculations, method-calls or even local variables inside the parameter being passed to `old`.
+`old`, as seen in the example above, can be used to access the value of an expression before the execution of the method in question. There can be no usage of local variables inside the parameter being passed to `old`.
 
 ```java
-  assert target.getBalance() == old(target.getBalance() - amount); // won't work
-  assert target.getBalance() == old(target.getBalance()) - old(amount); // won't work
+  @Override
+  public void withdraw(int amount) {
+    if (postCondition()) {
+      assert target.getBalance() == old(target.getBalance()) - amount; // works
+      assert target.getBalance() == old(target.getBalance() - amount); // works
+      assert target.getBalance() == old(arbitraryObject.arbitraryMethod("123", 456, new BigDecimal("0.01")).getAmount() + SomeClass.staticMethodCall()); // works
+      int localVar = 3;
+      assert target.getBalance() == old(target.getBalance() - localVar); // doesn't work as a local variable is used within old()
+    }
+  }
 ```
 
 ## Class-Invariants
