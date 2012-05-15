@@ -131,7 +131,7 @@ public class ConditionAndInvariantTransformer extends AbstractAffectedClassTrans
 		StandaloneExp callInvariantExpression = getInvariantCall(contracts, affectedClass);
 
 		Map<CtBehavior, List<CtBehavior>> contractMap = getContractMap(contracts, affectedClass);
-		for (CtBehavior affectedBehavior : reflectionHelper.getDeclaredModifiableBehaviors(affectedClass)) {
+		for (CtBehavior affectedBehavior : reflectionHelper.getDeclaredModifiableDynamicBehaviors(affectedClass)) {
 			StandaloneExp behaviorInvariant = callInvariantExpression;
 			if (affectedBehavior.hasAnnotation(Pure.class)
 					&& rootTransformer.getConfigurationManager().getConfiguration(affectedClass).getPureBehaviors()
@@ -173,6 +173,9 @@ public class ConditionAndInvariantTransformer extends AbstractAffectedClassTrans
 			}
 		}
 		if (invariantCall != null) {
+			if (logger.isTraceEnabled()) {
+				logger.trace("insertFinally: " + invariantCall);
+			}
 			invariantCall.insertFinally(affectedBehavior);
 		}
 	}
