@@ -20,6 +20,7 @@ import org.apache.log4j.Logger;
 
 import de.andrena.c4j.Condition;
 import de.andrena.c4j.Configuration.DefaultPreCondition;
+import de.andrena.c4j.internal.RTFMException;
 import de.andrena.c4j.internal.RootTransformer;
 import de.andrena.c4j.internal.compiler.AssignmentExp;
 import de.andrena.c4j.internal.compiler.BooleanExp;
@@ -41,6 +42,11 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 	private Stackalyzer stackalyzer = new Stackalyzer();
 	private List<byte[]> storeDependencies = new ArrayList<byte[]>();
 	private List<byte[]> unchangeableStoreDependencies = new ArrayList<byte[]>();
+	private RTFMException thrownException;
+
+	public RTFMException getThrownException() {
+		return thrownException;
+	}
 
 	public List<byte[]> getStoreDependencies() {
 		return storeDependencies;
@@ -166,9 +172,15 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		}
 	}
 
-	private void handleOldMethodCall(MethodCall methodCall) throws NotFoundException, CannotCompileException,
-			BadBytecode {
-		byte[] dependencyBytes = stackalyzer.getDependenciesFor(methodCall.where(), methodCall.indexOfBytecode());
+	private void handleOldMethodCall(MethodCall methodCall) throws NotFoundException, BadBytecode,
+			CannotCompileException {
+		byte[] dependencyBytes;
+		try {
+			dependencyBytes = stackalyzer.getDependenciesFor(methodCall.where(), methodCall.indexOfBytecode());
+		} catch (RTFMException e) {
+			thrownException = e;
+			return;
+		}
 		int storeIndex = storeDependencies.size();
 		storeDependencies.add(dependencyBytes);
 		StaticCallExp oldCall = new StaticCallExp(Evaluator.oldRetrieve, new ValueExp(storeIndex));
@@ -178,7 +190,13 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 
 	private void handleUnchangedMethodCall(MethodCall methodCall) throws CannotCompileException, NotFoundException,
 			BadBytecode {
-		byte[] dependencyBytes = stackalyzer.getDependenciesFor(methodCall.where(), methodCall.indexOfBytecode());
+		byte[] dependencyBytes;
+		try {
+			dependencyBytes = stackalyzer.getDependenciesFor(methodCall.where(), methodCall.indexOfBytecode());
+		} catch (RTFMException e) {
+			thrownException = e;
+			return;
+		}
 		int storeIndex = unchangeableStoreDependencies.size();
 		unchangeableStoreDependencies.add(dependencyBytes);
 		StaticCallExp oldCall = new StaticCallExp(Evaluator.isUnchanged, new StaticCallExp(Evaluator.oldRetrieve,

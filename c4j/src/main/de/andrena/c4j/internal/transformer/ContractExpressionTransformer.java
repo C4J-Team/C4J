@@ -28,6 +28,10 @@ public class ContractExpressionTransformer extends ContractDeclaredBehaviorTrans
 			logger.trace("transforming behavior " + contractBehavior.getLongName());
 		}
 		contractBehavior.instrument(expressionEditor);
+		if (expressionEditor.getThrownException() != null) {
+			expressionEditor.getThrownException().insertThrowExp(contractBehavior);
+			return;
+		}
 		additionalStoreExpressions(expressionEditor);
 		if (expressionEditor.getStoreDependencies().isEmpty()
 				&& expressionEditor.getUnchangeableStoreDependencies().isEmpty()) {
