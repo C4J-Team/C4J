@@ -70,7 +70,8 @@ public class AffectedBehaviorLocatorTest {
 
 	@Test
 	public void testGetAffectedMethodForIndirectContractMethod() throws Exception {
-		RootTransformer.INSTANCE.init("");
+		RootTransformer.INSTANCE.init();
+		RootTransformer.INSTANCE.loadConfiguration(null);
 		CtMethod affectedMethod = locator.getAffectedMethod(contractInfo, indirectClass,
 				contractClass.getDeclaredMethod("contractMethod"));
 		assertEquals(indirectClass.getDeclaredMethod("contractMethod"), affectedMethod);

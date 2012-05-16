@@ -18,11 +18,10 @@ import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 
 import de.andrena.c4j.ContractReference;
-import de.andrena.c4j.internal.RootTransformer;
 import de.andrena.c4j.internal.transformer.AffectedClassTransformer;
 import de.andrena.c4j.internal.transformer.ContractClassTransformer;
-import de.andrena.c4j.internal.util.ListOrderedSet;
 import de.andrena.c4j.internal.util.ContractRegistry.ContractInfo;
+import de.andrena.c4j.internal.util.ListOrderedSet;
 
 public class RootTransformerTest {
 
@@ -36,7 +35,7 @@ public class RootTransformerTest {
 	@Before
 	public void before() throws Exception {
 		transformer = RootTransformer.INSTANCE;
-		transformer.init("");
+		transformer.init();
 		targetClassTransformer = mock(AffectedClassTransformer.class);
 		transformer.targetClassTransformer = targetClassTransformer;
 		contractClassTransformer = mock(ContractClassTransformer.class);
@@ -48,13 +47,13 @@ public class RootTransformerTest {
 
 	@Test
 	public void testTransformClassInterface() throws Exception {
-		assertNull(transformer.transformClass(EmptyInterface.class.getName()));
+		assertNull(transformer.transformType(pool.get(EmptyInterface.class.getName())));
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testTransformClassTargetClass() throws Exception {
-		assertNotNull(transformer.transformClass(TargetClass.class.getName()));
+		assertNotNull(transformer.transformType(pool.get(TargetClass.class.getName())));
 		assertEquals(targetClass, transformer.contractRegistry.getContractInfo(contractClass).getTargetClass());
 		assertEquals(contractClass, transformer.contractRegistry.getContractInfo(contractClass).getContractClass());
 		verify(targetClassTransformer).transform(any(ListOrderedSet.class),
@@ -72,7 +71,7 @@ public class RootTransformerTest {
 	@Test
 	public void testTransformClassContractClass() throws Exception {
 		transformer.contractRegistry.registerContract(targetClass, contractClass);
-		assertNotNull(transformer.transformClass(ContractClass.class.getName()));
+		assertNotNull(transformer.transformType(pool.get(ContractClass.class.getName())));
 		verify(contractClassTransformer).transform(argThat(new ArgumentMatcher<ContractInfo>() {
 			@Override
 			public boolean matches(Object argument) {
@@ -85,7 +84,7 @@ public class RootTransformerTest {
 
 	@Test
 	public void testTransformClassUninvolvedClass() throws Exception {
-		assertNotNull(transformer.transformClass(UninvolvedClass.class.getName()));
+		assertNotNull(transformer.transformType(pool.get(UninvolvedClass.class.getName())));
 	}
 
 	@Test

@@ -10,7 +10,7 @@ import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
-import de.andrena.c4j.internal.RootTransformer;
+import de.andrena.c4j.internal.Agent;
 
 public class TransformerAwareRule implements TestRule {
 	private String expectedLogMessage;
@@ -86,9 +86,9 @@ public class TransformerAwareRule implements TestRule {
 	}
 
 	private void verifyException() throws Exception, Throwable {
-		if (RootTransformer.getLastException() != null) {
-			Throwable lastException = RootTransformer.getLastException();
-			RootTransformer.resetLastException();
+		if (Agent.getLastException() != null) {
+			Throwable lastException = Agent.getLastException();
+			Agent.resetLastException();
 			throw lastException;
 		}
 	}

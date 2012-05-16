@@ -1,7 +1,5 @@
 package de.andrena.c4j.internal;
 
-import java.lang.instrument.ClassFileTransformer;
-import java.security.ProtectionDomain;
 import java.util.Enumeration;
 
 import javassist.ByteArrayClassPath;
@@ -30,18 +28,16 @@ import de.andrena.c4j.internal.util.InvolvedTypeInspector;
 import de.andrena.c4j.internal.util.ListOrderedSet;
 import de.andrena.c4j.internal.util.LocalClassLoader;
 
-public class RootTransformer implements ClassFileTransformer {
+public class RootTransformer {
 	public static final RootTransformer INSTANCE = new RootTransformer();
 
-	private Logger logger = Logger.getLogger(getClass());
+	private Logger logger = Logger.getLogger(RootTransformer.class);
 	ClassPool pool = ClassPool.getDefault();
 
 	ContractRegistry contractRegistry = new ContractRegistry();
 
 	AffectedClassTransformer targetClassTransformer;
 	ContractClassTransformer contractClassTransformer;
-
-	private static Throwable lastException;
 
 	private ConfigurationManager configuration;
 
@@ -59,11 +55,10 @@ public class RootTransformer implements ClassFileTransformer {
 	private RootTransformer() {
 	}
 
-	public void init(String agentArgs) throws Exception {
+	public void init() throws Exception {
 		targetClassTransformer = new AffectedClassTransformer();
 		contractClassTransformer = new ContractClassTransformer();
 		loadLogger();
-		loadConfiguration(agentArgs);
 	}
 
 	private void loadLogger() {
@@ -76,7 +71,7 @@ public class RootTransformer implements ClassFileTransformer {
 		}
 	}
 
-	private void loadConfiguration(String agentArgs) throws Exception {
+	public void loadConfiguration(String agentArgs) throws Exception {
 		if (agentArgs == null || agentArgs.isEmpty()) {
 			logger.info("No configuration given, using DefaultConfiguration.");
 			configuration = new ConfigurationManager(new DefaultConfiguration(), pool);
@@ -99,33 +94,11 @@ public class RootTransformer implements ClassFileTransformer {
 		}
 	}
 
-	public static Throwable getLastException() {
-		return lastException;
+	public void setConfiguration(Configuration userConfiguration) throws Exception {
+		configuration = new ConfigurationManager(userConfiguration, pool);
 	}
 
-	public static void resetLastException() {
-		lastException = null;
-	}
-
-	@Override
-	public byte[] transform(ClassLoader loader, String classNameWithSlashes, Class<?> classBeingRedefined,
-			ProtectionDomain protectionDomain, byte[] classfileBuffer) {
-		String className = classNameWithSlashes.replace('/', '.');
-		if (logger.isTraceEnabled()) {
-			logger.trace("transformation started for class " + className);
-		}
-		try {
-			updateClassPath(loader, classfileBuffer, className);
-			return transformClass(className);
-		} catch (Exception e) {
-			lastException = e;
-			logger.fatal("Transformation failed for class '" + className + "'.", e);
-		}
-		return null;
-	}
-
-	byte[] transformClass(String className) throws Exception {
-		CtClass affectedClass = pool.get(className);
+	public byte[] transformType(CtClass affectedClass) throws Exception {
 		if (affectedClass.isInterface()) {
 			if (logger.isTraceEnabled()) {
 				logger.trace("transformation aborted, as class is an interface");
@@ -250,7 +223,7 @@ public class RootTransformer implements ClassFileTransformer {
 				+ " does not inherit from its non-final target type " + targetClass.getSimpleName() + ".");
 	}
 
-	void updateClassPath(ClassLoader loader, byte[] classfileBuffer, String className) {
+	public void updateClassPath(ClassLoader loader, byte[] classfileBuffer, String className) {
 		if (loader != null) {
 			if (logger.isTraceEnabled()) {
 				logger.trace("updating classpath with loader " + loader.getClass() + ", parent " + loader.getParent());

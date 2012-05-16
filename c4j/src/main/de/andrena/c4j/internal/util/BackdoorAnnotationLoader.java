@@ -15,7 +15,7 @@ public class BackdoorAnnotationLoader {
 	private static final Logger logger = Logger.getLogger(BackdoorAnnotationLoader.class);
 
 	public BackdoorAnnotationLoader(CtClass clazz) {
-		annotationsAttribute = (AnnotationsAttribute) clazz.getClassFile()
+		annotationsAttribute = (AnnotationsAttribute) clazz.getClassFile2()
 				.getAttribute(AnnotationsAttribute.invisibleTag);
 	}
 
