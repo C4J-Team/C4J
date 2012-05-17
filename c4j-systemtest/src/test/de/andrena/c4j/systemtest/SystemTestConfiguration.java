@@ -13,6 +13,7 @@ import de.andrena.c4j.Configuration;
 import de.andrena.c4j.PureRegistry;
 import de.andrena.c4j.PureRegistryException;
 import de.andrena.c4j.systemtest.config.AssertionErrorOnlyConfiguration;
+import de.andrena.c4j.systemtest.config.ContractsDirectoryAsJarFileConfiguration;
 import de.andrena.c4j.systemtest.config.ContractsDirectoryConfiguration;
 import de.andrena.c4j.systemtest.config.DefaultPreConditionTrueConfiguration;
 import de.andrena.c4j.systemtest.config.ExternalContractConfiguration;
@@ -33,6 +34,7 @@ public class SystemTestConfiguration extends AbstractConfiguration {
 		configurations.add(new PureBehaviorSkipOnlyConfiguration());
 		configurations.add(new PureBehaviorEmptyConfiguration());
 		configurations.add(new ContractsDirectoryConfiguration());
+		configurations.add(new ContractsDirectoryAsJarFileConfiguration());
 		return configurations;
 	}
 

@@ -2,6 +2,7 @@ package de.andrena.c4j.internal;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -49,21 +50,24 @@ public class RuntimeConfiguration {
 	private void searchContractsDirectory() throws Exception {
 		if (configuration.getContractsDirectory() != null) {
 			if (configuration.getContractsDirectory().isDirectory()) {
-				logger.info("Using ContractsDirectory " + configuration.getContractsDirectory().getCanonicalPath()
-						+ " from Configuration " + getConfigurationClass().getSimpleName() + ".");
+				logContractsDirectoryFound();
 				searchContracts(configuration.getContractsDirectory());
 				return;
 			}
 			if (configuration.getContractsDirectory().isFile()
 					&& configuration.getContractsDirectory().getName().endsWith(FILE_EXT_JAR)) {
-				logger.info("Using ContractsDirectory " + configuration.getContractsDirectory().getCanonicalPath()
-						+ " from Configuration " + getConfigurationClass().getSimpleName() + ".");
+				logContractsDirectoryFound();
 				searchContracts(new JarFile(configuration.getContractsDirectory()));
 				return;
 			}
 			logger.error("ContractsDirectory " + configuration.getContractsDirectory().getCanonicalPath()
-					+ " does not exist or is not a directory and will not be searched.");
+					+ " does not exist or is not a directory/JAR-file and will not be searched.");
 		}
+	}
+
+	private void logContractsDirectoryFound() throws IOException {
+		logger.info("Found ContractsDirectory " + configuration.getContractsDirectory().getCanonicalPath()
+				+ " from Configuration " + getConfigurationClass().getSimpleName() + ".");
 	}
 
 	private void searchContracts(JarFile jarFile) throws Exception {
@@ -101,7 +105,7 @@ public class RuntimeConfiguration {
 					addExternalContract(loadedClass.getClassFile().getInterfaces()[0], contractClass);
 				} else {
 					logger.error("Contract "
-							+ loadedClass.getSimpleName()
+							+ loadedClass.getName()
 							+ " was found in ContractsDirectory, but could not be mapped to a target class. "
 							+ "Extend from the target class or implement the target interface (while not implementing any other interfaces) "
 							+ "or simply declare the target class within the @Contract annotation.");
