@@ -1,0 +1,14 @@
+C4J 4.0 Beta5 (05/17/2012)
+=====
+New Features:
+* Configuration.getExternalContractsAsStrings() - external contracts can also be configured using strings
+* introduced Condition.noneIdentifiedYet() to communicate that no pre- or post-condition has been identified yet
+* advanced old() and unchanged() working with arbitrary expressions without local variables
+* PreTransformer allows to search a directory recursively, transform the contained .class files and save them to disk
+* Configuration.getContractsDirectory() now also accepts JAR-files
+* added EPL 1.0 as the license for C4J 4.0+
+
+Fixes:
+* renamed pre() and post() to preCondition() and postCondition() in order to be more descriptive
+* solved class-loader issues when using @Contract
+* @Pure strict enforcement now also works with array-element reassignments

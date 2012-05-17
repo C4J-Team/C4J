@@ -1,5 +1,5 @@
 <project default="build-c4j-jar">
-	<property name="VERSION" value="4.0-Beta5-SNAPSHOT"/>
+	<property name="VERSION" value="4.0-Beta5"/>
 	<property name="C4J_JAR" value="dist/c4j-${VERSION}.jar"/>
 	<property name="C4J_ZIP" value="dist/c4j-${VERSION}.zip"/>
 	<property name="C4J_ALL_JAR" value="dist/c4j-${VERSION}-all.jar"/>
@@ -30,6 +30,7 @@
 		</jar>
 		
 		<zip destfile="${C4J_ZIP}">
+			<fileset file="../CHANGELOG.txt"/>
 			<fileset file="${C4J_JAR}"/>
 			<fileset file="lib/${JAVASSIST_JAR}"/>
 			<fileset file="lib/${LOG4J_JAR}"/>
