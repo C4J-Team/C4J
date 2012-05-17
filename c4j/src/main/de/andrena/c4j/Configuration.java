@@ -54,7 +54,8 @@ public interface Configuration {
 	 * This directory will be recursively searched for contract classes containing the @{@link Contract} annotation,
 	 * making it possible to declare contracts non-intrusively in contrary to using @{@link ContractReference}.
 	 * 
-	 * @return A directory containing the contract classes to be searched for, or null if no search should be conducted.
+	 * @return A directory containing the contract classes to be searched for recursively, or null if no search should
+	 *         be conducted. The directory can also be a JAR file.
 	 */
 	File getContractsDirectory();
 

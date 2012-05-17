@@ -2,10 +2,14 @@ package de.andrena.c4j.internal;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -20,10 +24,13 @@ import de.andrena.c4j.Configuration.DefaultPreCondition;
 import de.andrena.c4j.Configuration.PureBehavior;
 import de.andrena.c4j.Contract;
 import de.andrena.c4j.Contract.InheritedType;
+import de.andrena.c4j.internal.util.BackdoorAnnotationLoader;
 import de.andrena.c4j.internal.util.WhitelistConverter;
 
 public class RuntimeConfiguration {
 
+	private static final String FILE_EXT_JAR = ".jar";
+	private static final String FILE_EXT_CLASS = ".class";
 	private Set<CtMethod> whitelistMethods;
 	private Configuration configuration;
 	private Map<String, String> externalContracts = new HashMap<String, String>();
@@ -41,14 +48,31 @@ public class RuntimeConfiguration {
 
 	private void searchContractsDirectory() throws Exception {
 		if (configuration.getContractsDirectory() != null) {
-			if (!configuration.getContractsDirectory().isDirectory()) {
-				logger.error("ContractsDirectory " + configuration.getContractsDirectory().getCanonicalPath()
-						+ " does not exist or is not a directory and will not be searched.");
+			if (configuration.getContractsDirectory().isDirectory()) {
+				logger.info("Using ContractsDirectory " + configuration.getContractsDirectory().getCanonicalPath()
+						+ " from Configuration " + getConfigurationClass().getSimpleName() + ".");
+				searchContracts(configuration.getContractsDirectory());
 				return;
 			}
-			logger.info("Using ContractsDirectory " + configuration.getContractsDirectory().getCanonicalPath()
-					+ " from Configuration " + getConfigurationClass().getSimpleName() + ".");
-			searchContracts(configuration.getContractsDirectory());
+			if (configuration.getContractsDirectory().isFile()
+					&& configuration.getContractsDirectory().getName().endsWith(FILE_EXT_JAR)) {
+				logger.info("Using ContractsDirectory " + configuration.getContractsDirectory().getCanonicalPath()
+						+ " from Configuration " + getConfigurationClass().getSimpleName() + ".");
+				searchContracts(new JarFile(configuration.getContractsDirectory()));
+				return;
+			}
+			logger.error("ContractsDirectory " + configuration.getContractsDirectory().getCanonicalPath()
+					+ " does not exist or is not a directory and will not be searched.");
+		}
+	}
+
+	private void searchContracts(JarFile jarFile) throws Exception {
+		Enumeration<JarEntry> entries = jarFile.entries();
+		while (entries.hasMoreElements()) {
+			JarEntry currentEntry = entries.nextElement();
+			if (!currentEntry.isDirectory() && currentEntry.getName().endsWith(FILE_EXT_CLASS)) {
+				checkClassFileForContract(jarFile.getInputStream(currentEntry));
+			}
 		}
 	}
 
@@ -56,24 +80,25 @@ public class RuntimeConfiguration {
 		for (File file : directory.listFiles()) {
 			if (file.isDirectory()) {
 				searchContracts(file);
-			} else if (file.getName().endsWith(".class")) {
-				checkClassFileForContract(file);
+			} else if (file.getName().endsWith(FILE_EXT_CLASS)) {
+				checkClassFileForContract(new FileInputStream(file));
 			}
 		}
 	}
 
-	private void checkClassFileForContract(File file) throws Exception {
-		CtClass loadedClass = RootTransformer.INSTANCE.getPool().makeClassIfNew(new FileInputStream(file));
+	private void checkClassFileForContract(InputStream inputStream) throws Exception {
+		CtClass loadedClass = RootTransformer.INSTANCE.getPool().makeClassIfNew(inputStream);
 		if (loadedClass.hasAnnotation(Contract.class)) {
-			Class<?> targetFromAnnotation = ((Contract) loadedClass.getAnnotation(Contract.class)).forTarget();
+			String targetFromAnnotation = new BackdoorAnnotationLoader(loadedClass).getClassValue(Contract.class,
+					"forTarget");
 			String contractClass = loadedClass.getName();
-			if (!targetFromAnnotation.equals(InheritedType.class)) {
-				addExternalContract(targetFromAnnotation.getName(), contractClass);
+			if (targetFromAnnotation != null && !targetFromAnnotation.equals(InheritedType.class.getName())) {
+				addExternalContract(targetFromAnnotation, contractClass);
 			} else {
-				if (!loadedClass.getSuperclass().equals(RootTransformer.INSTANCE.getPool().get(Object.class.getName()))) {
-					addExternalContract(loadedClass.getSuperclass().getName(), contractClass);
-				} else if (loadedClass.getInterfaces().length == 1) {
-					addExternalContract(loadedClass.getInterfaces()[0].getName(), contractClass);
+				if (!loadedClass.getClassFile().getSuperclass().equals(Object.class.getName())) {
+					addExternalContract(loadedClass.getClassFile().getSuperclass(), contractClass);
+				} else if (loadedClass.getClassFile().getInterfaces().length == 1) {
+					addExternalContract(loadedClass.getClassFile().getInterfaces()[0], contractClass);
 				} else {
 					logger.error("Contract "
 							+ loadedClass.getSimpleName()

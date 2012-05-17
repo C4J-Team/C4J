@@ -37,9 +37,11 @@ public class BackdoorAnnotationLoader {
 			return null;
 		}
 		MemberValue memberValue = annotation.getMemberValue(key);
-		if (memberValue == null || !(memberValue instanceof ClassMemberValue)) {
-			logger.fatal(annotationClass.getName() + " did not include '" + key
-					+ "' and/or it's not a value of type Class.");
+		if (memberValue == null) {
+			return null;
+		}
+		if (!(memberValue instanceof ClassMemberValue)) {
+			logger.fatal(annotationClass.getName() + "." + key + " is not a value of type Class.");
 			return null;
 		}
 		return ((ClassMemberValue) memberValue).getValue();
@@ -51,19 +53,29 @@ public class BackdoorAnnotationLoader {
 			return null;
 		}
 		MemberValue memberValue = annotation.getMemberValue(key);
-		if (memberValue == null || !(memberValue instanceof ArrayMemberValue)) {
-			logger.fatal(annotationClass.getName() + " did not include '" + key
-					+ "' and/or it's not a value of type Array.");
+		if (memberValue == null) {
 			return null;
 		}
-		MemberValue[] arrayValue = ((ArrayMemberValue) memberValue).getValue();
+		if (!(memberValue instanceof ArrayMemberValue)) {
+			logger.fatal(annotationClass.getName() + "." + key + " is not a value of type Array.");
+			return null;
+		}
+		String[] values = getClassArrayValues(annotationClass.getName(), key, ((ArrayMemberValue) memberValue)
+				.getValue());
+		return values;
+	}
+
+	private String[] getClassArrayValues(String annotationName, String key, MemberValue[] arrayValue) {
 		String[] values = new String[arrayValue.length];
 		for (int i = 0; i < arrayValue.length; i++) {
-			if (arrayValue[i] == null || !(arrayValue[i] instanceof ClassMemberValue)) {
-				logger.fatal(annotationClass.getName() + " is not a value of type Class-Array.");
-				return null;
+			if (arrayValue[i] == null) {
+				values[i] = null;
+			} else if (!(arrayValue[i] instanceof ClassMemberValue)) {
+				logger.fatal(annotationName + "." + key + ", element " + i + " is not a value of type Class-Array.");
+				values[i] = null;
+			} else {
+				values[i] = ((ClassMemberValue) arrayValue[i]).getValue();
 			}
-			values[i] = ((ClassMemberValue) arrayValue[i]).getValue();
 		}
 		return values;
 	}
