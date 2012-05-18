@@ -11,6 +11,8 @@
 		<javassist.artifactId>javassist</javassist.artifactId>
 		<javassist.version>3.16.1-GA</javassist.version>
 		<dist.dir>dist</dist.dir>
+		<premain.class>de.andrena.c4j.internal.Agent</premain.class>
+		<boot.class.path>${log4j.artifactId}-${log4j.version}.jar ${javassist.artifactId}-${javassist.version}.jar</boot.class.path>
 	</properties>
 
 	<build>
@@ -41,8 +43,8 @@
 				<configuration>
 					<archive>
 						<manifestEntries>
-							<Premain-Class>de.andrena.c4j.internal.Agent</Premain-Class>
-							<Boot-Class-Path>${log4j.artifactId}-${log4j.version}.jar ${javassist.artifactId}-${javassist.version}.jar</Boot-Class-Path>
+							<Premain-Class>${premain.class}</Premain-Class>
+							<Boot-Class-Path>${boot.class.path}</Boot-Class-Path>
 						</manifestEntries>
 					</archive>
 				</configuration>
@@ -54,6 +56,12 @@
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
+					<archive>
+	                    <manifestEntries>
+	                        <Premain-Class>${premain.class}</Premain-Class>
+							<Boot-Class-Path>${boot.class.path}</Boot-Class-Path>
+	                    </manifestEntries>
+	                </archive>
 					<finalName>${project.artifactId}-current-all</finalName>
 					<appendAssemblyId>false</appendAssemblyId>
 					<outputDirectory>${dist.dir}</outputDirectory>
