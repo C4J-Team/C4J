@@ -7,7 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class PureRegistryTypeTest {
-	private static final int NUMBER_OF_METHODS_IN_INVESTIGATED_CLASS = 7;
+	private static final int NUMBER_OF_METHODS_IN_INVESTIGATED_CLASS = 8;
 	@SuppressWarnings("rawtypes")
 	private static final Class<ArrayListDummyForPureRegistryTypeTest> INVESTIGATED_CLASS = ArrayListDummyForPureRegistryTypeTest.class;
 	private PureRegistryType pureType;

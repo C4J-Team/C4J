@@ -7,6 +7,10 @@ public class ArrayListDummyForPureRegistryTypeTest<T> {
 		return 1;
 	}
 
+	public T get(int index) {
+		return null;
+	}
+
 	protected void removeRange(int a, int b) {
 
 	}
