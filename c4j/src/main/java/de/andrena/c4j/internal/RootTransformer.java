@@ -1,0 +1,236 @@
+package de.andrena.c4j.internal;
+
+import java.util.Enumeration;
+
+import javassist.ByteArrayClassPath;
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.LoaderClassPath;
+import javassist.Modifier;
+import javassist.NotFoundException;
+
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Layout;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
+
+import de.andrena.c4j.Configuration;
+import de.andrena.c4j.ContractReference;
+import de.andrena.c4j.DefaultConfiguration;
+import de.andrena.c4j.internal.transformer.AffectedClassTransformer;
+import de.andrena.c4j.internal.transformer.ContractClassTransformer;
+import de.andrena.c4j.internal.util.BackdoorAnnotationLoader;
+import de.andrena.c4j.internal.util.CollectionsHelper;
+import de.andrena.c4j.internal.util.ContractRegistry;
+import de.andrena.c4j.internal.util.ContractRegistry.ContractInfo;
+import de.andrena.c4j.internal.util.InvolvedTypeInspector;
+import de.andrena.c4j.internal.util.ListOrderedSet;
+import de.andrena.c4j.internal.util.LocalClassLoader;
+
+public class RootTransformer {
+	public static final RootTransformer INSTANCE = new RootTransformer();
+
+	private Logger logger = Logger.getLogger(RootTransformer.class);
+	ClassPool pool = ClassPool.getDefault();
+
+	ContractRegistry contractRegistry = new ContractRegistry();
+
+	AffectedClassTransformer targetClassTransformer;
+	ContractClassTransformer contractClassTransformer;
+
+	private ConfigurationManager configuration;
+
+	private InvolvedTypeInspector involvedTypeInspector = new InvolvedTypeInspector();
+	private CollectionsHelper collectionsHelper = new CollectionsHelper();
+
+	public ClassPool getPool() {
+		return pool;
+	}
+
+	public ConfigurationManager getConfigurationManager() {
+		return configuration;
+	}
+
+	private RootTransformer() {
+	}
+
+	public void init() throws Exception {
+		targetClassTransformer = new AffectedClassTransformer();
+		contractClassTransformer = new ContractClassTransformer();
+		loadLogger();
+		configuration = new ConfigurationManager(new DefaultConfiguration(), pool);
+	}
+
+	private void loadLogger() {
+		Enumeration<?> allAppenders = Logger.getRootLogger().getAllAppenders();
+		if (!allAppenders.hasMoreElements()) {
+			Layout layout = new PatternLayout("C4J %-5p - %m%n");
+			Logger.getRootLogger().addAppender(new ConsoleAppender(layout));
+			Logger.getRootLogger().setLevel(Level.INFO);
+			logger.info("No Appender on RootLogger found, added a new ConsoleAppender on Level INFO.");
+		}
+	}
+
+	public void loadConfiguration(String agentArgs) throws Exception {
+		if (agentArgs == null || agentArgs.isEmpty()) {
+			logger.info("No configuration given, using DefaultConfiguration.");
+		} else {
+			try {
+				Class<?> configurationClass = Class.forName(agentArgs, true, new LocalClassLoader(getClass()
+						.getClassLoader()));
+				Configuration loadedConfig = (Configuration) configurationClass.newInstance();
+				if (loadedConfig.getRootPackages().isEmpty()) {
+					throw new IllegalArgumentException(
+							"RootPackages of a custom Configuration must contain at least 1 element.");
+				}
+				configuration = new ConfigurationManager(loadedConfig, pool);
+				logger.info("Loaded configuration from class '" + agentArgs + "'.");
+			} catch (Exception e) {
+				logger.error("Could not load configuration from class '" + agentArgs
+						+ "'. Using DefaultConfiguration.", e);
+			}
+		}
+	}
+
+	public byte[] transformType(CtClass affectedClass) throws Exception {
+		if (affectedClass.isInterface()) {
+			if (logger.isTraceEnabled()) {
+				logger.trace("transformation aborted, as class is an interface");
+			}
+			return null;
+		}
+		if (!affectedClass.hasAnnotation(Transformed.class)) {
+			transformClass(affectedClass);
+		}
+		if (configuration.getConfiguration(affectedClass).writeTransformedClasses()) {
+			affectedClass.writeFile();
+		}
+		return affectedClass.toBytecode();
+	}
+
+	private void transformClass(CtClass affectedClass) throws Exception {
+		if (contractRegistry.isContractClass(affectedClass)) {
+			ContractInfo contractInfo = contractRegistry.getContractInfo(affectedClass);
+			transformContractClass(affectedClass, contractInfo);
+		} else {
+			transformAffectedClass(affectedClass);
+		}
+	}
+
+	private void transformAffectedClass(CtClass affectedClass) throws NotFoundException, Exception {
+		ListOrderedSet<CtClass> involvedTypes = involvedTypeInspector.inspect(affectedClass);
+		ListOrderedSet<ContractInfo> contracts = transformInvolvedContracts(affectedClass, involvedTypes);
+		for (ContractInfo contract : contracts) {
+			logger.info(affectedClass.getSimpleName() + " must fulfill contract "
+					+ contract.getContractClass().getSimpleName() + " (defined on "
+					+ contract.getTargetClass().getSimpleName() + ").");
+		}
+		targetClassTransformer.transform(involvedTypes, contracts, affectedClass);
+	}
+
+	private ListOrderedSet<ContractInfo> transformInvolvedContracts(CtClass affectedClass,
+			ListOrderedSet<CtClass> involvedTypes) throws NotFoundException, Exception {
+		ListOrderedSet<ContractInfo> contracts = getContractsForTypes(involvedTypes, affectedClass);
+		for (ContractInfo contract : contracts) {
+			for (CtClass contractClass : contract.getAllContractClasses()) {
+				if (!contractClass.hasAnnotation(Transformed.class)) {
+					transformContractClass(contractClass, contract);
+				}
+			}
+		}
+		return contracts;
+	}
+
+	private void transformContractClass(CtClass contractClass, ContractInfo contractInfo) throws Exception {
+		contractClassTransformer.transform(contractInfo, contractClass);
+	}
+
+	public ListOrderedSet<ContractInfo> getContractsForTypes(ListOrderedSet<CtClass> types, CtClass affectedClass)
+			throws NotFoundException {
+		ListOrderedSet<ContractInfo> contracts = new ListOrderedSet<ContractInfo>();
+		for (CtClass type : types) {
+			CtClass externalContract = configuration.getConfiguration(affectedClass).getExternalContract(pool, type);
+			if (type.hasAnnotation(ContractReference.class) || externalContract != null) {
+				if (contractRegistry.hasRegisteredContract(type)) {
+					contracts.add(contractRegistry.getContractInfoForTargetClass(type));
+				} else {
+					verifyRegisterAndAddContract(contracts, type, externalContract);
+				}
+			}
+		}
+		return contracts;
+	}
+
+	private void verifyRegisterAndAddContract(ListOrderedSet<ContractInfo> contracts, CtClass type,
+			CtClass externalContract) throws NotFoundException {
+		CtClass contractClass = decideContractForType(type, externalContract);
+		if (verifyContract(type, contractClass)) {
+			contracts.add(contractRegistry.registerContract(type, contractClass));
+		}
+	}
+
+	private CtClass decideContractForType(CtClass type, CtClass externalContract) throws NotFoundException {
+		if (type.hasAnnotation(ContractReference.class)) {
+			String contractClassString = new BackdoorAnnotationLoader(type).getClassValue(
+					ContractReference.class,
+					"value");
+			return pool.get(contractClassString);
+		}
+		return externalContract;
+	}
+
+	private boolean verifyContract(CtClass targetClass, CtClass contractClass) throws NotFoundException {
+		if (contractClass.hasAnnotation(Transformed.class)) {
+			logger.error("Ignoring contract class " + contractClass.getSimpleName() + " defined on "
+					+ targetClass.getSimpleName() + " as it has been loaded before the target type was loaded.");
+			return false;
+		}
+		if (contractClass.isInterface()) {
+			logger.error("Ignoring contract " + contractClass.getSimpleName() + " defined on "
+					+ targetClass.getSimpleName() + " as the contract class is an interface.");
+			return false;
+		}
+		if (contractClass.equals(targetClass)) {
+			logger.error("Ignoring contract " + contractClass.getSimpleName() + " defined on "
+					+ targetClass.getSimpleName() + " as the contract class is the same as the target class.");
+			return false;
+		}
+		warnContractNotInheritingFromTarget(targetClass, contractClass);
+		return true;
+	}
+
+	private void warnContractNotInheritingFromTarget(CtClass targetClass, CtClass contractClass)
+			throws NotFoundException {
+		if (targetClass.isInterface()) {
+			if (!collectionsHelper.arrayContains(contractClass.getInterfaces(), targetClass)) {
+				logWarnContractNotInheritingFromTarget(targetClass, contractClass);
+			}
+		} else {
+			if (!contractClass.getSuperclass().equals(targetClass) && !Modifier.isFinal(targetClass.getModifiers())) {
+				logWarnContractNotInheritingFromTarget(targetClass, contractClass);
+			}
+		}
+	}
+
+	private void logWarnContractNotInheritingFromTarget(CtClass targetClass, CtClass contractClass) {
+		logger.warn("Contract type " + contractClass.getSimpleName()
+				+ " does not inherit from its non-final target type " + targetClass.getSimpleName() + ".");
+	}
+
+	public void updateClassPath(ClassLoader loader, byte[] classfileBuffer, String className) {
+		if (loader != null) {
+			if (logger.isTraceEnabled()) {
+				logger.trace("updating classpath with loader " + loader.getClass() + ", parent " + loader.getParent());
+			}
+			pool.insertClassPath(new LoaderClassPath(loader));
+		}
+		if (classfileBuffer != null) {
+			if (logger.isTraceEnabled()) {
+				logger.trace("updating classpath with classfileBuffer for class " + className);
+			}
+			pool.insertClassPath(new ByteArrayClassPath(className, classfileBuffer));
+		}
+	}
+
+}
