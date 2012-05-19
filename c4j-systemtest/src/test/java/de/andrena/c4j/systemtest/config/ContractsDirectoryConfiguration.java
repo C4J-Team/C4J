@@ -15,7 +15,7 @@ public class ContractsDirectoryConfiguration extends AbstractConfiguration {
 
 	@Override
 	public File getContractsDirectory() {
-		return new File("bin/de/andrena/c4j/systemtest/config/contractsdirectory");
+		return new File("target/test-classes/de/andrena/c4j/systemtest/config/contractsdirectory");
 	}
 
 }
