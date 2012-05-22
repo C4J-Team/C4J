@@ -20,7 +20,7 @@ import org.apache.log4j.Logger;
 
 import de.andrena.c4j.Condition;
 import de.andrena.c4j.Configuration.DefaultPreCondition;
-import de.andrena.c4j.internal.RTFMException;
+import de.andrena.c4j.internal.UsageException;
 import de.andrena.c4j.internal.RootTransformer;
 import de.andrena.c4j.internal.compiler.AssignmentExp;
 import de.andrena.c4j.internal.compiler.BooleanExp;
@@ -42,9 +42,9 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 	private Stackalyzer stackalyzer = new Stackalyzer();
 	private List<byte[]> storeDependencies = new ArrayList<byte[]>();
 	private List<byte[]> unchangeableStoreDependencies = new ArrayList<byte[]>();
-	private RTFMException thrownException;
+	private UsageException thrownException;
 
-	public RTFMException getThrownException() {
+	public UsageException getThrownException() {
 		return thrownException;
 	}
 
@@ -177,7 +177,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		byte[] dependencyBytes;
 		try {
 			dependencyBytes = stackalyzer.getDependenciesFor(methodCall.where(), methodCall.indexOfBytecode());
-		} catch (RTFMException e) {
+		} catch (UsageException e) {
 			thrownException = e;
 			return;
 		}
@@ -193,7 +193,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		byte[] dependencyBytes;
 		try {
 			dependencyBytes = stackalyzer.getDependenciesFor(methodCall.where(), methodCall.indexOfBytecode());
-		} catch (RTFMException e) {
+		} catch (UsageException e) {
 			thrownException = e;
 			return;
 		}

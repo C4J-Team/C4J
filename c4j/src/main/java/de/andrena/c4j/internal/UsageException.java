@@ -9,14 +9,14 @@ import de.andrena.c4j.internal.compiler.ConstructorExp;
 import de.andrena.c4j.internal.compiler.ThrowExp;
 import de.andrena.c4j.internal.compiler.ValueExp;
 
-public class RTFMException extends CannotCompileException {
+public class UsageException extends CannotCompileException {
 	private static final long serialVersionUID = 2689387273644009418L;
 
-	private Logger logger = Logger.getLogger(RTFMException.class);
+	private Logger logger = Logger.getLogger(UsageException.class);
 
 	private String message;
 
-	public RTFMException(String msg) {
+	public UsageException(String msg) {
 		super(msg);
 		this.message = msg;
 		logger.error(msg, this);
