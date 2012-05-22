@@ -208,6 +208,9 @@ public class Evaluator {
 
 	private static Object getContractFromCache(Object target, Class<?> contractClass, Class<?> callingClass)
 			throws InstantiationException, IllegalAccessException {
+		if (target == null) {
+			return null;
+		}
 		Object contract;
 		Pair<Class<?>, Class<?>> classPair = new Pair<Class<?>, Class<?>>(contractClass, callingClass);
 		if (contractCache.contains(target, classPair)) {

@@ -15,7 +15,7 @@ public class AffectedClassTransformer extends AbstractAffectedClassTransformer {
 	private TransformationHelper transformationHelper = new TransformationHelper();
 	private AbstractAffectedClassTransformer[] transformers = new AbstractAffectedClassTransformer[] {
 			// beware: PureTransformer has to run first!
-			new PureTransformer(), new ConditionAndInvariantTransformer() };
+			new PureTransformer(), new ConditionAndInvariantTransformer(), new StaticConditionTransformer() };
 
 	@Override
 	public void transform(ListOrderedSet<CtClass> involvedClasses, ListOrderedSet<ContractInfo> contracts,

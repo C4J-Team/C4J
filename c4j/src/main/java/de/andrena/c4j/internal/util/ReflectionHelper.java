@@ -15,48 +15,60 @@ import javassist.bytecode.MethodInfo;
 import de.andrena.c4j.internal.transformer.ContractBehaviorTransformer;
 
 public class ReflectionHelper {
-	public List<CtMethod> getDeclaredModifiableMethods(CtClass clazz) {
-		CtMethod[] declaredMethods = clazz.getDeclaredMethods();
-		List<CtMethod> declaredModifiableMethods = new ArrayList<CtMethod>(declaredMethods.length);
-		for (CtMethod method : declaredMethods) {
-			if (isModifiable(method)) {
-				declaredModifiableMethods.add(method);
-			}
+	interface BehaviorFilter {
+		boolean filter(CtBehavior behavior);
+	}
+
+	private BehaviorFilter modifiableFilter = new BehaviorFilter() {
+		@Override
+		public boolean filter(CtBehavior behavior) {
+			return isModifiable(behavior);
 		}
-		return declaredModifiableMethods;
+	};
+	private BehaviorFilter dynamicFilter = new BehaviorFilter() {
+		@Override
+		public boolean filter(CtBehavior behavior) {
+			return isDynamic(behavior);
+		}
+	};
+	private BehaviorFilter staticFilter = new BehaviorFilter() {
+		@Override
+		public boolean filter(CtBehavior behavior) {
+			return !isDynamic(behavior);
+		}
+	};
+
+	private <T extends CtBehavior> List<T> filterBehaviors(T[] behaviors, BehaviorFilter... filters) {
+		List<T> filteredList = new ArrayList<T>(behaviors.length);
+		behaviorLoop: for (T behavior : behaviors) {
+			for (BehaviorFilter filter : filters) {
+				if (!filter.filter(behavior)) {
+					continue behaviorLoop;
+				}
+			}
+			filteredList.add(behavior);
+		}
+		return filteredList;
+	}
+
+	public List<CtMethod> getDeclaredModifiableMethods(CtClass clazz) {
+		return filterBehaviors(clazz.getDeclaredMethods(), modifiableFilter);
 	}
 
 	public List<CtMethod> getDeclaredModifiableDynamicMethods(CtClass clazz) {
-		CtMethod[] declaredMethods = clazz.getDeclaredMethods();
-		List<CtMethod> declaredModifiableMethods = new ArrayList<CtMethod>(declaredMethods.length);
-		for (CtMethod method : declaredMethods) {
-			if (isModifiable(method) && isDynamic(method)) {
-				declaredModifiableMethods.add(method);
-			}
-		}
-		return declaredModifiableMethods;
+		return filterBehaviors(clazz.getDeclaredMethods(), modifiableFilter, dynamicFilter);
 	}
 
 	public List<CtBehavior> getDeclaredModifiableBehaviors(CtClass clazz) {
-		CtBehavior[] declaredBehaviors = clazz.getDeclaredBehaviors();
-		List<CtBehavior> declaredModifiableBehaviors = new ArrayList<CtBehavior>(declaredBehaviors.length);
-		for (CtBehavior behavior : declaredBehaviors) {
-			if (isModifiable(behavior)) {
-				declaredModifiableBehaviors.add(behavior);
-			}
-		}
-		return declaredModifiableBehaviors;
+		return filterBehaviors(clazz.getDeclaredBehaviors(), modifiableFilter);
 	}
 
 	public List<CtBehavior> getDeclaredModifiableDynamicBehaviors(CtClass clazz) {
-		CtBehavior[] declaredBehaviors = clazz.getDeclaredBehaviors();
-		List<CtBehavior> declaredModifiableBehaviors = new ArrayList<CtBehavior>(declaredBehaviors.length);
-		for (CtBehavior behavior : declaredBehaviors) {
-			if (isModifiable(behavior) && isDynamic(behavior)) {
-				declaredModifiableBehaviors.add(behavior);
-			}
-		}
-		return declaredModifiableBehaviors;
+		return filterBehaviors(clazz.getDeclaredBehaviors(), modifiableFilter, dynamicFilter);
+	}
+
+	public List<CtBehavior> getDeclaredModifiableStaticBehaviors(CtClass clazz) {
+		return filterBehaviors(clazz.getDeclaredBehaviors(), modifiableFilter, staticFilter);
 	}
 
 	public boolean isModifiable(CtBehavior behavior) {
