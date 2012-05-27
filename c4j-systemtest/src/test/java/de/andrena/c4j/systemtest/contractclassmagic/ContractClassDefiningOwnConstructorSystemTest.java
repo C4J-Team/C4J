@@ -42,9 +42,10 @@ public class ContractClassDefiningOwnConstructorSystemTest {
 		@Override
 		public int getValue() {
 			if (post()) {
-				assert result(Integer.class).intValue() > 0;
+				int result = (Integer) result();
+				assert result > 0;
 			}
-			return ignored();
+			return (Integer) ignored();
 		}
 	}
 }

@@ -23,7 +23,7 @@ public class StackSpecContract<T> implements StackSpec<T> {
 			int result = result(Integer.class);
 			assert result > 0 : "result > 0";
 		}
-		return ignored();
+		return (Integer) ignored();
 	}
 
 	@Override
@@ -36,7 +36,7 @@ public class StackSpecContract<T> implements StackSpec<T> {
 			assert result >= 0 : "result >= 0";
 			assert result <= target.capacity() : "count <= capacity";
 		}
-		return ignored();
+		return (Integer) ignored();
 	}
 
 	@Override
@@ -98,7 +98,7 @@ public class StackSpecContract<T> implements StackSpec<T> {
 				assert target.count() < target.capacity() : "count < capacity";
 			}
 		}
-		return ignored();
+		return (Boolean) ignored();
 	}
 
 	@Override
@@ -114,7 +114,7 @@ public class StackSpecContract<T> implements StackSpec<T> {
 				assert target.count() > 0 : "count > 0";
 			}
 		}
-		return ignored();
+		return (Boolean) ignored();
 	}
 
 	@Override

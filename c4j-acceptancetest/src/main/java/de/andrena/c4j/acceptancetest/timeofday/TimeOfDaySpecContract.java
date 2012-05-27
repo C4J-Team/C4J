@@ -22,7 +22,7 @@ public class TimeOfDaySpecContract implements TimeOfDaySpec {
 			assert result >= 0 : "result >= 0";
 			assert result <= 23 : "result <= 23";
 		}
-		return ignored();
+		return (Integer) ignored();
 	}
 
 	@Override
@@ -35,7 +35,7 @@ public class TimeOfDaySpecContract implements TimeOfDaySpec {
 			assert result >= 0 : "result >= 0";
 			assert result <= 59 : "result <= 59";
 		}
-		return ignored();
+		return (Integer) ignored();
 	}
 
 	@Override
@@ -48,7 +48,7 @@ public class TimeOfDaySpecContract implements TimeOfDaySpec {
 			assert result >= 0 : "result >= 0";
 			assert result <= 59 : "result <= 59";
 		}
-		return ignored();
+		return (Integer) ignored();
 	}
 
 	@Override

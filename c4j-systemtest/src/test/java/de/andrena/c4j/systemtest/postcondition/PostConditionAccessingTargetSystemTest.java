@@ -26,7 +26,7 @@ public class PostConditionAccessingTargetSystemTest {
 	public static class TargetClass {
 		private int z;
 
-		public int method(int x, int y) {
+		public Integer method(int x, int y) {
 			return z = x + y;
 		}
 
@@ -41,7 +41,7 @@ public class PostConditionAccessingTargetSystemTest {
 		private TargetClass target;
 
 		@Override
-		public int method(int x, int y) {
+		public Integer method(int x, int y) {
 			if (post()) {
 				// necessary for reproduction
 				target.getZ();

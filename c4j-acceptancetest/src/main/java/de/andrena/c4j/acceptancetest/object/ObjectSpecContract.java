@@ -42,7 +42,7 @@ public class ObjectSpecContract implements ObjectSpec {
 			}
 		}
 
-		return ignored();
+		return (Boolean) ignored();
 	}
 
 	@Override

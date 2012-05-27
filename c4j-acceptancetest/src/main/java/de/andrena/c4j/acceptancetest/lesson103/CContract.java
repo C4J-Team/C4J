@@ -20,7 +20,7 @@ public class CContract extends C {
 		if (post()) {
 			System.out.println("Post-Condition queryC");
 		}
-		return ignored();
+		return (Integer) ignored();
 	}
 
 	@Override
@@ -41,7 +41,7 @@ public class CContract extends C {
 		if (post()) {
 			System.out.println("Post-Condition query class C");
 		}
-		return ignored();
+		return (Integer) ignored();
 	}
 
 	@Override

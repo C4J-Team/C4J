@@ -24,7 +24,7 @@ public class AContract extends A {
 		if (post()) {
 			assert y >= 2 : "y >= 2";
 		}
-		return ignored();
+		return (Integer) ignored();
 	}
 
 	@Override

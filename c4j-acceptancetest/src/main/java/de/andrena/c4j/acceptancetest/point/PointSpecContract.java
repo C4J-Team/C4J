@@ -12,13 +12,13 @@ public class PointSpecContract implements PointSpec {
 	@Override
 	public int getX() {
 		// No contracts identified yet
-		return ignored();
+		return (Integer) ignored();
 	}
 
 	@Override
 	public int getY() {
 		// No contracts identified yet
-		return ignored();
+		return (Integer) ignored();
 	}
 
 	@Override

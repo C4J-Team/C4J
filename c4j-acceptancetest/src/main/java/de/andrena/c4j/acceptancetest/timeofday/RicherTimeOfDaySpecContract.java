@@ -19,7 +19,7 @@ public class RicherTimeOfDaySpecContract implements RicherTimeOfDaySpec {
 		if (post()) {
 			// no further post-condition identified yet
 		}
-		return ignored();
+		return (Integer) ignored();
 	}
 
 	@Override
@@ -30,7 +30,7 @@ public class RicherTimeOfDaySpecContract implements RicherTimeOfDaySpec {
 		if (post()) {
 			// no further post-condition identified yet
 		}
-		return ignored();
+		return (Integer) ignored();
 	}
 
 	@Override
@@ -41,7 +41,7 @@ public class RicherTimeOfDaySpecContract implements RicherTimeOfDaySpec {
 		if (post()) {
 			// no further post-condition identified yet
 		}
-		return ignored();
+		return (Integer) ignored();
 	}
 
 	@Override
@@ -87,7 +87,7 @@ public class RicherTimeOfDaySpecContract implements RicherTimeOfDaySpec {
 			assert !(minute >= 30 && hour < 23) || (result == hour + 1) : "if minute >= 30 && hour < 23 then result == hour + 1";
 			assert !(minute >= 30 && hour == 23) || (result == 0) : "if minute >= 30 && hour == 23 then result == 23";
 		}
-		return ignored();
+		return (Integer) ignored();
 	}
 
 }

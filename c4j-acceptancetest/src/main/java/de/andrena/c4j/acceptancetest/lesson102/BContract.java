@@ -20,7 +20,7 @@ public class BContract extends B {
 		if (post()) {
 			System.out.println("Post-Condition queryB");
 		}
-		return ignored();
+		return (Integer) ignored();
 	}
 
 	@Override
@@ -41,7 +41,7 @@ public class BContract extends B {
 		if (post()) {
 			System.out.println("Post-Condition query class B");
 		}
-		return ignored();
+		return (Integer) ignored();
 	}
 
 	@Override

@@ -14,21 +14,21 @@ public final class NorthEastFloatingWindowSpecContract implements NorthEastFloat
 	@Override
 	public int getWidth() {
 		// No contracts identified yet
-		return ignored();
+		return (Integer) ignored();
 	}
 
 	@Override
 	public int getHeight() {
 		// No contracts identified yet
-		return ignored();
+		return (Integer) ignored();
 	}
 
 	@Override
 	public void move(Vector vector) {
-		if(pre()) {
+		if (pre()) {
 			assert vector.getX() > 0 : "vector.x > 0";
 			assert vector.getY() > 0 : "vector.y > 0";
-		}		
+		}
 	}
-	
+
 }

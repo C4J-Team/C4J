@@ -14,7 +14,7 @@ public class BSpecContract implements BSpec {
 		if (post()) {
 			System.out.println("Post-Condition queryB");
 		}
-		return ignored();
+		return (Integer) ignored();
 	}
 
 	@Override
@@ -35,7 +35,7 @@ public class BSpecContract implements BSpec {
 		if (post()) {
 			System.out.println("Post-Condition query interface BSpec");
 		}
-		return ignored();
+		return (Integer) ignored();
 	}
 
 	@Override

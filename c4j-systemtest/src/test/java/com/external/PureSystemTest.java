@@ -49,7 +49,7 @@ public class PureSystemTest {
 				Integer result = Condition.result(Integer.class);
 				assert result.intValue() == (x + y) : "result == x + y";
 			}
-			return ignored();
+			return (Integer) ignored();
 		}
 	}
 }

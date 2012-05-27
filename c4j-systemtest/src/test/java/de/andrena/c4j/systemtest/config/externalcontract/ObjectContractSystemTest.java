@@ -45,12 +45,12 @@ public class ObjectContractSystemTest {
 		@Override
 		public boolean equals(Object obj) {
 			if (post()) {
-				boolean result = result();
+				Boolean result = result();
 				if (result) {
 					assert target.hashCode() == obj.hashCode();
 				}
 			}
-			return ignored();
+			return (Boolean) ignored();
 		}
 	}
 }

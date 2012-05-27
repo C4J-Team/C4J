@@ -12,6 +12,7 @@ public class AContract extends A {
 		System.out.println("ClassInvariant class A");
 	}
 
+	@Override
 	public int query(int x, int y) {
 		if (pre()) {
 			System.out.println("Pre-Condition query");
@@ -19,9 +20,10 @@ public class AContract extends A {
 		if (post()) {
 			System.out.println("Post-Condition query");
 		}
-		return ignored();
+		return (Integer) ignored();
 	}
 
+	@Override
 	public void command(int wert) {
 		if (pre()) {
 			System.out.println("Pre-Condition command");

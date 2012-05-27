@@ -7,8 +7,8 @@ import static de.andrena.c4j.Condition.result;
 import org.junit.Rule;
 import org.junit.Test;
 
-import de.andrena.c4j.systemtest.TransformerAwareRule;
 import de.andrena.c4j.ContractReference;
+import de.andrena.c4j.systemtest.TransformerAwareRule;
 
 public class PostConditionSystemTest {
 	@Rule
@@ -78,7 +78,7 @@ public class PostConditionSystemTest {
 			if (post()) {
 				assert DummyClass.staticValue == 5;
 			}
-			return ignored();
+			return (Integer) ignored();
 		}
 
 		@Override
@@ -86,7 +86,7 @@ public class PostConditionSystemTest {
 			if (post()) {
 				assert result(int.class) == 5;
 			}
-			return ignored();
+			return (Integer) ignored();
 		}
 
 		@Override

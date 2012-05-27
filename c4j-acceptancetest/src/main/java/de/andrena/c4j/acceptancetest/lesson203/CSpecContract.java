@@ -14,7 +14,7 @@ public class CSpecContract implements CSpec {
 		if (post()) {
 			System.out.println("Post-Condition queryC");
 		}
-		return ignored();
+		return (Integer) ignored();
 	}
 
 	@Override
@@ -35,7 +35,7 @@ public class CSpecContract implements CSpec {
 		if (post()) {
 			System.out.println("Post-Condition query interface CSpec");
 		}
-		return ignored();
+		return (Integer) ignored();
 	}
 
 	@Override
@@ -56,7 +56,7 @@ public class CSpecContract implements CSpec {
 		if (post()) {
 			System.out.println("Post-Condition queryB interface CSpec");
 		}
-		return ignored();
+		return (Integer) ignored();
 	}
 
 	@Override

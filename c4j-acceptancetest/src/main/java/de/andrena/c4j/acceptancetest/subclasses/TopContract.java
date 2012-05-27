@@ -16,7 +16,7 @@ public class TopContract extends Top {
 		if (Condition.pre()) {
 			assert parameter != null : "parameter must not be null";
 		}
-		return ignored();
+		return (Integer) ignored();
 	}
 
 	@Override
@@ -24,7 +24,7 @@ public class TopContract extends Top {
 		if (Condition.post()) {
 			assert result(Integer.class) >= 0 : "result >= 0";
 		}
-		return ignored();
+		return (Integer) ignored();
 	}
 
 	@Override
@@ -35,12 +35,12 @@ public class TopContract extends Top {
 		if (Condition.post()) {
 			assert result(Integer.class) >= 0 : "result >= 0";
 		}
-		return ignored();
+		return (Integer) ignored();
 	}
 
 	@Override
 	public int invariant(String parameter) {
-		return ignored();
+		return (Integer) ignored();
 	}
 
 	@ClassInvariant
@@ -53,7 +53,7 @@ public class TopContract extends Top {
 		if (Condition.post()) {
 			assert Condition.unchanged(target.unchanged()) : "unchanged never changes";
 		}
-		return ignored();
+		return (Integer) ignored();
 	}
 
 	@Override
@@ -61,7 +61,7 @@ public class TopContract extends Top {
 		if (Condition.post()) {
 			assert result().equals(Condition.old(target.old())) : "old value is preserved";
 		}
-		return ignored();
+		return (Integer) ignored();
 	}
 
 }

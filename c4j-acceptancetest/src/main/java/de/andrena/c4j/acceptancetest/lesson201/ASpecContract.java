@@ -14,7 +14,7 @@ public class ASpecContract implements ASpec {
 		if (post()) {
 			System.out.println("Post-Condition query interface ASpec");
 		}
-		return ignored();
+		return (Integer) ignored();
 	}
 
 	@Override

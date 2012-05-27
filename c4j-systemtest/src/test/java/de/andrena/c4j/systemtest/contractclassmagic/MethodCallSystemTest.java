@@ -7,10 +7,10 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import de.andrena.c4j.systemtest.TransformerAwareRule;
 import de.andrena.c4j.ContractReference;
 import de.andrena.c4j.Pure;
 import de.andrena.c4j.Target;
+import de.andrena.c4j.systemtest.TransformerAwareRule;
 
 public class MethodCallSystemTest {
 	@Rule
@@ -89,7 +89,7 @@ public class MethodCallSystemTest {
 
 		@Override
 		protected int getValueAlsoInContract() {
-			return ignored();
+			return (Integer) ignored();
 		}
 
 		@Override
