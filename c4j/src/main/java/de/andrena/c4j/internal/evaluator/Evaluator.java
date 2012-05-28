@@ -87,7 +87,7 @@ public class Evaluator {
 				|| compareObject instanceof Integer || compareObject instanceof Long || compareObject instanceof Short) {
 			return compareObject.equals(unchangedCache.get());
 		}
-		PureEvaluator.unregisterUnpure(new Object[] { compareObject });
+		PureEvaluator.unregisterUnchangeable(new Object[] { compareObject });
 		return compareObject == unchangedCache.get();
 	}
 
@@ -155,7 +155,7 @@ public class Evaluator {
 	}
 
 	public static boolean canExecuteCondition() {
-		return evaluationPhase.get() == EvaluationPhase.NONE;
+		return evaluationPhase.get() == EvaluationPhase.NONE && !(exceptionValue.get() instanceof AssertionError);
 	}
 
 	public static Object getInvariant(Object target, String className, Class<?> contractClass, Class<?> callingClass)

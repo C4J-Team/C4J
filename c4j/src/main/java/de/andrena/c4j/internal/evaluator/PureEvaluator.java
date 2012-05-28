@@ -38,12 +38,8 @@ public class PureEvaluator {
 
 	public static void registerUnpure(Object[] objects) {
 		pureCallDepth.set(Integer.valueOf(pureCallDepth.get().intValue() + 1));
-		unpureCache.get().addAll(Arrays.asList(objects));
-		for (Object obj : objects) {
-			if (obj instanceof Object[]) {
-				registerUnpure((Object[]) obj);
-			}
-		}
+		System.out.println(pureCallDepth.get() + " (++)");
+		addToUnpureCache(objects);
 	}
 
 	public static void registerUnchangeable(Object object) {
@@ -52,22 +48,42 @@ public class PureEvaluator {
 				|| object instanceof Integer || object instanceof Long || object instanceof Short) {
 			return;
 		}
-		registerUnpure(new Object[] { object });
+		addToUnpureCache(new Object[] { object });
+	}
+
+	private static void addToUnpureCache(Object[] objects) {
+		unpureCache.get().addAll(Arrays.asList(objects));
+		for (Object obj : objects) {
+			if (obj instanceof Object[]) {
+				addToUnpureCache((Object[]) obj);
+			}
+		}
 	}
 
 	public static void unregisterUnpure(Object[] objects) {
 		pureCallDepth.set(Integer.valueOf(pureCallDepth.get().intValue() - 1));
+		System.out.println(pureCallDepth.get() + " (--)");
+		removeFromUnpureCache(objects);
+	}
+
+	public static void unregisterUnchangeable(Object[] objects) {
+		removeFromUnpureCache(objects);
+	}
+
+	private static void removeFromUnpureCache(Object[] objects) {
 		unpureCache.get().removeAll(Arrays.asList(objects));
 		for (Object obj : objects) {
 			if (obj instanceof Object[]) {
-				unregisterUnpure((Object[]) obj);
+				removeFromUnpureCache((Object[]) obj);
 			}
 		}
 	}
 
 	public static void checkUnpureAccess(Object target) {
 		if (unpureCache.get().contains(target)) {
-			throw new AssertionError("illegal access on unpure method or field");
+			AssertionError assertionError = new AssertionError("illegal access on unpure method or field");
+			logger.error(assertionError.getMessage(), assertionError);
+			throw assertionError;
 		}
 	}
 
@@ -84,14 +100,18 @@ public class PureEvaluator {
 
 	public static void checkExternalBlacklistAccess(Object target, String method) {
 		if (unpureCache.get().contains(target)) {
-			throw new AssertionError("illegal access on unpure method " + method
+			AssertionError assertionError = new AssertionError("illegal access on unpure method " + method
 					+ " outside the root-packages.");
+			logger.error(assertionError.getMessage(), assertionError);
+			throw assertionError;
 		}
 	}
 
 	public static void checkUnpureStatic() {
 		if (pureCallDepth.get().intValue() > 0) {
-			throw new AssertionError("illegal method access on unpure static method or field");
+			AssertionError assertionError = new AssertionError("illegal method access on unpure static method or field");
+			logger.error(assertionError.getMessage(), assertionError);
+			throw assertionError;
 		}
 	}
 }
