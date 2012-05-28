@@ -5,8 +5,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -16,7 +14,6 @@ import org.junit.Test;
 
 import de.andrena.c4j.ClassInvariant;
 import de.andrena.c4j.internal.transformer.ContractBehaviorTransformer;
-import de.andrena.c4j.internal.util.ReflectionHelper;
 
 public class ReflectionHelperTest {
 	private ReflectionHelper helper;
@@ -31,29 +28,16 @@ public class ReflectionHelperTest {
 	}
 
 	@Test
-	public void testGetDeclaredModifiableMethods() throws Throwable {
-		assertEquals(5, helper.getDeclaredModifiableMethods(pool.get(Object.class.getName())).size());
-		assertEquals(0, helper.getDeclaredModifiableMethods(pool.get(List.class.getName())).size());
-	}
-
-	@Test
-	public void testGetDeclaredModifiableDynamicMethods() throws Throwable {
-		assertEquals(5, helper.getDeclaredModifiableDynamicMethods(pool.get(Object.class.getName())).size());
-		assertEquals(0, helper.getDeclaredModifiableDynamicMethods(pool.get(List.class.getName())).size());
-		assertEquals(0, helper.getDeclaredModifiableDynamicMethods(pool.get(Collections.class.getName())).size());
-	}
-
-	@Test
 	public void testIsModifiable() throws Throwable {
 		CtClass objectClass = pool.get(Object.class.getName());
-		assertTrue(helper.isModifiable(objectClass.getDeclaredMethod("finalize")));
-		assertFalse(helper.isModifiable(objectClass.getDeclaredMethod("hashCode")));
+		assertTrue(ReflectionHelper.isModifiable(objectClass.getDeclaredMethod("finalize")));
+		assertFalse(ReflectionHelper.isModifiable(objectClass.getDeclaredMethod("hashCode")));
 	}
 
 	@Test
 	public void testIsDynamic() throws Throwable {
-		assertTrue(helper.isDynamic(pool.get(Object.class.getName()).getDeclaredMethod("finalize")));
-		assertFalse(helper.isDynamic(pool.get(Arrays.class.getName()).getDeclaredMethod("asList")));
+		assertTrue(ReflectionHelper.isDynamic(pool.get(Object.class.getName()).getDeclaredMethod("finalize")));
+		assertFalse(ReflectionHelper.isDynamic(pool.get(Arrays.class.getName()).getDeclaredMethod("asList")));
 	}
 
 	@Test

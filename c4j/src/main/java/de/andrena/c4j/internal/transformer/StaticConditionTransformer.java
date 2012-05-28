@@ -1,5 +1,8 @@
 package de.andrena.c4j.internal.transformer;
 
+import static de.andrena.c4j.internal.util.BehaviorFilter.MODIFIABLE;
+import static de.andrena.c4j.internal.util.BehaviorFilter.STATIC;
+
 import java.util.Collections;
 
 import javassist.CtBehavior;
@@ -62,8 +65,8 @@ public class StaticConditionTransformer extends ConditionTransformer {
 	}
 
 	private void transform(ContractInfo contractInfo, CtClass affectedClass) throws Exception {
-		for (CtBehavior contractBehavior : reflectionHelper.getDeclaredModifiableStaticBehaviors(contractInfo
-				.getContractClass())) {
+		for (CtBehavior contractBehavior : reflectionHelper.getDeclaredBehaviors(contractInfo.getContractClass(),
+				MODIFIABLE, STATIC)) {
 			CtBehavior affectedBehavior = affectedBehaviorLocator.getAffectedBehavior(contractInfo, affectedClass,
 					contractBehavior);
 			if (affectedBehavior != null) {

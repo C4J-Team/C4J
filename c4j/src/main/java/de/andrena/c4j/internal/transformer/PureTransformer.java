@@ -1,5 +1,6 @@
 package de.andrena.c4j.internal.transformer;
 
+import static de.andrena.c4j.internal.util.BehaviorFilter.MODIFIABLE;
 import javassist.CannotCompileException;
 import javassist.CtBehavior;
 import javassist.CtClass;
@@ -24,7 +25,7 @@ public class PureTransformer extends AbstractAffectedClassTransformer {
 	@Override
 	public void transform(ListOrderedSet<CtClass> involvedClasses, ListOrderedSet<ContractInfo> contracts,
 			CtClass affectedClass) throws Exception {
-		for (CtBehavior affectedBehavior : reflectionHelper.getDeclaredModifiableBehaviors(affectedClass)) {
+		for (CtBehavior affectedBehavior : reflectionHelper.getDeclaredBehaviors(affectedClass, MODIFIABLE)) {
 			normalizePure(involvedClasses, contracts, affectedBehavior);
 			applyPure(affectedClass, affectedBehavior, contracts);
 		}

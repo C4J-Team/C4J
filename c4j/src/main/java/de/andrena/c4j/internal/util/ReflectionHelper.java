@@ -15,29 +15,6 @@ import javassist.bytecode.MethodInfo;
 import de.andrena.c4j.internal.transformer.ContractBehaviorTransformer;
 
 public class ReflectionHelper {
-	interface BehaviorFilter {
-		boolean filter(CtBehavior behavior);
-	}
-
-	private BehaviorFilter modifiableFilter = new BehaviorFilter() {
-		@Override
-		public boolean filter(CtBehavior behavior) {
-			return isModifiable(behavior);
-		}
-	};
-	private BehaviorFilter dynamicFilter = new BehaviorFilter() {
-		@Override
-		public boolean filter(CtBehavior behavior) {
-			return isDynamic(behavior);
-		}
-	};
-	private BehaviorFilter staticFilter = new BehaviorFilter() {
-		@Override
-		public boolean filter(CtBehavior behavior) {
-			return !isDynamic(behavior);
-		}
-	};
-
 	private <T extends CtBehavior> List<T> filterBehaviors(T[] behaviors, BehaviorFilter... filters) {
 		List<T> filteredList = new ArrayList<T>(behaviors.length);
 		behaviorLoop: for (T behavior : behaviors) {
@@ -51,32 +28,24 @@ public class ReflectionHelper {
 		return filteredList;
 	}
 
-	public List<CtMethod> getDeclaredModifiableMethods(CtClass clazz) {
-		return filterBehaviors(clazz.getDeclaredMethods(), modifiableFilter);
+	public List<CtMethod> getDeclaredMethods(CtClass clazz, BehaviorFilter... filters) {
+		return filterBehaviors(clazz.getDeclaredMethods(), filters);
 	}
 
-	public List<CtMethod> getDeclaredModifiableDynamicMethods(CtClass clazz) {
-		return filterBehaviors(clazz.getDeclaredMethods(), modifiableFilter, dynamicFilter);
+	public List<CtBehavior> getDeclaredBehaviors(CtClass clazz, BehaviorFilter... filters) {
+		return filterBehaviors(clazz.getDeclaredBehaviors(), filters);
 	}
 
-	public List<CtBehavior> getDeclaredModifiableBehaviors(CtClass clazz) {
-		return filterBehaviors(clazz.getDeclaredBehaviors(), modifiableFilter);
-	}
-
-	public List<CtBehavior> getDeclaredModifiableDynamicBehaviors(CtClass clazz) {
-		return filterBehaviors(clazz.getDeclaredBehaviors(), modifiableFilter, dynamicFilter);
-	}
-
-	public List<CtBehavior> getDeclaredModifiableStaticBehaviors(CtClass clazz) {
-		return filterBehaviors(clazz.getDeclaredBehaviors(), modifiableFilter, staticFilter);
-	}
-
-	public boolean isModifiable(CtBehavior behavior) {
+	static boolean isModifiable(CtBehavior behavior) {
 		return !Modifier.isNative(behavior.getModifiers()) && !Modifier.isAbstract(behavior.getModifiers());
 	}
 
-	public boolean isDynamic(CtBehavior behavior) {
+	static boolean isDynamic(CtBehavior behavior) {
 		return !Modifier.isStatic(behavior.getModifiers());
+	}
+
+	static boolean isPrivate(CtBehavior behavior) {
+		return Modifier.isPrivate(behavior.getModifiers());
 	}
 
 	public boolean constructorHasAdditionalParameter(CtClass affectedClass) throws NotFoundException {

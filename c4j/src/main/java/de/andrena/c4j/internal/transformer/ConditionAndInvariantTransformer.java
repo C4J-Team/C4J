@@ -1,5 +1,9 @@
 package de.andrena.c4j.internal.transformer;
 
+import static de.andrena.c4j.internal.util.BehaviorFilter.DYNAMIC;
+import static de.andrena.c4j.internal.util.BehaviorFilter.MODIFIABLE;
+import static de.andrena.c4j.internal.util.BehaviorFilter.VISIBLE;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -91,7 +95,8 @@ public class ConditionAndInvariantTransformer extends ConditionTransformer {
 		StandaloneExp callInvariantExpression = getInvariantCall(contracts, affectedClass);
 
 		Map<CtBehavior, List<CtBehavior>> contractMap = getContractMap(contracts, affectedClass);
-		for (CtBehavior affectedBehavior : reflectionHelper.getDeclaredModifiableDynamicBehaviors(affectedClass)) {
+		for (CtBehavior affectedBehavior : reflectionHelper.getDeclaredBehaviors(affectedClass, MODIFIABLE, DYNAMIC,
+				VISIBLE)) {
 			StandaloneExp behaviorInvariant = callInvariantExpression;
 			if (affectedBehavior.hasAnnotation(Pure.class)
 					&& rootTransformer.getConfigurationManager().getConfiguration(affectedClass).getPureBehaviors()
