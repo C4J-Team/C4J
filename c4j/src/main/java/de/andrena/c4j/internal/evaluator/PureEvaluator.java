@@ -38,7 +38,6 @@ public class PureEvaluator {
 
 	public static void registerUnpure(Object[] objects) {
 		pureCallDepth.set(Integer.valueOf(pureCallDepth.get().intValue() + 1));
-		System.out.println(pureCallDepth.get() + " (++)");
 		addToUnpureCache(objects);
 	}
 
@@ -62,7 +61,6 @@ public class PureEvaluator {
 
 	public static void unregisterUnpure(Object[] objects) {
 		pureCallDepth.set(Integer.valueOf(pureCallDepth.get().intValue() - 1));
-		System.out.println(pureCallDepth.get() + " (--)");
 		removeFromUnpureCache(objects);
 	}
 
