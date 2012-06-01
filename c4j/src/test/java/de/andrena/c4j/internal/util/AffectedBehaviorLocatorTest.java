@@ -4,11 +4,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.CtMethod;
+import javassist.NotFoundException;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -50,7 +50,7 @@ public class AffectedBehaviorLocatorTest {
 		assertNull(locator.getAffectedBehavior(null, null, contractClass.getDeclaredMethod("invariant")));
 	}
 
-	@Test(expected = CannotCompileException.class)
+	@Test(expected = NotFoundException.class)
 	public void testGetAffectedBehaviorForNonMethodOrConstructor() throws Exception {
 		CtBehavior contractBehavior = mock(CtBehavior.class);
 		when(contractBehavior.getName()).thenReturn("contractBehavior");

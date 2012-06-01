@@ -32,19 +32,20 @@ public class AffectedBehaviorLocator {
 
 	public CtBehavior getAffectedBehavior(ContractInfo contractInfo, CtClass affectedClass, CtBehavior contractBehavior)
 			throws NotFoundException, CannotCompileException {
-		CtBehavior affectedBehavior = null;
 		if (contractBehavior.hasAnnotation(ClassInvariant.class)) {
 			return null;
 		}
 		if (reflectionHelper.isContractConstructor(contractBehavior)) {
-			affectedBehavior = getAffectedConstructor(contractInfo, affectedClass, contractBehavior);
-		} else if (contractBehavior instanceof CtMethod) {
-			affectedBehavior = getAffectedMethod(contractInfo, affectedClass, contractBehavior);
-		} else {
-			throw new CannotCompileException("contractBehavior " + contractBehavior.getLongName()
-					+ " is neither constructor nor method");
+			return getAffectedConstructor(contractInfo, affectedClass, contractBehavior);
 		}
-		return affectedBehavior;
+		if (reflectionHelper.isContractClassInitializer(contractBehavior)) {
+			return affectedClass.getClassInitializer();
+		}
+		if (contractBehavior instanceof CtMethod) {
+			return getAffectedMethod(contractInfo, affectedClass, contractBehavior);
+		}
+		throw new NotFoundException("contractBehavior " + contractBehavior.getLongName()
+					+ " is neither constructor nor method");
 	}
 
 	CtMethod getAffectedMethod(ContractInfo contractInfo, CtClass affectedClass, CtBehavior contractBehavior)

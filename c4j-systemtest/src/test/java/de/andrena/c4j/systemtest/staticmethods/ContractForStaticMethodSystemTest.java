@@ -33,10 +33,6 @@ public class ContractForStaticMethodSystemTest {
 	public static class TargetClass {
 		private static int numCalls = 0;
 
-		static {
-
-		}
-
 		public static void main(String... args) {
 			numCalls += args.length;
 		}
@@ -47,12 +43,6 @@ public class ContractForStaticMethodSystemTest {
 	}
 
 	public static class ContractClass extends TargetClass {
-		static {
-			if (postCondition()) {
-				assert TargetClass.numCalls > 0;
-			}
-		}
-
 		public static void main(String... args) {
 			if (preCondition()) {
 				assert args.length > 0;

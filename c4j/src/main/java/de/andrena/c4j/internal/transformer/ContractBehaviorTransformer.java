@@ -15,6 +15,7 @@ import de.andrena.c4j.internal.util.ContractRegistry.ContractInfo;
 
 public class ContractBehaviorTransformer extends AbstractContractClassTransformer {
 	public static final String CONSTRUCTOR_REPLACEMENT_NAME = "constructor$";
+	public static final String CLASS_INITIALIZER_REPLACEMENT_NAME = "classInitializer$";
 
 	@Override
 	public void transform(ContractInfo contractInfo, CtClass contractClass) throws Exception {
@@ -24,6 +25,16 @@ public class ContractBehaviorTransformer extends AbstractContractClassTransforme
 				contractClass.addConstructor(getContractConstructor(contractClass));
 			}
 			makeAllBehaviorsAccessible(contractClass);
+			renameStaticInitializer(contractClass, contractInfo.getTargetClass());
+		}
+	}
+
+	private void renameStaticInitializer(CtClass contractClass, CtClass targetClass) throws CannotCompileException,
+			NotFoundException {
+		if (contractClass.getClassInitializer() != null && targetClass.getClassInitializer() != null) {
+			contractClass.addMethod(contractClass.getClassInitializer().toMethod(CLASS_INITIALIZER_REPLACEMENT_NAME,
+					contractClass));
+			contractClass.removeConstructor(contractClass.getClassInitializer());
 		}
 	}
 
