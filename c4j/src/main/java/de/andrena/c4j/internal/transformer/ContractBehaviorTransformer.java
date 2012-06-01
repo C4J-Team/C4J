@@ -54,10 +54,8 @@ public class ContractBehaviorTransformer extends AbstractContractClassTransforme
 	}
 
 	private void replaceConstructors(CtClass contractClass) throws CannotCompileException, NotFoundException {
+		// getConstructors() excludes the static initializer
 		for (CtConstructor constructor : contractClass.getConstructors()) {
-			if (constructor.isClassInitializer()) {
-				System.out.println("WARNING: REMOVING CLASS INITIALIZER!!!");
-			}
 			contractClass.addMethod(constructor.toMethod(CONSTRUCTOR_REPLACEMENT_NAME, contractClass));
 		}
 		if (contractClass.getSuperclass() != null) {
