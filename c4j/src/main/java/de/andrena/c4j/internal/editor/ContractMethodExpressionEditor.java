@@ -8,20 +8,18 @@ import java.util.Set;
 import javassist.CannotCompileException;
 import javassist.CtBehavior;
 import javassist.CtClass;
-import javassist.CtField;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 import javassist.bytecode.BadBytecode;
 import javassist.expr.ExprEditor;
-import javassist.expr.FieldAccess;
 import javassist.expr.MethodCall;
 
 import org.apache.log4j.Logger;
 
 import de.andrena.c4j.Condition;
 import de.andrena.c4j.Configuration.DefaultPreCondition;
-import de.andrena.c4j.internal.UsageException;
 import de.andrena.c4j.internal.RootTransformer;
+import de.andrena.c4j.internal.UsageException;
 import de.andrena.c4j.internal.compiler.AssignmentExp;
 import de.andrena.c4j.internal.compiler.BooleanExp;
 import de.andrena.c4j.internal.compiler.NestedExp;
@@ -70,24 +68,6 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 	}
 
 	@Override
-	public void edit(FieldAccess fieldAccess) throws CannotCompileException {
-		try {
-			editFieldAccess(fieldAccess);
-		} catch (NotFoundException e) {
-			throw new CannotCompileException(e);
-		}
-	}
-
-	void editFieldAccess(FieldAccess fieldAccess) throws NotFoundException, CannotCompileException {
-		CtField field = fieldAccess.getField();
-		if (!field.getDeclaringClass().equals(contract.getContractClass())) {
-			if (logger.isTraceEnabled()) {
-				logger.trace("last field access: " + field.getName());
-			}
-		}
-	}
-
-	@Override
 	public void edit(MethodCall methodCall) throws CannotCompileException {
 		try {
 			editMethodCall(methodCall);
@@ -100,9 +80,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 
 	void editMethodCall(MethodCall methodCall) throws NotFoundException, CannotCompileException, BadBytecode {
 		CtMethod method = methodCall.getMethod();
-		if (involvedTypeInspector.inspect(contract.getTargetClass()).contains(method.getDeclaringClass())) {
-			handleTargetMethodCall(methodCall);
-		} else if (method.getDeclaringClass().getName().equals(Condition.class.getName())) {
+		if (method.getDeclaringClass().getName().equals(Condition.class.getName())) {
 			if (method.getName().equals("old")) {
 				handleOldMethodCall(methodCall);
 			} else if (method.getName().equals("unchanged")) {
@@ -163,13 +141,6 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		}
 		AssignmentExp replacementExp = new AssignmentExp(NestedExp.RETURN_VALUE, BooleanExp.FALSE);
 		replacementExp.toStandalone().replace(methodCall);
-	}
-
-	private void handleTargetMethodCall(MethodCall methodCall) throws NotFoundException, CannotCompileException {
-		CtMethod method = methodCall.getMethod();
-		if (logger.isTraceEnabled()) {
-			logger.trace("last method call: " + method.getLongName());
-		}
 	}
 
 	private void handleOldMethodCall(MethodCall methodCall) throws NotFoundException, BadBytecode,

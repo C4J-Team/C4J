@@ -65,16 +65,14 @@ public class NestedExpTest {
 
 	@Test
 	public void testGetCodeForParams() {
-		NestedExp exp = new ValueExp("dummy");
 		assertEquals("(\"firstValue\", \"secondValue\")",
-				exp.getCodeForParams(new ValueExp("firstValue"), new ValueExp("secondValue")));
+				NestedExp.getCodeForParams(new ValueExp("firstValue"), new ValueExp("secondValue")));
 	}
 
 	@Test
 	public void testGetCodeForValues() {
-		NestedExp exp = new ValueExp("dummy");
 		assertEquals("\"firstValue\", \"secondValue\"",
-				exp.getCodeForValues(new ValueExp("firstValue"), new ValueExp("secondValue")));
+				NestedExp.getCodeForValues(new ValueExp("firstValue"), new ValueExp("secondValue")));
 	}
 
 	@Test

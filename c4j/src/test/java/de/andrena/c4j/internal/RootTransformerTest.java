@@ -18,7 +18,6 @@ import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 
 import de.andrena.c4j.ContractReference;
-import de.andrena.c4j.DefaultConfiguration;
 import de.andrena.c4j.internal.transformer.AffectedClassTransformer;
 import de.andrena.c4j.internal.transformer.ContractClassTransformer;
 import de.andrena.c4j.internal.util.ContractRegistry.ContractInfo;
