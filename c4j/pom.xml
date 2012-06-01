@@ -7,6 +7,28 @@
 		<version>4.0-Beta6-SNAPSHOT</version>
 	</parent>
 	<artifactId>c4j</artifactId>
+	<name>C4J - Contracts for Java</name>
+	<description>The C4J Contracts Framework for Java is, since version 4.0, using inheritance to provide classes and interfaces with contracts.</description>
+	<url>https://github.com/C4J-Team/C4J</url>
+	
+	<licenses>
+		<license>
+			<name>Eclipse Public License, Version 1.0</name>
+			<url>http://www.eclipse.org/legal/epl-v10.html</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	
+	<developers>
+		<developer>
+			<name>Ben Romberg</name>
+		</developer>
+	</developers>
+
+	<scm>
+		<connection>scm:git:git://github.com/C4J-Team/C4J.git</connection>
+		<url>https://github.com/C4J-Team/C4J/tree/master/c4j</url>
+	</scm>
 
 	<properties>
 		<log4j.artifactId>log4j</log4j.artifactId>
@@ -17,7 +39,7 @@
 		<premain.class>de.andrena.c4j.internal.Agent</premain.class>
 		<boot.class.path>${log4j.artifactId}-${log4j.version}.jar ${javassist.artifactId}-${javassist.version}.jar</boot.class.path>
 	</properties>
-
+	
 	<build>
 		<resources>
 			<resource>
