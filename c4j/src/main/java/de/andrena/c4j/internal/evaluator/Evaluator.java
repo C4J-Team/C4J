@@ -148,7 +148,7 @@ public class Evaluator {
 	public static Object getPreCondition(Object target, String methodName, Class<?> contractClass,
 			Class<?> callingClass, Class<?> returnType) throws InstantiationException, IllegalAccessException {
 		evaluationPhase.set(EvaluationPhase.BEFORE);
-		beforeContract(target, returnType, new Exception().getStackTrace().length);
+		beforeContract(target, returnType, Thread.currentThread().getStackTrace().length);
 		logger.info("Calling pre-condition for " + methodName + " in contract "
 				+ reflectionHelper.getSimplerName(contractClass) + ".");
 		return getContractFromCache(target, contractClass, callingClass);
@@ -161,7 +161,7 @@ public class Evaluator {
 	public static Object getInvariant(Object target, String className, Class<?> contractClass, Class<?> callingClass)
 			throws InstantiationException, IllegalAccessException {
 		evaluationPhase.set(EvaluationPhase.INVARIANT);
-		beforeContract(target, void.class, new Exception().getStackTrace().length);
+		beforeContract(target, void.class, Thread.currentThread().getStackTrace().length);
 		logger.info("Calling invariant for " + className + " in contract "
 				+ reflectionHelper.getSimplerName(contractClass) + ".");
 		return getContractFromCache(target, contractClass, callingClass);
@@ -177,7 +177,7 @@ public class Evaluator {
 			Class<?> callingClass, Class<?> returnType, Object actualReturnValue) throws InstantiationException,
 			IllegalAccessException {
 		evaluationPhase.set(EvaluationPhase.AFTER);
-		beforeContract(target, returnType, new Exception().getStackTrace().length);
+		beforeContract(target, returnType, Thread.currentThread().getStackTrace().length);
 		returnValue.set(actualReturnValue);
 		logger.info("Calling post-condition for " + methodName + " in contract "
 				+ reflectionHelper.getSimplerName(contractClass) + ".");
@@ -201,7 +201,7 @@ public class Evaluator {
 			returnValue.set(null);
 			exceptionValue.set(null);
 			oldCache.get()
-					.get(Integer.valueOf(new Exception().getStackTrace().length))
+					.get(Integer.valueOf(Thread.currentThread().getStackTrace().length))
 					.clear();
 		}
 	}
