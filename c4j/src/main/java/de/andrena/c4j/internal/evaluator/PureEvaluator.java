@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 
 import de.andrena.c4j.internal.compiler.StaticCall;
 import de.andrena.c4j.internal.util.ObjectIdentitySet;
+import de.andrena.c4j.internal.util.SelfInitializingMap;
 
 public class PureEvaluator {
 	public static final StaticCall registerUnpure = new StaticCall(PureEvaluator.class, "registerUnpure");
@@ -17,10 +18,15 @@ public class PureEvaluator {
 			"checkExternalBlacklistAccess");
 	public static final StaticCall checkUnpureStatic = new StaticCall(PureEvaluator.class, "checkUnpureStatic");
 
-	private static ThreadLocal<ObjectIdentitySet> unpureCache = new ThreadLocal<ObjectIdentitySet>() {
+	private static final ThreadLocal<SelfInitializingMap<Integer, ObjectIdentitySet>> unpureCache = new ThreadLocal<SelfInitializingMap<Integer, ObjectIdentitySet>>() {
 		@Override
-		protected ObjectIdentitySet initialValue() {
-			return new ObjectIdentitySet();
+		protected SelfInitializingMap<Integer, ObjectIdentitySet> initialValue() {
+			return new SelfInitializingMap<Integer, ObjectIdentitySet>() {
+				@Override
+				protected ObjectIdentitySet initialValue() {
+					return new ObjectIdentitySet();
+				}
+			};
 		}
 	};
 
@@ -32,13 +38,17 @@ public class PureEvaluator {
 	};
 	private static Logger logger = Logger.getLogger(PureEvaluator.class);
 
+	private static ObjectIdentitySet getCurrentUnpureCache(int stackDepth) {
+		return unpureCache.get().get(Integer.valueOf(stackDepth));
+	}
+
 	public static boolean isUnpureCacheEmpty() {
-		return unpureCache.get().isEmpty();
+		return unpureCache.get().size() == 0;
 	}
 
 	public static void registerUnpure(Object[] objects) {
 		pureCallDepth.set(Integer.valueOf(pureCallDepth.get().intValue() + 1));
-		addToUnpureCache(objects);
+		addToUnpureCache(objects, Thread.currentThread().getStackTrace().length);
 	}
 
 	public static void registerUnchangeable(Object object) {
@@ -47,34 +57,29 @@ public class PureEvaluator {
 				|| object instanceof Integer || object instanceof Long || object instanceof Short) {
 			return;
 		}
-		addToUnpureCache(new Object[] { object });
+		addToUnpureCache(new Object[] { object }, Thread.currentThread().getStackTrace().length - 1);
 	}
 
-	private static void addToUnpureCache(Object[] objects) {
-		unpureCache.get().addAll(Arrays.asList(objects));
+	private static void addToUnpureCache(Object[] objects, int stackDepth) {
+		getCurrentUnpureCache(stackDepth).addAll(Arrays.asList(objects));
 		for (Object obj : objects) {
 			if (obj instanceof Object[]) {
-				addToUnpureCache((Object[]) obj);
+				addToUnpureCache((Object[]) obj, stackDepth);
 			}
 		}
 	}
 
-	public static void unregisterUnpure(Object[] objects) {
+	public static void unregisterUnpure() {
 		pureCallDepth.set(Integer.valueOf(pureCallDepth.get().intValue() - 1));
-		removeFromUnpureCache(objects);
+		removeFromUnpureCache(Thread.currentThread().getStackTrace().length);
 	}
 
-	public static void unregisterUnchangeable(Object[] objects) {
-		removeFromUnpureCache(objects);
+	public static void unregisterUnchangeable() {
+		removeFromUnpureCache(Thread.currentThread().getStackTrace().length - 1);
 	}
 
-	private static void removeFromUnpureCache(Object[] objects) {
-		unpureCache.get().removeAll(Arrays.asList(objects));
-		for (Object obj : objects) {
-			if (obj instanceof Object[]) {
-				removeFromUnpureCache((Object[]) obj);
-			}
-		}
+	private static void removeFromUnpureCache(int stackDepth) {
+		getCurrentUnpureCache(stackDepth).clear();
 	}
 
 	public static void checkUnpureAccess(Object target) {

@@ -101,7 +101,7 @@ public class PureInspector {
 			throws CannotCompileException {
 		ArrayExp unpureArray = new ArrayExp(Object.class, unpureObjects);
 		StandaloneExp registerUnpureExp = new StaticCallExp(PureEvaluator.registerUnpure, unpureArray).toStandalone();
-		StandaloneExp unregisterUnpureExp = new StaticCallExp(PureEvaluator.unregisterUnpure, unpureArray)
+		StandaloneExp unregisterUnpureExp = new StaticCallExp(PureEvaluator.unregisterUnpure)
 				.toStandalone();
 		if (logger.isTraceEnabled()) {
 			logger.trace("puremagic.insertBefore " + affectedBehavior.getLongName() + ": \n"

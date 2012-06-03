@@ -9,7 +9,7 @@ import de.andrena.c4j.internal.compiler.StaticCall;
 import de.andrena.c4j.internal.util.ObjectMapper;
 import de.andrena.c4j.internal.util.Pair;
 import de.andrena.c4j.internal.util.ReflectionHelper;
-import de.andrena.c4j.internal.util.SelfInitializingMap;
+import de.andrena.c4j.internal.util.SelfInitializingMapOfMaps;
 
 public class Evaluator {
 	public static final StaticCall isBefore = new StaticCall(Evaluator.class, "isBefore");
@@ -66,10 +66,10 @@ public class Evaluator {
 	 * Integer = stack trace depth, class = contract class
 	 */
 	static final ThreadLocal<Integer> currentOldCacheEnvironment = new ThreadLocal<Integer>();
-	private static final ThreadLocal<SelfInitializingMap<Integer, Map<Integer, Object>>> oldCache = new ThreadLocal<SelfInitializingMap<Integer, Map<Integer, Object>>>() {
+	private static final ThreadLocal<SelfInitializingMapOfMaps<Integer, Map<Integer, Object>>> oldCache = new ThreadLocal<SelfInitializingMapOfMaps<Integer, Map<Integer, Object>>>() {
 		@Override
-		protected SelfInitializingMap<Integer, Map<Integer, Object>> initialValue() {
-			return new SelfInitializingMap<Integer, Map<Integer, Object>>() {
+		protected SelfInitializingMapOfMaps<Integer, Map<Integer, Object>> initialValue() {
+			return new SelfInitializingMapOfMaps<Integer, Map<Integer, Object>>() {
 				@Override
 				protected Map<Integer, Object> initialValue() {
 					return new HashMap<Integer, Object>();
@@ -87,7 +87,6 @@ public class Evaluator {
 				|| compareObject instanceof Integer || compareObject instanceof Long || compareObject instanceof Short) {
 			return compareObject.equals(unchangedCache.get());
 		}
-		PureEvaluator.unregisterUnchangeable(new Object[] { compareObject });
 		return compareObject == unchangedCache.get();
 	}
 
@@ -203,6 +202,7 @@ public class Evaluator {
 			oldCache.get()
 					.get(Integer.valueOf(Thread.currentThread().getStackTrace().length))
 					.clear();
+			PureEvaluator.unregisterUnchangeable();
 		}
 	}
 
