@@ -10,12 +10,17 @@ import javassist.CtNewConstructor;
 import javassist.Modifier;
 import javassist.NotFoundException;
 import de.andrena.c4j.InitializeContract;
+import de.andrena.c4j.UsageError;
 import de.andrena.c4j.internal.compiler.NestedExp;
+import de.andrena.c4j.internal.util.BehaviorFilter;
 import de.andrena.c4j.internal.util.ContractRegistry.ContractInfo;
+import de.andrena.c4j.internal.util.ReflectionHelper;
 
 public class ContractBehaviorTransformer extends AbstractContractClassTransformer {
 	public static final String CONSTRUCTOR_REPLACEMENT_NAME = "constructor$";
 	public static final String CLASS_INITIALIZER_REPLACEMENT_NAME = "classInitializer$";
+
+	private ReflectionHelper reflectionHelper = new ReflectionHelper();
 
 	@Override
 	public void transform(ContractInfo contractInfo, CtClass contractClass) throws Exception {
@@ -23,9 +28,22 @@ public class ContractBehaviorTransformer extends AbstractContractClassTransforme
 			if (!(contractInfo.getTargetClass().isInterface())) {
 				replaceConstructors(contractClass);
 				contractClass.addConstructor(getContractConstructor(contractClass));
+				checkMatchingStaticMethods(contractInfo);
 			}
 			makeAllBehaviorsAccessible(contractClass);
 			renameStaticInitializer(contractClass, contractInfo.getTargetClass());
+		}
+	}
+
+	private void checkMatchingStaticMethods(ContractInfo contractInfo) {
+		for (CtMethod contractMethod : reflectionHelper.getDeclaredMethods(contractInfo.getContractClass(),
+				BehaviorFilter.STATIC, BehaviorFilter.VISIBLE)) {
+			try {
+				contractInfo.getTargetClass().getMethod(contractMethod.getName(), contractMethod.getSignature());
+			} catch (NotFoundException e) {
+				throw new UsageError("Couldn't find matching target method for static contract method "
+						+ contractMethod.getLongName() + ".");
+			}
 		}
 	}
 

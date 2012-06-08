@@ -127,7 +127,13 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 
 	private void editMethodCall(MethodCall methodCall) throws NotFoundException, CannotCompileException,
 			SecurityException, NoSuchMethodException {
-		CtMethod method = methodCall.getMethod();
+		CtMethod method;
+		try {
+			method = methodCall.getMethod();
+		} catch (NotFoundException e) {
+			// if referencing another contract method, handled in ContractMethodExpressionEditor.editMethodCall
+			return;
+		}
 		if (isSynthetic(method)) {
 			return;
 		}
