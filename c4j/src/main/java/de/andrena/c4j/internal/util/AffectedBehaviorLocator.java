@@ -98,7 +98,7 @@ public class AffectedBehaviorLocator {
 					contractBehavior));
 		} catch (NotFoundException e) {
 			logger.warn("could not find a matching constructor in affected class " + affectedClass.getName()
-					+ " for the constructor defined in contract class " + contractInfo.getContractClass().getName());
+					+ " for constructor " + contractBehavior.getLongName());
 			return null;
 		}
 		if (contractBehavior instanceof CtMethod) {

@@ -65,7 +65,7 @@ public class StaticConditionTransformer extends ConditionTransformer {
 	}
 
 	private void transform(ContractInfo contractInfo, CtClass affectedClass) throws Exception {
-		for (CtBehavior contractBehavior : reflectionHelper.getDeclaredBehaviors(contractInfo.getContractClass(),
+		for (CtBehavior contractBehavior : reflectionHelper.getDeclaredMethods(contractInfo.getContractClass(),
 				MODIFIABLE, STATIC)) {
 			CtBehavior affectedBehavior = affectedBehaviorLocator.getAffectedBehavior(contractInfo, affectedClass,
 					contractBehavior);

@@ -112,7 +112,7 @@ public class ConditionAndInvariantTransformer extends ConditionTransformer {
 			CtClass affectedClass) throws NotFoundException, CannotCompileException {
 		Map<CtBehavior, List<CtBehavior>> contractMap = new HashMap<CtBehavior, List<CtBehavior>>();
 		for (ContractInfo contractInfo : contracts) {
-			for (CtBehavior contractBehavior : contractInfo.getContractClass().getDeclaredBehaviors()) {
+			for (CtBehavior contractBehavior : contractInfo.getContractClass().getDeclaredMethods()) {
 				CtBehavior affectedBehavior = affectedBehaviorLocator.getAffectedBehavior(contractInfo, affectedClass,
 						contractBehavior);
 				if (affectedBehavior != null) {
