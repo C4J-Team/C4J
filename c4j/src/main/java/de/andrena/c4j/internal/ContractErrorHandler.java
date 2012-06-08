@@ -5,6 +5,8 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import de.andrena.c4j.Configuration.ContractViolationAction;
+import de.andrena.c4j.ContractError;
+import de.andrena.c4j.UsageError;
 import de.andrena.c4j.internal.compiler.StaticCall;
 
 public class ContractErrorHandler {
@@ -16,10 +18,24 @@ public class ContractErrorHandler {
 	public static void handleContractException(ContractErrorSource source, Throwable throwable, Class<?> affectedClass) {
 		if (throwable instanceof AssertionError) {
 			contractAction(source, getEnhancedAssertionError(source, (AssertionError) throwable), affectedClass);
-		} else {
-			contractAction(source, new ContractError("Contract Error in " + source.getName() + ".", throwable),
-					affectedClass);
+			return;
 		}
+		UsageError usageError = getUsageError(throwable);
+		if (usageError != null) {
+			contractAction(source, usageError, affectedClass);
+		}
+		contractAction(source, new ContractError("Contract Error in " + source.getName() + ".", throwable),
+					affectedClass);
+	}
+
+	private static UsageError getUsageError(Throwable throwable) {
+		if (throwable instanceof UsageError) {
+			return (UsageError) throwable;
+		}
+		if (throwable.getCause() == null) {
+			return null;
+		}
+		return getUsageError(throwable.getCause());
 	}
 
 	private static void contractAction(ContractErrorSource source, Error error, Class<?> affectedClass) {

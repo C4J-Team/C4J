@@ -44,7 +44,7 @@ import javassist.bytecode.CodeAttribute;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import javassist.bytecode.Opcode;
-import de.andrena.c4j.internal.UsageException;
+import de.andrena.c4j.UsageError;
 import de.andrena.c4j.internal.RootTransformer;
 
 public class Stackalyzer {
@@ -52,7 +52,7 @@ public class Stackalyzer {
 	private static final String METHODREF_CONSTRUCTOR = "<init>";
 
 	public byte[] getDependenciesFor(CtBehavior contractBehavior, int indexOfDependentCall) throws BadBytecode,
-			NotFoundException, UsageException {
+			NotFoundException, UsageError {
 		CodeAttribute ca = contractBehavior.getMethodInfo().getCodeAttribute();
 		CodeIterator ci = ca.iterator();
 		LinkedList<Pair<Integer, Integer>> stackDepth = new LinkedList<Pair<Integer, Integer>>();
@@ -76,7 +76,7 @@ public class Stackalyzer {
 	}
 
 	private void checkLocalVarAccess(CodeIterator ci, int beginIndex, int endIndex, int numParams) throws BadBytecode,
-			UsageException {
+			UsageError {
 		ci.move(beginIndex);
 		while (ci.hasNext()) {
 			int index = ci.next();
@@ -88,7 +88,7 @@ public class Stackalyzer {
 		}
 	}
 
-	private void checkLoadOpcodes(CodeIterator ci, int numParams, int index, int op) throws UsageException {
+	private void checkLoadOpcodes(CodeIterator ci, int numParams, int index, int op) throws UsageError {
 		switch (op) {
 			case ALOAD_1:
 			case DLOAD_1:
@@ -121,14 +121,14 @@ public class Stackalyzer {
 		}
 	}
 
-	private void verifyLocalVarAccess(int i, int numParams) throws UsageException {
+	private void verifyLocalVarAccess(int i, int numParams) throws UsageError {
 		if (i > numParams) {
-			throw new UsageException("Illegal access on local variable within old().");
+			throw new UsageError("Illegal access on local variable within old().");
 		}
 	}
 
 	private int getOpcodeDelta(int op, int index, CodeIterator ci, ConstPool constPool)
-			throws BadBytecode, NotFoundException, UsageException {
+			throws BadBytecode, NotFoundException, UsageError {
 		switch (op) {
 			case GETFIELD:
 			case GETSTATIC:

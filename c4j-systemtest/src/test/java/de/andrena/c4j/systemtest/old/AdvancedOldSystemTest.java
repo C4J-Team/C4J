@@ -5,47 +5,37 @@ import static de.andrena.c4j.Condition.postCondition;
 import static org.junit.Assert.fail;
 
 import org.apache.log4j.Level;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
 import de.andrena.c4j.ContractReference;
 import de.andrena.c4j.Pure;
 import de.andrena.c4j.Target;
-import de.andrena.c4j.internal.ContractError;
+import de.andrena.c4j.UsageError;
 import de.andrena.c4j.systemtest.TransformerAwareRule;
 
 public class AdvancedOldSystemTest {
 	@Rule
 	public TransformerAwareRule transformerAware = new TransformerAwareRule();
-	private TargetClass target;
-
-	@Before
-	public void before() {
-		target = new TargetClass();
-	}
 
 	@Test
 	public void testValidCalls() {
-		target.method("abc", 123);
+		new TargetClassValid().method("abc", 123);
 	}
 
 	@Test
 	public void testInvalidReferenceOnLocalVariable() {
 		transformerAware.expectGlobalLog(Level.ERROR, "Illegal access on local variable within old().");
 		try {
-			target.invalidMethod("abc", 123);
-			fail("expected " + ContractError.class.getName());
-		} catch (ContractError e) {
+			new TargetClassInvalidLocalVariable().invalidMethod("abc", 123);
+			fail("expected " + UsageError.class.getName());
+		} catch (UsageError e) {
 		}
 	}
 
-	@ContractReference(ContractClass.class)
-	public static class TargetClass {
+	@ContractReference(ContractClassValid.class)
+	public static class TargetClassValid {
 		public void method(String name, int value) {
-		}
-
-		public void invalidMethod(String name, int value) {
 		}
 
 		@Pure
@@ -54,9 +44,9 @@ public class AdvancedOldSystemTest {
 		}
 	}
 
-	public static class ContractClass extends TargetClass {
+	public static class ContractClassValid extends TargetClassValid {
 		@Target
-		private TargetClass target;
+		private TargetClassValid target;
 
 		private OtherClass other = new OtherClass();
 
@@ -69,19 +59,28 @@ public class AdvancedOldSystemTest {
 			}
 		}
 
-		@Override
-		public void invalidMethod(String name, int value) {
-			if (postCondition()) {
-				double localVar = 3.0;
-				assert 3.0 == old(localVar);
-			}
-		}
 	}
 
 	public static class OtherClass {
 		@Pure
 		public double otherMethod(double value) {
 			return value;
+		}
+	}
+
+	@ContractReference(ContractClassInvalidLocalVariable.class)
+	public static class TargetClassInvalidLocalVariable {
+		public void invalidMethod(String name, int value) {
+		}
+	}
+
+	public static class ContractClassInvalidLocalVariable extends TargetClassInvalidLocalVariable {
+		@Override
+		public void invalidMethod(String name, int value) {
+			if (postCondition()) {
+				double localVar = 3.0;
+				assert 3.0 == old(localVar);
+			}
 		}
 	}
 }

@@ -18,8 +18,8 @@ import org.apache.log4j.Logger;
 
 import de.andrena.c4j.Condition;
 import de.andrena.c4j.Configuration.DefaultPreCondition;
+import de.andrena.c4j.UsageError;
 import de.andrena.c4j.internal.RootTransformer;
-import de.andrena.c4j.internal.UsageException;
 import de.andrena.c4j.internal.compiler.AssignmentExp;
 import de.andrena.c4j.internal.compiler.BooleanExp;
 import de.andrena.c4j.internal.compiler.NestedExp;
@@ -40,9 +40,9 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 	private Stackalyzer stackalyzer = new Stackalyzer();
 	private List<byte[]> storeDependencies = new ArrayList<byte[]>();
 	private List<byte[]> unchangeableStoreDependencies = new ArrayList<byte[]>();
-	private UsageException thrownException;
+	private UsageError thrownException;
 
-	public UsageException getThrownException() {
+	public UsageError getThrownException() {
 		return thrownException;
 	}
 
@@ -79,6 +79,11 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 	}
 
 	void editMethodCall(MethodCall methodCall) throws NotFoundException, CannotCompileException, BadBytecode {
+		if (invalidContractMethodCall(methodCall)) {
+			thrownException = new UsageError("Cannot call contract method " + methodCall.getMethodName()
+					+ " from contract method " + methodCall.where().getLongName() + ".");
+			return;
+		}
 		CtMethod method = methodCall.getMethod();
 		if (method.getDeclaringClass().getName().equals(Condition.class.getName())) {
 			if (method.getName().equals("old")) {
@@ -89,6 +94,24 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 				handlePreConditionMethodCall(methodCall);
 			}
 		}
+	}
+
+	private boolean invalidContractMethodCall(MethodCall methodCall) {
+		if (!methodCall.getClassName().equals(contract.getContractClass().getName())) {
+			return false;
+		}
+		CtMethod method;
+		try {
+			method = methodCall.getMethod();
+		} catch (NotFoundException e) {
+			return true;
+		}
+		try {
+			contract.getTargetClass().getMethod(method.getName(), method.getSignature());
+		} catch (NotFoundException e) {
+			return false;
+		}
+		return true;
 	}
 
 	private void handlePreConditionMethodCall(MethodCall methodCall) throws NotFoundException, CannotCompileException {
@@ -148,7 +171,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		byte[] dependencyBytes;
 		try {
 			dependencyBytes = stackalyzer.getDependenciesFor(methodCall.where(), methodCall.indexOfBytecode());
-		} catch (UsageException e) {
+		} catch (UsageError e) {
 			thrownException = e;
 			return;
 		}
@@ -164,7 +187,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		byte[] dependencyBytes;
 		try {
 			dependencyBytes = stackalyzer.getDependenciesFor(methodCall.where(), methodCall.indexOfBytecode());
-		} catch (UsageException e) {
+		} catch (UsageError e) {
 			thrownException = e;
 			return;
 		}
