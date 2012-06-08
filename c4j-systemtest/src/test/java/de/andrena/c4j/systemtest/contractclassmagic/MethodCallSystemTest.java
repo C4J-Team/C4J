@@ -99,7 +99,6 @@ public class MethodCallSystemTest {
 			}
 		}
 
-		@Pure
 		public int getFive() {
 			return 5;
 		}
