@@ -3,11 +3,11 @@ package de.andrena.c4j.systemtest.contractclassmagic;
 import static de.andrena.c4j.Condition.ignored;
 import static de.andrena.c4j.Condition.postCondition;
 import static de.andrena.c4j.Condition.preCondition;
+import static de.andrena.c4j.Condition.result;
 
 import org.junit.Rule;
 import org.junit.Test;
 
-import de.andrena.c4j.Condition;
 import de.andrena.c4j.ContractReference;
 import de.andrena.c4j.UsageError;
 import de.andrena.c4j.systemtest.TransformerAwareRule;
@@ -90,10 +90,10 @@ public class ContractMethodCallingOtherContractMethodSystemTest {
 		@Override
 		public int otherMethod() {
 			if (postCondition()) {
-				int result = Condition.result();
+				int result = (Integer) result();
 				assert result == 0;
 			}
-			return ignored();
+			return (Integer) ignored();
 		}
 	}
 }
