@@ -31,6 +31,8 @@ public abstract class ConditionTransformer extends AbstractAffectedClassTransfor
 				throws NotFoundException;
 
 		ContractErrorSource getContractErrorSource();
+
+		IfExp getCanExecuteConditionCall(StandaloneExp body);
 	}
 
 	protected final BeforeConditionCallProvider beforePreConditionCallProvider = new BeforeConditionCallProvider() {
@@ -47,6 +49,11 @@ public abstract class ConditionTransformer extends AbstractAffectedClassTransfor
 		public ContractErrorSource getContractErrorSource() {
 			return ContractErrorSource.PRE_CONDITION;
 		}
+
+		@Override
+		public IfExp getCanExecuteConditionCall(StandaloneExp body) {
+			return ConditionTransformer.this.getCanExecuteConditionCall(body);
+		}
 	};
 	protected final BeforeConditionCallProvider beforePostConditionCallProvider = new BeforeConditionCallProvider() {
 		@Override
@@ -61,6 +68,13 @@ public abstract class ConditionTransformer extends AbstractAffectedClassTransfor
 		@Override
 		public ContractErrorSource getContractErrorSource() {
 			return ContractErrorSource.POST_CONDITION;
+		}
+
+		@Override
+		public IfExp getCanExecuteConditionCall(StandaloneExp body) {
+			IfExp canExecuteConditionCall = new IfExp(new StaticCallExp(Evaluator.canExecutePostCondition));
+			canExecuteConditionCall.addIfBody(body);
+			return canExecuteConditionCall;
 		}
 	};
 
@@ -124,7 +138,7 @@ public abstract class ConditionTransformer extends AbstractAffectedClassTransfor
 		catchWithHandleContractException(affectedClass, tryPreCondition, beforeConditionCallProvider
 				.getContractErrorSource());
 		tryPreCondition.addFinally(getAfterContractCall());
-		return getCanExecuteConditionCall(tryPreCondition);
+		return beforeConditionCallProvider.getCanExecuteConditionCall(tryPreCondition);
 	}
 
 	protected abstract StandaloneExp getSingleConditionCall(CtClass affectedClass, CtBehavior affectedBehavior,

@@ -8,6 +8,7 @@ import de.andrena.c4j.Configuration.ContractViolationAction;
 import de.andrena.c4j.ContractError;
 import de.andrena.c4j.UsageError;
 import de.andrena.c4j.internal.compiler.StaticCall;
+import de.andrena.c4j.internal.evaluator.Evaluator;
 
 public class ContractErrorHandler {
 	public static final StaticCall handleContractException = new StaticCall(ContractErrorHandler.class,
@@ -39,6 +40,7 @@ public class ContractErrorHandler {
 	}
 
 	private static void contractAction(ContractErrorSource source, Error error, Class<?> affectedClass) {
+		Evaluator.setException(error);
 		Set<ContractViolationAction> contractViolationActions = RootTransformer.INSTANCE.getConfigurationManager()
 				.getConfiguration(affectedClass).getContractViolationActions();
 		if (contractViolationActions.contains(ContractViolationAction.LOG)) {

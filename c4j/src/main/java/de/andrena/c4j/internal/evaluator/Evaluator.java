@@ -22,6 +22,7 @@ public class Evaluator {
 	public static final StaticCall getPostCondition = new StaticCall(Evaluator.class, "getPostCondition");
 	public static final StaticCall getInvariant = new StaticCall(Evaluator.class, "getInvariant");
 	public static final StaticCall canExecuteCondition = new StaticCall(Evaluator.class, "canExecuteCondition");
+	public static final StaticCall canExecutePostCondition = new StaticCall(Evaluator.class, "canExecutePostCondition");
 	public static final StaticCall afterContract = new StaticCall(Evaluator.class, "afterContract");
 	public static final StaticCall afterContractMethod = new StaticCall(Evaluator.class, "afterContractMethod");
 	public static final StaticCall setException = new StaticCall(Evaluator.class, "setException");
@@ -153,8 +154,12 @@ public class Evaluator {
 		return getContractFromCache(target, contractClass, callingClass);
 	}
 
-	public static boolean canExecuteCondition() {
+	public static boolean canExecutePostCondition() {
 		return evaluationPhase.get() == EvaluationPhase.NONE && !(exceptionValue.get() instanceof AssertionError);
+	}
+
+	public static boolean canExecuteCondition() {
+		return evaluationPhase.get() == EvaluationPhase.NONE && exceptionValue.get() == null;
 	}
 
 	public static Object getInvariant(Object target, String className, Class<?> contractClass, Class<?> callingClass)

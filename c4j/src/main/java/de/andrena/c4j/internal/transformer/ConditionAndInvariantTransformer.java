@@ -21,7 +21,6 @@ import de.andrena.c4j.internal.ContractErrorHandler.ContractErrorSource;
 import de.andrena.c4j.internal.RootTransformer;
 import de.andrena.c4j.internal.compiler.CastExp;
 import de.andrena.c4j.internal.compiler.EmptyExp;
-import de.andrena.c4j.internal.compiler.IfExp;
 import de.andrena.c4j.internal.compiler.NestedExp;
 import de.andrena.c4j.internal.compiler.StandaloneExp;
 import de.andrena.c4j.internal.compiler.StaticCallExp;
@@ -80,7 +79,6 @@ try {
 			afterContractMethod();
 		}
 	}
-// without Invariant (if canExecuteCondition() is necessary and checked within afterContractMethod()):
 	afterContractMethod();
 }
 */
@@ -145,7 +143,7 @@ public class ConditionAndInvariantTransformer extends ConditionTransformer {
 		}
 	}
 
-	private IfExp getInvariantCall(ListOrderedSet<ContractInfo> contracts, CtClass affectedClass)
+	private StandaloneExp getInvariantCall(ListOrderedSet<ContractInfo> contracts, CtClass affectedClass)
 			throws NotFoundException {
 		StandaloneExp invariantCalls = getInvariantContractCalls(contracts, affectedClass);
 		if (invariantCalls.isEmpty()) {
@@ -154,7 +152,7 @@ public class ConditionAndInvariantTransformer extends ConditionTransformer {
 		TryExp tryInvariants = new TryExp(invariantCalls);
 		catchWithHandleContractException(affectedClass, tryInvariants, ContractErrorSource.CLASS_INVARIANT);
 		tryInvariants.addFinally(getAfterContractCall().append(getAfterContractMethodCall()));
-		return getCanExecuteConditionCall(tryInvariants);
+		return getCanExecuteConditionCall(tryInvariants).append(getAfterContractMethodCall());
 	}
 
 	private StandaloneExp getInvariantContractCalls(ListOrderedSet<ContractInfo> contracts, CtClass affectedClass)
