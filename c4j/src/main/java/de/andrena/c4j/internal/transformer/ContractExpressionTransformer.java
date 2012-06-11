@@ -2,12 +2,17 @@ package de.andrena.c4j.internal.transformer;
 
 import java.util.List;
 
+import javassist.CannotCompileException;
 import javassist.CtBehavior;
 import javassist.CtClass;
+import javassist.CtMethod;
+import javassist.CtNewMethod;
+import javassist.NotFoundException;
 import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import javassist.bytecode.Opcode;
+import de.andrena.c4j.ClassInvariant;
 import de.andrena.c4j.internal.RootTransformer;
 import de.andrena.c4j.internal.editor.ContractMethodExpressionEditor;
 import de.andrena.c4j.internal.evaluator.Evaluator;
@@ -17,6 +22,7 @@ import de.andrena.c4j.internal.util.TransformationHelper;
 
 public class ContractExpressionTransformer extends ContractDeclaredBehaviorTransformer {
 
+	public static final String BEFORE_INVARIANT_METHOD_SUFFIX = "$before";
 	private RootTransformer rootTransformer = RootTransformer.INSTANCE;
 	private TransformationHelper transformationHelper = new TransformationHelper();
 
@@ -40,6 +46,31 @@ public class ContractExpressionTransformer extends ContractDeclaredBehaviorTrans
 	}
 
 	private void insertStoreDependencies(CtBehavior contractBehavior, ContractMethodExpressionEditor expressionEditor)
+			throws BadBytecode, CannotCompileException, NotFoundException {
+		if (contractBehavior.hasAnnotation(ClassInvariant.class)) {
+			insertStoreDependenciesForClassInvariant(contractBehavior, expressionEditor);
+		} else {
+			insertStoreDependenciesForPostCondition(contractBehavior, expressionEditor);
+		}
+	}
+
+	private void insertStoreDependenciesForClassInvariant(CtBehavior contractBehavior,
+			ContractMethodExpressionEditor expressionEditor) throws BadBytecode, CannotCompileException,
+			NotFoundException {
+		CtMethod beforeInvariant = CtNewMethod.make(CtClass.voidType,
+				contractBehavior.getName() + BEFORE_INVARIANT_METHOD_SUFFIX, new CtClass[0],
+				contractBehavior.getExceptionTypes(), null, contractBehavior.getDeclaringClass());
+		contractBehavior.getDeclaringClass().addMethod(beforeInvariant);
+		transformationHelper.addBehaviorAnnotation(beforeInvariant, rootTransformer.getPool().get(
+				BeforeClassInvariant.class.getName()));
+		ConstPool constPool = beforeInvariant.getMethodInfo().getConstPool();
+		CodeIterator iterator = beforeInvariant.getMethodInfo().getCodeAttribute().iterator();
+		insertOldStoreCalls(iterator, expressionEditor.getStoreDependencies(), constPool, false);
+		insertOldStoreCalls(iterator, expressionEditor.getUnchangeableStoreDependencies(), constPool, true);
+	}
+
+	private void insertStoreDependenciesForPostCondition(CtBehavior contractBehavior,
+			ContractMethodExpressionEditor expressionEditor)
 			throws BadBytecode {
 		ConstPool constPool = contractBehavior.getMethodInfo().getConstPool();
 		CodeIterator iterator = contractBehavior.getMethodInfo().getCodeAttribute().iterator();

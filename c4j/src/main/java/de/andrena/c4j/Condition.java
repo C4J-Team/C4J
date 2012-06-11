@@ -139,8 +139,8 @@ public class Condition {
 	}
 
 	/**
-	 * Usable within a post-condition to get the value (primitive types) or reference (Objects) of an expression at the
-	 * beginning of the target method. May contain any expression except local variables.
+	 * Usable within a post-condition or class-invariant to get the value (primitive types) or reference (Objects) of an
+	 * expression at the beginning of the target method. May contain any expression except local variables.
 	 * <p>
 	 * Example:
 	 * </p>
@@ -187,10 +187,28 @@ public class Condition {
 	}
 
 	/**
+	 * Usable within a class-invariant to skip certain assert-statements in constructors only, e.g. when refering to the
+	 * old value of a field.
+	 * <p>
+	 * Example:
+	 * </p>
+	 * 
+	 * <pre>
+	 * assert constructorCall() || target.intValue == old(target.intValue) + 1;
+	 * </pre>
+	 * 
+	 * @return If the class-invariant is being called from a constructor.
+	 */
+	@Pure
+	public static boolean constructorCall() {
+		return Evaluator.isConstructorCall();
+	}
+
+	/**
 	 * EXPERIMENTAL! Usable only if PureBehavior.VALIDATE_PURE is enabled for the class being validated.
 	 * <p>
-	 * Usable within a post-condition to ensure, that a value (primitive types) or state (Objects) of an expression
-	 * remains unchanged.
+	 * Usable within a post-condition or class-invariant to ensure, that a value (primitive types) or state (Objects) of
+	 * an expression remains unchanged.
 	 * 
 	 * @param expressionWithoutLocalVariables
 	 *            An expression without local variables.

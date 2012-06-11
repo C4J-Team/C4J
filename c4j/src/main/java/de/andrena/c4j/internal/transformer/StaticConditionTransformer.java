@@ -7,7 +7,6 @@ import java.util.Collections;
 
 import javassist.CtBehavior;
 import javassist.CtClass;
-import javassist.CtConstructor;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 import de.andrena.c4j.internal.compiler.NestedExp;
@@ -50,7 +49,7 @@ try {
 	afterContractMethod();
 }
 */
-public class StaticConditionTransformer extends ConditionTransformer {
+public class StaticConditionTransformer extends PreAndPostConditionTransformer {
 	private AffectedBehaviorLocator affectedBehaviorLocator = new AffectedBehaviorLocator();
 	private ReflectionHelper reflectionHelper = new ReflectionHelper();
 
@@ -80,10 +79,6 @@ public class StaticConditionTransformer extends ConditionTransformer {
 		if (logger.isTraceEnabled()) {
 			logger.trace("transforming behavior " + affectedBehavior.getLongName());
 		}
-		if (contractBehavior instanceof CtConstructor) {
-			// TODO: handle static constructor
-			return;
-		}
 		insertPreAndPostCondition(Collections.singletonList(contractBehavior), affectedClass, affectedBehavior);
 		getAfterContractMethodCall().insertFinally(affectedBehavior);
 	}
@@ -97,7 +92,8 @@ public class StaticConditionTransformer extends ConditionTransformer {
 		return getContractCallExp(affectedClass, contractBehavior, getConditionCall);
 	}
 
-	private StandaloneExp getContractCallExp(CtClass affectedClass, CtBehavior contractBehavior,
+	@Override
+	protected StandaloneExp getContractCallExp(CtClass affectedClass, CtBehavior contractBehavior,
 			StaticCallExp conditionCall) throws NotFoundException {
 		StaticCallExp conditionExecCall = new StaticCallExp((CtMethod) contractBehavior, getArgsList(affectedClass,
 				contractBehavior));

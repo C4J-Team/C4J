@@ -27,6 +27,7 @@ public class Evaluator {
 	public static final StaticCall afterContractMethod = new StaticCall(Evaluator.class, "afterContractMethod");
 	public static final StaticCall setException = new StaticCall(Evaluator.class, "setException");
 	public static final StaticCall isUnchanged = new StaticCall(Evaluator.class, "isUnchanged");
+	public static final StaticCall setConstructorCall = new StaticCall(Evaluator.class, "setConstructorCall");
 
 	private static final Logger logger = Logger.getLogger(Evaluator.class);
 	private static final ReflectionHelper reflectionHelper = new ReflectionHelper();
@@ -62,6 +63,7 @@ public class Evaluator {
 	private final static ThreadLocal<Throwable> exceptionValue = new ThreadLocal<Throwable>();
 	final static ThreadLocal<Object> currentTarget = new ThreadLocal<Object>();
 	final static ThreadLocal<Class<?>> contractReturnType = new ThreadLocal<Class<?>>();
+	private final static ThreadLocal<Boolean> constructorCall = new ThreadLocal<Boolean>();
 
 	/**
 	 * Integer = stack trace depth, class = contract class
@@ -242,5 +244,13 @@ public class Evaluator {
 	@SuppressWarnings("unchecked")
 	public static <T extends Throwable> T getException() {
 		return (T) exceptionValue.get();
+	}
+
+	public static boolean isConstructorCall() {
+		return constructorCall.get().booleanValue();
+	}
+
+	public static void setConstructorCall(boolean constructorCall) {
+		Evaluator.constructorCall.set(Boolean.valueOf(constructorCall));
 	}
 }

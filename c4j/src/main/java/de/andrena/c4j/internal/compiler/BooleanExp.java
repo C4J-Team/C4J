@@ -10,6 +10,10 @@ public class BooleanExp extends NestedExp {
 		this(exp.getCode());
 	}
 
+	public static BooleanExp valueOf(boolean value) {
+		return value ? TRUE : FALSE;
+	}
+
 	protected BooleanExp(String code) {
 		this.code = code;
 	}
