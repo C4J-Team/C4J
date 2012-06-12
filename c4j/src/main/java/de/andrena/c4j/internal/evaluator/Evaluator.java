@@ -27,7 +27,8 @@ public class Evaluator {
 	public static final StaticCall afterContractMethod = new StaticCall(Evaluator.class, "afterContractMethod");
 	public static final StaticCall setException = new StaticCall(Evaluator.class, "setException");
 	public static final StaticCall isUnchanged = new StaticCall(Evaluator.class, "isUnchanged");
-	public static final StaticCall setConstructorCall = new StaticCall(Evaluator.class, "setConstructorCall");
+	public static final StaticCall setClassInvariantConstructorCall = new StaticCall(Evaluator.class,
+			"setClassInvariantConstructorCall");
 
 	private static final Logger logger = Logger.getLogger(Evaluator.class);
 	private static final ReflectionHelper reflectionHelper = new ReflectionHelper();
@@ -63,7 +64,7 @@ public class Evaluator {
 	private final static ThreadLocal<Throwable> exceptionValue = new ThreadLocal<Throwable>();
 	final static ThreadLocal<Object> currentTarget = new ThreadLocal<Object>();
 	final static ThreadLocal<Class<?>> contractReturnType = new ThreadLocal<Class<?>>();
-	private final static ThreadLocal<Boolean> constructorCall = new ThreadLocal<Boolean>();
+	private final static ThreadLocal<Boolean> classInvariantConstructorCall = new ThreadLocal<Boolean>();
 
 	/**
 	 * Integer = stack trace depth, class = contract class
@@ -84,6 +85,9 @@ public class Evaluator {
 	private final static ThreadLocal<Object> unchangedCache = new ThreadLocal<Object>();
 
 	public static boolean isUnchanged(Object compareObject, boolean triggerSetUnchangedCache) {
+		if (isClassInvariantConstructorCall()) {
+			return true;
+		}
 		// auto-boxing is evil, requires equals instead of ==
 		if (compareObject instanceof Boolean || compareObject instanceof Byte || compareObject instanceof Character
 				|| compareObject instanceof Double || compareObject instanceof Float
@@ -197,6 +201,7 @@ public class Evaluator {
 		contractReturnType.set(null);
 		currentTarget.set(null);
 		evaluationPhase.set(EvaluationPhase.NONE);
+		classInvariantConstructorCall.set(null);
 	}
 
 	public static void afterContractMethod() {
@@ -246,11 +251,14 @@ public class Evaluator {
 		return (T) exceptionValue.get();
 	}
 
-	public static boolean isConstructorCall() {
-		return constructorCall.get().booleanValue();
+	public static boolean isClassInvariantConstructorCall() {
+		if (classInvariantConstructorCall.get() == null) {
+			return false;
+		}
+		return classInvariantConstructorCall.get().booleanValue();
 	}
 
-	public static void setConstructorCall(boolean constructorCall) {
-		Evaluator.constructorCall.set(Boolean.valueOf(constructorCall));
+	public static void setClassInvariantConstructorCall(boolean constructorCall) {
+		Evaluator.classInvariantConstructorCall.set(Boolean.valueOf(constructorCall));
 	}
 }

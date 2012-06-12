@@ -126,7 +126,7 @@ public class InvariantTransformer extends ConditionTransformer {
 	}
 
 	private StandaloneExp setConstructorCall(CtBehavior affectedBehavior) {
-		return new StaticCallExp(Evaluator.setConstructorCall, BooleanExp
+		return new StaticCallExp(Evaluator.setClassInvariantConstructorCall, BooleanExp
 				.valueOf(affectedBehavior instanceof CtConstructor)).toStandalone();
 	}
 

@@ -197,11 +197,11 @@ public class Condition {
 	 * assert constructorCall() || target.intValue == old(target.intValue) + 1;
 	 * </pre>
 	 * 
-	 * @return If the class-invariant is being called from a constructor.
+	 * @return If the class-invariant is being called after a constructor.
 	 */
 	@Pure
 	public static boolean constructorCall() {
-		return Evaluator.isConstructorCall();
+		return Evaluator.isClassInvariantConstructorCall();
 	}
 
 	/**
@@ -209,6 +209,8 @@ public class Condition {
 	 * <p>
 	 * Usable within a post-condition or class-invariant to ensure, that a value (primitive types) or state (Objects) of
 	 * an expression remains unchanged.
+	 * <p>
+	 * Note: Will always return true whenever being called from a class-invariant after a constructor.
 	 * 
 	 * @param expressionWithoutLocalVariables
 	 *            An expression without local variables.
