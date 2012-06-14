@@ -14,6 +14,8 @@ import javassist.bytecode.ConstPool;
 import javassist.bytecode.Opcode;
 import de.vksi.c4j.ClassInvariant;
 import de.vksi.c4j.internal.RootTransformer;
+import de.vksi.c4j.internal.compiler.IfExp;
+import de.vksi.c4j.internal.compiler.StaticCallExp;
 import de.vksi.c4j.internal.editor.ContractMethodExpressionEditor;
 import de.vksi.c4j.internal.evaluator.Evaluator;
 import de.vksi.c4j.internal.evaluator.OldCache;
@@ -39,11 +41,9 @@ public class ContractExpressionTransformer extends ContractDeclaredBehaviorTrans
 			throw expressionEditor.getThrownException();
 		}
 		additionalStoreExpressions(expressionEditor);
-		if (expressionEditor.getStoreDependencies().isEmpty()
-				&& expressionEditor.getUnchangeableStoreDependencies().isEmpty()) {
-			return;
+		if (expressionEditor.hasStoreDependencies() || !expressionEditor.getPreConditionExp().isEmpty()) {
+			insertStoreDependencies(contractBehavior, expressionEditor);
 		}
-		insertStoreDependencies(contractBehavior, expressionEditor);
 	}
 
 	private void insertStoreDependencies(CtBehavior contractBehavior, ContractMethodExpressionEditor expressionEditor)
@@ -64,21 +64,39 @@ public class ContractExpressionTransformer extends ContractDeclaredBehaviorTrans
 		contractBehavior.getDeclaringClass().addMethod(beforeInvariant);
 		transformationHelper.addBehaviorAnnotation(beforeInvariant, rootTransformer.getPool().get(
 				BeforeClassInvariant.class.getName()));
-		ConstPool constPool = beforeInvariant.getMethodInfo().getConstPool();
-		CodeIterator iterator = beforeInvariant.getMethodInfo().getCodeAttribute().iterator();
-		insertOldStoreCalls(iterator, expressionEditor.getStoreDependencies(), constPool, false);
-		insertOldStoreCalls(iterator, expressionEditor.getUnchangeableStoreDependencies(), constPool, true);
+		insertIntoBeforeInvariant(expressionEditor, beforeInvariant);
+	}
+
+	private void insertIntoBeforeInvariant(ContractMethodExpressionEditor expressionEditor, CtMethod beforeInvariant)
+			throws CannotCompileException, BadBytecode {
+		if (!expressionEditor.getPreConditionExp().isEmpty()) {
+			expressionEditor.getPreConditionExp().insertBefore(beforeInvariant);
+		}
+		if (expressionEditor.hasStoreDependencies()) {
+			ConstPool constPool = beforeInvariant.getMethodInfo().getConstPool();
+			CodeIterator iterator = beforeInvariant.getMethodInfo().getCodeAttribute().iterator();
+			insertOldStoreCalls(iterator, expressionEditor.getStoreDependencies(), constPool, false);
+			insertOldStoreCalls(iterator, expressionEditor.getUnchangeableStoreDependencies(), constPool, true);
+		}
 	}
 
 	private void insertStoreDependenciesForPostCondition(CtBehavior contractBehavior,
 			ContractMethodExpressionEditor expressionEditor)
-			throws BadBytecode {
-		ConstPool constPool = contractBehavior.getMethodInfo().getConstPool();
-		CodeIterator iterator = contractBehavior.getMethodInfo().getCodeAttribute().iterator();
-		int ifBlockLength = insertOldStoreCalls(iterator, expressionEditor.getStoreDependencies(), constPool, false);
-		ifBlockLength += insertOldStoreCalls(iterator, expressionEditor.getUnchangeableStoreDependencies(), constPool,
-				true);
-		insertJump(iterator, ifBlockLength, constPool);
+			throws BadBytecode, CannotCompileException {
+		if (!expressionEditor.getPreConditionExp().isEmpty()) {
+			IfExp isBeforeCondition = new IfExp(new StaticCallExp(Evaluator.isBefore));
+			isBeforeCondition.addIfBody(expressionEditor.getPreConditionExp());
+			isBeforeCondition.insertBefore(contractBehavior);
+		}
+		if (expressionEditor.hasStoreDependencies()) {
+			ConstPool constPool = contractBehavior.getMethodInfo().getConstPool();
+			CodeIterator iterator = contractBehavior.getMethodInfo().getCodeAttribute().iterator();
+			int ifBlockLength = insertOldStoreCalls(iterator, expressionEditor.getStoreDependencies(), constPool, false);
+			ifBlockLength += insertOldStoreCalls(iterator, expressionEditor.getUnchangeableStoreDependencies(),
+					constPool,
+					true);
+			insertJump(iterator, ifBlockLength, constPool);
+		}
 	}
 
 	private void insertJump(CodeIterator iterator, int ifBlockLength, ConstPool constPool) throws BadBytecode {

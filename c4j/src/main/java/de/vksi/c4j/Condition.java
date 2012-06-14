@@ -1,6 +1,7 @@
 package de.vksi.c4j;
 
 import de.vksi.c4j.internal.evaluator.Evaluator;
+import de.vksi.c4j.internal.evaluator.MaxTimeCache;
 import de.vksi.c4j.internal.evaluator.UnchangedCache;
 
 /**
@@ -200,5 +201,21 @@ public class Condition {
 	public static boolean unchanged(Object expressionWithoutLocalVariables) {
 		UnchangedCache.setUnchangedCache(expressionWithoutLocalVariables);
 		return false;
+	}
+
+	/**
+	 * Usable within a post-condition or a class-invariant to ensure method execution within a specified duration.
+	 * <p>
+	 * Note: Accuracy not guaranteed. Internally, {@link System#nanoTime()} is used to determine method runtime. This
+	 * mechanism will not interrupt method execution after the specified maximum time. It will only complain after the
+	 * method has been successfully executed, no matter how long it takes.
+	 * 
+	 * @param seconds
+	 *            The maximum time the method execution is allowed to last.
+	 * @return Whether the specified maximum execution time was observed.
+	 */
+	@Pure
+	public static boolean maxTime(double seconds) {
+		return MaxTimeCache.isWithinMaxTime(seconds);
 	}
 }

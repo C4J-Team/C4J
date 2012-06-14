@@ -22,9 +22,12 @@ import de.vksi.c4j.UsageError;
 import de.vksi.c4j.internal.RootTransformer;
 import de.vksi.c4j.internal.compiler.AssignmentExp;
 import de.vksi.c4j.internal.compiler.BooleanExp;
+import de.vksi.c4j.internal.compiler.EmptyExp;
 import de.vksi.c4j.internal.compiler.NestedExp;
+import de.vksi.c4j.internal.compiler.StandaloneExp;
 import de.vksi.c4j.internal.compiler.StaticCallExp;
 import de.vksi.c4j.internal.compiler.ValueExp;
+import de.vksi.c4j.internal.evaluator.MaxTimeCache;
 import de.vksi.c4j.internal.evaluator.OldCache;
 import de.vksi.c4j.internal.evaluator.UnchangedCache;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
@@ -41,10 +44,15 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 	private Stackalyzer stackalyzer = new Stackalyzer();
 	private List<byte[]> storeDependencies = new ArrayList<byte[]>();
 	private List<byte[]> unchangeableStoreDependencies = new ArrayList<byte[]>();
+	private StandaloneExp preConditionExp = new EmptyExp();
 	private UsageError thrownException;
 
 	public UsageError getThrownException() {
 		return thrownException;
+	}
+
+	public StandaloneExp getPreConditionExp() {
+		return preConditionExp;
 	}
 
 	public List<byte[]> getStoreDependencies() {
@@ -91,10 +99,16 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 				handleOldMethodCall(methodCall);
 			} else if (method.getName().equals("unchanged")) {
 				handleUnchangedMethodCall(methodCall);
-			} else if (method.getName().equals("pre") || method.getName().equals("preCondition")) {
+			} else if (method.getName().equals("preCondition")) {
 				handlePreConditionMethodCall(methodCall);
+			} else if (method.getName().equals("maxTime")) {
+				handleMaxTimeMethodCall(methodCall);
 			}
 		}
+	}
+
+	private void handleMaxTimeMethodCall(MethodCall methodCall) {
+		preConditionExp = preConditionExp.append(new StaticCallExp(MaxTimeCache.setStartTime));
 	}
 
 	private boolean invalidContractMethodCall(MethodCall methodCall) {
@@ -199,5 +213,9 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		AssignmentExp assignmentExp = new AssignmentExp(NestedExp.RETURN_VALUE, oldCall);
 		methodCall.replace(assignmentExp.toStandalone().getCode());
 		contract.getMethodsContainingUnchanged().add(methodCall.where().getName() + methodCall.where().getSignature());
+	}
+
+	public boolean hasStoreDependencies() {
+		return !getStoreDependencies().isEmpty() || !getUnchangeableStoreDependencies().isEmpty();
 	}
 }
