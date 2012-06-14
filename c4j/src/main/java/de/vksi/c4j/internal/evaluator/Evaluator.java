@@ -6,8 +6,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import de.vksi.c4j.internal.compiler.StaticCall;
-import de.vksi.c4j.internal.util.ObjectMapper;
-import de.vksi.c4j.internal.util.Pair;
 import de.vksi.c4j.internal.util.ReflectionHelper;
 
 public class Evaluator {
@@ -29,8 +27,6 @@ public class Evaluator {
 
 	private static final Logger logger = Logger.getLogger(Evaluator.class);
 	private static final ReflectionHelper reflectionHelper = new ReflectionHelper();
-
-	private static final ObjectMapper<Pair<Class<?>, Class<?>>, Object> contractCache = new ObjectMapper<Pair<Class<?>, Class<?>>, Object>();
 
 	private static final Map<Class<?>, Object> primitiveReturnValues = new HashMap<Class<?>, Object>() {
 		private static final long serialVersionUID = 5365905181961089260L;
@@ -112,7 +108,7 @@ public class Evaluator {
 		beforeContract(target, returnType, Thread.currentThread().getStackTrace().length);
 		logger.info("Calling pre-condition for " + methodName + " in contract "
 				+ reflectionHelper.getSimplerName(contractClass) + ".");
-		return getContractFromCache(target, contractClass, callingClass);
+		return ContractCache.getContractFromCache(target, contractClass, callingClass);
 	}
 
 	public static boolean canExecutePostCondition() {
@@ -129,7 +125,7 @@ public class Evaluator {
 		beforeContract(target, void.class, Thread.currentThread().getStackTrace().length);
 		logger.info("Calling invariant for " + className + " in contract "
 				+ reflectionHelper.getSimplerName(contractClass) + ".");
-		return getContractFromCache(target, contractClass, callingClass);
+		return ContractCache.getContractFromCache(target, contractClass, callingClass);
 	}
 
 	private static void beforeContract(Object target, Class<?> returnType, int stackTraceDepth) {
@@ -146,7 +142,7 @@ public class Evaluator {
 		returnValue.set(actualReturnValue);
 		logger.info("Calling post-condition for " + methodName + " in contract "
 				+ reflectionHelper.getSimplerName(contractClass) + ".");
-		return getContractFromCache(target, contractClass, callingClass);
+		return ContractCache.getContractFromCache(target, contractClass, callingClass);
 	}
 
 	public static void afterContract() {
@@ -169,22 +165,6 @@ public class Evaluator {
 			OldCache.clear(Thread.currentThread().getStackTrace().length);
 			PureEvaluator.unregisterUnchangeable();
 		}
-	}
-
-	private static Object getContractFromCache(Object target, Class<?> contractClass, Class<?> callingClass)
-			throws InstantiationException, IllegalAccessException {
-		if (target == null) {
-			return null;
-		}
-		Object contract;
-		Pair<Class<?>, Class<?>> classPair = new Pair<Class<?>, Class<?>>(contractClass, callingClass);
-		if (contractCache.contains(target, classPair)) {
-			contract = contractCache.get(target, classPair);
-		} else {
-			contract = contractClass.newInstance();
-			contractCache.put(target, classPair, contract);
-		}
-		return contract;
 	}
 
 	@SuppressWarnings("unchecked")
