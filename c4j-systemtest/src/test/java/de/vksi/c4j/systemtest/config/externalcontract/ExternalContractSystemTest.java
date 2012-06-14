@@ -1,6 +1,6 @@
 package de.vksi.c4j.systemtest.config.externalcontract;
 
-import static de.vksi.c4j.Condition.pre;
+import static de.vksi.c4j.Condition.preCondition;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -25,7 +25,7 @@ public class ExternalContractSystemTest {
 	public static class ContractClass extends TargetClass {
 		@Override
 		public void method(int arg) {
-			if (pre()) {
+			if (preCondition()) {
 				assert arg > 0;
 			}
 		}
@@ -50,7 +50,7 @@ public class ExternalContractSystemTest {
 	public static class LocalContract extends TargetClassWithLocalAndExternalContract {
 		@Override
 		public void method(int arg) {
-			if (pre()) {
+			if (preCondition()) {
 				assert arg > 0;
 			}
 		}
@@ -59,7 +59,7 @@ public class ExternalContractSystemTest {
 	public static class ExternalContract extends TargetClassWithLocalAndExternalContract {
 		@Override
 		public void method(int arg) {
-			if (pre()) {
+			if (preCondition()) {
 				assert arg > 1;
 			}
 		}

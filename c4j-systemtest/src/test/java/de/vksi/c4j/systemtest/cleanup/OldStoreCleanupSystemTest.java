@@ -1,8 +1,8 @@
 package de.vksi.c4j.systemtest.cleanup;
 
 import static de.vksi.c4j.Condition.old;
-import static de.vksi.c4j.Condition.post;
-import static de.vksi.c4j.Condition.pre;
+import static de.vksi.c4j.Condition.postCondition;
+import static de.vksi.c4j.Condition.preCondition;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Rule;
@@ -63,7 +63,7 @@ public class OldStoreCleanupSystemTest {
 
 		@Override
 		public void method(int incrementor) {
-			if (post()) {
+			if (postCondition()) {
 				int oldValue = old(target.value);
 				assert target.value == (oldValue + incrementor);
 			}
@@ -71,17 +71,17 @@ public class OldStoreCleanupSystemTest {
 
 		@Override
 		public void methodFailingContract(int incrementor) {
-			if (pre()) {
+			if (preCondition()) {
 				assert false;
 			}
-			if (post()) {
+			if (postCondition()) {
 				assert target.value == old(target.value).intValue() + incrementor;
 			}
 		}
 
 		@Override
 		public void methodFailingSelf(int incrementor) {
-			if (post()) {
+			if (postCondition()) {
 				assert target.value == old(target.value);
 			}
 		}
@@ -105,7 +105,7 @@ public class OldStoreCleanupSystemTest {
 
 		@Override
 		public void method() {
-			if (post()) {
+			if (postCondition()) {
 				assert old(target.field) == 1;
 			}
 		}
@@ -125,7 +125,7 @@ public class OldStoreCleanupSystemTest {
 
 		@Override
 		public void method() {
-			if (post()) {
+			if (postCondition()) {
 				assert old(target.field) == 1;
 			}
 		}

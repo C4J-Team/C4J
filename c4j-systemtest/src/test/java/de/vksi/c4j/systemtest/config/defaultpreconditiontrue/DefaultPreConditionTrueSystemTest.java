@@ -1,6 +1,6 @@
 package de.vksi.c4j.systemtest.config.defaultpreconditiontrue;
 
-import static de.vksi.c4j.Condition.pre;
+import static de.vksi.c4j.Condition.preCondition;
 
 import org.apache.log4j.Level;
 import org.junit.Rule;
@@ -29,7 +29,7 @@ public class DefaultPreConditionTrueSystemTest {
 	public static class ContractClass extends TargetClass {
 		@Override
 		public void method(int arg) {
-			if (pre()) {
+			if (preCondition()) {
 				assert arg > 0;
 			}
 		}

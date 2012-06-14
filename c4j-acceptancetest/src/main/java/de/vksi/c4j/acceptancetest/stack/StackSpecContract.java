@@ -2,8 +2,8 @@ package de.vksi.c4j.acceptancetest.stack;
 
 import static de.vksi.c4j.Condition.ignored;
 import static de.vksi.c4j.Condition.old;
-import static de.vksi.c4j.Condition.post;
-import static de.vksi.c4j.Condition.pre;
+import static de.vksi.c4j.Condition.postCondition;
+import static de.vksi.c4j.Condition.preCondition;
 import static de.vksi.c4j.Condition.result;
 import de.vksi.c4j.Target;
 
@@ -16,10 +16,10 @@ public class StackSpecContract<T> implements StackSpec<T> {
 
 	@Override
 	public int capacity() {
-		if (pre()) {
+		if (preCondition()) {
 			// no pre-condition identified yet
 		}
-		if (post()) {
+		if (postCondition()) {
 			int result = result(Integer.class);
 			assert result > 0 : "result > 0";
 		}
@@ -28,10 +28,10 @@ public class StackSpecContract<T> implements StackSpec<T> {
 
 	@Override
 	public int count() {
-		if (pre()) {
+		if (preCondition()) {
 			// no pre-condition identified yet
 		}
-		if (post()) {
+		if (postCondition()) {
 			int result = result(Integer.class);
 			assert result >= 0 : "result >= 0";
 			assert result <= target.capacity() : "count <= capacity";
@@ -41,11 +41,11 @@ public class StackSpecContract<T> implements StackSpec<T> {
 
 	@Override
 	public void push(T x) {
-		if (pre()) {
+		if (preCondition()) {
 			assert x != null : "x != null";
 			assert !target.isFull() : "not isFull";
 		}
-		if (post()) {
+		if (postCondition()) {
 			assert target.count() == old(target.count()) + 1 : "old count increased by 1";
 			assert target.top() == x : "x set";
 		}
@@ -53,7 +53,7 @@ public class StackSpecContract<T> implements StackSpec<T> {
 
 	@Override
 	public void pop() {
-		if (pre()) {
+		if (preCondition()) {
 			assert !target.isEmpty() : "not isEmpty";
 			if (target.count() > 1) {
 				old_values = new Object[target.count() - 1];
@@ -62,7 +62,7 @@ public class StackSpecContract<T> implements StackSpec<T> {
 				}
 			}
 		}
-		if (post()) {
+		if (postCondition()) {
 			assert target.count() == old(target.count()) - 1 : "old count decreased by 1";
 			if (!target.isEmpty()) {
 				for (int i = 0; i < old_values.length; i = i + 1) {
@@ -75,10 +75,10 @@ public class StackSpecContract<T> implements StackSpec<T> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public T top() {
-		if (pre()) {
+		if (preCondition()) {
 			assert !target.isEmpty() : "not isEmpty";
 		}
-		if (post()) {
+		if (postCondition()) {
 			T result = (T) result();
 			assert result == target.get(target.count() - 1) : "result == top_item";
 		}
@@ -87,10 +87,10 @@ public class StackSpecContract<T> implements StackSpec<T> {
 
 	@Override
 	public boolean isFull() {
-		if (pre()) {
+		if (preCondition()) {
 			// no pre-condition identified yet
 		}
-		if (post()) {
+		if (postCondition()) {
 			boolean result = result(Boolean.class);
 			if (result) {
 				assert target.count() == target.capacity() : "count == capacity";
@@ -103,10 +103,10 @@ public class StackSpecContract<T> implements StackSpec<T> {
 
 	@Override
 	public boolean isEmpty() {
-		if (pre()) {
+		if (preCondition()) {
 			// no pre-condition identified yet
 		}
-		if (post()) {
+		if (postCondition()) {
 			boolean result = result(Boolean.class);
 			if (result) {
 				assert target.count() == 0 : "count == 0";
@@ -119,11 +119,11 @@ public class StackSpecContract<T> implements StackSpec<T> {
 
 	@Override
 	public T get(int index) {
-		if (pre()) {
+		if (preCondition()) {
 			assert index >= 0 : "index >= 0";
 			assert index < target.count() : "index < count";
 		}
-		if (post()) {
+		if (postCondition()) {
 			// no post-condition identified yet
 		}
 		return ignored();

@@ -1,6 +1,6 @@
 package de.vksi.c4j.systemtest.contractclassmagic;
 
-import static de.vksi.c4j.Condition.pre;
+import static de.vksi.c4j.Condition.preCondition;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -45,7 +45,7 @@ public class FieldAccessSystemTest {
 
 		@Override
 		public void methodContractHasFieldAccess() {
-			if (pre()) {
+			if (preCondition()) {
 				assert target.value == 5;
 			}
 		}
@@ -69,7 +69,7 @@ public class FieldAccessSystemTest {
 
 		@Override
 		public void method() {
-			if (pre()) {
+			if (preCondition()) {
 				assert target.field == 0;
 			}
 		}
@@ -89,7 +89,7 @@ public class FieldAccessSystemTest {
 
 		@Override
 		public void method() {
-			if (pre()) {
+			if (preCondition()) {
 				assert target.field == 0;
 			}
 		}

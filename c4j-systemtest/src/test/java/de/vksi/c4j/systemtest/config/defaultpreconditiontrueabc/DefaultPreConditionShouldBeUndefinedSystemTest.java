@@ -1,6 +1,6 @@
 package de.vksi.c4j.systemtest.config.defaultpreconditiontrueabc;
 
-import static de.vksi.c4j.Condition.pre;
+import static de.vksi.c4j.Condition.preCondition;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -24,7 +24,7 @@ public class DefaultPreConditionShouldBeUndefinedSystemTest {
 	public static class ContractClass extends TargetClass {
 		@Override
 		public void method(int arg) {
-			if (pre()) {
+			if (preCondition()) {
 				assert arg > 0;
 			}
 		}

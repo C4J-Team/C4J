@@ -1,6 +1,6 @@
 package de.vksi.c4j.systemtest.unchanged;
 
-import static de.vksi.c4j.Condition.post;
+import static de.vksi.c4j.Condition.postCondition;
 import static de.vksi.c4j.Condition.unchanged;
 
 import org.junit.Before;
@@ -145,84 +145,84 @@ public class UnchangedForObjectsSystemTest {
 
 		@Override
 		public void fieldRemainsUnchanged() {
-			if (post()) {
+			if (postCondition()) {
 				assert unchanged(target.field);
 			}
 		}
 
 		@Override
 		public void methodRemainsUnchanged() {
-			if (post()) {
+			if (postCondition()) {
 				assert unchanged(target.method());
 			}
 		}
 
 		@Override
 		public void parameterRemainsUnchanged(MutableString param) {
-			if (post()) {
+			if (postCondition()) {
 				assert unchanged(param);
 			}
 		}
 
 		@Override
 		public void fieldIsChanged() {
-			if (post()) {
+			if (postCondition()) {
 				assert unchanged(target.field);
 			}
 		}
 
 		@Override
 		public void methodIsChanged() {
-			if (post()) {
+			if (postCondition()) {
 				assert unchanged(target.method());
 			}
 		}
 
 		@Override
 		public void parameterIsChanged(MutableString param) {
-			if (post()) {
+			if (postCondition()) {
 				assert unchanged(param);
 			}
 		}
 
 		@Override
 		public void parameter5IsChanged(int a, int b, int c, int d, MutableString param) {
-			if (post()) {
+			if (postCondition()) {
 				assert unchanged(param);
 			}
 		}
 
 		@Override
 		public void parameterArrayIsChanged(MutableString[] param) {
-			if (post()) {
+			if (postCondition()) {
 				assert unchanged(param);
 			}
 		}
 
 		@Override
 		public void parameterArrayIsReplaced(MutableString[] param) {
-			if (post()) {
+			if (postCondition()) {
 				assert unchanged(param);
 			}
 		}
 
 		@Override
 		public void fieldIsReplaced() {
-			if (post()) {
+			if (postCondition()) {
 				assert unchanged(target.field);
 			}
 		}
 
 		@Override
 		public void methodIsReplaced() {
-			if (post()) {
+			if (postCondition()) {
 				assert unchanged(target.method());
 			}
 		}
 
 		@Override
 		public void parameterIsReplaced(MutableString param) {
-			if (post()) {
+			if (postCondition()) {
 				assert unchanged(param);
 			}
 		}

@@ -1,7 +1,7 @@
 package de.vksi.c4j.systemtest.contractclassmagic;
 
 import static de.vksi.c4j.Condition.ignored;
-import static de.vksi.c4j.Condition.post;
+import static de.vksi.c4j.Condition.postCondition;
 import static de.vksi.c4j.Condition.result;
 
 import org.junit.Rule;
@@ -41,7 +41,7 @@ public class ContractClassDefiningOwnConstructorSystemTest {
 
 		@Override
 		public int getValue() {
-			if (post()) {
+			if (postCondition()) {
 				int result = (Integer) result();
 				assert result > 0;
 			}

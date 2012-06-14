@@ -1,7 +1,7 @@
 package de.vksi.c4j.acceptancetest.object;
 
 import static de.vksi.c4j.Condition.ignored;
-import static de.vksi.c4j.Condition.post;
+import static de.vksi.c4j.Condition.postCondition;
 import static de.vksi.c4j.Condition.result;
 import de.vksi.c4j.Target;
 
@@ -14,7 +14,7 @@ public class ObjectSpecContract implements ObjectSpec {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (post()) {
+		if (postCondition()) {
 			boolean result = result(Boolean.class);
 			Object x = target;
 			Object y = obj;
@@ -47,7 +47,7 @@ public class ObjectSpecContract implements ObjectSpec {
 
 	@Override
 	public String toString() {
-		if (post()) {
+		if (postCondition()) {
 			String result = result(String.class);
 			assert result != null : "result not null";
 		}

@@ -1,7 +1,7 @@
 package de.vksi.c4j.systemtest.old;
 
 import static de.vksi.c4j.Condition.old;
-import static de.vksi.c4j.Condition.post;
+import static de.vksi.c4j.Condition.postCondition;
 
 import java.io.InputStream;
 
@@ -74,14 +74,14 @@ public class OldSystemTest {
 
 		@Override
 		public void incrementValueCheckField() {
-			if (post()) {
+			if (postCondition()) {
 				assert target.value == old(target.value) + 1;
 			}
 		}
 
 		@Override
 		public void incrementValueCheckMethod() {
-			if (post()) {
+			if (postCondition()) {
 				assert target.getValue() == old(target.getValue()) + 1;
 			}
 		}
@@ -102,7 +102,7 @@ public class OldSystemTest {
 
 		@Override
 		public int method() {
-			if (post()) {
+			if (postCondition()) {
 				assert old(target.field) == 0;
 				assert old(target.method()) == 0;
 			}
@@ -145,7 +145,7 @@ public class OldSystemTest {
 
 		@Override
 		public int method() {
-			if (post()) {
+			if (postCondition()) {
 				assert old(target.method()) == target.method();
 			}
 			return 0;

@@ -1,6 +1,6 @@
 package de.vksi.c4j.systemtest.inheritance;
 
-import static de.vksi.c4j.Condition.post;
+import static de.vksi.c4j.Condition.postCondition;
 
 import org.apache.log4j.Level;
 import org.junit.Before;
@@ -66,7 +66,7 @@ public class SuperclassSystemTest {
 	public static class DummyContract extends DummyClass {
 		@Override
 		public void method(final int arg) {
-			if (post()) {
+			if (postCondition()) {
 				assert arg < 5;
 			}
 		}
@@ -82,7 +82,7 @@ public class SuperclassSystemTest {
 	public static class DummyContractDeclaringMethod extends DummyClassDeclaringMethod {
 		@Override
 		public void method(final int arg) {
-			if (post()) {
+			if (postCondition()) {
 				assert arg < 5;
 			}
 		}
@@ -97,7 +97,7 @@ public class SuperclassSystemTest {
 	public static class SuperContract extends SuperClass {
 		@Override
 		public void method(final int arg) {
-			if (post()) {
+			if (postCondition()) {
 				assert arg > 0;
 			}
 		}

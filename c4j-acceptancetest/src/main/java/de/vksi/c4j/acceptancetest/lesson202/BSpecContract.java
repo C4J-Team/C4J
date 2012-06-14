@@ -1,17 +1,17 @@
 package de.vksi.c4j.acceptancetest.lesson202;
 
 import static de.vksi.c4j.Condition.ignored;
-import static de.vksi.c4j.Condition.post;
-import static de.vksi.c4j.Condition.pre;
+import static de.vksi.c4j.Condition.postCondition;
+import static de.vksi.c4j.Condition.preCondition;
 
 public class BSpecContract implements BSpec {
 
 	@Override
 	public int queryB() {
-		if (pre()) {
+		if (preCondition()) {
 			System.out.println("Pre-Condition queryB");
 		}
-		if (post()) {
+		if (postCondition()) {
 			System.out.println("Post-Condition queryB");
 		}
 		return (Integer) ignored();
@@ -19,20 +19,20 @@ public class BSpecContract implements BSpec {
 
 	@Override
 	public void commandB(int value) {
-		if (pre()) {
+		if (preCondition()) {
 			System.out.println("Pre-Condition commandB");
 		}
-		if (post()) {
+		if (postCondition()) {
 			System.out.println("Post-Condition commandB");
 		}
 	}
 
 	@Override
 	public int query(int x, int y) {
-		if (pre()) {
+		if (preCondition()) {
 			System.out.println("Pre-Condition query interface BSpec");
 		}
-		if (post()) {
+		if (postCondition()) {
 			System.out.println("Post-Condition query interface BSpec");
 		}
 		return (Integer) ignored();
@@ -40,10 +40,10 @@ public class BSpecContract implements BSpec {
 
 	@Override
 	public void command(int value) {
-		if (pre()) {
+		if (preCondition()) {
 			System.out.println("Pre-Condition command interface BSpec");
 		}
-		if (post()) {
+		if (postCondition()) {
 			System.out.println("Post-Condition command interface BSpec");
 		}
 	}

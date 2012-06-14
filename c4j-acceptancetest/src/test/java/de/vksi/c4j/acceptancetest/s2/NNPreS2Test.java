@@ -1,7 +1,7 @@
 package de.vksi.c4j.acceptancetest.s2;
 
 import static de.vksi.c4j.Condition.ignored;
-import static de.vksi.c4j.Condition.pre;
+import static de.vksi.c4j.Condition.preCondition;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -52,7 +52,7 @@ public class NNPreS2Test {
 	public static class MiniStackContract<T> implements MiniStack<T> {
 		@Override
 		public T get(final int index) {
-			if (pre()) {
+			if (preCondition()) {
 				assert index > 0 : "index greater 0";
 			}
 			return ignored();

@@ -1,7 +1,7 @@
 package de.vksi.c4j.systemtest.pure;
 
-import static de.vksi.c4j.Condition.post;
-import static de.vksi.c4j.Condition.pre;
+import static de.vksi.c4j.Condition.postCondition;
+import static de.vksi.c4j.Condition.preCondition;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,10 +37,10 @@ public class PureInContractSystemTest {
 
 		@Override
 		public void method() {
-			if (pre()) {
+			if (preCondition()) {
 				assert target.pureMethod();
 			}
-			if (post()) {
+			if (postCondition()) {
 				assert target.pureMethod();
 			}
 		}
@@ -67,10 +67,10 @@ public class PureInContractSystemTest {
 
 		@Override
 		public void method() {
-			if (pre()) {
+			if (preCondition()) {
 				assert target.unpureMethod();
 			}
-			if (post()) {
+			if (postCondition()) {
 				assert target.unpureMethod();
 			}
 		}
@@ -92,10 +92,10 @@ public class PureInContractSystemTest {
 
 		@Override
 		public void method() {
-			if (pre()) {
+			if (preCondition()) {
 				numCall++;
 			}
-			if (post()) {
+			if (postCondition()) {
 				numCall++;
 			}
 		}

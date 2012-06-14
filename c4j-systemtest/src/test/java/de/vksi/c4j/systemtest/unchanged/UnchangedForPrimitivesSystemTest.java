@@ -1,6 +1,6 @@
 package de.vksi.c4j.systemtest.unchanged;
 
-import static de.vksi.c4j.Condition.post;
+import static de.vksi.c4j.Condition.postCondition;
 import static de.vksi.c4j.Condition.unchanged;
 
 import org.junit.Before;
@@ -72,7 +72,7 @@ public class UnchangedForPrimitivesSystemTest {
 
 		@Override
 		public void setHour(int hour) {
-			if (post()) {
+			if (postCondition()) {
 				assert unchanged(target.minute);
 				assert unchanged(target.getMinute());
 			}
@@ -80,14 +80,14 @@ public class UnchangedForPrimitivesSystemTest {
 
 		@Override
 		public void setHourWrongForField(int hour) {
-			if (post()) {
+			if (postCondition()) {
 				assert unchanged(target.minute);
 			}
 		}
 
 		@Override
 		public void setHourWrongForMethod(int hour) {
-			if (post()) {
+			if (postCondition()) {
 				assert unchanged(target.getMinute());
 			}
 		}

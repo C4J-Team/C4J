@@ -7,17 +7,6 @@ import de.vksi.c4j.internal.evaluator.Evaluator;
  */
 public class Condition {
 	/**
-	 * Deprecated, use {@link Configuration#preCondition()} instead as it is more descriptive.
-	 * <p>
-	 * Will be removed with Version 4.0-RC1.
-	 */
-	@Pure
-	@Deprecated
-	public static boolean pre() {
-		return Evaluator.isBefore();
-	}
-
-	/**
 	 * Usable to define a pre-condition within a contract-method.
 	 * 
 	 * @return Whether the contract-method is being executed as a pre-condition.
@@ -25,17 +14,6 @@ public class Condition {
 	@Pure
 	public static boolean preCondition() {
 		return Evaluator.isBefore();
-	}
-
-	/**
-	 * Deprecated, use {@link Configuration#postCondition()} instead as it is more descriptive.
-	 * <p>
-	 * Will be removed with Version 4.0-RC1.
-	 */
-	@Pure
-	@Deprecated
-	public static boolean post() {
-		return Evaluator.isAfter();
 	}
 
 	/**

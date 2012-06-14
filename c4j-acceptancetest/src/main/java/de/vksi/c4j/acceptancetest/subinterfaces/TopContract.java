@@ -13,7 +13,7 @@ public class TopContract implements Top {
 
 	@Override
 	public int pre(String parameter) {
-		if (Condition.pre()) {
+		if (Condition.preCondition()) {
 			assert parameter != null : "parameter must not be null";
 		}
 		return (Integer) ignored();
@@ -21,7 +21,7 @@ public class TopContract implements Top {
 
 	@Override
 	public int post(String parameter) {
-		if (Condition.post()) {
+		if (Condition.postCondition()) {
 			assert result(Integer.class) >= 0 : "result >= 0";
 		}
 		return (Integer) ignored();
@@ -29,10 +29,10 @@ public class TopContract implements Top {
 
 	@Override
 	public int preAndPost(String parameter) {
-		if (Condition.pre()) {
+		if (Condition.preCondition()) {
 			assert parameter != null : "parameter must not be null";
 		}
-		if (Condition.post()) {
+		if (Condition.postCondition()) {
 			assert result(Integer.class) >= 0 : "result >= 0";
 		}
 		return (Integer) ignored();
@@ -50,7 +50,7 @@ public class TopContract implements Top {
 
 	@Override
 	public int unchanged() {
-		if (Condition.post()) {
+		if (Condition.postCondition()) {
 			assert Condition.unchanged(target.unchanged()) : "unchanged never changes";
 		}
 		return (Integer) ignored();
@@ -58,7 +58,7 @@ public class TopContract implements Top {
 
 	@Override
 	public int old() {
-		if (Condition.post()) {
+		if (Condition.postCondition()) {
 			assert result().equals(Condition.old(target.old())) : "old value is preserved";
 		}
 		return (Integer) ignored();

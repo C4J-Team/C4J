@@ -1,7 +1,7 @@
 package de.vksi.c4j.systemtest.config.externalcontract;
 
 import static de.vksi.c4j.Condition.ignored;
-import static de.vksi.c4j.Condition.post;
+import static de.vksi.c4j.Condition.postCondition;
 import static de.vksi.c4j.Condition.result;
 
 import org.junit.Rule;
@@ -44,7 +44,7 @@ public class ObjectContractSystemTest {
 
 		@Override
 		public boolean equals(Object obj) {
-			if (post()) {
+			if (postCondition()) {
 				Boolean result = result();
 				if (result) {
 					assert target.hashCode() == obj.hashCode();

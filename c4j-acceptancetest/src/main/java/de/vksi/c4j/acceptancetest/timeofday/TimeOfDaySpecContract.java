@@ -1,8 +1,8 @@
 package de.vksi.c4j.acceptancetest.timeofday;
 
 import static de.vksi.c4j.Condition.ignored;
-import static de.vksi.c4j.Condition.post;
-import static de.vksi.c4j.Condition.pre;
+import static de.vksi.c4j.Condition.postCondition;
+import static de.vksi.c4j.Condition.preCondition;
 import static de.vksi.c4j.Condition.result;
 import static de.vksi.c4j.Condition.unchanged;
 import de.vksi.c4j.Target;
@@ -14,10 +14,10 @@ public class TimeOfDaySpecContract implements TimeOfDaySpec {
 
 	@Override
 	public int getHour() {
-		if (pre()) {
+		if (preCondition()) {
 			// no pre-condition identified yet
 		}
-		if (post()) {
+		if (postCondition()) {
 			int result = result(Integer.class);
 			assert result >= 0 : "result >= 0";
 			assert result <= 23 : "result <= 23";
@@ -27,10 +27,10 @@ public class TimeOfDaySpecContract implements TimeOfDaySpec {
 
 	@Override
 	public int getMinute() {
-		if (pre()) {
+		if (preCondition()) {
 			// no pre-condition identified yet
 		}
-		if (post()) {
+		if (postCondition()) {
 			int result = result(Integer.class);
 			assert result >= 0 : "result >= 0";
 			assert result <= 59 : "result <= 59";
@@ -40,10 +40,10 @@ public class TimeOfDaySpecContract implements TimeOfDaySpec {
 
 	@Override
 	public int getSecond() {
-		if (pre()) {
+		if (preCondition()) {
 			// no pre-condition identified yet
 		}
-		if (post()) {
+		if (postCondition()) {
 			int result = result(Integer.class);
 			assert result >= 0 : "result >= 0";
 			assert result <= 59 : "result <= 59";
@@ -53,12 +53,12 @@ public class TimeOfDaySpecContract implements TimeOfDaySpec {
 
 	@Override
 	public void setHour(int hour) {
-		if (pre()) {
+		if (preCondition()) {
 			assert hour >= 0 : "hour >= 0";
 			assert hour <= 23 : "hour <= 23";
 			System.out.println(target.getMinute());
 		}
-		if (post()) {
+		if (postCondition()) {
 			assert target.getHour() == hour : "hour set";
 			System.out.println(target.getMinute());
 			assert unchanged(target.getMinute()) : "minute unchanged";
@@ -68,11 +68,11 @@ public class TimeOfDaySpecContract implements TimeOfDaySpec {
 
 	@Override
 	public void setMinute(int minute) {
-		if (pre()) {
+		if (preCondition()) {
 			assert minute >= 0 : "minute >= 0";
 			assert minute <= 59 : "minute <= 59";
 		}
-		if (post()) {
+		if (postCondition()) {
 			assert unchanged(target.getHour()) : "hour unchanged";
 			assert target.getMinute() == minute : "minute set";
 			assert unchanged(target.getSecond()) : "second unchanged";
@@ -81,11 +81,11 @@ public class TimeOfDaySpecContract implements TimeOfDaySpec {
 
 	@Override
 	public void setSecond(int second) {
-		if (pre()) {
+		if (preCondition()) {
 			assert second >= 0 : "second >= 0";
 			assert second <= 59 : "second <= 59";
 		}
-		if (post()) {
+		if (postCondition()) {
 			assert unchanged(target.getHour()) : "hour unchanged";
 			assert unchanged(target.getMinute()) : "minute unchanged";
 			assert target.getSecond() == second : "second set";

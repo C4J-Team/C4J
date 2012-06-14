@@ -1,6 +1,6 @@
 package de.vksi.c4j.systemtest.hamcrestintegration;
 
-import static de.vksi.c4j.Condition.pre;
+import static de.vksi.c4j.Condition.preCondition;
 import static org.hamcrest.JavaLangMatcherAssert.that;
 import static org.hamcrest.Matchers.startsWith;
 
@@ -33,7 +33,7 @@ public class HamcrestIntegrationSystemTest {
 	public static class DummyContract extends DummyClass {
 		@Override
 		public void method(String arg) {
-			if (pre()) {
+			if (preCondition()) {
 				assert that(arg, startsWith("Dummy"));
 			}
 		}

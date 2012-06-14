@@ -1,7 +1,7 @@
 package de.vksi.c4j.systemtest.postcondition;
 
 import static de.vksi.c4j.Condition.ignored;
-import static de.vksi.c4j.Condition.post;
+import static de.vksi.c4j.Condition.postCondition;
 import static de.vksi.c4j.Condition.result;
 
 import org.junit.Rule;
@@ -68,14 +68,14 @@ public class PostConditionSystemTest {
 	public static class DummyContract extends DummyClass {
 		@Override
 		public void setStaticValue(int value) {
-			if (post()) {
+			if (postCondition()) {
 				assert DummyClass.staticValue == 5;
 			}
 		}
 
 		@Override
 		public int noArgs() {
-			if (post()) {
+			if (postCondition()) {
 				assert DummyClass.staticValue == 5;
 			}
 			return (Integer) ignored();
@@ -83,7 +83,7 @@ public class PostConditionSystemTest {
 
 		@Override
 		public int returnValue(int value) {
-			if (post()) {
+			if (postCondition()) {
 				assert result(int.class) == 5;
 			}
 			return (Integer) ignored();
@@ -91,7 +91,7 @@ public class PostConditionSystemTest {
 
 		@Override
 		public void returnValueVoid() {
-			if (post()) {
+			if (postCondition()) {
 				assert result() == null;
 			}
 		}

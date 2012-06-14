@@ -1,6 +1,6 @@
 package de.vksi.c4j.acceptancetest.floatingwindow;
 
-import static de.vksi.c4j.Condition.pre;
+import static de.vksi.c4j.Condition.preCondition;
 
 public class NorthEastAndSouthWestFloatingWindowContract extends NorthEastAndSouthWestFloatingWindow {
 
@@ -11,7 +11,7 @@ public class NorthEastAndSouthWestFloatingWindowContract extends NorthEastAndSou
 	@SuppressWarnings("unused")
 	@Override
 	public void move(Vector vector) {
-		if(pre()) {
+		if(preCondition()) {
 			assert true : "true";
 		}
 	}

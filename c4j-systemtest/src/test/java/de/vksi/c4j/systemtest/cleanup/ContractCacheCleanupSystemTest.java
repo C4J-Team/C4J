@@ -1,8 +1,8 @@
 package de.vksi.c4j.systemtest.cleanup;
 
 import static de.vksi.c4j.Condition.old;
-import static de.vksi.c4j.Condition.post;
-import static de.vksi.c4j.Condition.pre;
+import static de.vksi.c4j.Condition.postCondition;
+import static de.vksi.c4j.Condition.preCondition;
 import static org.junit.Assert.assertNull;
 
 import java.lang.ref.WeakReference;
@@ -38,7 +38,7 @@ public class ContractCacheCleanupSystemTest {
 	public static class ContractClass extends TargetClass {
 		@Override
 		public void method(int value) {
-			if (pre()) {
+			if (preCondition()) {
 				assert value > 0;
 			}
 		}
@@ -72,7 +72,7 @@ public class ContractCacheCleanupSystemTest {
 
 		@Override
 		public void method(int incrementor) {
-			if (post()) {
+			if (postCondition()) {
 				int oldValue = old(target.value);
 				assert target.value == (oldValue + incrementor);
 			}
@@ -80,10 +80,10 @@ public class ContractCacheCleanupSystemTest {
 
 		@Override
 		public void methodFailing(int incrementor) {
-			if (pre()) {
+			if (preCondition()) {
 				assert false;
 			}
-			if (post()) {
+			if (postCondition()) {
 				int oldValue = old(target.value);
 				assert target.value == (oldValue + incrementor);
 			}

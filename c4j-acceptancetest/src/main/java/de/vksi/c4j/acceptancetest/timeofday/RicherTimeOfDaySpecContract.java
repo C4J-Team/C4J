@@ -1,8 +1,8 @@
 package de.vksi.c4j.acceptancetest.timeofday;
 
 import static de.vksi.c4j.Condition.ignored;
-import static de.vksi.c4j.Condition.post;
-import static de.vksi.c4j.Condition.pre;
+import static de.vksi.c4j.Condition.postCondition;
+import static de.vksi.c4j.Condition.preCondition;
 import static de.vksi.c4j.Condition.result;
 import de.vksi.c4j.Target;
 
@@ -13,10 +13,10 @@ public class RicherTimeOfDaySpecContract implements RicherTimeOfDaySpec {
 
 	@Override
 	public int getHour() {
-		if (pre()) {
+		if (preCondition()) {
 			// no further pre-condition identified yet
 		}
-		if (post()) {
+		if (postCondition()) {
 			// no further post-condition identified yet
 		}
 		return (Integer) ignored();
@@ -24,10 +24,10 @@ public class RicherTimeOfDaySpecContract implements RicherTimeOfDaySpec {
 
 	@Override
 	public int getMinute() {
-		if (pre()) {
+		if (preCondition()) {
 			// no further pre-condition identified yet
 		}
-		if (post()) {
+		if (postCondition()) {
 			// no further post-condition identified yet
 		}
 		return (Integer) ignored();
@@ -35,10 +35,10 @@ public class RicherTimeOfDaySpecContract implements RicherTimeOfDaySpec {
 
 	@Override
 	public int getSecond() {
-		if (pre()) {
+		if (preCondition()) {
 			// no further pre-condition identified yet
 		}
-		if (post()) {
+		if (postCondition()) {
 			// no further post-condition identified yet
 		}
 		return (Integer) ignored();
@@ -46,40 +46,40 @@ public class RicherTimeOfDaySpecContract implements RicherTimeOfDaySpec {
 
 	@Override
 	public void setHour(int hour) {
-		if (pre()) {
+		if (preCondition()) {
 			// no further pre-condition identified yet
 		}
-		if (post()) {
+		if (postCondition()) {
 			// no further post-condition identified yet
 		}
 	}
 
 	@Override
 	public void setMinute(int minute) {
-		if (pre()) {
+		if (preCondition()) {
 			// no further pre-condition identified yet
 		}
-		if (post()) {
+		if (postCondition()) {
 			// no further post-condition identified yet
 		}
 	}
 
 	@Override
 	public void setSecond(int second) {
-		if (pre()) {
+		if (preCondition()) {
 			// no further pre-condition identified yet
 		}
-		if (post()) {
+		if (postCondition()) {
 			// no further post-condition identified yet
 		}
 	}
 
 	@Override
 	public int getNearestHour() {
-		if (pre()) {
+		if (preCondition()) {
 			// no pre-condition identified yet
 		}
-		if (post()) {
+		if (postCondition()) {
 			int result = result(Integer.class);
 			int hour = target.getHour();
 			int minute = target.getMinute();

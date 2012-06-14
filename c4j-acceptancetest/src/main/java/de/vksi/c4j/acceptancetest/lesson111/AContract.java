@@ -1,8 +1,8 @@
 package de.vksi.c4j.acceptancetest.lesson111;
 
 import static de.vksi.c4j.Condition.ignored;
-import static de.vksi.c4j.Condition.post;
-import static de.vksi.c4j.Condition.pre;
+import static de.vksi.c4j.Condition.postCondition;
+import static de.vksi.c4j.Condition.preCondition;
 import de.vksi.c4j.ClassInvariant;
 import de.vksi.c4j.Target;
 
@@ -18,10 +18,10 @@ public class AContract extends A {
 
 	@Override
 	public int query(int x, int y) {
-		if (pre()) {
+		if (preCondition()) {
 			assert x >= 1 : "x >= 1";
 		}
-		if (post()) {
+		if (postCondition()) {
 			assert y >= 2 : "y >= 2";
 		}
 		return (Integer) ignored();
@@ -29,10 +29,10 @@ public class AContract extends A {
 
 	@Override
 	public void command(int value) {
-		if (pre()) {
+		if (preCondition()) {
 			assert value > 0 : "value > 0";
 		}
-		if (post()) {
+		if (postCondition()) {
 			assert target.getA() == value : "a set";
 		}
 	}

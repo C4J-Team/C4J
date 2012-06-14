@@ -1,6 +1,6 @@
 package de.vksi.c4j.systemtest.contractclassmagic;
 
-import static de.vksi.c4j.Condition.post;
+import static de.vksi.c4j.Condition.postCondition;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,7 +34,7 @@ public class ContractClassAccessingTargetClassFieldsSystemTest {
 
 		@Override
 		public void method(int value, int param) {
-			if (post()) {
+			if (postCondition()) {
 				assert target.value >= param;
 			}
 		}

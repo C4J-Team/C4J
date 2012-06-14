@@ -1,6 +1,6 @@
 package de.vksi.c4j.acceptancetest.s2;
 
-import static de.vksi.c4j.Condition.post;
+import static de.vksi.c4j.Condition.postCondition;
 import static de.vksi.c4j.Condition.unchanged;
 
 import org.junit.Rule;
@@ -58,7 +58,7 @@ public class NNUnchangedS2Test {
 
 		@Override
 		public void setStyleColor(Color color) {
-			if (post()) {
+			if (postCondition()) {
 				assert target.style.color.equals(color) : "color set";
 				assert unchanged(target.upperLeftCorner) : "upperLeftCorner unchanged";
 			}

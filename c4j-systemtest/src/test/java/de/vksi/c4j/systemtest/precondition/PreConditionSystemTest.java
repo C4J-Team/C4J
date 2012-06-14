@@ -1,6 +1,6 @@
 package de.vksi.c4j.systemtest.precondition;
 
-import static de.vksi.c4j.Condition.pre;
+import static de.vksi.c4j.Condition.preCondition;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -39,7 +39,7 @@ public class PreConditionSystemTest {
 	public static class DummyContract extends DummyClass {
 		@Override
 		public void method(int arg) {
-			if (pre()) {
+			if (preCondition()) {
 				assert arg > 0;
 			}
 		}

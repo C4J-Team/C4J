@@ -1,6 +1,6 @@
 package de.vksi.c4j.systemtest.inheritance;
 
-import static de.vksi.c4j.Condition.pre;
+import static de.vksi.c4j.Condition.preCondition;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -44,7 +44,7 @@ public class InterfaceSystemTest {
 	public static class ContractedInterfaceContract implements ContractedInterface {
 		@Override
 		public void method(int value) {
-			if (pre()) {
+			if (preCondition()) {
 				assert value > 0;
 			}
 		}

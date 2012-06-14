@@ -1,7 +1,7 @@
 package de.vksi.c4j.acceptancetest.timeofday;
 
-import static de.vksi.c4j.Condition.post;
-import static de.vksi.c4j.Condition.pre;
+import static de.vksi.c4j.Condition.postCondition;
+import static de.vksi.c4j.Condition.preCondition;
 import de.vksi.c4j.ClassInvariant;
 import de.vksi.c4j.Target;
 
@@ -12,10 +12,10 @@ public class TimeOfDayContract extends TimeOfDay {
 
 	public TimeOfDayContract() {
 		super();
-		if (pre()) {
+		if (preCondition()) {
 			// no pre-condition identified yet
 		}
-		if (post()) {
+		if (postCondition()) {
 			assert target.getHour() == 0 : "hour == 0";
 			assert target.getMinute() == 0 : "minute == 0";
 			assert target.getSecond() == 0 : "second == 0";

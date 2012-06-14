@@ -1,7 +1,7 @@
 package de.vksi.c4j.acceptancetest.stack;
 
-import static de.vksi.c4j.Condition.post;
-import static de.vksi.c4j.Condition.pre;
+import static de.vksi.c4j.Condition.postCondition;
+import static de.vksi.c4j.Condition.preCondition;
 import de.vksi.c4j.ClassInvariant;
 import de.vksi.c4j.Target;
 
@@ -12,10 +12,10 @@ public class StackContract<T> extends Stack<T> {
 
 	public StackContract(int capacity) {
 		super(capacity);
-		if (pre()) {
+		if (preCondition()) {
 			assert capacity > 0 : "capacity > 0";
 		}
-		if (post()) {
+		if (postCondition()) {
 			assert target.capacity() == capacity : "capacity set";
 		}
 	}

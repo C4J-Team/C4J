@@ -1,8 +1,8 @@
 package com.external;
 
 import static de.vksi.c4j.Condition.ignored;
-import static de.vksi.c4j.Condition.post;
-import static de.vksi.c4j.Condition.pre;
+import static de.vksi.c4j.Condition.postCondition;
+import static de.vksi.c4j.Condition.preCondition;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -41,11 +41,11 @@ public class PureSystemTest {
 	public static class AContract extends A {
 		@Override
 		public int mA(int x, int y) {
-			if (pre()) {
+			if (preCondition()) {
 				assert x > 3 : "x > 3";
 				assert y > 4 : "y > 4";
 			}
-			if (post()) {
+			if (postCondition()) {
 				Integer result = Condition.result(Integer.class);
 				assert result.intValue() == (x + y) : "result == x + y";
 			}

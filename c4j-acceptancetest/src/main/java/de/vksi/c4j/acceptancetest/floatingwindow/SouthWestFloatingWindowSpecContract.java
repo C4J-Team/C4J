@@ -1,7 +1,7 @@
 package de.vksi.c4j.acceptancetest.floatingwindow;
 
 import static de.vksi.c4j.Condition.ignored;
-import static de.vksi.c4j.Condition.pre;
+import static de.vksi.c4j.Condition.preCondition;
 
 public final class SouthWestFloatingWindowSpecContract implements SouthWestFloatingWindowSpec {
 
@@ -25,7 +25,7 @@ public final class SouthWestFloatingWindowSpecContract implements SouthWestFloat
 
 	@Override
 	public void move(Vector vector) {
-		if (pre()) {
+		if (preCondition()) {
 			assert vector.getX() < 0 : "vector.x < 0";
 			assert vector.getY() < 0 : "vector.y < 0";
 		}

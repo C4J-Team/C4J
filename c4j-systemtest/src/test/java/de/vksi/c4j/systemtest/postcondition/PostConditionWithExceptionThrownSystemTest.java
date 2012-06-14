@@ -1,7 +1,7 @@
 package de.vksi.c4j.systemtest.postcondition;
 
 import static de.vksi.c4j.Condition.exceptionThrownOfType;
-import static de.vksi.c4j.Condition.post;
+import static de.vksi.c4j.Condition.postCondition;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -58,7 +58,7 @@ public class PostConditionWithExceptionThrownSystemTest {
 	public static class SampleClassContract extends SampleClass {
 		@Override
 		public void methodThrowingException(boolean throwException) throws IOException {
-			if (post()) {
+			if (postCondition()) {
 				if (exceptionThrownOfType(IOException.class)) {
 					postConditionRan = true;
 					assert throwException;

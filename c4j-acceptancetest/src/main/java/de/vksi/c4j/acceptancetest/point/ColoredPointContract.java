@@ -1,7 +1,7 @@
 package de.vksi.c4j.acceptancetest.point;
 
-import static de.vksi.c4j.Condition.post;
-import static de.vksi.c4j.Condition.pre;
+import static de.vksi.c4j.Condition.postCondition;
+import static de.vksi.c4j.Condition.preCondition;
 import de.vksi.c4j.Target;
 
 public class ColoredPointContract extends ColoredPoint {
@@ -11,10 +11,10 @@ public class ColoredPointContract extends ColoredPoint {
 
 	public ColoredPointContract(int x, int y, Color color) {
 		super(x, y, color);
-		if (pre()) {
+		if (preCondition()) {
 			assert color != null : "color not null";
 		}
-		if (post()) {
+		if (postCondition()) {
 			assert target.getX() == x : "x set";
 			assert target.getY() == y : "y set";
 			assert target.getColor() == color : "color set";

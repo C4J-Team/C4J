@@ -1,7 +1,7 @@
 package de.vksi.c4j.systemtest.postcondition;
 
 import static de.vksi.c4j.Condition.ignored;
-import static de.vksi.c4j.Condition.post;
+import static de.vksi.c4j.Condition.postCondition;
 import static de.vksi.c4j.Condition.result;
 
 import org.junit.Rule;
@@ -42,7 +42,7 @@ public class PostConditionAccessingTargetSystemTest {
 
 		@Override
 		public Integer method(int x, int y) {
-			if (post()) {
+			if (postCondition()) {
 				// necessary for reproduction
 				target.getZ();
 				assert result(Integer.class).intValue() == x + y;

@@ -1,7 +1,7 @@
 package de.vksi.c4j.systemtest.contractclassmagic;
 
 import static de.vksi.c4j.Condition.ignored;
-import static de.vksi.c4j.Condition.pre;
+import static de.vksi.c4j.Condition.preCondition;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -75,14 +75,14 @@ public class MethodCallSystemTest {
 
 		@Override
 		public void methodContractHasMethodAccess() {
-			if (pre()) {
+			if (preCondition()) {
 				assert target.getValue() == 5;
 			}
 		}
 
 		@Override
 		public void methodContractHasMethodAccessAndMethodAlsoInContract() {
-			if (pre()) {
+			if (preCondition()) {
 				assert target.getValueAlsoInContract() == 5;
 			}
 		}
@@ -94,7 +94,7 @@ public class MethodCallSystemTest {
 
 		@Override
 		public void methodContractHasMethodAccessOnContractOnly() {
-			if (pre()) {
+			if (preCondition()) {
 				assert target.getValue() == getFive();
 			}
 		}

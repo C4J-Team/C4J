@@ -1,6 +1,6 @@
 package de.vksi.c4j.systemtest.config.assertionerroronly;
 
-import static de.vksi.c4j.Condition.pre;
+import static de.vksi.c4j.Condition.preCondition;
 
 import org.apache.log4j.Level;
 import org.junit.Rule;
@@ -31,7 +31,7 @@ public class AssertionErrorOnlyConfigurationSystemTest {
 	public static class ContractClass extends TargetClass {
 		@Override
 		public void method(int value) {
-			if (pre()) {
+			if (preCondition()) {
 				assert value > 0;
 			}
 		}

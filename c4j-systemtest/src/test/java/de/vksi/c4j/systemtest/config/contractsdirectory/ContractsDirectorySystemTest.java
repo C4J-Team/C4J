@@ -1,6 +1,6 @@
 package de.vksi.c4j.systemtest.config.contractsdirectory;
 
-import static de.vksi.c4j.Condition.pre;
+import static de.vksi.c4j.Condition.preCondition;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -26,7 +26,7 @@ public class ContractsDirectorySystemTest {
 	public static class ContractClass extends TargetClass {
 		@Override
 		public void method(int arg) {
-			if (pre()) {
+			if (preCondition()) {
 				assert arg > 0;
 			}
 		}

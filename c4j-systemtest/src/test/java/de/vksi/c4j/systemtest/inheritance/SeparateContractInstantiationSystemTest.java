@@ -1,6 +1,6 @@
 package de.vksi.c4j.systemtest.inheritance;
 
-import static de.vksi.c4j.Condition.post;
+import static de.vksi.c4j.Condition.postCondition;
 import static de.vksi.c4j.Condition.result;
 
 import org.junit.Rule;
@@ -28,7 +28,7 @@ public class SeparateContractInstantiationSystemTest {
 
 		@Override
 		public String interfaceMethod() {
-			if (post()) {
+			if (postCondition()) {
 				String result = result(String.class);
 				if (fixedInstance == null) {
 					fixedInstance = result;

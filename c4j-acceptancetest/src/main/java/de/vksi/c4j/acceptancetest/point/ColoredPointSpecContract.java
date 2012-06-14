@@ -1,8 +1,8 @@
 package de.vksi.c4j.acceptancetest.point;
 
 import static de.vksi.c4j.Condition.ignored;
-import static de.vksi.c4j.Condition.post;
-import static de.vksi.c4j.Condition.pre;
+import static de.vksi.c4j.Condition.postCondition;
+import static de.vksi.c4j.Condition.preCondition;
 import static de.vksi.c4j.Condition.result;
 import de.vksi.c4j.Target;
 
@@ -35,7 +35,7 @@ public class ColoredPointSpecContract implements ColoredPointSpec {
 
 	@Override
 	public Color getColor() {
-		if (post()) {
+		if (postCondition()) {
 			Color result = result(Color.class);
 			assert result != null : "result not null";
 		}
@@ -44,10 +44,10 @@ public class ColoredPointSpecContract implements ColoredPointSpec {
 
 	@Override
 	public void setColor(Color color) {
-		if (pre()) {
+		if (preCondition()) {
 			assert color != null : "color not null";
 		}
-		if (post()) {
+		if (postCondition()) {
 			assert target.getColor() == color : "color set";
 		}
 	}

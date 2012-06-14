@@ -1,8 +1,8 @@
 package de.vksi.c4j.acceptancetest.lesson102;
 
 import static de.vksi.c4j.Condition.ignored;
-import static de.vksi.c4j.Condition.post;
-import static de.vksi.c4j.Condition.pre;
+import static de.vksi.c4j.Condition.postCondition;
+import static de.vksi.c4j.Condition.preCondition;
 import de.vksi.c4j.ClassInvariant;
 
 public class BContract extends B {
@@ -14,10 +14,10 @@ public class BContract extends B {
 
 	@Override
 	public int queryB() {
-		if (pre()) {
+		if (preCondition()) {
 			System.out.println("Pre-Condition queryB");
 		}
-		if (post()) {
+		if (postCondition()) {
 			System.out.println("Post-Condition queryB");
 		}
 		return (Integer) ignored();
@@ -25,20 +25,20 @@ public class BContract extends B {
 
 	@Override
 	public void commandB(int value) {
-		if (pre()) {
+		if (preCondition()) {
 			System.out.println("Pre-Condition commandB");
 		}
-		if (post()) {
+		if (postCondition()) {
 			System.out.println("Post-Condition commandB");
 		}
 	}
 
 	@Override
 	public int query(int x, int y) {
-		if (pre()) {
+		if (preCondition()) {
 			System.out.println("Pre-Condition query class B");
 		}
-		if (post()) {
+		if (postCondition()) {
 			System.out.println("Post-Condition query class B");
 		}
 		return (Integer) ignored();
@@ -46,10 +46,10 @@ public class BContract extends B {
 
 	@Override
 	public void command(int value) {
-		if (pre()) {
+		if (preCondition()) {
 			System.out.println("Pre-Condition command class B");
 		}
-		if (post()) {
+		if (postCondition()) {
 			System.out.println("Post-Condition command class B");
 		}
 	}

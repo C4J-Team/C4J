@@ -1,6 +1,6 @@
 package de.vksi.c4j.systemtest.contractclassmagic;
 
-import static de.vksi.c4j.Condition.pre;
+import static de.vksi.c4j.Condition.preCondition;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
@@ -71,7 +71,7 @@ public class ConstructorInInnerClassesSystemTest {
 	public static class SuperClassWithParameterContract extends SuperClassWithParameter {
 		public SuperClassWithParameterContract(int value) {
 			super(value);
-			if (pre()) {
+			if (preCondition()) {
 				expectedNumCalls++;
 			}
 		}
@@ -89,7 +89,7 @@ public class ConstructorInInnerClassesSystemTest {
 
 	public static class SuperClassContract extends SuperClass {
 		public SuperClassContract() {
-			if (pre()) {
+			if (preCondition()) {
 				expectedNumCalls++;
 			}
 		}

@@ -1,7 +1,7 @@
 package de.vksi.c4j.systemtest.unchanged;
 
-import static de.vksi.c4j.Condition.post;
-import static de.vksi.c4j.Condition.pre;
+import static de.vksi.c4j.Condition.postCondition;
+import static de.vksi.c4j.Condition.preCondition;
 import static de.vksi.c4j.Condition.unchanged;
 import static org.junit.Assert.assertEquals;
 
@@ -31,10 +31,10 @@ public class UnchangedParamOutOfBoundsSystemTest {
 
 		@Override
 		public void setHour(int hour) {
-			if (pre()) {
+			if (preCondition()) {
 				assert hour >= 0 && hour <= 23;
 			}
-			if (post()) {
+			if (postCondition()) {
 				assert hour == target.getHour();
 				assert unchanged(target.getMinute());
 			}

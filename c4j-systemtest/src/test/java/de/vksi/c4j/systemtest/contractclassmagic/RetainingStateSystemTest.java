@@ -1,6 +1,6 @@
 package de.vksi.c4j.systemtest.contractclassmagic;
 
-import static de.vksi.c4j.Condition.pre;
+import static de.vksi.c4j.Condition.preCondition;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -50,7 +50,7 @@ public class RetainingStateSystemTest {
 
 		@Override
 		public void method(final int expectedNumCall) {
-			if (pre()) {
+			if (preCondition()) {
 				assert expectedNumCall == numCall;
 				numCall++;
 			}
