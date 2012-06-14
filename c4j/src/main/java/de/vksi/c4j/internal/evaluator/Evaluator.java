@@ -21,9 +21,6 @@ public class Evaluator {
 	public static final StaticCall afterContract = new StaticCall(Evaluator.class, "afterContract");
 	public static final StaticCall afterContractMethod = new StaticCall(Evaluator.class, "afterContractMethod");
 	public static final StaticCall setException = new StaticCall(Evaluator.class, "setException");
-	public static final StaticCall isUnchanged = new StaticCall(Evaluator.class, "isUnchanged");
-	public static final StaticCall setClassInvariantConstructorCall = new StaticCall(Evaluator.class,
-			"setClassInvariantConstructorCall");
 
 	private static final Logger logger = Logger.getLogger(Evaluator.class);
 	private static final ReflectionHelper reflectionHelper = new ReflectionHelper();
@@ -57,26 +54,6 @@ public class Evaluator {
 	private final static ThreadLocal<Throwable> exceptionValue = new ThreadLocal<Throwable>();
 	final static ThreadLocal<Object> currentTarget = new ThreadLocal<Object>();
 	final static ThreadLocal<Class<?>> contractReturnType = new ThreadLocal<Class<?>>();
-	private final static ThreadLocal<Boolean> classInvariantConstructorCall = new ThreadLocal<Boolean>();
-
-	private final static ThreadLocal<Object> unchangedCache = new ThreadLocal<Object>();
-
-	public static boolean isUnchanged(Object compareObject, boolean triggerSetUnchangedCache) {
-		if (isClassInvariantConstructorCall()) {
-			return true;
-		}
-		// auto-boxing is evil, requires equals instead of ==
-		if (compareObject instanceof Boolean || compareObject instanceof Byte || compareObject instanceof Character
-				|| compareObject instanceof Double || compareObject instanceof Float
-				|| compareObject instanceof Integer || compareObject instanceof Long || compareObject instanceof Short) {
-			return compareObject.equals(unchangedCache.get());
-		}
-		return compareObject == unchangedCache.get();
-	}
-
-	public static void setUnchangedCache(Object value) {
-		unchangedCache.set(value);
-	}
 
 	@SuppressWarnings("unchecked")
 	public static <T> T getCurrentTarget() {
@@ -152,7 +129,7 @@ public class Evaluator {
 		contractReturnType.set(null);
 		currentTarget.set(null);
 		evaluationPhase.set(EvaluationPhase.NONE);
-		classInvariantConstructorCall.set(null);
+		UnchangedCache.setClassInvariantConstructorCall(false);
 	}
 
 	public static void afterContractMethod() {
@@ -182,16 +159,5 @@ public class Evaluator {
 	@SuppressWarnings("unchecked")
 	public static <T extends Throwable> T getException() {
 		return (T) exceptionValue.get();
-	}
-
-	public static boolean isClassInvariantConstructorCall() {
-		if (classInvariantConstructorCall.get() == null) {
-			return false;
-		}
-		return classInvariantConstructorCall.get().booleanValue();
-	}
-
-	public static void setClassInvariantConstructorCall(boolean constructorCall) {
-		Evaluator.classInvariantConstructorCall.set(Boolean.valueOf(constructorCall));
 	}
 }

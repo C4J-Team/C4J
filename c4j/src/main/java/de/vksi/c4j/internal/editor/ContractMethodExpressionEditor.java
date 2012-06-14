@@ -25,8 +25,8 @@ import de.vksi.c4j.internal.compiler.BooleanExp;
 import de.vksi.c4j.internal.compiler.NestedExp;
 import de.vksi.c4j.internal.compiler.StaticCallExp;
 import de.vksi.c4j.internal.compiler.ValueExp;
-import de.vksi.c4j.internal.evaluator.Evaluator;
 import de.vksi.c4j.internal.evaluator.OldCache;
+import de.vksi.c4j.internal.evaluator.UnchangedCache;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
 import de.vksi.c4j.internal.util.InvolvedTypeInspector;
 import de.vksi.c4j.internal.util.ListOrderedSet;
@@ -194,7 +194,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		}
 		int storeIndex = unchangeableStoreDependencies.size();
 		unchangeableStoreDependencies.add(dependencyBytes);
-		StaticCallExp oldCall = new StaticCallExp(Evaluator.isUnchanged, new StaticCallExp(OldCache.oldRetrieve,
+		StaticCallExp oldCall = new StaticCallExp(UnchangedCache.isUnchanged, new StaticCallExp(OldCache.oldRetrieve,
 				new ValueExp(storeIndex)), NestedExp.PROCEED);
 		AssignmentExp assignmentExp = new AssignmentExp(NestedExp.RETURN_VALUE, oldCall);
 		methodCall.replace(assignmentExp.toStandalone().getCode());

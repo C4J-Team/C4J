@@ -1,6 +1,7 @@
 package de.vksi.c4j;
 
 import de.vksi.c4j.internal.evaluator.Evaluator;
+import de.vksi.c4j.internal.evaluator.UnchangedCache;
 
 /**
  * Provides a contract with methods, allowing the definition of pre- and post-conditions within contract-methods.
@@ -179,7 +180,7 @@ public class Condition {
 	 */
 	@Pure
 	public static boolean constructorCall() {
-		return Evaluator.isClassInvariantConstructorCall();
+		return UnchangedCache.isClassInvariantConstructorCall();
 	}
 
 	/**
@@ -197,7 +198,7 @@ public class Condition {
 	 */
 	@Pure
 	public static boolean unchanged(Object expressionWithoutLocalVariables) {
-		Evaluator.setUnchangedCache(expressionWithoutLocalVariables);
+		UnchangedCache.setUnchangedCache(expressionWithoutLocalVariables);
 		return false;
 	}
 }

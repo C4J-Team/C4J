@@ -16,10 +16,10 @@ import javassist.CtConstructor;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 import de.vksi.c4j.ClassInvariant;
-import de.vksi.c4j.Pure;
 import de.vksi.c4j.Configuration.PureBehavior;
-import de.vksi.c4j.internal.RootTransformer;
+import de.vksi.c4j.Pure;
 import de.vksi.c4j.internal.ContractErrorHandler.ContractErrorSource;
+import de.vksi.c4j.internal.RootTransformer;
 import de.vksi.c4j.internal.compiler.BooleanExp;
 import de.vksi.c4j.internal.compiler.EmptyExp;
 import de.vksi.c4j.internal.compiler.NestedExp;
@@ -28,8 +28,9 @@ import de.vksi.c4j.internal.compiler.StaticCallExp;
 import de.vksi.c4j.internal.compiler.TryExp;
 import de.vksi.c4j.internal.compiler.ValueExp;
 import de.vksi.c4j.internal.evaluator.Evaluator;
-import de.vksi.c4j.internal.util.ListOrderedSet;
+import de.vksi.c4j.internal.evaluator.UnchangedCache;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
+import de.vksi.c4j.internal.util.ListOrderedSet;
 
 /**
  * Transforming a method to look like the following block-comment:
@@ -126,7 +127,7 @@ public class InvariantTransformer extends ConditionTransformer {
 	}
 
 	private StandaloneExp setConstructorCall(CtBehavior affectedBehavior) {
-		return new StaticCallExp(Evaluator.setClassInvariantConstructorCall, BooleanExp
+		return new StaticCallExp(UnchangedCache.setClassInvariantConstructorCall, BooleanExp
 				.valueOf(affectedBehavior instanceof CtConstructor)).toStandalone();
 	}
 
