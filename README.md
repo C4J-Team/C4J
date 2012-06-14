@@ -20,7 +20,7 @@ public class CashTerminal {
 Our contract `CashTerminalContract` could ensure that only a positive amount of money can be withdrawn from a `CashTerminal`:
 
 ```java
-import static de.andrena.c4j.Condition.*;
+import static de.vksi.c4j.Condition.*;
 
 public class CashTerminalContract extends CashTerminal {
   @Override
@@ -88,7 +88,7 @@ public class CashTerminal {
 ```
 
 ```java
-import static de.andrena.c4j.Condition.*;
+import static de.vksi.c4j.Condition.*;
 
 public class CashTerminalContract extends CashTerminal {
   @Target
@@ -227,7 +227,7 @@ public interface TimeOfDay {
 ```
 
 ```java
-import static de.andrena.c4j.Condition.*;
+import static de.vksi.c4j.Condition.*;
 
 public class TimeOfDayContract implements TimeOfDay {
   @Target

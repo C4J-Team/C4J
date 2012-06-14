@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>de.andrena.c4j</groupId>
+		<groupId>de.vksi.c4j</groupId>
 		<artifactId>c4j-parent</artifactId>
 		<version>4.0-Beta6-SNAPSHOT</version>
 	</parent>
@@ -36,7 +36,7 @@
 		<javassist.artifactId>javassist</javassist.artifactId>
 		<javassist.version>3.16.1-GA</javassist.version>
 		<dist.dir>dist</dist.dir>
-		<premain.class>de.andrena.c4j.internal.Agent</premain.class>
+		<premain.class>de.vksi.c4j.internal.Agent</premain.class>
 		<boot.class.path>${log4j.artifactId}-${log4j.version}.jar ${javassist.artifactId}-${javassist.version}.jar</boot.class.path>
 	</properties>
 	

@@ -24,7 +24,7 @@
 
 		<jar basedir="target" destfile="${C4J_JAR}">
 			<manifest>
-				<attribute name="Premain-Class" value="de.andrena.c4j.internal.Agent"/>
+				<attribute name="Premain-Class" value="de.vksi.c4j.internal.Agent"/>
 				<attribute name="Boot-Class-Path" value="${JAVASSIST_JAR} ${LOG4J_JAR}"/>
 			</manifest>
 		</jar>
@@ -49,7 +49,7 @@
 		
 		<jar basedir="target" destfile="${C4J_ALL_JAR}">
 			<manifest>
-				<attribute name="Premain-Class" value="de.andrena.c4j.internal.Agent"/>
+				<attribute name="Premain-Class" value="de.vksi.c4j.internal.Agent"/>
 			</manifest>
 		</jar>
 		

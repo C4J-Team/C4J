@@ -1,16 +1,16 @@
 package com.external;
 
-import static de.andrena.c4j.Condition.ignored;
-import static de.andrena.c4j.Condition.post;
-import static de.andrena.c4j.Condition.pre;
+import static de.vksi.c4j.Condition.ignored;
+import static de.vksi.c4j.Condition.post;
+import static de.vksi.c4j.Condition.pre;
 
 import org.junit.Rule;
 import org.junit.Test;
 
-import de.andrena.c4j.Condition;
-import de.andrena.c4j.ContractReference;
-import de.andrena.c4j.Pure;
-import de.andrena.c4j.systemtest.TransformerAwareRule;
+import de.vksi.c4j.Condition;
+import de.vksi.c4j.ContractReference;
+import de.vksi.c4j.Pure;
+import de.vksi.c4j.systemtest.TransformerAwareRule;
 
 public class PureSystemTest {
 	@Rule

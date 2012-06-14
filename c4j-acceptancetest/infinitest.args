@@ -1,1 +1,1 @@
--ea -javaagent:../c4j/dist/c4j-current-all.jar=de.andrena.c4j.systemtest.TestConfiguration
+-ea -javaagent:../c4j/dist/c4j-current-all.jar=de.vksi.c4j.systemtest.TestConfiguration
