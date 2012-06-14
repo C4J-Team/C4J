@@ -1,4 +1,22 @@
-C4J 4.0 Beta5 (05/17/2012)
+C4J 4.0-Beta6 (06/14/2012)
+=====
+New Features:
+* changed package-name to de.vksi.c4j
+* contracts for static methods, including static initializers
+* old() and unchanged() now usable within class-invariants
+* UsageError when referencing an overridden contract method from another contract method
+* UsageError when using @Pure on a contract method, which is already implicitly pure
+* migrated from Ant to Maven
+* setup a build server with BuildHive
+
+Fixes:
+* once a condition fails, no other conditions will be checked
+* class-invariants are no longer considered for private methods
+* removed false warning when using a constructor in a contract class
+* removed depracated Condition.pre() and Condition.post()
+
+
+C4J 4.0-Beta5 (05/17/2012)
 =====
 New Features:
 * Configuration.getExternalContractsAsStrings() - external contracts can also be configured using strings
