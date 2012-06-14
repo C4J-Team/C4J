@@ -16,9 +16,10 @@ import de.vksi.c4j.ClassInvariant;
 import de.vksi.c4j.internal.RootTransformer;
 import de.vksi.c4j.internal.editor.ContractMethodExpressionEditor;
 import de.vksi.c4j.internal.evaluator.Evaluator;
+import de.vksi.c4j.internal.evaluator.OldCache;
 import de.vksi.c4j.internal.evaluator.PureEvaluator;
-import de.vksi.c4j.internal.util.TransformationHelper;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
+import de.vksi.c4j.internal.util.TransformationHelper;
 
 public class ContractExpressionTransformer extends ContractDeclaredBehaviorTransformer {
 
@@ -127,7 +128,7 @@ public class ContractExpressionTransformer extends ContractDeclaredBehaviorTrans
 	private byte[] getOldStoreBytes(ConstPool constPool) {
 		byte[] oldStoreBytes = new byte[3];
 		oldStoreBytes[0] = (byte) Opcode.INVOKESTATIC;
-		transformationHelper.setMethodIndex(constPool, oldStoreBytes, 1, Evaluator.oldStore, "(ILjava/lang/Object;)V");
+		transformationHelper.setMethodIndex(constPool, oldStoreBytes, 1, OldCache.oldStore, "(ILjava/lang/Object;)V");
 		return oldStoreBytes;
 	}
 

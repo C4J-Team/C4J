@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import de.vksi.c4j.ContractReference;
 import de.vksi.c4j.Target;
-import de.vksi.c4j.internal.evaluator.Evaluator;
+import de.vksi.c4j.internal.evaluator.OldCache;
 import de.vksi.c4j.systemtest.TransformerAwareRule;
 
 public class OldStoreCleanupSystemTest {
@@ -20,7 +20,7 @@ public class OldStoreCleanupSystemTest {
 	@Test
 	public void testOldStoreCleanup() {
 		new OldClass().method(3);
-		assertEquals(0, Evaluator.getOldStoreSize());
+		assertEquals(0, OldCache.getOldStoreSize());
 	}
 
 	@Test
@@ -29,7 +29,7 @@ public class OldStoreCleanupSystemTest {
 			new OldClass().methodFailingContract(3);
 		} catch (AssertionError e) {
 		}
-		assertEquals(0, Evaluator.getOldStoreSize());
+		assertEquals(0, OldCache.getOldStoreSize());
 	}
 
 	@Test
@@ -38,7 +38,7 @@ public class OldStoreCleanupSystemTest {
 			new OldClass().methodFailingSelf(3);
 		} catch (RuntimeException e) {
 		}
-		assertEquals(0, Evaluator.getOldStoreSize());
+		assertEquals(0, OldCache.getOldStoreSize());
 	}
 
 	@ContractReference(OldClassContract.class)

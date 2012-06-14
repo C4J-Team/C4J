@@ -17,8 +17,8 @@ import javassist.expr.MethodCall;
 import org.apache.log4j.Logger;
 
 import de.vksi.c4j.Condition;
-import de.vksi.c4j.UsageError;
 import de.vksi.c4j.Configuration.DefaultPreCondition;
+import de.vksi.c4j.UsageError;
 import de.vksi.c4j.internal.RootTransformer;
 import de.vksi.c4j.internal.compiler.AssignmentExp;
 import de.vksi.c4j.internal.compiler.BooleanExp;
@@ -26,10 +26,11 @@ import de.vksi.c4j.internal.compiler.NestedExp;
 import de.vksi.c4j.internal.compiler.StaticCallExp;
 import de.vksi.c4j.internal.compiler.ValueExp;
 import de.vksi.c4j.internal.evaluator.Evaluator;
+import de.vksi.c4j.internal.evaluator.OldCache;
+import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
 import de.vksi.c4j.internal.util.InvolvedTypeInspector;
 import de.vksi.c4j.internal.util.ListOrderedSet;
 import de.vksi.c4j.internal.util.Stackalyzer;
-import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
 
 public class ContractMethodExpressionEditor extends ExprEditor {
 	private Logger logger = Logger.getLogger(getClass());
@@ -177,7 +178,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		}
 		int storeIndex = storeDependencies.size();
 		storeDependencies.add(dependencyBytes);
-		StaticCallExp oldCall = new StaticCallExp(Evaluator.oldRetrieve, new ValueExp(storeIndex));
+		StaticCallExp oldCall = new StaticCallExp(OldCache.oldRetrieve, new ValueExp(storeIndex));
 		AssignmentExp assignmentExp = new AssignmentExp(NestedExp.RETURN_VALUE, oldCall);
 		methodCall.replace(assignmentExp.toStandalone().getCode());
 	}
@@ -193,7 +194,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		}
 		int storeIndex = unchangeableStoreDependencies.size();
 		unchangeableStoreDependencies.add(dependencyBytes);
-		StaticCallExp oldCall = new StaticCallExp(Evaluator.isUnchanged, new StaticCallExp(Evaluator.oldRetrieve,
+		StaticCallExp oldCall = new StaticCallExp(Evaluator.isUnchanged, new StaticCallExp(OldCache.oldRetrieve,
 				new ValueExp(storeIndex)), NestedExp.PROCEED);
 		AssignmentExp assignmentExp = new AssignmentExp(NestedExp.RETURN_VALUE, oldCall);
 		methodCall.replace(assignmentExp.toStandalone().getCode());

@@ -9,14 +9,11 @@ import de.vksi.c4j.internal.compiler.StaticCall;
 import de.vksi.c4j.internal.util.ObjectMapper;
 import de.vksi.c4j.internal.util.Pair;
 import de.vksi.c4j.internal.util.ReflectionHelper;
-import de.vksi.c4j.internal.util.SelfInitializingMapOfMaps;
 
 public class Evaluator {
 	public static final StaticCall isBefore = new StaticCall(Evaluator.class, "isBefore");
 	public static final StaticCall isAfter = new StaticCall(Evaluator.class, "isAfter");
 	public static final StaticCall getReturnValue = new StaticCall(Evaluator.class, "getReturnValue");
-	public static final StaticCall oldRetrieve = new StaticCall(Evaluator.class, "oldRetrieve");
-	public static final StaticCall oldStore = new StaticCall(Evaluator.class, "oldStore");
 	public static final StaticCall getCurrentTarget = new StaticCall(Evaluator.class, "getCurrentTarget");
 	public static final StaticCall getPreCondition = new StaticCall(Evaluator.class, "getPreCondition");
 	public static final StaticCall getPostCondition = new StaticCall(Evaluator.class, "getPostCondition");
@@ -66,22 +63,6 @@ public class Evaluator {
 	final static ThreadLocal<Class<?>> contractReturnType = new ThreadLocal<Class<?>>();
 	private final static ThreadLocal<Boolean> classInvariantConstructorCall = new ThreadLocal<Boolean>();
 
-	/**
-	 * Integer = stack trace depth, class = contract class
-	 */
-	static final ThreadLocal<Integer> currentOldCacheEnvironment = new ThreadLocal<Integer>();
-	private static final ThreadLocal<SelfInitializingMapOfMaps<Integer, Map<Integer, Object>>> oldCache = new ThreadLocal<SelfInitializingMapOfMaps<Integer, Map<Integer, Object>>>() {
-		@Override
-		protected SelfInitializingMapOfMaps<Integer, Map<Integer, Object>> initialValue() {
-			return new SelfInitializingMapOfMaps<Integer, Map<Integer, Object>>() {
-				@Override
-				protected Map<Integer, Object> initialValue() {
-					return new HashMap<Integer, Object>();
-				}
-			};
-		}
-	};
-
 	private final static ThreadLocal<Object> unchangedCache = new ThreadLocal<Object>();
 
 	public static boolean isUnchanged(Object compareObject, boolean triggerSetUnchangedCache) {
@@ -106,10 +87,6 @@ public class Evaluator {
 		return (T) currentTarget.get();
 	}
 
-	public static int getOldStoreSize() {
-		return oldCache.get().size();
-	}
-
 	public static boolean isBefore() {
 		if (logger.isTraceEnabled()) {
 			logger.trace("isBefore returning " + (evaluationPhase.get() == EvaluationPhase.BEFORE));
@@ -122,28 +99,6 @@ public class Evaluator {
 			logger.trace("isAfter returning " + (evaluationPhase.get() == EvaluationPhase.AFTER));
 		}
 		return evaluationPhase.get() == EvaluationPhase.AFTER;
-	}
-
-	public static Object oldRetrieve(int index) {
-		Object oldValue = getCurrentOldCache().get(Integer.valueOf(index));
-		if (logger.isTraceEnabled()) {
-			logger.trace("oldRetrieve for index '" + index + "' with " + currentOldCacheEnvironment.get()
-					+ " returning " + oldValue);
-		}
-		return oldValue;
-	}
-
-	private static Map<Integer, Object> getCurrentOldCache() {
-		return oldCache.get().get(currentOldCacheEnvironment.get());
-	}
-
-	public static void oldStore(int index, Object value) {
-		if (logger.isTraceEnabled()) {
-			logger.trace("oldStore for index '" + index + "' with "
-					+ currentOldCacheEnvironment.get()
-					+ " storing " + value);
-		}
-		getCurrentOldCache().put(index, value);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -179,7 +134,7 @@ public class Evaluator {
 
 	private static void beforeContract(Object target, Class<?> returnType, int stackTraceDepth) {
 		currentTarget.set(target);
-		currentOldCacheEnvironment.set(Integer.valueOf(stackTraceDepth));
+		OldCache.setCurrentEnvironment(stackTraceDepth);
 		contractReturnType.set(returnType);
 	}
 
@@ -211,9 +166,7 @@ public class Evaluator {
 			}
 			returnValue.set(null);
 			exceptionValue.set(null);
-			oldCache.get()
-					.get(Integer.valueOf(Thread.currentThread().getStackTrace().length))
-					.clear();
+			OldCache.clear(Thread.currentThread().getStackTrace().length);
 			PureEvaluator.unregisterUnchangeable();
 		}
 	}
