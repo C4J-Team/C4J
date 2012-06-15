@@ -15,7 +15,7 @@ public class MaxTimeSystemTest {
 
 	@Test
 	public void testMaxTimeSuccess() throws Throwable {
-		new TargetClass().sleep(1);
+		new TargetClass().sleep(0);
 	}
 
 	@Test(expected = AssertionError.class)
@@ -26,7 +26,9 @@ public class MaxTimeSystemTest {
 	@ContractReference(ContractClass.class)
 	public static class TargetClass {
 		public void sleep(long milliSeconds) throws InterruptedException {
-			Thread.sleep(milliSeconds);
+			if (milliSeconds > 0) {
+				Thread.sleep(milliSeconds);
+			}
 		}
 	}
 
