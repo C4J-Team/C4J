@@ -20,7 +20,7 @@ public class MaxTimeSystemTest {
 
 	@Test(expected = AssertionError.class)
 	public void testMaxTimeFailure() throws Throwable {
-		new TargetClass().sleep(11);
+		new TargetClass().sleep(51);
 	}
 
 	@ContractReference(ContractClass.class)
@@ -36,7 +36,7 @@ public class MaxTimeSystemTest {
 		@Override
 		public void sleep(long milliSeconds) throws InterruptedException {
 			if (postCondition()) {
-				assert maxTime(0.01);
+				assert maxTime(0.05);
 			}
 		}
 	}
