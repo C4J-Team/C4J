@@ -84,11 +84,11 @@ public class Stackalyzer {
 				return;
 			}
 			int op = ci.byteAt(index);
-			checkLoadOpcodes(ci, numParams, index, op);
+			checkLoadOpcodes(ci, numParams, index, op, false);
 		}
 	}
 
-	private void checkLoadOpcodes(CodeIterator ci, int numParams, int index, int op) throws UsageError {
+	private void checkLoadOpcodes(CodeIterator ci, int numParams, int index, int op, boolean wide) throws UsageError {
 		switch (op) {
 			case ALOAD_1:
 			case DLOAD_1:
@@ -116,7 +116,12 @@ public class Stackalyzer {
 			case FLOAD:
 			case ILOAD:
 			case LLOAD:
-				verifyLocalVarAccess(ci.byteAt(index + 1), numParams);
+				int register = wide ? ci.u16bitAt(index + 1) : ci.byteAt(index + 1);
+				verifyLocalVarAccess(register, numParams);
+				break;
+			case WIDE:
+				int loadOp = ci.byteAt(index + 1);
+				checkLoadOpcodes(ci, numParams, index + 1, loadOp, true);
 				break;
 		}
 	}

@@ -1,0 +1,300 @@
+package de.vksi.c4j.systemtest.old;
+
+import static de.vksi.c4j.Condition.old;
+import static de.vksi.c4j.Condition.postCondition;
+import static org.junit.Assert.fail;
+
+import org.apache.log4j.Level;
+import org.junit.Rule;
+import org.junit.Test;
+
+import de.vksi.c4j.ContractReference;
+import de.vksi.c4j.UsageError;
+import de.vksi.c4j.systemtest.TransformerAwareRule;
+
+public class ManyLocalVariablesSystemTest {
+	@Rule
+	public TransformerAwareRule transformerAware = new TransformerAwareRule();
+
+	@Test
+	public void testInvalidReferenceOnLocalVariable() {
+		transformerAware.expectGlobalLog(Level.ERROR, "Illegal access on local variable within old().");
+		try {
+			new TargetClassInvalidLocalVariable().invalidMethod();
+			fail("expected " + UsageError.class.getName());
+		} catch (UsageError e) {
+		}
+	}
+
+	@ContractReference(ContractClassInvalidLocalVariable.class)
+	public static class TargetClassInvalidLocalVariable {
+		public void invalidMethod() {
+		}
+	}
+
+	public static class ContractClassInvalidLocalVariable extends TargetClassInvalidLocalVariable {
+		@SuppressWarnings("unused")
+		@Override
+		public void invalidMethod() {
+			if (postCondition()) {
+				int localVar1 = 0;
+				int localVar2 = 0;
+				int localVar3 = 0;
+				int localVar4 = 0;
+				int localVar5 = 0;
+				int localVar6 = 0;
+				int localVar7 = 0;
+				int localVar8 = 0;
+				int localVar9 = 0;
+				int localVar10 = 0;
+				int localVar11 = 0;
+				int localVar12 = 0;
+				int localVar13 = 0;
+				int localVar14 = 0;
+				int localVar15 = 0;
+				int localVar16 = 0;
+				int localVar17 = 0;
+				int localVar18 = 0;
+				int localVar19 = 0;
+				int localVar20 = 0;
+				int localVar21 = 0;
+				int localVar22 = 0;
+				int localVar23 = 0;
+				int localVar24 = 0;
+				int localVar25 = 0;
+				int localVar26 = 0;
+				int localVar27 = 0;
+				int localVar28 = 0;
+				int localVar29 = 0;
+				int localVar30 = 0;
+				int localVar31 = 0;
+				int localVar32 = 0;
+				int localVar33 = 0;
+				int localVar34 = 0;
+				int localVar35 = 0;
+				int localVar36 = 0;
+				int localVar37 = 0;
+				int localVar38 = 0;
+				int localVar39 = 0;
+				int localVar40 = 0;
+				int localVar41 = 0;
+				int localVar42 = 0;
+				int localVar43 = 0;
+				int localVar44 = 0;
+				int localVar45 = 0;
+				int localVar46 = 0;
+				int localVar47 = 0;
+				int localVar48 = 0;
+				int localVar49 = 0;
+				int localVar50 = 0;
+				int localVar51 = 0;
+				int localVar52 = 0;
+				int localVar53 = 0;
+				int localVar54 = 0;
+				int localVar55 = 0;
+				int localVar56 = 0;
+				int localVar57 = 0;
+				int localVar58 = 0;
+				int localVar59 = 0;
+				int localVar60 = 0;
+				int localVar61 = 0;
+				int localVar62 = 0;
+				int localVar63 = 0;
+				int localVar64 = 0;
+				int localVar65 = 0;
+				int localVar66 = 0;
+				int localVar67 = 0;
+				int localVar68 = 0;
+				int localVar69 = 0;
+				int localVar70 = 0;
+				int localVar71 = 0;
+				int localVar72 = 0;
+				int localVar73 = 0;
+				int localVar74 = 0;
+				int localVar75 = 0;
+				int localVar76 = 0;
+				int localVar77 = 0;
+				int localVar78 = 0;
+				int localVar79 = 0;
+				int localVar80 = 0;
+				int localVar81 = 0;
+				int localVar82 = 0;
+				int localVar83 = 0;
+				int localVar84 = 0;
+				int localVar85 = 0;
+				int localVar86 = 0;
+				int localVar87 = 0;
+				int localVar88 = 0;
+				int localVar89 = 0;
+				int localVar90 = 0;
+				int localVar91 = 0;
+				int localVar92 = 0;
+				int localVar93 = 0;
+				int localVar94 = 0;
+				int localVar95 = 0;
+				int localVar96 = 0;
+				int localVar97 = 0;
+				int localVar98 = 0;
+				int localVar99 = 0;
+				int localVar100 = 0;
+				int localVar101 = 0;
+				int localVar102 = 0;
+				int localVar103 = 0;
+				int localVar104 = 0;
+				int localVar105 = 0;
+				int localVar106 = 0;
+				int localVar107 = 0;
+				int localVar108 = 0;
+				int localVar109 = 0;
+				int localVar110 = 0;
+				int localVar111 = 0;
+				int localVar112 = 0;
+				int localVar113 = 0;
+				int localVar114 = 0;
+				int localVar115 = 0;
+				int localVar116 = 0;
+				int localVar117 = 0;
+				int localVar118 = 0;
+				int localVar119 = 0;
+				int localVar120 = 0;
+				int localVar121 = 0;
+				int localVar122 = 0;
+				int localVar123 = 0;
+				int localVar124 = 0;
+				int localVar125 = 0;
+				int localVar126 = 0;
+				int localVar127 = 0;
+				int localVar128 = 0;
+				int localVar129 = 0;
+				int localVar130 = 0;
+				int localVar131 = 0;
+				int localVar132 = 0;
+				int localVar133 = 0;
+				int localVar134 = 0;
+				int localVar135 = 0;
+				int localVar136 = 0;
+				int localVar137 = 0;
+				int localVar138 = 0;
+				int localVar139 = 0;
+				int localVar140 = 0;
+				int localVar141 = 0;
+				int localVar142 = 0;
+				int localVar143 = 0;
+				int localVar144 = 0;
+				int localVar145 = 0;
+				int localVar146 = 0;
+				int localVar147 = 0;
+				int localVar148 = 0;
+				int localVar149 = 0;
+				int localVar150 = 0;
+				int localVar151 = 0;
+				int localVar152 = 0;
+				int localVar153 = 0;
+				int localVar154 = 0;
+				int localVar155 = 0;
+				int localVar156 = 0;
+				int localVar157 = 0;
+				int localVar158 = 0;
+				int localVar159 = 0;
+				int localVar160 = 0;
+				int localVar161 = 0;
+				int localVar162 = 0;
+				int localVar163 = 0;
+				int localVar164 = 0;
+				int localVar165 = 0;
+				int localVar166 = 0;
+				int localVar167 = 0;
+				int localVar168 = 0;
+				int localVar169 = 0;
+				int localVar170 = 0;
+				int localVar171 = 0;
+				int localVar172 = 0;
+				int localVar173 = 0;
+				int localVar174 = 0;
+				int localVar175 = 0;
+				int localVar176 = 0;
+				int localVar177 = 0;
+				int localVar178 = 0;
+				int localVar179 = 0;
+				int localVar180 = 0;
+				int localVar181 = 0;
+				int localVar182 = 0;
+				int localVar183 = 0;
+				int localVar184 = 0;
+				int localVar185 = 0;
+				int localVar186 = 0;
+				int localVar187 = 0;
+				int localVar188 = 0;
+				int localVar189 = 0;
+				int localVar190 = 0;
+				int localVar191 = 0;
+				int localVar192 = 0;
+				int localVar193 = 0;
+				int localVar194 = 0;
+				int localVar195 = 0;
+				int localVar196 = 0;
+				int localVar197 = 0;
+				int localVar198 = 0;
+				int localVar199 = 0;
+				int localVar200 = 0;
+				int localVar201 = 0;
+				int localVar202 = 0;
+				int localVar203 = 0;
+				int localVar204 = 0;
+				int localVar205 = 0;
+				int localVar206 = 0;
+				int localVar207 = 0;
+				int localVar208 = 0;
+				int localVar209 = 0;
+				int localVar210 = 0;
+				int localVar211 = 0;
+				int localVar212 = 0;
+				int localVar213 = 0;
+				int localVar214 = 0;
+				int localVar215 = 0;
+				int localVar216 = 0;
+				int localVar217 = 0;
+				int localVar218 = 0;
+				int localVar219 = 0;
+				int localVar220 = 0;
+				int localVar221 = 0;
+				int localVar222 = 0;
+				int localVar223 = 0;
+				int localVar224 = 0;
+				int localVar225 = 0;
+				int localVar226 = 0;
+				int localVar227 = 0;
+				int localVar228 = 0;
+				int localVar229 = 0;
+				int localVar230 = 0;
+				int localVar231 = 0;
+				int localVar232 = 0;
+				int localVar233 = 0;
+				int localVar234 = 0;
+				int localVar235 = 0;
+				int localVar236 = 0;
+				int localVar237 = 0;
+				int localVar238 = 0;
+				int localVar239 = 0;
+				int localVar240 = 0;
+				int localVar241 = 0;
+				int localVar242 = 0;
+				int localVar243 = 0;
+				int localVar244 = 0;
+				int localVar245 = 0;
+				int localVar246 = 0;
+				int localVar247 = 0;
+				int localVar248 = 0;
+				int localVar249 = 0;
+				int localVar250 = 0;
+				int localVar251 = 0;
+				int localVar252 = 0;
+				int localVar253 = 0;
+				int localVar254 = 0;
+				int localVar255 = 0;
+				int localVar256 = 0;
+				assert 3.0 == old(localVar256);
+			}
+		}
+	}
+}
