@@ -16,6 +16,7 @@ import javassist.NotFoundException;
 
 import org.apache.log4j.Logger;
 
+import de.vksi.c4j.AllowPureAccess;
 import de.vksi.c4j.Pure;
 import de.vksi.c4j.PureTarget;
 import de.vksi.c4j.internal.RootTransformer;
@@ -88,7 +89,8 @@ public class PureInspector {
 			i++;
 		}
 		for (CtField field : getAccessibleFields(affectedBehavior)) {
-			if (!field.getType().isPrimitive() && (!methodIsStatic || Modifier.isStatic(field.getModifiers()))) {
+			if (!field.getType().isPrimitive() && (!methodIsStatic || Modifier.isStatic(field.getModifiers()))
+					&& !field.hasAnnotation(AllowPureAccess.class)) {
 				unpureObjects.add(NestedExp.field(field));
 			}
 		}

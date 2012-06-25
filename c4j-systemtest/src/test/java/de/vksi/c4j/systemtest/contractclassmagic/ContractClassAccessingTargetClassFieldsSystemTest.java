@@ -13,7 +13,6 @@ public class ContractClassAccessingTargetClassFieldsSystemTest {
 	@Rule
 	public TransformerAwareRule transformerAwareRule = new TransformerAwareRule();
 
-	// TODO
 	@Test
 	public void testContractClassAccessingTargetClassField() {
 		new TargetClass().method(3, 3);
