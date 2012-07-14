@@ -14,7 +14,7 @@ public interface Configuration {
 	 * Define the so-called root packages. Only classes within those packages will use this configuration. Must contain
 	 * at least one element for custom, user-defined configurations.
 	 * 
-	 * @return Packages as Strings, e.g. "java.lang.util".
+	 * @return Packages as Strings, e.g. "com.mycompany.myproject".
 	 */
 	Set<String> getRootPackages();
 
