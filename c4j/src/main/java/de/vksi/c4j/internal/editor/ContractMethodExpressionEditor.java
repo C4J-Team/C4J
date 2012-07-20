@@ -11,6 +11,8 @@ import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 import javassist.bytecode.BadBytecode;
+import javassist.bytecode.CodeIterator;
+import javassist.bytecode.Opcode;
 import javassist.expr.ExprEditor;
 import javassist.expr.MethodCall;
 
@@ -192,9 +194,19 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		}
 		int storeIndex = storeDependencies.size();
 		storeDependencies.add(dependencyBytes);
+		eraseOriginalCall(methodCall, dependencyBytes.length);
 		StaticCallExp oldCall = new StaticCallExp(OldCache.oldRetrieve, new ValueExp(storeIndex));
 		AssignmentExp assignmentExp = new AssignmentExp(NestedExp.RETURN_VALUE, oldCall);
 		methodCall.replace(assignmentExp.toStandalone().getCode());
+	}
+
+	private void eraseOriginalCall(MethodCall methodCall, int length) {
+		CodeIterator iterator = methodCall.where().getMethodInfo().getCodeAttribute().iterator();
+		int beginIndex = methodCall.indexOfBytecode() - length;
+		iterator.writeByte(Opcode.ACONST_NULL, beginIndex);
+		for (int i = beginIndex + 1; i < methodCall.indexOfBytecode(); i++) {
+			iterator.writeByte(Opcode.NOP, i);
+		}
 	}
 
 	private void handleUnchangedMethodCall(MethodCall methodCall) throws CannotCompileException, NotFoundException,

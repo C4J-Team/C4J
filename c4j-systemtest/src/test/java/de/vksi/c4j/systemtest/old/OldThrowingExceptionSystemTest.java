@@ -20,6 +20,13 @@ public class OldThrowingExceptionSystemTest {
 		new TargetClass().method();
 	}
 
+	@Test
+	public void testOldExpressionEvaluatedInPostCondition() {
+		TargetClass target = new TargetClass();
+		target.setThrowException(false);
+		target.method2();
+	}
+
 	@ContractReference(ContractClass.class)
 	public static class TargetClass {
 		private boolean throwException = true;
@@ -27,6 +34,14 @@ public class OldThrowingExceptionSystemTest {
 
 		public void method() {
 			throwException = false;
+		}
+
+		public void method2() {
+			throwException = true;
+		}
+
+		public void setThrowException(boolean throwException) {
+			this.throwException = throwException;
 		}
 
 		@Pure
@@ -51,5 +66,13 @@ public class OldThrowingExceptionSystemTest {
 				}
 			}
 		}
+
+		@Override
+		public void method2() {
+			if (postCondition()) {
+				assert old(target.getValue()) == 0;
+			}
+		}
+
 	}
 }
