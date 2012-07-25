@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:self="http://c4j.vksi.de/c4j-global/" targetNamespace="http://c4j.vksi.de/c4j-global/"
+	elementFormDefault="qualified">
+	<element name="c4j-global">
+		<complexType>
+			<sequence>
+				<element name="write-transformed-classes" minOccurs="0">
+					<complexType>
+						<simpleContent>
+							<extension base="boolean">
+								<attribute name="directory" type="string" default="."/>
+							</extension>
+						</simpleContent>
+					</complexType>
+				</element>
+				<element name="contract-violation-action" minOccurs="0">
+					<complexType>
+						<choice minOccurs="0" maxOccurs="unbounded">
+							<element name="default" type="self:contract-violation-action" minOccurs="0" maxOccurs="1"/>
+							<element name="package" type="self:contract-violation-action-with-name" minOccurs="0" maxOccurs="unbounded"/>
+							<element name="class" type="self:contract-violation-action-with-name" minOccurs="0" maxOccurs="unbounded"/>
+						</choice>
+					</complexType>
+				</element>
+			</sequence>
+		</complexType>
+	</element>
+
+	<complexType name="contract-violation-action">
+		<sequence>
+			<element name="log" type="boolean" minOccurs="0" default="true"/>
+			<element name="throw-error" type="boolean" minOccurs="0" default="true"/>
+		</sequence>
+	</complexType>
+	<complexType name="contract-violation-action-with-name">
+		<complexContent>
+			<extension base="self:contract-violation-action">
+				<attribute name="name" type="string" use="required"/>
+			</extension>
+		</complexContent>
+	</complexType>
+</schema>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:self="http://c4j.vksi.de/c4j-pure-registry/"
+	targetNamespace="http://c4j.vksi.de/c4j-pure-registry/" elementFormDefault="qualified">
+	<element name="c4j-pure-registry">
+		<complexType>
+			<sequence>
+				<element name="type" minOccurs="0" maxOccurs="unbounded">
+					<complexType>
+						<choice>
+							<choice>
+								<element name="only-pure-methods" type="self:empty"/>
+								<element name="only-unpure-methods" type="self:empty"/>
+							</choice>
+							<sequence>
+								<element name="pure-method" type="self:method-by-signature" minOccurs="0" maxOccurs="unbounded"/>
+								<element name="pure-methods" type="self:method-by-name" minOccurs="0" maxOccurs="unbounded"/>
+								<element name="unpure-method" type="self:method-by-signature" minOccurs="0" maxOccurs="unbounded"/>
+								<element name="unpure-methods" type="self:method-by-name" minOccurs="0" maxOccurs="unbounded"/>
+							</sequence>
+						</choice>
+						<attribute name="name" type="string" use="required"/>
+					</complexType>
+				</element>
+			</sequence>
+		</complexType>
+	</element>
+
+	<complexType name="method-by-signature">
+		<attribute name="signature" use="required">
+			<simpleType>
+				<restriction base="string">
+					<pattern value="[\w$]+\([\w$\.,\s]*\)"/>
+				</restriction>
+			</simpleType>
+		</attribute>
+	</complexType>
+	<complexType name="method-by-name">
+		<attribute name="name" use="required">
+			<simpleType>
+				<restriction base="string">
+					<pattern value="[\w$]+"/>
+				</restriction>
+			</simpleType>
+		</attribute>
+	</complexType>
+	<complexType name="empty"></complexType>
+</schema>
