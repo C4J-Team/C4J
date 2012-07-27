@@ -15,12 +15,13 @@ public class MaxTimeSystemTest {
 
 	@Test
 	public void testMaxTimeSuccess() throws Throwable {
+		// takes up to 0.1 seconds on Jenkins...
 		new TargetClass().sleep(0);
 	}
 
 	@Test(expected = AssertionError.class)
 	public void testMaxTimeFailure() throws Throwable {
-		new TargetClass().sleep(51);
+		new TargetClass().sleep(201);
 	}
 
 	@ContractReference(ContractClass.class)
@@ -36,7 +37,7 @@ public class MaxTimeSystemTest {
 		@Override
 		public void sleep(long milliSeconds) throws InterruptedException {
 			if (postCondition()) {
-				assert maxTime(0.05);
+				assert maxTime(0.2);
 			}
 		}
 	}
