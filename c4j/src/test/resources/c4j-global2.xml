@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<c4j-global xmlns="http://c4j.vksi.de/c4j-global/">
+	<write-transformed-classes>false</write-transformed-classes>
+</c4j-global>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://c4j.vksi.de/c4j-local/"
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:self="http://c4j.vksi.de/c4j-local/" targetNamespace="http://c4j.vksi.de/c4j-local/"
 	elementFormDefault="qualified">
 	<element name="c4j-local">
 		<complexType>
@@ -18,14 +18,7 @@
 								</complexType>
 							</element>
 							<element name="strengthening-preconditions-allowed" type="boolean" minOccurs="0" default="false"/>
-							<element name="default-precondition" minOccurs="0" default="undefined">
-								<simpleType>
-									<restriction base="string">
-										<enumeration value="undefined"/>
-										<enumeration value="true"/>
-									</restriction>
-								</simpleType>
-							</element>
+							<element name="default-precondition" type="self:default-precondition-type" minOccurs="0" default="undefined"/>
 							<element name="pure-validate" type="boolean" minOccurs="0" default="false"/>
 							<element name="pure-skip-invariants" type="boolean" minOccurs="0" default="true"/>
 							<element name="pure-registry-import" type="string" minOccurs="0" maxOccurs="unbounded"/>
@@ -35,4 +28,10 @@
 			</sequence>
 		</complexType>
 	</element>
+	<simpleType name="default-precondition-type">
+		<restriction base="string">
+			<enumeration value="undefined"/>
+			<enumeration value="true"/>
+		</restriction>
+	</simpleType>
 </schema>

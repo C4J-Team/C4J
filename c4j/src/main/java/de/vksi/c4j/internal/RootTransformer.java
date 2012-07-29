@@ -1,6 +1,8 @@
 package de.vksi.c4j.internal;
 
 import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
 
 import javassist.ByteArrayClassPath;
 import javassist.ClassPool;
@@ -8,6 +10,8 @@ import javassist.CtClass;
 import javassist.LoaderClassPath;
 import javassist.Modifier;
 import javassist.NotFoundException;
+
+import javax.xml.bind.JAXBException;
 
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Layout;
@@ -23,10 +27,10 @@ import de.vksi.c4j.internal.transformer.ContractClassTransformer;
 import de.vksi.c4j.internal.util.BackdoorAnnotationLoader;
 import de.vksi.c4j.internal.util.CollectionsHelper;
 import de.vksi.c4j.internal.util.ContractRegistry;
+import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
 import de.vksi.c4j.internal.util.InvolvedTypeInspector;
 import de.vksi.c4j.internal.util.ListOrderedSet;
 import de.vksi.c4j.internal.util.LocalClassLoader;
-import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
 
 public class RootTransformer {
 	public static final RootTransformer INSTANCE = new RootTransformer();
@@ -44,6 +48,9 @@ public class RootTransformer {
 	private InvolvedTypeInspector involvedTypeInspector = new InvolvedTypeInspector();
 	private CollectionsHelper collectionsHelper = new CollectionsHelper();
 
+	private XMLConfigurationManager xmlConfiguration;
+	private Set<ClassLoader> classLoaders = new HashSet<ClassLoader>();
+
 	public ClassPool getPool() {
 		return pool;
 	}
@@ -60,6 +67,8 @@ public class RootTransformer {
 		contractClassTransformer = new ContractClassTransformer();
 		loadLogger();
 		configuration = new ConfigurationManager(new DefaultConfiguration(), pool);
+		xmlConfiguration = new XMLConfigurationManager();
+		xmlConfiguration.registerClassLoader(ClassLoader.getSystemClassLoader());
 	}
 
 	private void loadLogger() {
@@ -219,17 +228,31 @@ public class RootTransformer {
 	}
 
 	public void updateClassPath(ClassLoader loader, byte[] classfileBuffer, String className) {
-		if (loader != null) {
-			if (logger.isTraceEnabled()) {
-				logger.trace("updating classpath with loader " + loader.getClass() + ", parent " + loader.getParent());
-			}
-			pool.insertClassPath(new LoaderClassPath(loader));
+		if (loader != null && !classLoaders.contains(loader)) {
+			classLoaders.add(loader);
+			addClassLoader(loader);
 		}
 		if (classfileBuffer != null) {
-			if (logger.isTraceEnabled()) {
-				logger.trace("updating classpath with classfileBuffer for class " + className);
-			}
-			pool.insertClassPath(new ByteArrayClassPath(className, classfileBuffer));
+			addClassFile(classfileBuffer, className);
+		}
+	}
+
+	private void addClassFile(byte[] classfileBuffer, String className) {
+		if (logger.isTraceEnabled()) {
+			logger.trace("updating classpath with classfileBuffer for class " + className);
+		}
+		pool.insertClassPath(new ByteArrayClassPath(className, classfileBuffer));
+	}
+
+	private void addClassLoader(ClassLoader loader) {
+		if (logger.isTraceEnabled()) {
+			logger.trace("updating classpath with loader " + loader.getClass() + ", parent " + loader.getParent());
+		}
+		pool.insertClassPath(new LoaderClassPath(loader));
+		try {
+			xmlConfiguration.registerClassLoader(loader);
+		} catch (JAXBException e) {
+			logger.error("Could not add ClassLoader " + loader.getClass().getName() + " to configuration.", e);
 		}
 	}
 
