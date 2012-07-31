@@ -44,8 +44,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 	private RootTransformer rootTransformer;
 	private InvolvedTypeInspector involvedTypeInspector = new InvolvedTypeInspector();
 	private Stackalyzer stackalyzer = new Stackalyzer();
-	private List<byte[]> storeDependencies = new ArrayList<byte[]>();
-	private List<byte[]> unchangeableStoreDependencies = new ArrayList<byte[]>();
+	private List<StoreDependency> storeDependencies = new ArrayList<StoreDependency>();
 	private StandaloneExp preConditionExp = new EmptyExp();
 	private UsageError thrownException;
 
@@ -57,12 +56,8 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		return preConditionExp;
 	}
 
-	public List<byte[]> getStoreDependencies() {
+	public List<StoreDependency> getStoreDependencies() {
 		return storeDependencies;
-	}
-
-	public List<byte[]> getUnchangeableStoreDependencies() {
-		return unchangeableStoreDependencies;
 	}
 
 	public ContractMethodExpressionEditor(RootTransformer rootTransformer, ContractInfo contract,
@@ -193,7 +188,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 			return;
 		}
 		int storeIndex = storeDependencies.size();
-		storeDependencies.add(dependencyBytes);
+		storeDependencies.add(new StoreDependency(dependencyBytes, false));
 		eraseOriginalCall(methodCall, dependencyBytes.length);
 		StaticCallExp oldCall = new StaticCallExp(OldCache.oldRetrieve, new ValueExp(storeIndex));
 		AssignmentExp assignmentExp = new AssignmentExp(NestedExp.RETURN_VALUE, oldCall);
@@ -218,8 +213,8 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 			thrownException = e;
 			return;
 		}
-		int storeIndex = unchangeableStoreDependencies.size();
-		unchangeableStoreDependencies.add(dependencyBytes);
+		int storeIndex = storeDependencies.size();
+		storeDependencies.add(new StoreDependency(dependencyBytes, true));
 		StaticCallExp oldCall = new StaticCallExp(UnchangedCache.isUnchanged, new StaticCallExp(OldCache.oldRetrieve,
 				new ValueExp(storeIndex)), NestedExp.PROCEED);
 		AssignmentExp assignmentExp = new AssignmentExp(NestedExp.RETURN_VALUE, oldCall);
@@ -228,6 +223,6 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 	}
 
 	public boolean hasStoreDependencies() {
-		return !getStoreDependencies().isEmpty() || !getUnchangeableStoreDependencies().isEmpty();
+		return !getStoreDependencies().isEmpty();
 	}
 }

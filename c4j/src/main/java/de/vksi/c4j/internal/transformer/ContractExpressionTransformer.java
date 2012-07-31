@@ -19,6 +19,7 @@ import de.vksi.c4j.internal.compiler.IfExp;
 import de.vksi.c4j.internal.compiler.StaticCall;
 import de.vksi.c4j.internal.compiler.StaticCallExp;
 import de.vksi.c4j.internal.editor.ContractMethodExpressionEditor;
+import de.vksi.c4j.internal.editor.StoreDependency;
 import de.vksi.c4j.internal.evaluator.Evaluator;
 import de.vksi.c4j.internal.evaluator.OldCache;
 import de.vksi.c4j.internal.evaluator.PureEvaluator;
@@ -77,8 +78,7 @@ public class ContractExpressionTransformer extends ContractDeclaredBehaviorTrans
 		if (expressionEditor.hasStoreDependencies()) {
 			ConstPool constPool = beforeInvariant.getMethodInfo().getConstPool();
 			CodeAttribute attribute = beforeInvariant.getMethodInfo().getCodeAttribute();
-			insertOldStoreCalls(attribute, expressionEditor.getStoreDependencies(), constPool, false);
-			insertOldStoreCalls(attribute, expressionEditor.getUnchangeableStoreDependencies(), constPool, true);
+			insertOldStoreCalls(attribute, expressionEditor.getStoreDependencies(), constPool);
 		}
 	}
 
@@ -93,10 +93,7 @@ public class ContractExpressionTransformer extends ContractDeclaredBehaviorTrans
 		if (expressionEditor.hasStoreDependencies()) {
 			ConstPool constPool = contractBehavior.getMethodInfo().getConstPool();
 			CodeAttribute attribute = contractBehavior.getMethodInfo().getCodeAttribute();
-			int ifBlockLength = insertOldStoreCalls(attribute, expressionEditor.getStoreDependencies(), constPool,
-					false);
-			ifBlockLength += insertOldStoreCalls(attribute, expressionEditor
-					.getUnchangeableStoreDependencies(), constPool, true);
+			int ifBlockLength = insertOldStoreCalls(attribute, expressionEditor.getStoreDependencies(), constPool);
 			insertJump(attribute.iterator(), ifBlockLength, constPool);
 		}
 	}
@@ -112,16 +109,16 @@ public class ContractExpressionTransformer extends ContractDeclaredBehaviorTrans
 		iterator.insertEx(0, ifBytes);
 	}
 
-	private int insertOldStoreCalls(CodeAttribute attribute, List<byte[]> storeDependencies, ConstPool constPool,
-			boolean isUnchangeable) throws BadBytecode {
+	private int insertOldStoreCalls(CodeAttribute attribute, List<StoreDependency> storeDependencies,
+			ConstPool constPool) throws BadBytecode {
 		CodeIterator iterator = attribute.iterator();
 		int ifBlockLength = 0;
 		byte[] oldStoreBytes = getOldStoreBytes(constPool, OldCache.oldStore);
 		byte[] oldStoreExceptionBytes = getOldStoreBytes(constPool, OldCache.oldStoreException);
 		for (int i = 0; i < storeDependencies.size(); i++) {
-			byte[] storeDependency = storeDependencies.get(i);
-			int startIndex = iterator.insert(storeDependency);
-			if (isUnchangeable) {
+			StoreDependency storeDependency = storeDependencies.get(i);
+			int startIndex = iterator.insert(storeDependency.getDependency());
+			if (storeDependency.isUnchangeable()) {
 				byte[] registerUnchangeableBytes = getRegisterUnchangeableBytes(constPool);
 				iterator.insert(registerUnchangeableBytes);
 			}
