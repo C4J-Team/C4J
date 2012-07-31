@@ -256,4 +256,8 @@ public class RootTransformer {
 		}
 	}
 
+	public XMLConfigurationManager getXmlConfiguration() {
+		return xmlConfiguration;
+	}
+
 }

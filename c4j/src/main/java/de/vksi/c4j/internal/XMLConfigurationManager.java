@@ -7,6 +7,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javassist.CtClass;
+
 import javax.xml.bind.JAXBException;
 
 import org.apache.log4j.Logger;
@@ -80,8 +82,15 @@ public class XMLConfigurationManager {
 				rootPackageToConfiguration.put(rootPackage, config);
 	}
 
+	public Configuration getConfiguration(CtClass clazz) {
+		return getConfiguration(clazz.getName());
+	}
+
 	public Configuration getConfiguration(Class<?> clazz) {
-		String currentPackage = clazz.getName();
+		return getConfiguration(clazz.getName());
+	}
+
+	public Configuration getConfiguration(String currentPackage) {
 		while (currentPackage.lastIndexOf('.') > -1)
 			if (rootPackageToConfiguration.containsKey(currentPackage = decimateLastPart(currentPackage)))
 				return rootPackageToConfiguration.get(currentPackage);

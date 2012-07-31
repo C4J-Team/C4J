@@ -16,7 +16,6 @@ import javassist.CtConstructor;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 import de.vksi.c4j.ClassInvariant;
-import de.vksi.c4j.Configuration.PureBehavior;
 import de.vksi.c4j.Pure;
 import de.vksi.c4j.internal.ContractErrorHandler.ContractErrorSource;
 import de.vksi.c4j.internal.RootTransformer;
@@ -91,8 +90,7 @@ public class InvariantTransformer extends ConditionTransformer {
 			logger.trace("transforming behavior " + affectedBehavior.getLongName());
 		}
 		if (affectedBehavior.hasAnnotation(Pure.class)
-				&& rootTransformer.getConfigurationManager().getConfiguration(affectedClass).getPureBehaviors()
-						.contains(PureBehavior.SKIP_INVARIANTS)) {
+				&& rootTransformer.getXmlConfiguration().getConfiguration(affectedClass).isPureSkipInvariants()) {
 			transformWithoutInvariants(affectedClass, affectedBehavior, contractMap);
 			return;
 		}
