@@ -35,7 +35,7 @@ public class ContractExpressionTransformer extends ContractDeclaredBehaviorTrans
 	@Override
 	public void transform(ContractInfo contractInfo, CtBehavior contractBehavior) throws Exception {
 		ContractMethodExpressionEditor expressionEditor = new ContractMethodExpressionEditor(rootTransformer,
-				contractInfo, contractBehavior);
+				contractInfo);
 		if (logger.isTraceEnabled()) {
 			logger.trace("transforming behavior " + contractBehavior.getLongName());
 		}
@@ -43,7 +43,6 @@ public class ContractExpressionTransformer extends ContractDeclaredBehaviorTrans
 		if (expressionEditor.getThrownException() != null) {
 			throw expressionEditor.getThrownException();
 		}
-		additionalStoreExpressions(expressionEditor);
 		if (expressionEditor.hasStoreDependencies() || !expressionEditor.getPreConditionExp().isEmpty()) {
 			insertStoreDependencies(contractBehavior, expressionEditor);
 		}
@@ -162,15 +161,6 @@ public class ContractExpressionTransformer extends ContractDeclaredBehaviorTrans
 		oldStoreBytes[0] = (byte) Opcode.INVOKESTATIC;
 		transformationHelper.setMethodIndex(constPool, oldStoreBytes, 1, oldStoreCall, "(Ljava/lang/Object;I)V");
 		return oldStoreBytes;
-	}
-
-	private void additionalStoreExpressions(ContractMethodExpressionEditor expressionEditor) throws Exception {
-		for (CtClass nestedContractClass : expressionEditor.getAndClearNestedInnerClasses()) {
-			for (CtBehavior nestedBehavior : nestedContractClass.getDeclaredBehaviors()) {
-				nestedBehavior.instrument(expressionEditor);
-			}
-			additionalStoreExpressions(expressionEditor);
-		}
 	}
 
 }

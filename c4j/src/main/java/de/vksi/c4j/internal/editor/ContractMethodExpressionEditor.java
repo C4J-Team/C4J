@@ -1,9 +1,7 @@
 package de.vksi.c4j.internal.editor;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javassist.CannotCompileException;
 import javassist.CtBehavior;
@@ -39,7 +37,6 @@ import de.vksi.c4j.internal.util.Stackalyzer;
 
 public class ContractMethodExpressionEditor extends ExprEditor {
 	private Logger logger = Logger.getLogger(getClass());
-	Set<CtClass> nestedInnerClasses = new HashSet<CtClass>();
 	private ContractInfo contract;
 	private RootTransformer rootTransformer;
 	private InvolvedTypeInspector involvedTypeInspector = new InvolvedTypeInspector();
@@ -60,17 +57,10 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		return storeDependencies;
 	}
 
-	public ContractMethodExpressionEditor(RootTransformer rootTransformer, ContractInfo contract,
-			CtBehavior contractBehavior)
+	public ContractMethodExpressionEditor(RootTransformer rootTransformer, ContractInfo contract)
 			throws NotFoundException {
 		this.rootTransformer = rootTransformer;
 		this.contract = contract;
-	}
-
-	public Set<CtClass> getAndClearNestedInnerClasses() {
-		HashSet<CtClass> cachedInnerClasses = new HashSet<CtClass>(nestedInnerClasses);
-		nestedInnerClasses.clear();
-		return cachedInnerClasses;
 	}
 
 	@Override
