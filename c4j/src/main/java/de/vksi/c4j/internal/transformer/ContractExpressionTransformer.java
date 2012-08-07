@@ -87,6 +87,7 @@ public class ContractExpressionTransformer extends AbstractContractClassTransfor
 			ConstPool constPool = beforeInvariant.getMethodInfo().getConstPool();
 			CodeAttribute attribute = beforeInvariant.getMethodInfo().getCodeAttribute();
 			insertOldStoreCalls(attribute, expressionEditor.getStoreDependencies(), constPool);
+			attribute.computeMaxStack();
 		}
 	}
 

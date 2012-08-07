@@ -17,9 +17,9 @@ import de.vksi.c4j.internal.compiler.StandaloneExp;
 import de.vksi.c4j.internal.compiler.StaticCallExp;
 import de.vksi.c4j.internal.editor.TargetAccessEditor;
 import de.vksi.c4j.internal.evaluator.Evaluator;
+import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
 import de.vksi.c4j.internal.util.Pair;
 import de.vksi.c4j.internal.util.ReflectionHelper;
-import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
 
 public class TargetTransformer extends AbstractContractClassTransformer {
 
@@ -45,6 +45,9 @@ public class TargetTransformer extends AbstractContractClassTransformer {
 		}
 		TargetAccessEditor targetAccessEditor = new TargetAccessEditor(targetField);
 		for (CtBehavior contractBehavior : contractClass.getDeclaredBehaviors()) {
+			if (logger.isTraceEnabled()) {
+				logger.trace("instrumenting " + contractBehavior.getLongName());
+			}
 			contractBehavior.instrument(targetAccessEditor);
 		}
 		initWeakField(contractClass, targetField.getSecond());
