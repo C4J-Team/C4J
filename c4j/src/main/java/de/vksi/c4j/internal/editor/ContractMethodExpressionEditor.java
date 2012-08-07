@@ -2,6 +2,7 @@ package de.vksi.c4j.internal.editor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javassist.CannotCompileException;
 import javassist.CtBehavior;
@@ -44,6 +45,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 	private List<StoreDependency> storeDependencies = new ArrayList<StoreDependency>();
 	private StandaloneExp preConditionExp = new EmptyExp();
 	private UsageError thrownException;
+	private final AtomicInteger storeIndex;
 
 	public UsageError getThrownException() {
 		return thrownException;
@@ -57,10 +59,12 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		return storeDependencies;
 	}
 
-	public ContractMethodExpressionEditor(RootTransformer rootTransformer, ContractInfo contract)
+	public ContractMethodExpressionEditor(RootTransformer rootTransformer, ContractInfo contract,
+			AtomicInteger storeIndex)
 			throws NotFoundException {
 		this.rootTransformer = rootTransformer;
 		this.contract = contract;
+		this.storeIndex = storeIndex;
 	}
 
 	@Override
@@ -177,10 +181,10 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 			thrownException = e;
 			return;
 		}
-		int storeIndex = storeDependencies.size();
-		storeDependencies.add(new StoreDependency(dependencyBytes, false));
+		int newStoreIndex = storeIndex.getAndIncrement();
+		storeDependencies.add(new StoreDependency(dependencyBytes, false, newStoreIndex));
 		eraseOriginalCall(methodCall, dependencyBytes.length);
-		StaticCallExp oldCall = new StaticCallExp(OldCache.oldRetrieve, new ValueExp(storeIndex));
+		StaticCallExp oldCall = new StaticCallExp(OldCache.oldRetrieve, new ValueExp(newStoreIndex));
 		AssignmentExp assignmentExp = new AssignmentExp(NestedExp.RETURN_VALUE, oldCall);
 		methodCall.replace(assignmentExp.toStandalone().getCode());
 	}
@@ -203,10 +207,10 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 			thrownException = e;
 			return;
 		}
-		int storeIndex = storeDependencies.size();
-		storeDependencies.add(new StoreDependency(dependencyBytes, true));
+		int newStoreIndex = storeIndex.getAndIncrement();
+		storeDependencies.add(new StoreDependency(dependencyBytes, true, newStoreIndex));
 		StaticCallExp oldCall = new StaticCallExp(UnchangedCache.isUnchanged, new StaticCallExp(OldCache.oldRetrieve,
-				new ValueExp(storeIndex)), NestedExp.PROCEED);
+				new ValueExp(newStoreIndex)), NestedExp.PROCEED);
 		AssignmentExp assignmentExp = new AssignmentExp(NestedExp.RETURN_VALUE, oldCall);
 		methodCall.replace(assignmentExp.toStandalone().getCode());
 		contract.getMethodsContainingUnchanged().add(methodCall.where().getName() + methodCall.where().getSignature());

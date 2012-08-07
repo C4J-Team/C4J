@@ -1,6 +1,7 @@
 package de.vksi.c4j.internal.transformer;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javassist.CannotCompileException;
 import javassist.CtBehavior;
@@ -26,19 +27,27 @@ import de.vksi.c4j.internal.evaluator.PureEvaluator;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
 import de.vksi.c4j.internal.util.TransformationHelper;
 
-public class ContractExpressionTransformer extends ContractDeclaredBehaviorTransformer {
+public class ContractExpressionTransformer extends AbstractContractClassTransformer {
 
 	public static final String BEFORE_INVARIANT_METHOD_SUFFIX = "$before";
 	private RootTransformer rootTransformer = RootTransformer.INSTANCE;
 	private TransformationHelper transformationHelper = new TransformationHelper();
 
 	@Override
-	public void transform(ContractInfo contractInfo, CtBehavior contractBehavior) throws Exception {
-		ContractMethodExpressionEditor expressionEditor = new ContractMethodExpressionEditor(rootTransformer,
-				contractInfo);
-		if (logger.isTraceEnabled()) {
-			logger.trace("transforming behavior " + contractBehavior.getLongName());
+	public void transform(ContractInfo contractInfo, CtClass currentContractClass) throws Exception {
+		AtomicInteger storeIndex = new AtomicInteger();
+		for (CtBehavior contractBehavior : currentContractClass.getDeclaredBehaviors()) {
+			if (logger.isTraceEnabled()) {
+				logger.trace("transforming behavior " + contractBehavior.getLongName());
+			}
+			transform(contractInfo, contractBehavior, storeIndex);
 		}
+	}
+
+	public void transform(ContractInfo contractInfo, CtBehavior contractBehavior, AtomicInteger storeIndex)
+			throws Exception {
+		ContractMethodExpressionEditor expressionEditor = new ContractMethodExpressionEditor(rootTransformer,
+				contractInfo, storeIndex);
 		contractBehavior.instrument(expressionEditor);
 		if (expressionEditor.getThrownException() != null) {
 			throw expressionEditor.getThrownException();
@@ -114,14 +123,13 @@ public class ContractExpressionTransformer extends ContractDeclaredBehaviorTrans
 		int ifBlockLength = 0;
 		byte[] oldStoreBytes = getOldStoreBytes(constPool, OldCache.oldStore);
 		byte[] oldStoreExceptionBytes = getOldStoreBytes(constPool, OldCache.oldStoreException);
-		for (int i = 0; i < storeDependencies.size(); i++) {
-			StoreDependency storeDependency = storeDependencies.get(i);
+		for (StoreDependency storeDependency : storeDependencies) {
 			int startIndex = iterator.insert(storeDependency.getDependency());
 			if (storeDependency.isUnchangeable()) {
 				byte[] registerUnchangeableBytes = getRegisterUnchangeableBytes(constPool);
 				iterator.insert(registerUnchangeableBytes);
 			}
-			byte[] iloadBytes = getIloadBytes(i);
+			byte[] iloadBytes = getIloadBytes(storeDependency.getIndex());
 			iterator.insert(iloadBytes);
 			iterator.insert(oldStoreBytes);
 			byte[] gotoBytes = new byte[3];
