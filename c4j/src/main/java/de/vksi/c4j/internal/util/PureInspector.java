@@ -1,6 +1,5 @@
 package de.vksi.c4j.internal.util;
 
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -12,6 +11,7 @@ import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.CtField;
 import javassist.CtMethod;
+import javassist.Modifier;
 import javassist.NotFoundException;
 
 import org.apache.log4j.Logger;
@@ -117,7 +117,13 @@ public class PureInspector {
 
 	private Set<CtField> getAccessibleFields(CtBehavior affectedBehavior) {
 		Set<CtField> accessibleFields = new HashSet<CtField>();
-		Collections.addAll(accessibleFields, affectedBehavior.getDeclaringClass().getFields());
+		for (CtField field : affectedBehavior.getDeclaringClass().getFields()) {
+			if (!Modifier.isPackage(field.getModifiers())
+					|| affectedBehavior.getDeclaringClass().getPackageName().equals(
+							field.getDeclaringClass().getPackageName())) {
+				accessibleFields.add(field);
+			}
+		}
 		Collections.addAll(accessibleFields, affectedBehavior.getDeclaringClass().getDeclaredFields());
 		return accessibleFields;
 	}
