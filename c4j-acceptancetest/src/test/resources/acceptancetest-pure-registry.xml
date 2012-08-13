@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<c4j-pure-registry xmlns="http://c4j.vksi.de/c4j-pure-registry/">
+	<type name="java.lang.Boolean">
+		<pure-method signature="booleanValue()"/>
+	</type>
+	<type name="java.lang.Class">
+		<pure-method signature="desiredAssertionStatus()"/>
+		<pure-method signature="getName()"/>
+	</type>
+	<type name="java.lang.Integer">
+		<pure-method signature="intValue()"/>
+		<pure-method signature="valueOf(int)"/>
+	</type>
+	<type name="java.lang.Object">
+		<pure-method signature="getClass()"/>
+		<pure-method signature="equals(java.lang.Object)"/>
+		<pure-method signature="hashCode()"/>
+		<pure-method signature="toString()"/>
+	</type>
+	<type name="java.lang.StackTraceElement">
+		<pure-method signature="getClassName()"/>
+	</type>
+	<type name="java.lang.String">
+		<pure-method signature="valueOf(java.lang.Object)"/>
+	</type>
+	<type name="java.lang.Throwable">
+		<pure-method signature="getStackTrace()"/>
+	</type>
+	<type name="java.util.Collection">
+		<pure-method signature="size()"/>
+		<pure-method signature="isEmpty()"/>
+	</type>
+	<type name="java.util.List">
+		<pure-method signature="get(int)"/>
+	</type>
+</c4j-pure-registry>
