@@ -21,16 +21,16 @@ import de.vksi.c4j.internal.configuration.C4JPureRegistry;
 import de.vksi.c4j.internal.configuration.DefaultPreconditionType;
 import de.vksi.c4j.internal.util.JaxbUnmarshaller;
 
-public class XMLLocalConfiguration {
+public class XmlLocalConfiguration {
 
 	private final Configuration xmlConfiguration;
 	private Set<CtMethod> whitelistMethods = new HashSet<CtMethod>();
 	private Set<CtMethod> blacklistMethods = new HashSet<CtMethod>();
-	private Logger logger = Logger.getLogger(XMLLocalConfiguration.class);
+	private Logger logger = Logger.getLogger(XmlLocalConfiguration.class);
 	private JaxbUnmarshaller jaxbUnmarshaller = new JaxbUnmarshaller();
 	private Map<String, String> externalContracts;
 
-	public XMLLocalConfiguration(Configuration xmlConfiguration, ClassLoader classLoader) throws Exception {
+	public XmlLocalConfiguration(Configuration xmlConfiguration, ClassLoader classLoader) throws Exception {
 		this.xmlConfiguration = xmlConfiguration;
 		importPureRegistries(xmlConfiguration, classLoader);
 		externalContracts = new ContractPackageScanner(xmlConfiguration.getContractScanPackage(), classLoader)

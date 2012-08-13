@@ -1,9 +1,8 @@
 package de.vksi.c4j.internal;
 
-import static de.vksi.c4j.internal.XMLConfigurationManager.C4J_GLOBAL_XML;
-import static de.vksi.c4j.internal.XMLConfigurationManager.C4J_LOCAL_XML;
+import static de.vksi.c4j.internal.XmlConfigurationManager.C4J_GLOBAL_XML;
+import static de.vksi.c4j.internal.XmlConfigurationManager.C4J_LOCAL_XML;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -19,10 +18,9 @@ import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import de.vksi.c4j.internal.configuration.C4JGlobal;
 import de.vksi.c4j.internal.configuration.DefaultPreconditionType;
 
-public class XMLConfigurationManagerTest {
+public class XmlConfigurationManagerTest {
 	private static final String C4J_GLOBAL2_XML = "c4j-global2.xml";
 	private static final String C4J_LOCAL_SAME_PACKAGE_XML = "c4j-local_same-package.xml";
 	private static final String C4J_LOCAL_DIFFERENT_PACKAGE_XML = "c4j-local_different-package.xml";
@@ -41,16 +39,16 @@ public class XMLConfigurationManagerTest {
 	}
 
 	public ClasspathResourceLoader classpathResourceLoader = new ClasspathResourceLoader();
-	private XMLConfigurationManager manager;
+	private XmlConfigurationManager manager;
 
 	@Before
 	public void before() {
-		manager = new XMLConfigurationManager();
+		manager = new XmlConfigurationManager();
 	}
 
 	@Test
 	public void testDefaultLocalConfiguration() {
-		XMLLocalConfiguration configuration = manager.getConfiguration(XMLConfigurationManager.class);
+		XmlLocalConfiguration configuration = manager.getConfiguration(XmlConfigurationManager.class);
 		assertThat(configuration.getDefaultPrecondition(), is(DefaultPreconditionType.UNDEFINED));
 		assertThat(configuration.isPureSkipInvariants(), is(true));
 		assertThat(configuration.isPureValidate(), is(false));
@@ -59,16 +57,16 @@ public class XMLConfigurationManagerTest {
 
 	@Test
 	public void testDefaultGlobalConfiguration() {
-		C4JGlobal globalConfig = manager.getGlobalConfiguration();
-		assertThat(globalConfig.getContractViolationAction().getDefaultOrPackageOrClazz(), is(empty()));
-		assertThat(globalConfig.getWriteTransformedClasses().isValue(), is(false));
+		XmlGlobalConfiguration globalConfig = manager.getGlobalConfiguration();
+		assertThat(globalConfig.writeTransformedClasses(), is(false));
+		assertThat(globalConfig.writeTransformedClassesDirectory(), is("."));
 	}
 
 	@Test
 	public void testRegisterLocalConfiguration() throws Exception {
 		ClassLoader classLoader = createClassLoaderMock(C4J_LOCAL_XML, C4J_LOCAL_XML);
 		manager.registerClassLoader(classLoader);
-		XMLLocalConfiguration configuration = manager.getConfiguration(XMLConfigurationManager.class);
+		XmlLocalConfiguration configuration = manager.getConfiguration(XmlConfigurationManager.class);
 		assertThat(configuration.isPureValidate(), is(true));
 		assertThat(configuration.isPureSkipInvariants(), is(true));
 	}
@@ -77,7 +75,7 @@ public class XMLConfigurationManagerTest {
 	public void testRegisterMultipleLocalConfigurations_SamePackage() throws Exception {
 		ClassLoader classLoader = createClassLoaderMock(C4J_LOCAL_XML, C4J_LOCAL_XML, C4J_LOCAL_SAME_PACKAGE_XML);
 		manager.registerClassLoader(classLoader);
-		XMLLocalConfiguration configuration = manager.getConfiguration(XMLConfigurationManager.class);
+		XmlLocalConfiguration configuration = manager.getConfiguration(XmlConfigurationManager.class);
 		assertThat(configuration.isPureValidate(), is(configuration.isPureSkipInvariants()));
 	}
 
@@ -85,10 +83,10 @@ public class XMLConfigurationManagerTest {
 	public void testRegisterMultipleLocalConfigurations_DifferentPackage() throws Exception {
 		ClassLoader classLoader = createClassLoaderMock(C4J_LOCAL_XML, C4J_LOCAL_XML, C4J_LOCAL_DIFFERENT_PACKAGE_XML);
 		manager.registerClassLoader(classLoader);
-		XMLLocalConfiguration configuration = manager.getConfiguration(XMLConfigurationManager.class);
+		XmlLocalConfiguration configuration = manager.getConfiguration(XmlConfigurationManager.class);
 		assertThat(configuration.isPureValidate(), is(true));
 		assertThat(configuration.isPureSkipInvariants(), is(true));
-		XMLLocalConfiguration configurationForDifferentPackage = manager
+		XmlLocalConfiguration configurationForDifferentPackage = manager
 				.getConfiguration("com.external.DifferentClass");
 		assertThat(configurationForDifferentPackage.isPureValidate(), is(false));
 		assertThat(configurationForDifferentPackage.isPureSkipInvariants(), is(false));
@@ -110,9 +108,9 @@ public class XMLConfigurationManagerTest {
 	public void testRegisterGlobalConfiguration() throws Exception {
 		ClassLoader classLoader = createClassLoaderMock(C4J_GLOBAL_XML, C4J_GLOBAL_XML);
 		manager.registerClassLoader(classLoader);
-		C4JGlobal globalConfig = manager.getGlobalConfiguration();
-		assertThat(globalConfig.getContractViolationAction().getDefaultOrPackageOrClazz(), is(empty()));
-		assertThat(globalConfig.getWriteTransformedClasses().isValue(), is(true));
+		XmlGlobalConfiguration globalConfig = manager.getGlobalConfiguration();
+		//		assertThat(globalConfig.getContractViolationAction().getDefaultOrPackageOrClazz(), is(empty()));
+		assertThat(globalConfig.writeTransformedClasses(), is(true));
 	}
 
 	@Test
@@ -120,9 +118,9 @@ public class XMLConfigurationManagerTest {
 		ClassLoader classLoader = createClassLoaderMock(C4J_GLOBAL_XML, C4J_GLOBAL_XML);
 		manager.registerClassLoader(classLoader);
 		manager.registerClassLoader(classLoader);
-		C4JGlobal globalConfig = manager.getGlobalConfiguration();
-		assertThat(globalConfig.getContractViolationAction().getDefaultOrPackageOrClazz(), is(empty()));
-		assertThat(globalConfig.getWriteTransformedClasses().isValue(), is(true));
+		XmlGlobalConfiguration globalConfig = manager.getGlobalConfiguration();
+		//		assertThat(globalConfig.getContractViolationAction().getDefaultOrPackageOrClazz(), is(empty()));
+		assertThat(globalConfig.writeTransformedClasses(), is(true));
 	}
 
 	@Test
@@ -131,8 +129,8 @@ public class XMLConfigurationManagerTest {
 		ClassLoader classLoader2 = createClassLoaderMock(C4J_GLOBAL_XML, C4J_GLOBAL2_XML);
 		manager.registerClassLoader(classLoader);
 		manager.registerClassLoader(classLoader2);
-		C4JGlobal globalConfig = manager.getGlobalConfiguration();
-		assertThat(globalConfig.getContractViolationAction().getDefaultOrPackageOrClazz(), is(empty()));
-		assertThat(globalConfig.getWriteTransformedClasses().isValue(), is(true));
+		XmlGlobalConfiguration globalConfig = manager.getGlobalConfiguration();
+		//		assertThat(globalConfig.getContractViolationAction().getDefaultOrPackageOrClazz(), is(empty()));
+		assertThat(globalConfig.writeTransformedClasses(), is(true));
 	}
 }

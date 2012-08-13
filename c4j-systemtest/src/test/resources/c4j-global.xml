@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <c4j-global xmlns="http://c4j.vksi.de/c4j-global/">
-	<write-transformed-classes directory="c4j-classes">true</write-transformed-classes>
+	<write-transformed-classes directory="c4j-classes">false</write-transformed-classes>
 	<contract-violation-action>
 		<default>
 			<log>true</log>

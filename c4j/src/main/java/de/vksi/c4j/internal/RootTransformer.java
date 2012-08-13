@@ -46,7 +46,7 @@ public class RootTransformer {
 	private InvolvedTypeInspector involvedTypeInspector = new InvolvedTypeInspector();
 	private CollectionsHelper collectionsHelper = new CollectionsHelper();
 
-	private XMLConfigurationManager xmlConfiguration;
+	private XmlConfigurationManager xmlConfiguration;
 	private Set<ClassLoader> classLoaders = new HashSet<ClassLoader>();
 
 	public ClassPool getPool() {
@@ -65,7 +65,7 @@ public class RootTransformer {
 		contractClassTransformer = new ContractClassTransformer();
 		loadLogger();
 		configuration = new ConfigurationManager(new DefaultConfiguration(), pool);
-		xmlConfiguration = new XMLConfigurationManager();
+		xmlConfiguration = new XmlConfigurationManager();
 		xmlConfiguration.registerClassLoader(ClassLoader.getSystemClassLoader());
 	}
 
@@ -110,8 +110,8 @@ public class RootTransformer {
 		if (!affectedClass.hasAnnotation(Transformed.class)) {
 			transformClass(affectedClass);
 		}
-		if (configuration.getConfiguration(affectedClass).writeTransformedClasses()) {
-			affectedClass.writeFile();
+		if (xmlConfiguration.getGlobalConfiguration().writeTransformedClasses()) {
+			affectedClass.writeFile(xmlConfiguration.getGlobalConfiguration().writeTransformedClassesDirectory());
 		}
 		return affectedClass.toBytecode();
 	}
@@ -253,7 +253,7 @@ public class RootTransformer {
 		}
 	}
 
-	public XMLConfigurationManager getXmlConfiguration() {
+	public XmlConfigurationManager getXmlConfiguration() {
 		return xmlConfiguration;
 	}
 
