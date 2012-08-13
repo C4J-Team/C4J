@@ -15,13 +15,11 @@ import java.net.URL;
 import java.util.Vector;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import de.vksi.c4j.internal.configuration.C4JGlobal;
-import de.vksi.c4j.internal.configuration.C4JLocal.Configuration;
 import de.vksi.c4j.internal.configuration.DefaultPreconditionType;
 
 public class XMLConfigurationManagerTest {
@@ -42,7 +40,6 @@ public class XMLConfigurationManagerTest {
 		}
 	}
 
-	@Rule
 	public ClasspathResourceLoader classpathResourceLoader = new ClasspathResourceLoader();
 	private XMLConfigurationManager manager;
 
@@ -53,11 +50,8 @@ public class XMLConfigurationManagerTest {
 
 	@Test
 	public void testDefaultLocalConfiguration() {
-		Configuration configuration = manager.getConfiguration(XMLConfigurationManager.class);
-		assertThat(configuration.getContractScanPackage(), is(empty()));
+		XMLLocalConfiguration configuration = manager.getConfiguration(XMLConfigurationManager.class);
 		assertThat(configuration.getDefaultPrecondition(), is(DefaultPreconditionType.UNDEFINED));
-		assertThat(configuration.getPureRegistryImport(), is(empty()));
-		assertThat(configuration.getRootPackage(), is(empty()));
 		assertThat(configuration.isPureSkipInvariants(), is(true));
 		assertThat(configuration.isPureValidate(), is(false));
 		assertThat(configuration.isStrengtheningPreconditionsAllowed(), is(false));
@@ -74,7 +68,7 @@ public class XMLConfigurationManagerTest {
 	public void testRegisterLocalConfiguration() throws Exception {
 		ClassLoader classLoader = createClassLoaderMock(C4J_LOCAL_XML, C4J_LOCAL_XML);
 		manager.registerClassLoader(classLoader);
-		Configuration configuration = manager.getConfiguration(XMLConfigurationManager.class);
+		XMLLocalConfiguration configuration = manager.getConfiguration(XMLConfigurationManager.class);
 		assertThat(configuration.isPureValidate(), is(true));
 		assertThat(configuration.isPureSkipInvariants(), is(true));
 	}
@@ -83,7 +77,7 @@ public class XMLConfigurationManagerTest {
 	public void testRegisterMultipleLocalConfigurations_SamePackage() throws Exception {
 		ClassLoader classLoader = createClassLoaderMock(C4J_LOCAL_XML, C4J_LOCAL_XML, C4J_LOCAL_SAME_PACKAGE_XML);
 		manager.registerClassLoader(classLoader);
-		Configuration configuration = manager.getConfiguration(XMLConfigurationManager.class);
+		XMLLocalConfiguration configuration = manager.getConfiguration(XMLConfigurationManager.class);
 		assertThat(configuration.isPureValidate(), is(configuration.isPureSkipInvariants()));
 	}
 
@@ -91,10 +85,11 @@ public class XMLConfigurationManagerTest {
 	public void testRegisterMultipleLocalConfigurations_DifferentPackage() throws Exception {
 		ClassLoader classLoader = createClassLoaderMock(C4J_LOCAL_XML, C4J_LOCAL_XML, C4J_LOCAL_DIFFERENT_PACKAGE_XML);
 		manager.registerClassLoader(classLoader);
-		Configuration configuration = manager.getConfiguration(XMLConfigurationManager.class);
+		XMLLocalConfiguration configuration = manager.getConfiguration(XMLConfigurationManager.class);
 		assertThat(configuration.isPureValidate(), is(true));
 		assertThat(configuration.isPureSkipInvariants(), is(true));
-		Configuration configurationForDifferentPackage = manager.getConfiguration("com.external.DifferentClass");
+		XMLLocalConfiguration configurationForDifferentPackage = manager
+				.getConfiguration("com.external.DifferentClass");
 		assertThat(configurationForDifferentPackage.isPureValidate(), is(false));
 		assertThat(configurationForDifferentPackage.isPureSkipInvariants(), is(false));
 	}

@@ -3,8 +3,8 @@
 	<type name="com.external.ExternalClass">
 		<pure-method signature="pureMethodWhitelistedInConfig()"/>
 		<pure-method signature="pureStaticMethodWhitelistedInConfig()"/>
-		<unpure-method signature="unpureMethodWhitelistedInConfig()"/>
-		<unpure-method signature="unpureStaticMethodWhitelistedInConfig()"/>
+		<unpure-method signature="unpureMethodBlacklistedInConfig()"/>
+		<unpure-method signature="unpureStaticMethodBlacklistedInConfig()"/>
 	</type>
 	<type name="java.lang.Boolean">
 		<pure-method signature="booleanValue()"/>

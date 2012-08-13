@@ -13,9 +13,9 @@
 							</choice>
 							<sequence>
 								<element name="pure-method" type="self:method-by-signature" minOccurs="0" maxOccurs="unbounded"/>
-								<element name="pure-methods" type="self:method-by-name" minOccurs="0" maxOccurs="unbounded"/>
+								<element name="pure-method-by-name" type="self:method-by-name" minOccurs="0" maxOccurs="unbounded"/>
 								<element name="unpure-method" type="self:method-by-signature" minOccurs="0" maxOccurs="unbounded"/>
-								<element name="unpure-methods" type="self:method-by-name" minOccurs="0" maxOccurs="unbounded"/>
+								<element name="unpure-method-by-name" type="self:method-by-name" minOccurs="0" maxOccurs="unbounded"/>
 							</sequence>
 						</choice>
 						<attribute name="name" type="string" use="required"/>
