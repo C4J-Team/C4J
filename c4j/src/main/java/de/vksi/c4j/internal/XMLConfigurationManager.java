@@ -1,7 +1,9 @@
 package de.vksi.c4j.internal;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -40,8 +42,8 @@ public class XMLConfigurationManager {
 		}
 	}
 
-	public void registerClassLoader(ClassLoader classLoader) throws JAXBException {
-		registerLocalConfig(classLoader);
+	public void registerClassLoader(ClassLoader classLoader) throws Exception {
+		registerLocalConfigs(classLoader);
 		registerGlobalConfig(classLoader);
 	}
 
@@ -62,24 +64,48 @@ public class XMLConfigurationManager {
 		logger.info("Loaded global configuration from " + xmlUrl + ".");
 	}
 
-	private void registerLocalConfig(ClassLoader classLoader) throws JAXBException {
-		InputStream xmlStream = classLoader.getResourceAsStream(C4J_LOCAL_XML);
-		URL xmlUrl = classLoader.getResource(C4J_LOCAL_XML);
+	private void registerLocalConfigs(ClassLoader classLoader) throws Exception {
+		Enumeration<URL> resources = classLoader.getResources(C4J_LOCAL_XML);
+		if (resources == null) {
+			return;
+		}
+		while (resources.hasMoreElements()) {
+			registerSingleLocalConfig(resources.nextElement());
+		}
+	}
+
+	private void registerSingleLocalConfig(URL xmlUrl) throws IOException, JAXBException {
+		InputStream xmlStream = xmlUrl.openStream();
 		if (xmlStream != null && !localConfigurationsPaths.contains(xmlUrl))
 			registerExistingLocalConfig(xmlStream, xmlUrl);
 	}
 
 	private void registerExistingLocalConfig(InputStream xmlStream, URL xmlUrl) throws JAXBException {
 		C4JLocal localConfig = jaxbUnmarshaller.unmarshal(xmlStream, C4JLocal.class);
-		addConfigurations(localConfig);
+		addConfigurations(localConfig, xmlUrl);
 		localConfigurationsPaths.add(xmlUrl);
 		logger.info("Loaded local configuration from " + xmlUrl + ".");
 	}
 
-	private void addConfigurations(C4JLocal localConfig) {
-		for (Configuration config : localConfig.getConfiguration())
-			for (String rootPackage : config.getRootPackage())
-				rootPackageToConfiguration.put(rootPackage, config);
+	private void addConfigurations(C4JLocal localConfig, URL xmlUrl) {
+		for (Configuration config : localConfig.getConfiguration()) {
+			addConfiguration(config, xmlUrl);
+		}
+	}
+
+	private void addConfiguration(Configuration config, URL xmlUrl) {
+		for (String rootPackage : config.getRootPackage()) {
+			addUniqueConfiguration(config, xmlUrl, rootPackage);
+		}
+	}
+
+	private void addUniqueConfiguration(Configuration config, URL xmlUrl, String rootPackage) {
+		if (rootPackageToConfiguration.containsKey(rootPackage)) {
+			logger.error("Configuration for root-package " + rootPackage
+					+ " is already defined, ignoring the configuration in " + xmlUrl);
+			return;
+		}
+		rootPackageToConfiguration.put(rootPackage, config);
 	}
 
 	public Configuration getConfiguration(CtClass clazz) {

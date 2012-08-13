@@ -11,8 +11,6 @@ import javassist.LoaderClassPath;
 import javassist.Modifier;
 import javassist.NotFoundException;
 
-import javax.xml.bind.JAXBException;
-
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Layout;
 import org.apache.log4j.Level;
@@ -251,7 +249,7 @@ public class RootTransformer {
 		pool.insertClassPath(new LoaderClassPath(loader));
 		try {
 			xmlConfiguration.registerClassLoader(loader);
-		} catch (JAXBException e) {
+		} catch (Exception e) {
 			logger.error("Could not add ClassLoader " + loader.getClass().getName() + " to configuration.", e);
 		}
 	}

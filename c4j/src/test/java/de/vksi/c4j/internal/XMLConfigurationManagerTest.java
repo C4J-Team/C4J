@@ -9,7 +9,10 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.util.Vector;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -22,6 +25,23 @@ import de.vksi.c4j.internal.configuration.C4JLocal.Configuration;
 import de.vksi.c4j.internal.configuration.DefaultPreconditionType;
 
 public class XMLConfigurationManagerTest {
+	private static final String C4J_GLOBAL2_XML = "c4j-global2.xml";
+	private static final String C4J_LOCAL_SAME_PACKAGE_XML = "c4j-local_same-package.xml";
+	private static final String C4J_LOCAL_DIFFERENT_PACKAGE_XML = "c4j-local_different-package.xml";
+
+	private final class AnswerWithNewInputStream implements Answer<InputStream> {
+		private final String realPath;
+
+		private AnswerWithNewInputStream(String realPath) {
+			this.realPath = realPath;
+		}
+
+		@Override
+		public InputStream answer(InvocationOnMock invocation) throws Throwable {
+			return classpathResourceLoader.loadStream(realPath);
+		}
+	}
+
 	@Rule
 	public ClasspathResourceLoader classpathResourceLoader = new ClasspathResourceLoader();
 	private XMLConfigurationManager manager;
@@ -59,16 +79,35 @@ public class XMLConfigurationManagerTest {
 		assertThat(configuration.isPureSkipInvariants(), is(true));
 	}
 
-	private ClassLoader createClassLoaderMock(String mockPath, final String realPath) {
-		ClassLoader classLoader = mock(ClassLoader.class);
-		when(classLoader.getResourceAsStream(eq(mockPath))).thenAnswer(new Answer<InputStream>() {
+	@Test
+	public void testRegisterMultipleLocalConfigurations_SamePackage() throws Exception {
+		ClassLoader classLoader = createClassLoaderMock(C4J_LOCAL_XML, C4J_LOCAL_XML, C4J_LOCAL_SAME_PACKAGE_XML);
+		manager.registerClassLoader(classLoader);
+		Configuration configuration = manager.getConfiguration(XMLConfigurationManager.class);
+		assertThat(configuration.isPureValidate(), is(configuration.isPureSkipInvariants()));
+	}
 
-			@Override
-			public InputStream answer(InvocationOnMock invocation) throws Throwable {
-				return classpathResourceLoader.loadStream(realPath);
-			}
-		});
-		when(classLoader.getResource(eq(mockPath))).thenReturn(classpathResourceLoader.getUrl(realPath));
+	@Test
+	public void testRegisterMultipleLocalConfigurations_DifferentPackage() throws Exception {
+		ClassLoader classLoader = createClassLoaderMock(C4J_LOCAL_XML, C4J_LOCAL_XML, C4J_LOCAL_DIFFERENT_PACKAGE_XML);
+		manager.registerClassLoader(classLoader);
+		Configuration configuration = manager.getConfiguration(XMLConfigurationManager.class);
+		assertThat(configuration.isPureValidate(), is(true));
+		assertThat(configuration.isPureSkipInvariants(), is(true));
+		Configuration configurationForDifferentPackage = manager.getConfiguration("com.external.DifferentClass");
+		assertThat(configurationForDifferentPackage.isPureValidate(), is(false));
+		assertThat(configurationForDifferentPackage.isPureSkipInvariants(), is(false));
+	}
+
+	private ClassLoader createClassLoaderMock(String mockPath, final String... realPaths) throws IOException {
+		ClassLoader classLoader = mock(ClassLoader.class);
+		when(classLoader.getResourceAsStream(eq(mockPath))).thenAnswer(new AnswerWithNewInputStream(realPaths[0]));
+		Vector<URL> xmlConfigs = new Vector<URL>();
+		for (String realPath : realPaths) {
+			xmlConfigs.add(classpathResourceLoader.getUrl(realPath));
+		}
+		when(classLoader.getResources(eq(mockPath))).thenReturn(xmlConfigs.elements());
+		when(classLoader.getResource(eq(mockPath))).thenReturn(classpathResourceLoader.getUrl(realPaths[0]));
 		return classLoader;
 	}
 
@@ -94,7 +133,7 @@ public class XMLConfigurationManagerTest {
 	@Test
 	public void testRegisterGlobalConfigurations_WithDifferentClassLoaders() throws Exception {
 		ClassLoader classLoader = createClassLoaderMock(C4J_GLOBAL_XML, C4J_GLOBAL_XML);
-		ClassLoader classLoader2 = createClassLoaderMock(C4J_GLOBAL_XML, "c4j-global2.xml");
+		ClassLoader classLoader2 = createClassLoaderMock(C4J_GLOBAL_XML, C4J_GLOBAL2_XML);
 		manager.registerClassLoader(classLoader);
 		manager.registerClassLoader(classLoader2);
 		C4JGlobal globalConfig = manager.getGlobalConfiguration();
