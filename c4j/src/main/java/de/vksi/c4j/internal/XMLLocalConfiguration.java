@@ -4,9 +4,13 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import javassist.ClassPool;
+import javassist.CtClass;
 import javassist.CtMethod;
+import javassist.NotFoundException;
 
 import javax.xml.bind.JAXBException;
 
@@ -24,9 +28,16 @@ public class XMLLocalConfiguration {
 	private Set<CtMethod> blacklistMethods = new HashSet<CtMethod>();
 	private Logger logger = Logger.getLogger(XMLLocalConfiguration.class);
 	private JaxbUnmarshaller jaxbUnmarshaller = new JaxbUnmarshaller();
+	private Map<String, String> externalContracts;
 
 	public XMLLocalConfiguration(Configuration xmlConfiguration, ClassLoader classLoader) throws Exception {
 		this.xmlConfiguration = xmlConfiguration;
+		importPureRegistries(xmlConfiguration, classLoader);
+		externalContracts = new ContractPackageScanner(xmlConfiguration.getContractScanPackage(), classLoader)
+				.getExternalContracts();
+	}
+
+	private void importPureRegistries(Configuration xmlConfiguration, ClassLoader classLoader) throws Exception {
 		for (String pureRegistryXml : xmlConfiguration.getPureRegistryImport()) {
 			importPureRegistry(classLoader, pureRegistryXml);
 		}
@@ -74,6 +85,13 @@ public class XMLLocalConfiguration {
 
 	public Set<CtMethod> getBlacklistMethods() {
 		return blacklistMethods;
+	}
+
+	public CtClass getExternalContract(ClassPool pool, CtClass type) throws NotFoundException {
+		if (externalContracts.containsKey(type.getName())) {
+			return pool.get(externalContracts.get(type.getName()));
+		}
+		return null;
 	}
 
 }

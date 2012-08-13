@@ -70,5 +70,12 @@
 			<version>${hamcrest.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>de.vksi.c4j</groupId>
+			<artifactId>c4j-systemtest-contractsdirectoryasjarfile</artifactId>
+			<version>${project.version}</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/contractsdirectoryasjarfile.jar</systemPath>
+		</dependency>
 	</dependencies>
 </project>

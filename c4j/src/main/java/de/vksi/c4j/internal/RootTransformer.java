@@ -94,8 +94,8 @@ public class RootTransformer {
 				configuration = new ConfigurationManager(loadedConfig, pool);
 				logger.info("Loaded configuration from class '" + agentArgs + "'.");
 			} catch (Exception e) {
-				logger.error("Could not load configuration from class '" + agentArgs
-						+ "'. Using DefaultConfiguration.", e);
+				logger.error(
+						"Could not load configuration from class '" + agentArgs + "'. Using DefaultConfiguration.", e);
 			}
 		}
 	}
@@ -157,7 +157,7 @@ public class RootTransformer {
 			throws NotFoundException {
 		ListOrderedSet<ContractInfo> contracts = new ListOrderedSet<ContractInfo>();
 		for (CtClass type : types) {
-			CtClass externalContract = configuration.getConfiguration(affectedClass).getExternalContract(pool, type);
+			CtClass externalContract = xmlConfiguration.getConfiguration(affectedClass).getExternalContract(pool, type);
 			if (type.hasAnnotation(ContractReference.class) || externalContract != null) {
 				if (contractRegistry.hasRegisteredContract(type)) {
 					contracts.add(contractRegistry.getContractInfoForTargetClass(type));
@@ -179,8 +179,7 @@ public class RootTransformer {
 
 	private CtClass decideContractForType(CtClass type, CtClass externalContract) throws NotFoundException {
 		if (type.hasAnnotation(ContractReference.class)) {
-			String contractClassString = new BackdoorAnnotationLoader(type).getClassValue(
-					ContractReference.class,
+			String contractClassString = new BackdoorAnnotationLoader(type).getClassValue(ContractReference.class,
 					"value");
 			return pool.get(contractClassString);
 		}
