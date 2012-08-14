@@ -62,11 +62,10 @@ public class PureInspector {
 		}
 	}
 
-	public void verify(CtMethod affectedBehavior, boolean allowOwnStateChange)
-			throws CannotCompileException,
+	public void verify(CtMethod affectedBehavior, boolean allowOwnStateChange) throws CannotCompileException,
 			NotFoundException {
 		PureBehaviorExpressionEditor editor = new PureBehaviorExpressionEditor(affectedBehavior, rootTransformer, this,
-						allowOwnStateChange);
+				allowOwnStateChange);
 		affectedBehavior.instrument(editor);
 		arrayAccessEditor.instrumentArrayAccesses(affectedBehavior);
 		if (editor.getPureError() != null) {
@@ -103,8 +102,7 @@ public class PureInspector {
 			throws CannotCompileException {
 		ArrayExp unpureArray = new ArrayExp(Object.class, unpureObjects);
 		StandaloneExp registerUnpureExp = new StaticCallExp(PureEvaluator.registerUnpure, unpureArray).toStandalone();
-		StandaloneExp unregisterUnpureExp = new StaticCallExp(PureEvaluator.unregisterUnpure)
-				.toStandalone();
+		StandaloneExp unregisterUnpureExp = new StaticCallExp(PureEvaluator.unregisterUnpure).toStandalone();
 		if (logger.isTraceEnabled()) {
 			logger.trace("puremagic.insertBefore " + affectedBehavior.getLongName() + ": \n"
 					+ registerUnpureExp.getCode());
@@ -129,7 +127,7 @@ public class PureInspector {
 	}
 
 	public void checkUnpureAccess(CtBehavior affectedBehavior) throws CannotCompileException {
-		if (!rootTransformer.getConfigurationManager().isWithinRootPackages(affectedBehavior.getDeclaringClass())) {
+		if (!rootTransformer.getXmlConfiguration().isWithinRootPackages(affectedBehavior.getDeclaringClass())) {
 			return;
 		}
 		affectedBehavior.instrument(unpureBehaviorExpressionEditor);

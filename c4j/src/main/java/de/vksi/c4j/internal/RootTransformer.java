@@ -17,9 +17,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 
-import de.vksi.c4j.Configuration;
 import de.vksi.c4j.ContractReference;
-import de.vksi.c4j.DefaultConfiguration;
 import de.vksi.c4j.internal.transformer.AffectedClassTransformer;
 import de.vksi.c4j.internal.transformer.ContractClassTransformer;
 import de.vksi.c4j.internal.util.BackdoorAnnotationLoader;
@@ -28,7 +26,6 @@ import de.vksi.c4j.internal.util.ContractRegistry;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
 import de.vksi.c4j.internal.util.InvolvedTypeInspector;
 import de.vksi.c4j.internal.util.ListOrderedSet;
-import de.vksi.c4j.internal.util.LocalClassLoader;
 
 public class RootTransformer {
 	public static final RootTransformer INSTANCE = new RootTransformer();
@@ -41,8 +38,6 @@ public class RootTransformer {
 	AffectedClassTransformer targetClassTransformer;
 	ContractClassTransformer contractClassTransformer;
 
-	private ConfigurationManager configuration;
-
 	private InvolvedTypeInspector involvedTypeInspector = new InvolvedTypeInspector();
 	private CollectionsHelper collectionsHelper = new CollectionsHelper();
 
@@ -53,10 +48,6 @@ public class RootTransformer {
 		return pool;
 	}
 
-	public ConfigurationManager getConfigurationManager() {
-		return configuration;
-	}
-
 	private RootTransformer() {
 	}
 
@@ -64,7 +55,6 @@ public class RootTransformer {
 		targetClassTransformer = new AffectedClassTransformer();
 		contractClassTransformer = new ContractClassTransformer();
 		loadLogger();
-		configuration = new ConfigurationManager(new DefaultConfiguration(), pool);
 		xmlConfiguration = new XmlConfigurationManager();
 		xmlConfiguration.registerClassLoader(ClassLoader.getSystemClassLoader());
 	}
@@ -76,27 +66,6 @@ public class RootTransformer {
 			Logger.getRootLogger().addAppender(new ConsoleAppender(layout));
 			Logger.getRootLogger().setLevel(Level.INFO);
 			logger.info("No Appender on RootLogger found, added a new ConsoleAppender on Level INFO.");
-		}
-	}
-
-	public void loadConfiguration(String agentArgs) throws Exception {
-		if (agentArgs == null || agentArgs.isEmpty()) {
-			logger.info("No configuration given, using DefaultConfiguration.");
-		} else {
-			try {
-				Class<?> configurationClass = Class.forName(agentArgs, true, new LocalClassLoader(getClass()
-						.getClassLoader()));
-				Configuration loadedConfig = (Configuration) configurationClass.newInstance();
-				if (loadedConfig.getRootPackages().isEmpty()) {
-					throw new IllegalArgumentException(
-							"RootPackages of a custom Configuration must contain at least 1 element.");
-				}
-				configuration = new ConfigurationManager(loadedConfig, pool);
-				logger.info("Loaded configuration from class '" + agentArgs + "'.");
-			} catch (Exception e) {
-				logger.error(
-						"Could not load configuration from class '" + agentArgs + "'. Using DefaultConfiguration.", e);
-			}
 		}
 	}
 

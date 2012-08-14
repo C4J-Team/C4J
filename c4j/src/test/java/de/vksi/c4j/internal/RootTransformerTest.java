@@ -18,11 +18,10 @@ import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 
 import de.vksi.c4j.ContractReference;
-import de.vksi.c4j.internal.RootTransformer;
 import de.vksi.c4j.internal.transformer.AffectedClassTransformer;
 import de.vksi.c4j.internal.transformer.ContractClassTransformer;
-import de.vksi.c4j.internal.util.ListOrderedSet;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
+import de.vksi.c4j.internal.util.ListOrderedSet;
 
 public class RootTransformerTest {
 
@@ -37,7 +36,6 @@ public class RootTransformerTest {
 	public void before() throws Exception {
 		transformer = RootTransformer.INSTANCE;
 		transformer.init();
-		transformer.loadConfiguration(null);
 		targetClassTransformer = mock(AffectedClassTransformer.class);
 		transformer.targetClassTransformer = targetClassTransformer;
 		contractClassTransformer = mock(ContractClassTransformer.class);

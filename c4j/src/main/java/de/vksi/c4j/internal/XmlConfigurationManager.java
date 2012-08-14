@@ -136,6 +136,10 @@ public class XmlConfigurationManager {
 				defaultLocalConfiguration);
 	}
 
+	public boolean isWithinRootPackages(CtClass clazz) {
+		return getConfiguration(clazz) != defaultLocalConfiguration;
+	}
+
 	private <T> T getMapValueFromClassName(String classNamePrefix, Map<String, T> map, T defaultValue) {
 		if (!classNamePrefix.contains(".")) {
 			return defaultValue;

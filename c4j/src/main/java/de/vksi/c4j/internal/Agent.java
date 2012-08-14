@@ -16,7 +16,6 @@ public class Agent implements ClassFileTransformer {
 
 	public static void premain(String agentArgs, Instrumentation inst) throws Exception {
 		RootTransformer.INSTANCE.init();
-		RootTransformer.INSTANCE.loadConfiguration(agentArgs);
 		inst.addTransformer(new Agent());
 	}
 

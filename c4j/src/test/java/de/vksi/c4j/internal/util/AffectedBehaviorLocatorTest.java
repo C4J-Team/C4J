@@ -17,8 +17,6 @@ import de.vksi.c4j.ClassInvariant;
 import de.vksi.c4j.ContractReference;
 import de.vksi.c4j.internal.RootTransformer;
 import de.vksi.c4j.internal.transformer.ContractBehaviorTransformer;
-import de.vksi.c4j.internal.util.AffectedBehaviorLocator;
-import de.vksi.c4j.internal.util.ContractRegistry;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
 
 public class AffectedBehaviorLocatorTest {
@@ -66,31 +64,29 @@ public class AffectedBehaviorLocatorTest {
 
 	@Test
 	public void testGetAffectedMethodForContractMethod() throws Exception {
-		assertEquals(targetClass.getDeclaredMethod("contractMethod"),
-				locator.getAffectedMethod(contractInfo, targetClass, contractClass.getDeclaredMethod("contractMethod")));
+		assertEquals(targetClass.getDeclaredMethod("contractMethod"), locator.getAffectedMethod(contractInfo,
+				targetClass, contractClass.getDeclaredMethod("contractMethod")));
 	}
 
 	@Test
 	public void testGetAffectedMethodForIndirectContractMethod() throws Exception {
 		RootTransformer.INSTANCE.init();
-		RootTransformer.INSTANCE.loadConfiguration(null);
-		CtMethod affectedMethod = locator.getAffectedMethod(contractInfo, indirectClass,
-				contractClass.getDeclaredMethod("contractMethod"));
+		CtMethod affectedMethod = locator.getAffectedMethod(contractInfo, indirectClass, contractClass
+				.getDeclaredMethod("contractMethod"));
 		assertEquals(indirectClass.getDeclaredMethod("contractMethod"), affectedMethod);
 	}
 
 	@Test
 	public void testGetAffectedConstructorDuplicateFound() throws Exception {
-		assertNull(locator.getAffectedConstructor(contractInfo, targetClass,
-				contractClass.getDeclaredConstructor(new CtClass[0])));
+		assertNull(locator.getAffectedConstructor(contractInfo, targetClass, contractClass
+				.getDeclaredConstructor(new CtClass[0])));
 	}
 
 	@Test
 	public void testGetAffectedConstructor() throws Exception {
-		assertEquals(
-				targetClass.getDeclaredConstructor(new CtClass[] { CtClass.doubleType }),
-				locator.getAffectedConstructor(contractInfo, targetClass,
-						contractClass.getDeclaredConstructor(new CtClass[] { CtClass.doubleType })));
+		assertEquals(targetClass.getDeclaredConstructor(new CtClass[] { CtClass.doubleType }), locator
+				.getAffectedConstructor(contractInfo, targetClass, contractClass
+						.getDeclaredConstructor(new CtClass[] { CtClass.doubleType })));
 	}
 
 	@Test
@@ -102,14 +98,14 @@ public class AffectedBehaviorLocatorTest {
 
 	@Test
 	public void testGetAffectedConstructorNotFound() throws Exception {
-		assertNull(locator.getAffectedConstructor(contractInfo, targetClass,
-				contractClass.getDeclaredConstructor(new CtClass[] { CtClass.intType })));
+		assertNull(locator.getAffectedConstructor(contractInfo, targetClass, contractClass
+				.getDeclaredConstructor(new CtClass[] { CtClass.intType })));
 	}
 
 	@Test
 	public void testGetAffectedConstructorForTargetInterface() throws Exception {
-		assertNull(locator.getAffectedConstructor(contractInfoForTargetInterface, targetInterface,
-				contractClass.getDeclaredConstructor(new CtClass[0])));
+		assertNull(locator.getAffectedConstructor(contractInfoForTargetInterface, targetInterface, contractClass
+				.getDeclaredConstructor(new CtClass[0])));
 	}
 
 	public static class IndirectClass extends TargetClass {

@@ -64,8 +64,8 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 				.getBlacklistMethods().contains(method)) {
 			checkMethod = PureEvaluator.checkExternalBlacklistAccess;
 		}
-		StandaloneExp checkUnpureAccessExp = new StaticCallExp(checkMethod,
-				NestedExp.CALLING_OBJECT, new ValueExp(method.getLongName())).toStandalone();
+		StandaloneExp checkUnpureAccessExp = new StaticCallExp(checkMethod, NestedExp.CALLING_OBJECT, new ValueExp(
+				method.getLongName())).toStandalone();
 		StandaloneExp replacementExp = checkUnpureAccessExp.append(StandaloneExp.PROCEED_AND_ASSIGN);
 		if (logger.isDebugEnabled()) {
 			logger.debug("possible call to external unpure method " + method.getLongName());
@@ -159,7 +159,7 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 		if (pureInspector.getPureOrigin(involvedTypes, contracts, method) != null) {
 			return;
 		}
-		if (rootTransformer.getConfigurationManager().isWithinRootPackages(method.getDeclaringClass())) {
+		if (rootTransformer.getXmlConfiguration().isWithinRootPackages(method.getDeclaringClass())) {
 			return;
 		}
 		replaceWithPureCheck(methodCall);
@@ -169,7 +169,7 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 		if (method.getDeclaringClass().getPackageName().startsWith(C4J_INTERNAL_PACKAGE)) {
 			return;
 		}
-		if (rootTransformer.getConfigurationManager().isWithinRootPackages(method.getDeclaringClass())
+		if (rootTransformer.getXmlConfiguration().isWithinRootPackages(method.getDeclaringClass())
 				|| rootTransformer.getXmlConfiguration().getConfiguration(affectedMethod.getDeclaringClass())
 						.getBlacklistMethods().contains(method)) {
 			pureError("illegal access on static method " + method.getLongName() + " in pure method "
