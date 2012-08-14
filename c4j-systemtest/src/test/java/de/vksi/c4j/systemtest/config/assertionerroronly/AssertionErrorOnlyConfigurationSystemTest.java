@@ -14,8 +14,8 @@ public class AssertionErrorOnlyConfigurationSystemTest {
 	public TransformerAwareRule transformerAwareRule = new TransformerAwareRule();
 
 	@Test
-	public void testLogOnly() {
-		transformerAwareRule.banLocalLog(Level.ERROR, "Contract Violation.");
+	public void testAssertionErrorOnly() {
+		transformerAwareRule.banLocalLog(Level.ERROR, "Contract Violation in pre-condition.");
 		try {
 			new TargetClass().method(0);
 		} catch (AssertionError e) {

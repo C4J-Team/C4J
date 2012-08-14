@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import de.vksi.c4j.internal.configuration.C4JGlobal;
 import de.vksi.c4j.internal.configuration.C4JLocal;
 import de.vksi.c4j.internal.configuration.C4JLocal.Configuration;
+import de.vksi.c4j.internal.configuration.ContractViolationAction;
 import de.vksi.c4j.internal.util.JaxbUnmarshaller;
 
 public class XmlConfigurationManager {
@@ -130,18 +131,34 @@ public class XmlConfigurationManager {
 		return getConfiguration(clazz.getName());
 	}
 
-	public XmlLocalConfiguration getConfiguration(String currentPackage) {
-		while (currentPackage.lastIndexOf('.') > -1)
-			if (rootPackageToConfiguration.containsKey(currentPackage = decimateLastPart(currentPackage)))
-				return rootPackageToConfiguration.get(currentPackage);
-		return defaultLocalConfiguration;
+	public XmlLocalConfiguration getConfiguration(String className) {
+		return getMapValueFromClassName(decimateLastPart(className), rootPackageToConfiguration,
+				defaultLocalConfiguration);
 	}
 
-	private String decimateLastPart(String currentPackage) {
-		return currentPackage.substring(0, currentPackage.lastIndexOf('.'));
+	private <T> T getMapValueFromClassName(String classNamePrefix, Map<String, T> map, T defaultValue) {
+		if (!classNamePrefix.contains(".")) {
+			return defaultValue;
+		}
+		if (map.containsKey(classNamePrefix)) {
+			return map.get(classNamePrefix);
+		}
+		return getMapValueFromClassName(decimateLastPart(classNamePrefix), map, defaultValue);
+	}
+
+	private String decimateLastPart(String classNamePrefix) {
+		if (!classNamePrefix.contains(".")) {
+			return "";
+		}
+		return classNamePrefix.substring(0, classNamePrefix.lastIndexOf('.'));
 	}
 
 	public XmlGlobalConfiguration getGlobalConfiguration() {
 		return globalConfiguration;
+	}
+
+	public ContractViolationAction getContractViolationAction(Class<?> clazz) {
+		return getMapValueFromClassName(clazz.getName(), globalConfiguration.getContractViolationActions(),
+				globalConfiguration.getDefaultContractViolationAction());
 	}
 }

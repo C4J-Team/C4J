@@ -60,6 +60,7 @@ public class XmlConfigurationManagerTest {
 		XmlGlobalConfiguration globalConfig = manager.getGlobalConfiguration();
 		assertThat(globalConfig.writeTransformedClasses(), is(false));
 		assertThat(globalConfig.writeTransformedClassesDirectory(), is("."));
+		assertThat(globalConfig.getContractViolationActions().size(), is(0));
 	}
 
 	@Test
@@ -109,7 +110,7 @@ public class XmlConfigurationManagerTest {
 		ClassLoader classLoader = createClassLoaderMock(C4J_GLOBAL_XML, C4J_GLOBAL_XML);
 		manager.registerClassLoader(classLoader);
 		XmlGlobalConfiguration globalConfig = manager.getGlobalConfiguration();
-		//		assertThat(globalConfig.getContractViolationAction().getDefaultOrPackageOrClazz(), is(empty()));
+		assertThat(globalConfig.getContractViolationActions().size(), is(0));
 		assertThat(globalConfig.writeTransformedClasses(), is(true));
 	}
 
@@ -119,7 +120,7 @@ public class XmlConfigurationManagerTest {
 		manager.registerClassLoader(classLoader);
 		manager.registerClassLoader(classLoader);
 		XmlGlobalConfiguration globalConfig = manager.getGlobalConfiguration();
-		//		assertThat(globalConfig.getContractViolationAction().getDefaultOrPackageOrClazz(), is(empty()));
+		assertThat(globalConfig.getContractViolationActions().size(), is(0));
 		assertThat(globalConfig.writeTransformedClasses(), is(true));
 	}
 
@@ -130,7 +131,7 @@ public class XmlConfigurationManagerTest {
 		manager.registerClassLoader(classLoader);
 		manager.registerClassLoader(classLoader2);
 		XmlGlobalConfiguration globalConfig = manager.getGlobalConfiguration();
-		//		assertThat(globalConfig.getContractViolationAction().getDefaultOrPackageOrClazz(), is(empty()));
+		assertThat(globalConfig.getContractViolationActions().size(), is(0));
 		assertThat(globalConfig.writeTransformedClasses(), is(true));
 	}
 }
