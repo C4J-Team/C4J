@@ -11,8 +11,6 @@ import javassist.LoaderClassPath;
 import javassist.Modifier;
 import javassist.NotFoundException;
 
-import javax.xml.bind.JAXBException;
-
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Layout;
 import org.apache.log4j.Level;
@@ -48,7 +46,7 @@ public class RootTransformer {
 	private InvolvedTypeInspector involvedTypeInspector = new InvolvedTypeInspector();
 	private CollectionsHelper collectionsHelper = new CollectionsHelper();
 
-	private XMLConfigurationManager xmlConfiguration;
+	private XmlConfigurationManager xmlConfiguration;
 	private Set<ClassLoader> classLoaders = new HashSet<ClassLoader>();
 
 	public ClassPool getPool() {
@@ -67,7 +65,7 @@ public class RootTransformer {
 		contractClassTransformer = new ContractClassTransformer();
 		loadLogger();
 		configuration = new ConfigurationManager(new DefaultConfiguration(), pool);
-		xmlConfiguration = new XMLConfigurationManager();
+		xmlConfiguration = new XmlConfigurationManager();
 		xmlConfiguration.registerClassLoader(ClassLoader.getSystemClassLoader());
 	}
 
@@ -96,8 +94,8 @@ public class RootTransformer {
 				configuration = new ConfigurationManager(loadedConfig, pool);
 				logger.info("Loaded configuration from class '" + agentArgs + "'.");
 			} catch (Exception e) {
-				logger.error("Could not load configuration from class '" + agentArgs
-						+ "'. Using DefaultConfiguration.", e);
+				logger.error(
+						"Could not load configuration from class '" + agentArgs + "'. Using DefaultConfiguration.", e);
 			}
 		}
 	}
@@ -112,8 +110,8 @@ public class RootTransformer {
 		if (!affectedClass.hasAnnotation(Transformed.class)) {
 			transformClass(affectedClass);
 		}
-		if (configuration.getConfiguration(affectedClass).writeTransformedClasses()) {
-			affectedClass.writeFile();
+		if (xmlConfiguration.getGlobalConfiguration().writeTransformedClasses()) {
+			affectedClass.writeFile(xmlConfiguration.getGlobalConfiguration().writeTransformedClassesDirectory());
 		}
 		return affectedClass.toBytecode();
 	}
@@ -159,7 +157,7 @@ public class RootTransformer {
 			throws NotFoundException {
 		ListOrderedSet<ContractInfo> contracts = new ListOrderedSet<ContractInfo>();
 		for (CtClass type : types) {
-			CtClass externalContract = configuration.getConfiguration(affectedClass).getExternalContract(pool, type);
+			CtClass externalContract = xmlConfiguration.getConfiguration(affectedClass).getExternalContract(pool, type);
 			if (type.hasAnnotation(ContractReference.class) || externalContract != null) {
 				if (contractRegistry.hasRegisteredContract(type)) {
 					contracts.add(contractRegistry.getContractInfoForTargetClass(type));
@@ -181,8 +179,7 @@ public class RootTransformer {
 
 	private CtClass decideContractForType(CtClass type, CtClass externalContract) throws NotFoundException {
 		if (type.hasAnnotation(ContractReference.class)) {
-			String contractClassString = new BackdoorAnnotationLoader(type).getClassValue(
-					ContractReference.class,
+			String contractClassString = new BackdoorAnnotationLoader(type).getClassValue(ContractReference.class,
 					"value");
 			return pool.get(contractClassString);
 		}
@@ -251,9 +248,13 @@ public class RootTransformer {
 		pool.insertClassPath(new LoaderClassPath(loader));
 		try {
 			xmlConfiguration.registerClassLoader(loader);
-		} catch (JAXBException e) {
+		} catch (Exception e) {
 			logger.error("Could not add ClassLoader " + loader.getClass().getName() + " to configuration.", e);
 		}
+	}
+
+	public XmlConfigurationManager getXmlConfiguration() {
+		return xmlConfiguration;
 	}
 
 }

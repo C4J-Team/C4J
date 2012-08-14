@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <c4j-global xmlns="http://c4j.vksi.de/c4j-global/">
-	<write-transformed-classes directory="c4j-classes">true</write-transformed-classes>
+	<write-transformed-classes directory="c4j-classes">false</write-transformed-classes>
 	<contract-violation-action>
 		<default>
 			<log>true</log>
@@ -10,7 +10,7 @@
 			<log>true</log>
 			<throw-error>false</throw-error>
 		</package>
-		<class name="de.vksi.c4j.systemtest.config.assertionerroronly.AssertionErrorOnlyConfigurationSystemTest">
+		<class name="de.vksi.c4j.systemtest.config.assertionerroronly.AssertionErrorOnlyConfigurationSystemTest$TargetClass">
 			<log>false</log>
 			<throw-error>true</throw-error>
 		</class>

@@ -1,11 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <c4j-pure-registry xmlns="http://c4j.vksi.de/c4j-pure-registry/">
-	<type name="com.external.ExternalClass">
-		<pure-method signature="pureMethodWhitelistedInConfig()"/>
-		<pure-method signature="pureStaticMethodWhitelistedInConfig()"/>
-		<unpure-method signature="unpureMethodBlacklistedInConfig()"/>
-		<unpure-method signature="unpureStaticMethodBlacklistedInConfig()"/>
-	</type>
 	<type name="java.lang.Boolean">
 		<pure-method signature="booleanValue()"/>
 	</type>

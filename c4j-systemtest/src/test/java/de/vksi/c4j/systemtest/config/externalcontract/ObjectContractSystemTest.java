@@ -7,6 +7,7 @@ import static de.vksi.c4j.Condition.result;
 import org.junit.Rule;
 import org.junit.Test;
 
+import de.vksi.c4j.Contract;
 import de.vksi.c4j.Target;
 import de.vksi.c4j.systemtest.TransformerAwareRule;
 
@@ -38,6 +39,7 @@ public class ObjectContractSystemTest {
 		}
 	}
 
+	@Contract(forTarget = Object.class)
 	public static class ObjectContract {
 		@Target
 		private Object target;

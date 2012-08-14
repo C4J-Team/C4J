@@ -18,7 +18,6 @@ import javassist.expr.MethodCall;
 import org.apache.log4j.Logger;
 
 import de.vksi.c4j.Condition;
-import de.vksi.c4j.Configuration.DefaultPreCondition;
 import de.vksi.c4j.UsageError;
 import de.vksi.c4j.internal.RootTransformer;
 import de.vksi.c4j.internal.compiler.AssignmentExp;
@@ -28,6 +27,7 @@ import de.vksi.c4j.internal.compiler.NestedExp;
 import de.vksi.c4j.internal.compiler.StandaloneExp;
 import de.vksi.c4j.internal.compiler.StaticCallExp;
 import de.vksi.c4j.internal.compiler.ValueExp;
+import de.vksi.c4j.internal.configuration.DefaultPreconditionType;
 import de.vksi.c4j.internal.evaluator.MaxTimeCache;
 import de.vksi.c4j.internal.evaluator.OldCache;
 import de.vksi.c4j.internal.evaluator.UnchangedCache;
@@ -124,8 +124,8 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		CtBehavior method = methodCall.where();
 		if (contract.getContractClass().equals(method.getDeclaringClass())) {
 			ListOrderedSet<CtClass> involvedTypes = involvedTypeInspector.inspect(contract.getTargetClass());
-			if (rootTransformer.getConfigurationManager().getConfiguration(contract.getTargetClass())
-					.getDefaultPreCondition() == DefaultPreCondition.TRUE) {
+			if (rootTransformer.getXmlConfiguration().getConfiguration(contract.getTargetClass())
+					.getDefaultPrecondition() == DefaultPreconditionType.TRUE) {
 				handleTrueDefaultPreCondition(methodCall, method, involvedTypes);
 			} else {
 				handleUndefinedDefaultPreCondition(methodCall, method, involvedTypes);
@@ -163,8 +163,8 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 
 	private void preConditionStrengthening(MethodCall methodCall, CtBehavior method, CtClass definingClass)
 			throws CannotCompileException, NotFoundException {
-		if (!rootTransformer.getConfigurationManager().getConfiguration(contract.getTargetClass())
-				.isStrengtheningPreConditionAllowed()) {
+		if (!rootTransformer.getXmlConfiguration().getConfiguration(contract.getTargetClass())
+				.isStrengtheningPreconditionsAllowed()) {
 			logger.error(("Found strengthening pre-condition in " + method.getLongName()
 					+ " which is already defined from " + definingClass.getName()) + " - ignoring the pre-condition.");
 		}

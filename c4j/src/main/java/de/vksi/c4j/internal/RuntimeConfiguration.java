@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarEntry;
@@ -20,10 +19,8 @@ import javassist.NotFoundException;
 import org.apache.log4j.Logger;
 
 import de.vksi.c4j.Configuration;
-import de.vksi.c4j.Contract;
 import de.vksi.c4j.Configuration.ContractViolationAction;
-import de.vksi.c4j.Configuration.DefaultPreCondition;
-import de.vksi.c4j.Configuration.PureBehavior;
+import de.vksi.c4j.Contract;
 import de.vksi.c4j.Contract.InheritedType;
 import de.vksi.c4j.internal.util.BackdoorAnnotationLoader;
 import de.vksi.c4j.internal.util.WhitelistConverter;
@@ -136,17 +133,6 @@ public class RuntimeConfiguration {
 		return configuration.getClass();
 	}
 
-	public Set<String> getInvolvedClassNames(ClassPool pool) throws NotFoundException {
-		@SuppressWarnings("unchecked")
-		Set<String> classNamesWithSlashes = pool.get(getConfigurationClass().getName()).getClassFile().getConstPool()
-				.getClassNames();
-		Set<String> involvedClassNames = new HashSet<String>();
-		for (String classNameWithSlashes : classNamesWithSlashes) {
-			involvedClassNames.add(classNameWithSlashes.replace('/', '.'));
-		}
-		return involvedClassNames;
-	}
-
 	public Set<CtMethod> getWhitelistMethods() {
 		return whitelistMethods;
 	}
@@ -163,14 +149,6 @@ public class RuntimeConfiguration {
 		return configuration.writeTransformedClasses();
 	}
 
-	public DefaultPreCondition getDefaultPreCondition() {
-		return configuration.getDefaultPreCondition();
-	}
-
-	public boolean isStrengtheningPreConditionAllowed() {
-		return configuration.isStrengtheningPreConditionAllowed();
-	}
-
 	public Set<ContractViolationAction> getContractViolationActions() {
 		return configuration.getContractViolationActions();
 	}
@@ -180,9 +158,5 @@ public class RuntimeConfiguration {
 			return pool.get(externalContracts.get(type.getName()));
 		}
 		return null;
-	}
-
-	public Set<PureBehavior> getPureBehaviors() {
-		return configuration.getPureBehaviors();
 	}
 }

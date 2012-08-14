@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<c4j-local xmlns="http://c4j.vksi.de/c4j-local/">
+	<configuration>
+		<root-package>com.external</root-package>
+		<pure-skip-invariants>false</pure-skip-invariants>
+	</configuration>
+</c4j-local>

@@ -60,7 +60,7 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 	private void replaceWithPureCheck(MethodCall methodCall) throws NotFoundException, CannotCompileException {
 		CtMethod method = methodCall.getMethod();
 		StaticCall checkMethod = PureEvaluator.checkExternalAccess;
-		if (rootTransformer.getConfigurationManager().getConfiguration(affectedMethod.getDeclaringClass())
+		if (rootTransformer.getXmlConfiguration().getConfiguration(affectedMethod.getDeclaringClass())
 				.getBlacklistMethods().contains(method)) {
 			checkMethod = PureEvaluator.checkExternalBlacklistAccess;
 		}
@@ -137,7 +137,7 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 		if (isSynthetic(method)) {
 			return;
 		}
-		if (rootTransformer.getConfigurationManager().getConfiguration(affectedMethod.getDeclaringClass())
+		if (rootTransformer.getXmlConfiguration().getConfiguration(affectedMethod.getDeclaringClass())
 				.getWhitelistMethods().contains(method)) {
 			return;
 		}
@@ -170,7 +170,7 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 			return;
 		}
 		if (rootTransformer.getConfigurationManager().isWithinRootPackages(method.getDeclaringClass())
-				|| rootTransformer.getConfigurationManager().getConfiguration(affectedMethod.getDeclaringClass())
+				|| rootTransformer.getXmlConfiguration().getConfiguration(affectedMethod.getDeclaringClass())
 						.getBlacklistMethods().contains(method)) {
 			pureError("illegal access on static method " + method.getLongName() + " in pure method "
 					+ affectedMethod.getLongName() + " on line " + methodCall.getLineNumber());

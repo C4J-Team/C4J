@@ -3,14 +3,12 @@ package de.vksi.c4j.internal;
 import java.io.InputStream;
 import java.net.URL;
 
-import org.junit.rules.ExternalResource;
-
-public class ClasspathResourceLoader extends ExternalResource {
+public class ClasspathResourceLoader {
 	public InputStream loadStream(String path) {
-		return getClass().getResourceAsStream("/" + path);
+		return getClass().getClassLoader().getResourceAsStream(path);
 	}
 
 	public URL getUrl(String path) {
-		return getClass().getResource("/" + path);
+		return getClass().getClassLoader().getResource(path);
 	}
 }

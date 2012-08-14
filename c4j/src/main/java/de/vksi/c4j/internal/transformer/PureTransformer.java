@@ -8,13 +8,12 @@ import javassist.CtConstructor;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 import de.vksi.c4j.Pure;
-import de.vksi.c4j.Configuration.PureBehavior;
 import de.vksi.c4j.internal.RootTransformer;
+import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
 import de.vksi.c4j.internal.util.ListOrderedSet;
 import de.vksi.c4j.internal.util.PureInspector;
 import de.vksi.c4j.internal.util.ReflectionHelper;
 import de.vksi.c4j.internal.util.TransformationHelper;
-import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
 
 public class PureTransformer extends AbstractAffectedClassTransformer {
 	private PureInspector pureInspector = new PureInspector();
@@ -34,8 +33,7 @@ public class PureTransformer extends AbstractAffectedClassTransformer {
 	private void applyPure(CtClass affectedClass, CtBehavior affectedBehavior, ListOrderedSet<ContractInfo> contracts)
 			throws CannotCompileException,
 			NotFoundException {
-		if (rootTransformer.getConfigurationManager().getConfiguration(affectedClass).getPureBehaviors()
-				.contains(PureBehavior.VALIDATE_PURE)) {
+		if (rootTransformer.getXmlConfiguration().getConfiguration(affectedClass).isPureValidate()) {
 			if (affectedBehavior.hasAnnotation(Pure.class)) {
 				pureInspector.verify((CtMethod) affectedBehavior, false);
 			} else {

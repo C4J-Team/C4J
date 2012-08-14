@@ -4,10 +4,9 @@ import javassist.CtBehavior;
 import javassist.CtMethod;
 import de.vksi.c4j.Pure;
 import de.vksi.c4j.UsageError;
-import de.vksi.c4j.Configuration.PureBehavior;
 import de.vksi.c4j.internal.RootTransformer;
-import de.vksi.c4j.internal.util.PureInspector;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
+import de.vksi.c4j.internal.util.PureInspector;
 
 public class PureContractTransformer extends ContractDeclaredBehaviorTransformer {
 
@@ -24,9 +23,8 @@ public class PureContractTransformer extends ContractDeclaredBehaviorTransformer
 							+ "Consider using @PureTarget if the target method should be declared as being pure.");
 		}
 		if (contractBehavior instanceof CtMethod
-				&& rootTransformer.getConfigurationManager().getConfiguration(contractInfo.getContractClass())
-						.getPureBehaviors()
-						.contains(PureBehavior.VALIDATE_PURE)) {
+				&& rootTransformer.getXmlConfiguration().getConfiguration(contractInfo.getContractClass())
+						.isPureValidate()) {
 			pureInspector.verify((CtMethod) contractBehavior, true);
 		}
 	}

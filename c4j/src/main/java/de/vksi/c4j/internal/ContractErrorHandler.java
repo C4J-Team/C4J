@@ -1,13 +1,11 @@
 package de.vksi.c4j.internal;
 
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 
 import de.vksi.c4j.ContractError;
 import de.vksi.c4j.UsageError;
-import de.vksi.c4j.Configuration.ContractViolationAction;
 import de.vksi.c4j.internal.compiler.StaticCall;
+import de.vksi.c4j.internal.configuration.ContractViolationAction;
 import de.vksi.c4j.internal.evaluator.Evaluator;
 
 public class ContractErrorHandler {
@@ -26,7 +24,7 @@ public class ContractErrorHandler {
 			contractAction(source, usageError, affectedClass);
 		}
 		contractAction(source, new ContractError("Contract Error in " + source.getName() + ".", throwable),
-					affectedClass);
+				affectedClass);
 	}
 
 	private static UsageError getUsageError(Throwable throwable) {
@@ -41,12 +39,12 @@ public class ContractErrorHandler {
 
 	private static void contractAction(ContractErrorSource source, Error error, Class<?> affectedClass) {
 		Evaluator.setException(error);
-		Set<ContractViolationAction> contractViolationActions = RootTransformer.INSTANCE.getConfigurationManager()
-				.getConfiguration(affectedClass).getContractViolationActions();
-		if (contractViolationActions.contains(ContractViolationAction.LOG)) {
+		ContractViolationAction contractViolationActions = RootTransformer.INSTANCE.getXmlConfiguration()
+				.getContractViolationAction(affectedClass);
+		if (contractViolationActions.isLog().booleanValue()) {
 			logger.error("Contract Violation in " + source.getName() + ".", error);
 		}
-		if (contractViolationActions.contains(ContractViolationAction.ASSERTION_ERROR)) {
+		if (contractViolationActions.isThrowError().booleanValue()) {
 			throw error;
 		}
 	}
