@@ -21,7 +21,9 @@ import org.mockito.stubbing.Answer;
 import de.vksi.c4j.internal.configuration.DefaultPreconditionType;
 
 public class XmlConfigurationManagerTest {
-	private static final String C4J_GLOBAL2_XML = "c4j-global2.xml";
+	private static final String C4J_GLOBAL_WRITE_TRUE_XML = "c4j-global_write-true.xml";
+	private static final String C4J_GLOBAL_WRITE_FALSE_XML = "c4j-global_write-false.xml";
+	private static final String C4J_LOCAL_DEFAULT_XML = "c4j-local_default.xml";
 	private static final String C4J_LOCAL_SAME_PACKAGE_XML = "c4j-local_same-package.xml";
 	private static final String C4J_LOCAL_DIFFERENT_PACKAGE_XML = "c4j-local_different-package.xml";
 
@@ -65,7 +67,7 @@ public class XmlConfigurationManagerTest {
 
 	@Test
 	public void testRegisterLocalConfiguration() throws Exception {
-		ClassLoader classLoader = createClassLoaderMock(C4J_LOCAL_XML, C4J_LOCAL_XML);
+		ClassLoader classLoader = createClassLoaderMock(C4J_LOCAL_XML, C4J_LOCAL_DEFAULT_XML);
 		manager.registerClassLoader(classLoader);
 		XmlLocalConfiguration configuration = manager.getConfiguration(XmlConfigurationManager.class);
 		assertThat(configuration.isPureValidate(), is(true));
@@ -74,7 +76,8 @@ public class XmlConfigurationManagerTest {
 
 	@Test
 	public void testRegisterMultipleLocalConfigurations_SamePackage() throws Exception {
-		ClassLoader classLoader = createClassLoaderMock(C4J_LOCAL_XML, C4J_LOCAL_XML, C4J_LOCAL_SAME_PACKAGE_XML);
+		ClassLoader classLoader = createClassLoaderMock(C4J_LOCAL_XML, C4J_LOCAL_DEFAULT_XML,
+				C4J_LOCAL_SAME_PACKAGE_XML);
 		manager.registerClassLoader(classLoader);
 		XmlLocalConfiguration configuration = manager.getConfiguration(XmlConfigurationManager.class);
 		assertThat(configuration.isPureValidate(), is(configuration.isPureSkipInvariants()));
@@ -82,7 +85,8 @@ public class XmlConfigurationManagerTest {
 
 	@Test
 	public void testRegisterMultipleLocalConfigurations_DifferentPackage() throws Exception {
-		ClassLoader classLoader = createClassLoaderMock(C4J_LOCAL_XML, C4J_LOCAL_XML, C4J_LOCAL_DIFFERENT_PACKAGE_XML);
+		ClassLoader classLoader = createClassLoaderMock(C4J_LOCAL_XML, C4J_LOCAL_DEFAULT_XML,
+				C4J_LOCAL_DIFFERENT_PACKAGE_XML);
 		manager.registerClassLoader(classLoader);
 		XmlLocalConfiguration configuration = manager.getConfiguration(XmlConfigurationManager.class);
 		assertThat(configuration.isPureValidate(), is(true));
@@ -107,7 +111,7 @@ public class XmlConfigurationManagerTest {
 
 	@Test
 	public void testRegisterGlobalConfiguration() throws Exception {
-		ClassLoader classLoader = createClassLoaderMock(C4J_GLOBAL_XML, C4J_GLOBAL_XML);
+		ClassLoader classLoader = createClassLoaderMock(C4J_GLOBAL_XML, C4J_GLOBAL_WRITE_TRUE_XML);
 		manager.registerClassLoader(classLoader);
 		XmlGlobalConfiguration globalConfig = manager.getGlobalConfiguration();
 		assertThat(globalConfig.getContractViolationActions().size(), is(0));
@@ -116,7 +120,7 @@ public class XmlConfigurationManagerTest {
 
 	@Test
 	public void testRegisterGlobalConfigurations_Twice() throws Exception {
-		ClassLoader classLoader = createClassLoaderMock(C4J_GLOBAL_XML, C4J_GLOBAL_XML);
+		ClassLoader classLoader = createClassLoaderMock(C4J_GLOBAL_XML, C4J_GLOBAL_WRITE_TRUE_XML);
 		manager.registerClassLoader(classLoader);
 		manager.registerClassLoader(classLoader);
 		XmlGlobalConfiguration globalConfig = manager.getGlobalConfiguration();
@@ -126,8 +130,8 @@ public class XmlConfigurationManagerTest {
 
 	@Test
 	public void testRegisterGlobalConfigurations_WithDifferentClassLoaders() throws Exception {
-		ClassLoader classLoader = createClassLoaderMock(C4J_GLOBAL_XML, C4J_GLOBAL_XML);
-		ClassLoader classLoader2 = createClassLoaderMock(C4J_GLOBAL_XML, C4J_GLOBAL2_XML);
+		ClassLoader classLoader = createClassLoaderMock(C4J_GLOBAL_XML, C4J_GLOBAL_WRITE_TRUE_XML);
+		ClassLoader classLoader2 = createClassLoaderMock(C4J_GLOBAL_XML, C4J_GLOBAL_WRITE_FALSE_XML);
 		manager.registerClassLoader(classLoader);
 		manager.registerClassLoader(classLoader2);
 		XmlGlobalConfiguration globalConfig = manager.getGlobalConfiguration();
