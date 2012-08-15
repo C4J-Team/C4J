@@ -1,3 +1,16 @@
+C4J 4.0-Beta7 (08/15/2012)
+=====
+New Features:
+* implemented maxTime(seconds) asserting the duration of a method
+* changed configuration to be xml-based using a local and a global configuration
+
+Fixes:
+* @AllowPureAcces is now usable with Objects
+* fixed various issues executing conditions in the correct order
+* old-expressions are no longer being evaluated in the post-condition
+* fixed various side-effect issues using old and unchanged in post-conditions and invariants
+* fixed pure mechanism trying to access package-private fields from super-classes when class is not in the same package
+
 C4J 4.0-Beta6 (06/14/2012)
 =====
 New Features:
