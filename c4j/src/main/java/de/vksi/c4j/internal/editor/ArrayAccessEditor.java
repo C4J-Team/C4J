@@ -1,5 +1,8 @@
 package de.vksi.c4j.internal.editor;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javassist.CannotCompileException;
 import javassist.CtBehavior;
 import javassist.bytecode.BadBytecode;
@@ -11,6 +14,22 @@ import de.vksi.c4j.internal.util.TransformationHelper;
 
 public class ArrayAccessEditor {
 	private TransformationHelper transformationHelper = new TransformationHelper();
+	private static final Set<Integer> ARRAY_STORE_OPCODES = new HashSet<Integer>();
+
+	static {
+		addToOpcodes(ARRAY_STORE_OPCODES, Opcode.AASTORE);
+		addToOpcodes(ARRAY_STORE_OPCODES, Opcode.BASTORE);
+		addToOpcodes(ARRAY_STORE_OPCODES, Opcode.CASTORE);
+		addToOpcodes(ARRAY_STORE_OPCODES, Opcode.DASTORE);
+		addToOpcodes(ARRAY_STORE_OPCODES, Opcode.FASTORE);
+		addToOpcodes(ARRAY_STORE_OPCODES, Opcode.IASTORE);
+		addToOpcodes(ARRAY_STORE_OPCODES, Opcode.LASTORE);
+		addToOpcodes(ARRAY_STORE_OPCODES, Opcode.SASTORE);
+	}
+
+	private static void addToOpcodes(Set<Integer> arrayStoreOpcodes, int opcode) {
+		arrayStoreOpcodes.add(Integer.valueOf(opcode));
+	}
 
 	public void instrumentArrayAccesses(CtBehavior affectedMethod) throws CannotCompileException {
 		try {
@@ -31,15 +50,23 @@ public class ArrayAccessEditor {
 			throws BadBytecode {
 		int index = ci.next();
 		int op = ci.byteAt(index);
-		if (op == Opcode.AASTORE || op == Opcode.BASTORE || op == Opcode.CASTORE || op == Opcode.DASTORE
-				|| op == Opcode.FASTORE || op == Opcode.IASTORE || op == Opcode.LASTORE || op == Opcode.SASTORE) {
-			if (op == Opcode.DASTORE || op == Opcode.LASTORE) {
-				ci.insert(index, checkUnpureBytesLong);
-			} else {
-				ci.insert(index, checkUnpureBytes);
-			}
+		if (ARRAY_STORE_OPCODES.contains(Integer.valueOf(op))) {
+			handleArrayStoreOpcodes(ci, checkUnpureBytes, checkUnpureBytesLong, index, op);
 		}
 		return op;
+	}
+
+	private void handleArrayStoreOpcodes(CodeIterator ci, byte[] checkUnpureBytes, byte[] checkUnpureBytesLong,
+			int index, int op) throws BadBytecode {
+		if (isDoubleOrLongArrayStoreOpcode(op)) {
+			ci.insert(index, checkUnpureBytesLong);
+			return;
+		}
+		ci.insert(index, checkUnpureBytes);
+	}
+
+	private boolean isDoubleOrLongArrayStoreOpcode(int op) {
+		return op == Opcode.DASTORE || op == Opcode.LASTORE;
 	}
 
 	private byte[] getCheckUnpureBytesLong(CtBehavior affectedMethod) {

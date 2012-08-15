@@ -40,7 +40,7 @@ public class XmlConfigurationManagerTest {
 		}
 	}
 
-	public ClasspathResourceLoader classpathResourceLoader = new ClasspathResourceLoader();
+	private ClasspathResourceLoader classpathResourceLoader = new ClasspathResourceLoader();
 	private XmlConfigurationManager manager;
 
 	@Before

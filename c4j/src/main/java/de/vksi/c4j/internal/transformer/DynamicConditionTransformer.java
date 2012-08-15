@@ -13,41 +13,39 @@ import javassist.NotFoundException;
 import de.vksi.c4j.internal.compiler.NestedExp;
 import de.vksi.c4j.internal.compiler.StandaloneExp;
 import de.vksi.c4j.internal.compiler.StaticCallExp;
-import de.vksi.c4j.internal.util.ListOrderedSet;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
+import de.vksi.c4j.internal.util.ListOrderedSet;
 
 /**
- * Transforming a method to look like the following block-comment:
- */
-/*
-if (canExecuteCondition()) {
-	try {
-		preForContract1();
-		preForContract2();
-	} catch (Throwable e) {
-		handleContractException(e);
-	} finally {
-		afterContract();
-	}
-}
-try {
-	code();
-} catch (Throwable e) {
-	setException(e);
-	throw e;
-} finally {
+ * Transforming a method to look like the following block-comment: <code>
 	if (canExecuteCondition()) {
 		try {
-			postForContract1();
-			postForContract2();
+			preForContract1();
+			preForContract2();
 		} catch (Throwable e) {
 			handleContractException(e);
 		} finally {
 			afterContract();
 		}
 	}
-}
-*/
+	try {
+		code();
+	} catch (Throwable e) {
+		setException(e);
+		throw e;
+	} finally {
+		if (canExecuteCondition()) {
+			try {
+				postForContract1();
+				postForContract2();
+			} catch (Throwable e) {
+				handleContractException(e);
+			} finally {
+				afterContract();
+			}
+		}
+	}</code>
+ */
 public class DynamicConditionTransformer extends PreAndPostConditionTransformer {
 	@Override
 	public void transform(ListOrderedSet<CtClass> involvedClasses, ListOrderedSet<ContractInfo> contracts,
@@ -59,8 +57,8 @@ public class DynamicConditionTransformer extends PreAndPostConditionTransformer 
 		}
 	}
 
-	public void transform(CtClass affectedClass, CtBehavior affectedBehavior,
-			List<CtBehavior> contractList) throws Exception {
+	public void transform(CtClass affectedClass, CtBehavior affectedBehavior, List<CtBehavior> contractList)
+			throws Exception {
 		if (logger.isTraceEnabled()) {
 			logger.trace("transforming behavior " + affectedBehavior.getLongName());
 		}
@@ -71,10 +69,10 @@ public class DynamicConditionTransformer extends PreAndPostConditionTransformer 
 
 	@Override
 	protected StandaloneExp getSingleConditionCall(CtClass affectedClass, CtBehavior affectedBehavior,
-			BeforeConditionCallProvider beforeConditionCallProvider,
-			CtBehavior contractBehavior) throws NotFoundException {
-		StaticCallExp getConditionCall = beforeConditionCallProvider.conditionCall(affectedBehavior,
-				contractBehavior, NestedExp.THIS);
+			BeforeConditionCallProvider beforeConditionCallProvider, CtBehavior contractBehavior)
+			throws NotFoundException {
+		StaticCallExp getConditionCall = beforeConditionCallProvider.conditionCall(affectedBehavior, contractBehavior,
+				NestedExp.THIS);
 		return getContractCallExp(affectedClass, contractBehavior, getConditionCall);
 	}
 }

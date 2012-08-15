@@ -10,6 +10,7 @@ import javassist.CannotCompileException;
 import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.CtField;
+import javassist.CtMember;
 import javassist.CtMethod;
 import javassist.Modifier;
 import javassist.NotFoundException;
@@ -80,50 +81,60 @@ public class PureInspector {
 		if (!methodIsStatic) {
 			unpureObjects.add(NestedExp.THIS);
 		}
-		int i = 1;
-		for (CtClass paramType : affectedBehavior.getParameterTypes()) {
-			if (!paramType.isPrimitive()) {
-				unpureObjects.add(NestedExp.arg(i));
-			}
-			i++;
-		}
+		addParametersToUnpureObjects(affectedBehavior, unpureObjects);
+		addFieldsToUnpureObjects(affectedBehavior, unpureObjects, methodIsStatic);
+		registerUnpureObjects(affectedBehavior, unpureObjects);
+	}
+
+	private void addFieldsToUnpureObjects(CtMethod affectedBehavior, List<NestedExp> unpureObjects,
+			boolean methodIsStatic) throws NotFoundException {
 		for (CtField field : getAccessibleFields(affectedBehavior)) {
 			if (!field.getType().isPrimitive() && (!methodIsStatic || Modifier.isStatic(field.getModifiers()))
 					&& !field.hasAnnotation(AllowPureAccess.class)) {
 				unpureObjects.add(NestedExp.field(field));
 			}
 		}
-		if (!unpureObjects.isEmpty()) {
-			registerUnpureObjects(affectedBehavior, unpureObjects);
+	}
+
+	private void addParametersToUnpureObjects(CtMethod affectedBehavior, List<NestedExp> unpureObjects)
+			throws NotFoundException {
+		CtClass[] parameterTypes = affectedBehavior.getParameterTypes();
+		for (int parameterIndex = 0; parameterIndex < parameterTypes.length; parameterIndex++) {
+			CtClass paramType = parameterTypes[parameterIndex];
+			if (!paramType.isPrimitive()) {
+				unpureObjects.add(NestedExp.arg(parameterIndex + 1));
+			}
 		}
 	}
 
 	private void registerUnpureObjects(CtBehavior affectedBehavior, List<NestedExp> unpureObjects)
 			throws CannotCompileException {
-		ArrayExp unpureArray = new ArrayExp(Object.class, unpureObjects);
-		StandaloneExp registerUnpureExp = new StaticCallExp(PureEvaluator.registerUnpure, unpureArray).toStandalone();
-		StandaloneExp unregisterUnpureExp = new StaticCallExp(PureEvaluator.unregisterUnpure).toStandalone();
-		if (logger.isTraceEnabled()) {
-			logger.trace("puremagic.insertBefore " + affectedBehavior.getLongName() + ": \n"
-					+ registerUnpureExp.getCode());
-			logger.trace("puremagic.insertFinally " + affectedBehavior.getLongName() + ": \n"
-					+ unregisterUnpureExp.getCode());
+		if (unpureObjects.isEmpty()) {
+			return;
 		}
-		registerUnpureExp.insertBefore(affectedBehavior);
-		unregisterUnpureExp.insertFinally(affectedBehavior);
+		ArrayExp unpureArray = new ArrayExp(Object.class, unpureObjects);
+		new StaticCallExp(PureEvaluator.registerUnpure, unpureArray).toStandalone().insertBefore(affectedBehavior);
+		new StaticCallExp(PureEvaluator.unregisterUnpure).toStandalone().insertFinally(affectedBehavior);
 	}
 
 	private Set<CtField> getAccessibleFields(CtBehavior affectedBehavior) {
 		Set<CtField> accessibleFields = new HashSet<CtField>();
 		for (CtField field : affectedBehavior.getDeclaringClass().getFields()) {
-			if (!Modifier.isPackage(field.getModifiers())
-					|| affectedBehavior.getDeclaringClass().getPackageName().equals(
-							field.getDeclaringClass().getPackageName())) {
+			if (isAccessibleField(affectedBehavior, field)) {
 				accessibleFields.add(field);
 			}
 		}
 		Collections.addAll(accessibleFields, affectedBehavior.getDeclaringClass().getDeclaredFields());
 		return accessibleFields;
+	}
+
+	private boolean isAccessibleField(CtBehavior affectedBehavior, CtField field) {
+		return !Modifier.isPackage(field.getModifiers())
+				|| getPackageName(affectedBehavior).equals(getPackageName(field));
+	}
+
+	private String getPackageName(CtMember member) {
+		return member.getDeclaringClass().getPackageName();
 	}
 
 	public void checkUnpureAccess(CtBehavior affectedBehavior) throws CannotCompileException {

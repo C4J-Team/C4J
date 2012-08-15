@@ -49,7 +49,7 @@ public class AffectedBehaviorLocator {
 			return getAffectedMethod(contractInfo, affectedClass, contractBehavior);
 		}
 		throw new NotFoundException("contractBehavior " + contractBehavior.getLongName()
-					+ " is neither constructor nor method");
+				+ " is neither constructor nor method");
 	}
 
 	CtMethod getAffectedMethod(ContractInfo contractInfo, CtClass affectedClass, CtBehavior contractBehavior)
@@ -58,8 +58,8 @@ public class AffectedBehaviorLocator {
 		CtMethod affectedMethod = null;
 		while (affectedMethod == null && currentClass != null) {
 			try {
-				affectedMethod = currentClass.getDeclaredMethod(contractBehavior.getName(),
-						contractBehavior.getParameterTypes());
+				affectedMethod = currentClass.getDeclaredMethod(contractBehavior.getName(), contractBehavior
+						.getParameterTypes());
 			} catch (NotFoundException e) {
 			}
 			currentClass = currentClass.getSuperclass();
@@ -73,17 +73,17 @@ public class AffectedBehaviorLocator {
 		if (affectedMethod.getDeclaringClass().equals(affectedClass)) {
 			return affectedMethod;
 		}
-		if (!hasContract(affectedMethod.getDeclaringClass(), contractInfo)) {
-			logger.warn("could not find method " + contractBehavior.getName() + " in affected class "
-					+ affectedClass.getName() + " for contract class " + contractInfo.getContractClass().getName()
-					+ " - inserting an empty method");
-			affectedMethod = CtNewMethod.delegator(affectedMethod, affectedClass);
-			affectedMethod.setModifiers(Modifier.clear(affectedMethod.getModifiers(), Modifier.NATIVE));
-			affectedMethod.setModifiers(Modifier.clear(affectedMethod.getModifiers(), Modifier.ABSTRACT));
-			affectedClass.addMethod(affectedMethod);
-			return affectedMethod;
+		if (hasContract(affectedMethod.getDeclaringClass(), contractInfo)) {
+			return null;
 		}
-		return null;
+		logger.warn("could not find method " + contractBehavior.getName() + " in affected class "
+				+ affectedClass.getName() + " for contract class " + contractInfo.getContractClass().getName()
+				+ " - inserting an empty method");
+		affectedMethod = CtNewMethod.delegator(affectedMethod, affectedClass);
+		affectedMethod.setModifiers(Modifier.clear(affectedMethod.getModifiers(), Modifier.NATIVE));
+		affectedMethod.setModifiers(Modifier.clear(affectedMethod.getModifiers(), Modifier.ABSTRACT));
+		affectedClass.addMethod(affectedMethod);
+		return affectedMethod;
 	}
 
 	private boolean hasContract(CtClass clazz, ContractInfo contractInfo) throws NotFoundException {
