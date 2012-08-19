@@ -36,7 +36,6 @@ import java.util.LinkedList;
 
 import javassist.CtBehavior;
 import javassist.CtClass;
-import javassist.CtConstructor;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 import javassist.bytecode.BadBytecode;
@@ -132,8 +131,8 @@ public class Stackalyzer {
 		}
 	}
 
-	private int getOpcodeDelta(int op, int index, CodeIterator ci, ConstPool constPool)
-			throws BadBytecode, NotFoundException, UsageError {
+	private int getOpcodeDelta(int op, int index, CodeIterator ci, ConstPool constPool) throws BadBytecode,
+			NotFoundException, UsageError {
 		switch (op) {
 			case GETFIELD:
 			case GETSTATIC:
@@ -165,8 +164,7 @@ public class Stackalyzer {
 
 	private int getStaticFieldDelta(int index, CodeIterator ci, ConstPool constPool) throws NotFoundException {
 		int fieldIndex = ci.u16bitAt(index + 1);
-		CtClass fieldClass = RootTransformer.INSTANCE.getPool().get(
-				constPool.getFieldrefClassName(fieldIndex));
+		CtClass fieldClass = RootTransformer.INSTANCE.getPool().get(constPool.getFieldrefClassName(fieldIndex));
 		return getTypeDelta(fieldClass.getField(constPool.getFieldrefName(fieldIndex)).getType());
 	}
 
@@ -183,8 +181,7 @@ public class Stackalyzer {
 	private CtBehavior getBehaviorFromMethodrefInfo(int index, CodeIterator ci, ConstPool constPool)
 			throws NotFoundException {
 		int methodIndex = ci.u16bitAt(index + 1);
-		CtClass behaviorClass = RootTransformer.INSTANCE.getPool().get(
-				constPool.getMethodrefClassName(methodIndex));
+		CtClass behaviorClass = RootTransformer.INSTANCE.getPool().get(constPool.getMethodrefClassName(methodIndex));
 		String behaviorName = constPool.getMethodrefName(methodIndex);
 		String behaviorDescriptor = constPool.getMethodrefType(methodIndex);
 		return getBehaviorFromInfo(behaviorClass, behaviorName, behaviorDescriptor);
@@ -203,9 +200,7 @@ public class Stackalyzer {
 		for (CtClass paramType : behavior.getParameterTypes()) {
 			delta -= getTypeDelta(paramType);
 		}
-		if (behavior instanceof CtConstructor) {
-			delta++;
-		} else {
+		if (behavior instanceof CtMethod) {
 			delta += getTypeDelta(((CtMethod) behavior).getReturnType());
 		}
 		return delta;
