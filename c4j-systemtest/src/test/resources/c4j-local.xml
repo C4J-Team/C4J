@@ -35,4 +35,8 @@
 		<root-package>de.vksi.c4j.systemtest.config.contractsdirectoryasjarfile</root-package>
 		<contract-scan-package>de.vksi.c4j.systemtest.config.contractsdirectoryasjarfile</contract-scan-package>
 	</configuration>
+	<configuration>
+		<root-package>singlepackage</root-package>
+		<pure-validate>true</pure-validate>
+	</configuration>
 </c4j-local>

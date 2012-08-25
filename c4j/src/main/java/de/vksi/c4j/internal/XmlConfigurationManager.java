@@ -141,7 +141,7 @@ public class XmlConfigurationManager {
 	}
 
 	private <T> T getMapValueFromClassName(String classNamePrefix, Map<String, T> map, T defaultValue) {
-		if (!classNamePrefix.contains(".")) {
+		if (classNamePrefix.isEmpty()) {
 			return defaultValue;
 		}
 		if (map.containsKey(classNamePrefix)) {
