@@ -13,9 +13,9 @@ import de.vksi.c4j.internal.compiler.NestedExp;
 import de.vksi.c4j.internal.compiler.StandaloneExp;
 import de.vksi.c4j.internal.compiler.StaticCallExp;
 import de.vksi.c4j.internal.util.AffectedBehaviorLocator;
+import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
 import de.vksi.c4j.internal.util.ListOrderedSet;
 import de.vksi.c4j.internal.util.ReflectionHelper;
-import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
 
 /*
 try {
@@ -80,15 +80,16 @@ public class StaticConditionTransformer extends PreAndPostConditionTransformer {
 			logger.trace("transforming behavior " + affectedBehavior.getLongName());
 		}
 		insertPreAndPostCondition(Collections.singletonList(contractBehavior), affectedClass, affectedBehavior);
+		getBeforeContractMethodCall().insertBefore(affectedBehavior);
 		getAfterContractMethodCall().insertFinally(affectedBehavior);
 	}
 
 	@Override
 	protected StandaloneExp getSingleConditionCall(CtClass affectedClass, CtBehavior affectedBehavior,
-			BeforeConditionCallProvider beforeConditionCallProvider,
-			CtBehavior contractBehavior) throws NotFoundException {
-		StaticCallExp getConditionCall = beforeConditionCallProvider.conditionCall(affectedBehavior,
-				contractBehavior, NestedExp.NULL);
+			BeforeConditionCallProvider beforeConditionCallProvider, CtBehavior contractBehavior)
+			throws NotFoundException {
+		StaticCallExp getConditionCall = beforeConditionCallProvider.conditionCall(affectedBehavior, contractBehavior,
+				NestedExp.NULL);
 		return getContractCallExp(affectedClass, contractBehavior, getConditionCall);
 	}
 

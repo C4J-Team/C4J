@@ -1,5 +1,7 @@
 package de.vksi.c4j.internal.evaluator;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,7 +10,6 @@ import org.apache.log4j.Logger;
 import de.vksi.c4j.ContractError;
 import de.vksi.c4j.internal.compiler.StaticCall;
 import de.vksi.c4j.internal.util.Pair;
-import de.vksi.c4j.internal.util.SelfInitializingMapOfMaps;
 
 public class OldCache {
 	public static final StaticCall oldRetrieve = new StaticCall(OldCache.class, "oldRetrieve");
@@ -21,15 +22,10 @@ public class OldCache {
 	 * Integer = stack trace depth, Integer = old-call index, Boolean = exception thrown
 	 */
 	static final ThreadLocal<Integer> currentOldCacheEnvironment = new ThreadLocal<Integer>();
-	private static final ThreadLocal<SelfInitializingMapOfMaps<Integer, Map<Integer, Pair<Boolean, Object>>>> oldCache = new ThreadLocal<SelfInitializingMapOfMaps<Integer, Map<Integer, Pair<Boolean, Object>>>>() {
+	private static final ThreadLocal<Deque<Map<Integer, Pair<Boolean, Object>>>> oldCache = new ThreadLocal<Deque<Map<Integer, Pair<Boolean, Object>>>>() {
 		@Override
-		protected SelfInitializingMapOfMaps<Integer, Map<Integer, Pair<Boolean, Object>>> initialValue() {
-			return new SelfInitializingMapOfMaps<Integer, Map<Integer, Pair<Boolean, Object>>>() {
-				@Override
-				protected Map<Integer, Pair<Boolean, Object>> initialValue() {
-					return new HashMap<Integer, Pair<Boolean, Object>>();
-				}
-			};
+		protected Deque<Map<Integer, Pair<Boolean, Object>>> initialValue() {
+			return new ArrayDeque<Map<Integer, Pair<Boolean, Object>>>();
 		}
 	};
 
@@ -64,33 +60,31 @@ public class OldCache {
 	}
 
 	private static Map<Integer, Pair<Boolean, Object>> getCurrentOldCache() {
-		return oldCache.get().get(currentOldCacheEnvironment.get());
+		return oldCache.get().peekFirst();
 	}
 
 	public static void oldStore(Object value, int index) {
 		if (logger.isTraceEnabled()) {
-			logger.trace("oldStore for index '" + index + "' with "
-					+ currentOldCacheEnvironment.get()
-					+ " storing " + value);
+			logger.trace("oldStore for index '" + index + "' with " + currentOldCacheEnvironment.get() + " storing "
+					+ value);
 		}
 		getCurrentOldCache().put(index, new Pair<Boolean, Object>(Boolean.FALSE, value));
 	}
 
 	public static void oldStoreException(Object exception, int index) {
 		if (logger.isTraceEnabled()) {
-			logger.trace("oldStore for index '" + index + "' with "
-					+ currentOldCacheEnvironment.get()
+			logger.trace("oldStore for index '" + index + "' with " + currentOldCacheEnvironment.get()
 					+ " storing EXCEPTION " + exception);
 		}
 		getCurrentOldCache().put(index, new Pair<Boolean, Object>(Boolean.TRUE, exception));
 	}
 
-	public static void setCurrentEnvironment(int stackTraceDepth) {
-		currentOldCacheEnvironment.set(Integer.valueOf(stackTraceDepth));
+	public static void add() {
+		oldCache.get().addFirst(new HashMap<Integer, Pair<Boolean, Object>>());
 	}
 
-	public static void clear(int stackTraceDepth) {
-		oldCache.get().get(Integer.valueOf(stackTraceDepth)).clear();
+	public static void remove() {
+		oldCache.get().removeFirst();
 	}
 
 }

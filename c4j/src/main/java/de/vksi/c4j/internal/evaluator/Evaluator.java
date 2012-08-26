@@ -18,6 +18,7 @@ public class Evaluator {
 	public static final StaticCall getInvariant = new StaticCall(Evaluator.class, "getInvariant");
 	public static final StaticCall canExecuteCondition = new StaticCall(Evaluator.class, "canExecuteCondition");
 	public static final StaticCall canExecutePostCondition = new StaticCall(Evaluator.class, "canExecutePostCondition");
+	public static final StaticCall beforeContractMethod = new StaticCall(Evaluator.class, "beforeContractMethod");
 	public static final StaticCall afterContract = new StaticCall(Evaluator.class, "afterContract");
 	public static final StaticCall afterContractMethod = new StaticCall(Evaluator.class, "afterContractMethod");
 	public static final StaticCall setException = new StaticCall(Evaluator.class, "setException");
@@ -82,7 +83,7 @@ public class Evaluator {
 	public static Object getPreCondition(Object target, String methodName, Class<?> contractClass,
 			Class<?> callingClass, Class<?> returnType) throws InstantiationException, IllegalAccessException {
 		evaluationPhase.set(EvaluationPhase.BEFORE);
-		beforeContract(target, returnType, Thread.currentThread().getStackTrace().length);
+		beforeContract(target, returnType);
 		logger.info("Calling pre-condition for " + methodName + " in contract "
 				+ reflectionHelper.getSimplerName(contractClass) + ".");
 		return ContractCache.getContractFromCache(target, contractClass, callingClass);
@@ -99,23 +100,30 @@ public class Evaluator {
 	public static Object getInvariant(Object target, String className, Class<?> contractClass, Class<?> callingClass)
 			throws InstantiationException, IllegalAccessException {
 		evaluationPhase.set(EvaluationPhase.INVARIANT);
-		beforeContract(target, void.class, Thread.currentThread().getStackTrace().length);
+		beforeContract(target, void.class);
 		logger.info("Calling invariant for " + className + " in contract "
 				+ reflectionHelper.getSimplerName(contractClass) + ".");
 		return ContractCache.getContractFromCache(target, contractClass, callingClass);
 	}
 
-	private static void beforeContract(Object target, Class<?> returnType, int stackTraceDepth) {
+	private static void beforeContract(Object target, Class<?> returnType) {
 		currentTarget.set(target);
-		OldCache.setCurrentEnvironment(stackTraceDepth);
 		contractReturnType.set(returnType);
+	}
+
+	public static void beforeContractMethod() {
+		if (evaluationPhase.get() == EvaluationPhase.NONE) {
+			OldCache.add();
+			PureEvaluator.addUnchangeable();
+			MaxTimeCache.add();
+		}
 	}
 
 	public static Object getPostCondition(Object target, String methodName, Class<?> contractClass,
 			Class<?> callingClass, Class<?> returnType, Object actualReturnValue) throws InstantiationException,
 			IllegalAccessException {
 		evaluationPhase.set(EvaluationPhase.AFTER);
-		beforeContract(target, returnType, Thread.currentThread().getStackTrace().length);
+		beforeContract(target, returnType);
 		returnValue.set(actualReturnValue);
 		logger.info("Calling post-condition for " + methodName + " in contract "
 				+ reflectionHelper.getSimplerName(contractClass) + ".");
@@ -139,8 +147,9 @@ public class Evaluator {
 			}
 			returnValue.set(null);
 			exceptionValue.set(null);
-			OldCache.clear(Thread.currentThread().getStackTrace().length);
-			PureEvaluator.unregisterUnchangeable();
+			OldCache.remove();
+			PureEvaluator.removeUnchangeable();
+			MaxTimeCache.remove();
 		}
 	}
 

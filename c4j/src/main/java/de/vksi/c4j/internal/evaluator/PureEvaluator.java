@@ -1,12 +1,13 @@
 package de.vksi.c4j.internal.evaluator;
 
+import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Deque;
 
 import org.apache.log4j.Logger;
 
 import de.vksi.c4j.internal.compiler.StaticCall;
 import de.vksi.c4j.internal.util.ObjectIdentitySet;
-import de.vksi.c4j.internal.util.SelfInitializingMap;
 
 public class PureEvaluator {
 	public static final StaticCall registerUnpure = new StaticCall(PureEvaluator.class, "registerUnpure");
@@ -18,15 +19,16 @@ public class PureEvaluator {
 			"checkExternalBlacklistAccess");
 	public static final StaticCall checkUnpureStatic = new StaticCall(PureEvaluator.class, "checkUnpureStatic");
 
-	private static final ThreadLocal<SelfInitializingMap<Integer, ObjectIdentitySet>> unpureCache = new ThreadLocal<SelfInitializingMap<Integer, ObjectIdentitySet>>() {
+	private static final ThreadLocal<Deque<ObjectIdentitySet>> unpureCache = new ThreadLocal<Deque<ObjectIdentitySet>>() {
 		@Override
-		protected SelfInitializingMap<Integer, ObjectIdentitySet> initialValue() {
-			return new SelfInitializingMap<Integer, ObjectIdentitySet>() {
-				@Override
-				protected ObjectIdentitySet initialValue() {
-					return new ObjectIdentitySet();
-				}
-			};
+		protected Deque<ObjectIdentitySet> initialValue() {
+			return new ArrayDeque<ObjectIdentitySet>();
+		}
+	};
+	private static final ThreadLocal<Deque<ObjectIdentitySet>> unchangeableCache = new ThreadLocal<Deque<ObjectIdentitySet>>() {
+		@Override
+		protected Deque<ObjectIdentitySet> initialValue() {
+			return new ArrayDeque<ObjectIdentitySet>();
 		}
 	};
 
@@ -38,60 +40,68 @@ public class PureEvaluator {
 	};
 	private static Logger logger = Logger.getLogger(PureEvaluator.class);
 
-	private static ObjectIdentitySet getCurrentUnpureCache(int stackDepth) {
-		return unpureCache.get().get(Integer.valueOf(stackDepth));
-	}
-
 	public static boolean isUnpureCacheEmpty() {
-		return unpureCache.get().size() == 0;
+		for (ObjectIdentitySet element : unpureCache.get()) {
+			if (!element.isEmpty()) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	public static void registerUnpure(Object[] objects) {
+		unpureCache.get().addFirst(new ObjectIdentitySet());
 		pureCallDepth.set(Integer.valueOf(pureCallDepth.get().intValue() + 1));
-		addToUnpureCache(objects, Thread.currentThread().getStackTrace().length);
+		addToCache(unpureCache, objects);
 	}
 
 	public static void registerUnchangeable(Object object) {
 		if (object instanceof Boolean || object instanceof Byte || object instanceof Character
-				|| object instanceof Double || object instanceof Float
-				|| object instanceof Integer || object instanceof Long || object instanceof Short) {
+				|| object instanceof Double || object instanceof Float || object instanceof Integer
+				|| object instanceof Long || object instanceof Short) {
 			return;
 		}
-		addToUnpureCache(new Object[] { object }, Thread.currentThread().getStackTrace().length - 1);
+		addToCache(unchangeableCache, new Object[] { object });
 	}
 
-	private static void addToUnpureCache(Object[] objects, int stackDepth) {
-		getCurrentUnpureCache(stackDepth).addAll(Arrays.asList(objects));
+	private static void addToCache(ThreadLocal<Deque<ObjectIdentitySet>> cache, Object[] objects) {
+		cache.get().peekFirst().addAll(Arrays.asList(objects));
 		for (Object obj : objects) {
 			if (obj instanceof Object[]) {
-				addToUnpureCache((Object[]) obj, stackDepth);
+				addToCache(cache, (Object[]) obj);
 			}
 		}
 	}
 
 	public static void unregisterUnpure() {
+		unpureCache.get().removeFirst();
 		pureCallDepth.set(Integer.valueOf(pureCallDepth.get().intValue() - 1));
-		removeFromUnpureCache(Thread.currentThread().getStackTrace().length);
-	}
-
-	public static void unregisterUnchangeable() {
-		removeFromUnpureCache(Thread.currentThread().getStackTrace().length - 1);
-	}
-
-	private static void removeFromUnpureCache(int stackDepth) {
-		getCurrentUnpureCache(stackDepth).clear();
 	}
 
 	public static void checkUnpureAccess(Object target) {
-		if (unpureCache.get().contains(target)) {
+		if (cacheContains(target)) {
 			AssertionError assertionError = new AssertionError("illegal access on unpure method or field");
 			logger.error(assertionError.getMessage(), assertionError);
 			throw assertionError;
 		}
 	}
 
+	private static boolean cacheContains(Object target) {
+		return cacheContains(unpureCache, target) || cacheContains(unchangeableCache, target);
+
+	}
+
+	private static boolean cacheContains(ThreadLocal<Deque<ObjectIdentitySet>> cache, Object target) {
+		for (ObjectIdentitySet element : cache.get()) {
+			if (element.contains(target)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public static void checkExternalAccess(Object target, String method) {
-		if (unpureCache.get().contains(target)) {
+		if (cacheContains(target)) {
 			warnExternalAccess(method);
 		}
 	}
@@ -102,7 +112,7 @@ public class PureEvaluator {
 	}
 
 	public static void checkExternalBlacklistAccess(Object target, String method) {
-		if (unpureCache.get().contains(target)) {
+		if (cacheContains(target)) {
 			AssertionError assertionError = new AssertionError("illegal access on unpure method " + method
 					+ " outside the root-packages.");
 			logger.error(assertionError.getMessage(), assertionError);
@@ -116,5 +126,13 @@ public class PureEvaluator {
 			logger.error(assertionError.getMessage(), assertionError);
 			throw assertionError;
 		}
+	}
+
+	public static void addUnchangeable() {
+		unchangeableCache.get().addFirst(new ObjectIdentitySet());
+	}
+
+	public static void removeUnchangeable() {
+		unchangeableCache.get().removeFirst();
 	}
 }

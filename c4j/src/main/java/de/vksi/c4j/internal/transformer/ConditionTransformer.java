@@ -20,9 +20,9 @@ import de.vksi.c4j.internal.compiler.TryExp;
 import de.vksi.c4j.internal.compiler.ValueExp;
 import de.vksi.c4j.internal.evaluator.Evaluator;
 import de.vksi.c4j.internal.util.AffectedBehaviorLocator;
+import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
 import de.vksi.c4j.internal.util.ListOrderedSet;
 import de.vksi.c4j.internal.util.ReflectionHelper;
-import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
 
 public abstract class ConditionTransformer extends AbstractAffectedClassTransformer {
 	protected ReflectionHelper reflectionHelper = new ReflectionHelper();
@@ -44,6 +44,10 @@ public abstract class ConditionTransformer extends AbstractAffectedClassTransfor
 		return NestedExp.getArgsList(contractBehavior, 1);
 	}
 
+	protected StandaloneExp getBeforeContractMethodCall() {
+		return new StaticCallExp(Evaluator.beforeContractMethod).toStandalone();
+	}
+
 	protected StandaloneExp getAfterContractMethodCall() {
 		return new StaticCallExp(Evaluator.afterContractMethod).toStandalone();
 	}
@@ -60,8 +64,7 @@ public abstract class ConditionTransformer extends AbstractAffectedClassTransfor
 	}
 
 	protected StandaloneExp getContractCallExp(CtClass affectedClass, CtBehavior contractBehavior,
-			StaticCallExp conditionCall)
-			throws NotFoundException {
+			StaticCallExp conditionCall) throws NotFoundException {
 		CastExp getContractInstance = new CastExp(contractBehavior.getDeclaringClass(), conditionCall);
 		return getContractInstance.appendCall(reflectionHelper.getContractBehaviorName(contractBehavior),
 				getArgsList(affectedClass, contractBehavior)).toStandalone();

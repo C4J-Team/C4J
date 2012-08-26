@@ -1,30 +1,36 @@
 package de.vksi.c4j.internal.evaluator;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 import de.vksi.c4j.internal.compiler.StaticCall;
 
 public class MaxTimeCache {
 	public static final StaticCall setStartTime = new StaticCall(MaxTimeCache.class, "setStartTime");
 
-	private static final ThreadLocal<Map<Integer, Long>> maxTimeCache = new ThreadLocal<Map<Integer, Long>>() {
+	private static final ThreadLocal<Deque<Long>> maxTimeCache = new ThreadLocal<Deque<Long>>() {
 		@Override
-		protected Map<Integer, Long> initialValue() {
-			return new HashMap<Integer, Long>();
+		protected Deque<Long> initialValue() {
+			return new ArrayDeque<Long>();
 		}
 	};
 
+	public static void add() {
+		maxTimeCache.get().addFirst(Long.valueOf(0));
+	}
+
+	public static void remove() {
+		maxTimeCache.get().removeFirst();
+	}
+
 	public static void setStartTime() {
-		int length = Thread.currentThread().getStackTrace().length;
-		maxTimeCache.get().put(Integer.valueOf(length),
-				Long.valueOf(System.nanoTime()));
+		maxTimeCache.get().removeFirst();
+		maxTimeCache.get().addFirst(Long.valueOf(System.nanoTime()));
 	}
 
 	public static boolean isWithinMaxTime(double seconds) {
 		long endTime = System.nanoTime();
-		int length = Thread.currentThread().getStackTrace().length;
-		long startTime = maxTimeCache.get().get(Integer.valueOf(length - 1));
+		long startTime = maxTimeCache.get().getFirst();
 		return ((double) (endTime - startTime)) / 1000000000 <= seconds;
 	}
 }
