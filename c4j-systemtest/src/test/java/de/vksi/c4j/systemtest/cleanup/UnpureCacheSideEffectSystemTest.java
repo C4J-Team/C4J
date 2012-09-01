@@ -1,6 +1,5 @@
 package de.vksi.c4j.systemtest.cleanup;
 
-import static de.vksi.c4j.Condition.noneIdentifiedYet;
 import static de.vksi.c4j.Condition.preCondition;
 
 import org.junit.Rule;
@@ -42,7 +41,6 @@ public class UnpureCacheSideEffectSystemTest {
 		@Override
 		protected void unpureMethod() {
 			if (preCondition()) {
-				noneIdentifiedYet();
 			}
 		}
 	}
