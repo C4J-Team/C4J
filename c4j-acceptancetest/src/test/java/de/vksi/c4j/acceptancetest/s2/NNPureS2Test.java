@@ -8,10 +8,10 @@ import org.junit.Test;
 import org.junit.matchers.JUnitMatchers;
 import org.junit.rules.ExpectedException;
 
-import de.vksi.c4j.systemtest.TransformerAwareRule;
 import de.vksi.c4j.Pure;
 import de.vksi.c4j.acceptancetest.floatingwindow.Vector;
 import de.vksi.c4j.acceptancetest.point.Color;
+import de.vksi.c4j.systemtest.TransformerAwareRule;
 
 public class NNPureS2Test {
 
@@ -24,7 +24,7 @@ public class NNPureS2Test {
 	@Test
 	public void testIncorrectPureUsage_IllegalMethodAccessOnBoxedField() {
 		thrown.expect(AssertionError.class);
-		thrown.expectMessage(JUnitMatchers.containsString("illegal access on unpure method"));
+		thrown.expectMessage(JUnitMatchers.containsString("illegal access on unpure object"));
 
 		FloatingWindow window = new FloatingWindow(new Vector(0, 0));
 		window.move(new Vector(5, 10));
@@ -55,7 +55,7 @@ public class NNPureS2Test {
 	@Test
 	public void testIncorrectPureUsage_FieldModifiedInPureMethodOfAnotherType() {
 		thrown.expect(AssertionError.class);
-		thrown.expectMessage(JUnitMatchers.containsString("illegal access on unpure method"));
+		thrown.expectMessage(JUnitMatchers.containsString("illegal access on unpure object"));
 		FloatingWindow window = new FloatingWindow(new Vector(1, 3));
 		window.resetUpperLeftCorner();
 	}

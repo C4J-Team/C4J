@@ -28,6 +28,7 @@ import de.vksi.c4j.internal.compiler.StaticCallExp;
 import de.vksi.c4j.internal.compiler.ThrowExp;
 import de.vksi.c4j.internal.compiler.ValueExp;
 import de.vksi.c4j.internal.evaluator.PureEvaluator;
+import de.vksi.c4j.internal.evaluator.PureEvaluator.ErrorType;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
 import de.vksi.c4j.internal.util.InvolvedTypeInspector;
 import de.vksi.c4j.internal.util.ListOrderedSet;
@@ -176,7 +177,7 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 					+ affectedMethod.getLongName() + " on line " + methodCall.getLineNumber());
 			return;
 		}
-		PureEvaluator.warnExternalAccess(method.getLongName());
+		PureEvaluator.warnExternalAccess(method.getLongName(), ErrorType.UNPURE);
 	}
 
 	private boolean isSynthetic(CtBehavior behavior) {

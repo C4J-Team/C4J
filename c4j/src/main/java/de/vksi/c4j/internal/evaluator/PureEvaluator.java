@@ -19,6 +19,21 @@ public class PureEvaluator {
 			"checkExternalBlacklistAccess");
 	public static final StaticCall checkUnpureStatic = new StaticCall(PureEvaluator.class, "checkUnpureStatic");
 
+	public static enum ErrorType {
+		UNPURE("unpure"), UNCHANGEABLE("unchangeable"), NONE(null);
+
+		private String message;
+
+		private ErrorType(String message) {
+			this.message = message;
+		}
+
+		@Override
+		public String toString() {
+			return message;
+		}
+	}
+
 	private static final ThreadLocal<Deque<ObjectIdentitySet>> unpureCache = new ThreadLocal<Deque<ObjectIdentitySet>>() {
 		@Override
 		protected Deque<ObjectIdentitySet> initialValue() {
@@ -79,16 +94,22 @@ public class PureEvaluator {
 	}
 
 	public static void checkUnpureAccess(Object target) {
-		if (cacheContains(target)) {
-			AssertionError assertionError = new AssertionError("illegal access on unpure method or field");
+		ErrorType errorType = getAccessErrorType(target);
+		if (errorType != ErrorType.NONE) {
+			AssertionError assertionError = new AssertionError("illegal access on " + errorType + " object");
 			logger.error(assertionError.getMessage(), assertionError);
 			throw assertionError;
 		}
 	}
 
-	private static boolean cacheContains(Object target) {
-		return cacheContains(unpureCache, target) || cacheContains(unchangeableCache, target);
-
+	private static ErrorType getAccessErrorType(Object target) {
+		if (cacheContains(unpureCache, target)) {
+			return ErrorType.UNPURE;
+		}
+		if (cacheContains(unchangeableCache, target)) {
+			return ErrorType.UNCHANGEABLE;
+		}
+		return ErrorType.NONE;
 	}
 
 	private static boolean cacheContains(ThreadLocal<Deque<ObjectIdentitySet>> cache, Object target) {
@@ -101,20 +122,22 @@ public class PureEvaluator {
 	}
 
 	public static void checkExternalAccess(Object target, String method) {
-		if (cacheContains(target)) {
-			warnExternalAccess(method);
+		ErrorType errorType = getAccessErrorType(target);
+		if (errorType != ErrorType.NONE) {
+			warnExternalAccess(method, errorType);
 		}
 	}
 
-	public static void warnExternalAccess(String method) {
-		logger.warn("Access on unknown method " + method
+	public static void warnExternalAccess(String method, ErrorType errorType) {
+		logger.warn("Access on " + errorType + " object, method " + method
 				+ " outside the root-packages. Add it to the pure-registry in the configuration.");
 	}
 
 	public static void checkExternalBlacklistAccess(Object target, String method) {
-		if (cacheContains(target)) {
-			AssertionError assertionError = new AssertionError("illegal access on unpure method " + method
-					+ " outside the root-packages.");
+		ErrorType errorType = getAccessErrorType(target);
+		if (errorType != ErrorType.NONE) {
+			AssertionError assertionError = new AssertionError("illegal access on " + errorType + " object, method "
+					+ method + " outside the root-packages.");
 			logger.error(assertionError.getMessage(), assertionError);
 			throw assertionError;
 		}

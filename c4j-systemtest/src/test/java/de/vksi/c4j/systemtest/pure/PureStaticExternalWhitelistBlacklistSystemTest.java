@@ -25,7 +25,7 @@ public class PureStaticExternalWhitelistBlacklistSystemTest {
 		transformerAware
 				.expectGlobalLog(
 						Level.WARN,
-						"Access on unknown method "
+						"Access on unpure object, method "
 								+ ExternalClass.class.getName()
 								+ ".staticMethodUndefinedInConfig() outside the root-packages. Add it to the pure-registry in the configuration.");
 		target.pureMethodCallingUndefinedExternal();
@@ -33,9 +33,9 @@ public class PureStaticExternalWhitelistBlacklistSystemTest {
 
 	@Test
 	public void testPureExternalOnWhitelistThrowingNothing() {
-		transformerAware.banGlobalLog(Level.WARN,
-				"Access on unpure method " + ExternalClass.class.getName() + ".pureStaticMethodWhitelistedInConfig() "
-						+ "outside the root-packages. Add it to the white- or blacklist in the configuration.");
+		transformerAware.banGlobalLog(Level.WARN, "Access on unpure method " + ExternalClass.class.getName()
+				+ ".pureStaticMethodWhitelistedInConfig() "
+				+ "outside the root-packages. Add it to the white- or blacklist in the configuration.");
 		target.pureMethodCallingWhitelistExternal();
 	}
 

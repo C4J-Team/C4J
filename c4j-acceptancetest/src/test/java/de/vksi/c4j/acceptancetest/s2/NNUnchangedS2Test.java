@@ -7,12 +7,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import de.vksi.c4j.systemtest.TransformerAwareRule;
 import de.vksi.c4j.ContractReference;
 import de.vksi.c4j.Target;
 import de.vksi.c4j.acceptancetest.floatingwindow.Vector;
 import de.vksi.c4j.acceptancetest.floatingwindow.WindowStyle;
 import de.vksi.c4j.acceptancetest.point.Color;
+import de.vksi.c4j.systemtest.TransformerAwareRule;
 
 public class NNUnchangedS2Test {
 
@@ -25,7 +25,7 @@ public class NNUnchangedS2Test {
 	@Test
 	public void testUnchangedViolation() {
 		thrown.expect(AssertionError.class);
-		thrown.expectMessage("illegal access on unpure method or field");
+		thrown.expectMessage("illegal access on unchangeable object");
 
 		Window window = new Window(new Vector(0, 0));
 		window.setStyleColor(Color.BLUE);
