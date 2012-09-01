@@ -9,8 +9,11 @@ import de.vksi.c4j.internal.compiler.NestedExp;
 import de.vksi.c4j.internal.compiler.StandaloneExp;
 import de.vksi.c4j.internal.compiler.StaticCallExp;
 import de.vksi.c4j.internal.evaluator.PureEvaluator;
+import de.vksi.c4j.internal.util.ReflectionHelper;
 
 public class UnpureBehaviorExpressionEditor extends ExprEditor {
+	private ReflectionHelper reflectionHelper = new ReflectionHelper();
+
 	@Override
 	public void edit(FieldAccess fieldAccess) throws CannotCompileException {
 		try {
@@ -25,8 +28,12 @@ public class UnpureBehaviorExpressionEditor extends ExprEditor {
 			return;
 		}
 		// own fields can be written, as this is not a pure method and access is already prevented by PureInspector.checkUnpureAccess
-		if (!fieldAccess.isStatic()
-				&& fieldAccess.getField().getDeclaringClass().equals(fieldAccess.where().getDeclaringClass())) {
+		if (!fieldAccess.isStatic() && isOwnFieldAccess(fieldAccess)) {
+			return;
+		}
+		// class initializers may initialize their own fields
+		if (fieldAccess.isStatic() && reflectionHelper.isClassInitializer(fieldAccess.where())
+				&& isOwnFieldAccess(fieldAccess)) {
 			return;
 		}
 		if (fieldAccess.getField().hasAnnotation(AllowPureAccess.class)) {
@@ -42,4 +49,9 @@ public class UnpureBehaviorExpressionEditor extends ExprEditor {
 		StandaloneExp replacementExp = checkUnpureExp.append(StandaloneExp.PROCEED_AND_ASSIGN);
 		replacementExp.replace(fieldAccess);
 	}
+
+	private boolean isOwnFieldAccess(FieldAccess fieldAccess) throws NotFoundException {
+		return fieldAccess.getField().getDeclaringClass().equals(fieldAccess.where().getDeclaringClass());
+	}
+
 }

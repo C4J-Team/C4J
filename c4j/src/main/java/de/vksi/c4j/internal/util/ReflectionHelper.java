@@ -53,13 +53,21 @@ public class ReflectionHelper {
 	}
 
 	public boolean isContractConstructor(CtBehavior contractBehavior) {
-		return (contractBehavior instanceof CtConstructor && !((CtConstructor) contractBehavior).isClassInitializer())
+		return isInitializer(contractBehavior)
 				|| contractBehavior.getName().equals(ContractBehaviorTransformer.CONSTRUCTOR_REPLACEMENT_NAME);
 	}
 
+	public boolean isInitializer(CtBehavior behavior) {
+		return (behavior instanceof CtConstructor && !((CtConstructor) behavior).isClassInitializer());
+	}
+
 	public boolean isContractClassInitializer(CtBehavior contractBehavior) {
-		return (contractBehavior instanceof CtConstructor && ((CtConstructor) contractBehavior).isClassInitializer())
+		return isClassInitializer(contractBehavior)
 				|| contractBehavior.getName().equals(ContractBehaviorTransformer.CLASS_INITIALIZER_REPLACEMENT_NAME);
+	}
+
+	public boolean isClassInitializer(CtBehavior behavior) {
+		return (behavior instanceof CtConstructor && ((CtConstructor) behavior).isClassInitializer());
 	}
 
 	public String getContractBehaviorName(CtBehavior contractBehavior) {
