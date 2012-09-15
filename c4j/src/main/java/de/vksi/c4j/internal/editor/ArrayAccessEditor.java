@@ -1,5 +1,6 @@
 package de.vksi.c4j.internal.editor;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,18 +18,8 @@ public class ArrayAccessEditor {
 	private static final Set<Integer> ARRAY_STORE_OPCODES = new HashSet<Integer>();
 
 	static {
-		addToOpcodes(ARRAY_STORE_OPCODES, Opcode.AASTORE);
-		addToOpcodes(ARRAY_STORE_OPCODES, Opcode.BASTORE);
-		addToOpcodes(ARRAY_STORE_OPCODES, Opcode.CASTORE);
-		addToOpcodes(ARRAY_STORE_OPCODES, Opcode.DASTORE);
-		addToOpcodes(ARRAY_STORE_OPCODES, Opcode.FASTORE);
-		addToOpcodes(ARRAY_STORE_OPCODES, Opcode.IASTORE);
-		addToOpcodes(ARRAY_STORE_OPCODES, Opcode.LASTORE);
-		addToOpcodes(ARRAY_STORE_OPCODES, Opcode.SASTORE);
-	}
-
-	private static void addToOpcodes(Set<Integer> arrayStoreOpcodes, int opcode) {
-		arrayStoreOpcodes.add(Integer.valueOf(opcode));
+		Collections.addAll(ARRAY_STORE_OPCODES, Opcode.AASTORE, Opcode.BASTORE, Opcode.CASTORE, Opcode.DASTORE,
+				Opcode.FASTORE, Opcode.IASTORE, Opcode.LASTORE, Opcode.SASTORE);
 	}
 
 	public void instrumentArrayAccesses(CtBehavior affectedMethod) throws CannotCompileException {
