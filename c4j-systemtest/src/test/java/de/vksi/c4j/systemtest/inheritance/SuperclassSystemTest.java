@@ -40,6 +40,15 @@ public class SuperclassSystemTest {
 	}
 
 	@Test
+	public void testErrorWhenOverriddenTargetMethodIsFinal() {
+		transformerAware.expectGlobalLog(Level.WARN, "could not find method method in affected class "
+				+ FinalMethodOverriddenClass.class.getName() + " for contract class "
+				+ FinalMethodOverriddenContract.class.getName()
+				+ " and cannot insert a delegate, as the overridden method is final");
+		new FinalMethodOverriddenClass().method(5);
+	}
+
+	@Test
 	public void testNoWarningWhenContractMethodNotOverwritten() {
 		transformerAware.banGlobalLog(Level.WARN, "could not find method method in affected class "
 				+ NoWarningClass.class.getName() + " for contract class " + SuperContract.class.getName()
@@ -57,6 +66,23 @@ public class SuperclassSystemTest {
 	}
 
 	public static class NoWarningClassContract extends NoWarningClass {
+	}
+
+	public static class FinalSuperClass {
+		public final void method(int arg) {
+		}
+	}
+
+	@ContractReference(FinalMethodOverriddenContract.class)
+	public static class FinalMethodOverriddenClass extends FinalSuperClass {
+	}
+
+	public static class FinalMethodOverriddenContract {
+		public void method(int arg) {
+			if (postCondition()) {
+				assert arg < 5;
+			}
+		}
 	}
 
 	@ContractReference(DummyContract.class)

@@ -76,6 +76,12 @@ public class AffectedBehaviorLocator {
 		if (hasContract(affectedMethod.getDeclaringClass(), contractInfo)) {
 			return null;
 		}
+		if (Modifier.isFinal(affectedMethod.getModifiers())) {
+			logger.warn("could not find method " + contractBehavior.getName() + " in affected class "
+					+ affectedClass.getName() + " for contract class " + contractInfo.getContractClass().getName()
+					+ " and cannot insert a delegate, as the overridden method is final");
+			return null;
+		}
 		logger.warn("could not find method " + contractBehavior.getName() + " in affected class "
 				+ affectedClass.getName() + " for contract class " + contractInfo.getContractClass().getName()
 				+ " - inserting an empty method");
