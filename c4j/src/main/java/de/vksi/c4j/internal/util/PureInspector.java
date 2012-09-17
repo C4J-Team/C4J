@@ -14,9 +14,6 @@ import javassist.CtMember;
 import javassist.CtMethod;
 import javassist.Modifier;
 import javassist.NotFoundException;
-
-import org.apache.log4j.Logger;
-
 import de.vksi.c4j.AllowPureAccess;
 import de.vksi.c4j.Pure;
 import de.vksi.c4j.PureTarget;
@@ -32,7 +29,6 @@ import de.vksi.c4j.internal.evaluator.PureEvaluator;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
 
 public class PureInspector {
-	private Logger logger = Logger.getLogger(getClass());
 	private RootTransformer rootTransformer = RootTransformer.INSTANCE;
 	private UnpureBehaviorExpressionEditor unpureBehaviorExpressionEditor = new UnpureBehaviorExpressionEditor();
 	private AffectedBehaviorLocator affectedBehaviorLocator = new AffectedBehaviorLocator();
@@ -147,10 +143,6 @@ public class PureInspector {
 		}
 		StandaloneExp checkUnpureAccessExp = new StaticCallExp(PureEvaluator.checkUnpureAccess, NestedExp.THIS)
 				.toStandalone();
-		if (logger.isTraceEnabled()) {
-			logger.trace("puremagic.checkUnpureAccess insertBefore " + affectedBehavior.getLongName() + ": \n"
-					+ checkUnpureAccessExp.getCode());
-		}
 		checkUnpureAccessExp.insertBefore(affectedBehavior);
 	}
 
