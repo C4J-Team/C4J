@@ -28,9 +28,15 @@ public class TargetTransformer extends AbstractContractClassTransformer {
 	private RootTransformer rootTransformer = RootTransformer.INSTANCE;
 	private ReflectionHelper reflectionHelper = new ReflectionHelper();
 
+	private static class WeakFieldMapping extends Pair<CtField, CtField> {
+		public WeakFieldMapping(CtField targetField, CtField weakField) {
+			super(targetField, weakField);
+		}
+	}
+
 	@Override
 	public void transform(ContractInfo contractInfo, CtClass contractClass) throws Exception {
-		Pair<CtField, CtField> targetField = createWeakField(contractClass);
+		WeakFieldMapping targetField = createWeakField(contractClass);
 		if (targetField == null) {
 			return;
 		}
@@ -57,13 +63,12 @@ public class TargetTransformer extends AbstractContractClassTransformer {
 			CannotCompileException {
 		CtConstructor defaultConstructor = contractClass.getDeclaredConstructor(new CtClass[0]);
 		ConstructorExp weakConstructorCall = new ConstructorExp(WeakReference.class, new StaticCallExp(
-					Evaluator.getCurrentTarget));
+				Evaluator.getCurrentTarget));
 		StandaloneExp initExp = new AssignmentExp(NestedExp.field(weakField), weakConstructorCall).toStandalone();
 		initExp.insertBefore(defaultConstructor);
 	}
 
-	private Pair<CtField, CtField> createWeakField(CtClass contractClass) throws NotFoundException,
-			CannotCompileException {
+	private WeakFieldMapping createWeakField(CtClass contractClass) throws NotFoundException, CannotCompileException {
 		CtClass weakReferenceClass = rootTransformer.getPool().get(WeakReference.class.getName());
 		CtField targetField = getTargetField(contractClass);
 		if (targetField == null) {
@@ -71,7 +76,7 @@ public class TargetTransformer extends AbstractContractClassTransformer {
 		}
 		CtField weakTargetField = new CtField(weakReferenceClass, TARGET_FIELD_NAME, contractClass);
 		contractClass.addField(weakTargetField);
-		return new Pair<CtField, CtField>(targetField, weakTargetField);
+		return new WeakFieldMapping(targetField, weakTargetField);
 	}
 
 	private CtField getTargetField(CtClass contractClass) {

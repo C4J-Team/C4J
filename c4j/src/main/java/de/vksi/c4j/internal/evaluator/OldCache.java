@@ -14,18 +14,27 @@ import de.vksi.c4j.internal.util.Pair;
 public class OldCache {
 	public static final StaticCall oldRetrieve = new StaticCall(OldCache.class, "oldRetrieve");
 	public static final StaticCall oldStore = new StaticCall(OldCache.class, "oldStore");
+	public static final String oldStoreDescriptor = "(Ljava/lang/Object;Ljava/lang/Class;I)V";
 	public static final StaticCall oldStoreException = new StaticCall(OldCache.class, "oldStoreException");
+
+	private static class OldIdentifier extends Pair<Class<?>, Integer> {
+		public OldIdentifier(Class<?> contractClass, int index) {
+			super(contractClass, index);
+		}
+	}
+
+	private static class OldValue extends Pair<Boolean, Object> {
+		public OldValue(boolean isException, Object value) {
+			super(isException, value);
+		}
+	}
 
 	private static final Logger logger = Logger.getLogger(OldCache.class);
 
-	/**
-	 * Integer = stack trace depth, Integer = old-call index, Boolean = exception thrown
-	 */
-	static final ThreadLocal<Integer> currentOldCacheEnvironment = new ThreadLocal<Integer>();
-	private static final ThreadLocal<Deque<Map<Integer, Pair<Boolean, Object>>>> oldCache = new ThreadLocal<Deque<Map<Integer, Pair<Boolean, Object>>>>() {
+	private static final ThreadLocal<Deque<Map<OldIdentifier, OldValue>>> oldCache = new ThreadLocal<Deque<Map<OldIdentifier, OldValue>>>() {
 		@Override
-		protected Deque<Map<Integer, Pair<Boolean, Object>>> initialValue() {
-			return new ArrayDeque<Map<Integer, Pair<Boolean, Object>>>();
+		protected Deque<Map<OldIdentifier, OldValue>> initialValue() {
+			return new ArrayDeque<Map<OldIdentifier, OldValue>>();
 		}
 	};
 
@@ -33,8 +42,10 @@ public class OldCache {
 		return oldCache.get().size();
 	}
 
-	public static Object oldRetrieve(int index) {
-		Pair<Boolean, Object> oldPair = getCurrentOldCache().get(Integer.valueOf(index));
+	public static Object oldRetrieve(Class<?> contractClass, int index) {
+		Pair<Boolean, Object> oldPair = getCurrentOldCache().get(new OldIdentifier(contractClass, index));
+		System.out.println("XXX depth " + oldCache.get().size() + " retrieving " + index + " with value "
+				+ oldPair.getSecond());
 		if (oldPair.getFirst().booleanValue()) {
 			return retrieveException(index, (Throwable) oldPair.getSecond());
 		} else {
@@ -44,43 +55,42 @@ public class OldCache {
 
 	private static Object retrieveValue(int index, Object value) {
 		if (logger.isTraceEnabled()) {
-			logger.trace("oldRetrieve for index '" + index + "' with " + currentOldCacheEnvironment.get()
-					+ " returning " + value);
+			logger.trace("oldRetrieve for index '" + index + "' with " + oldCache.get().size() + " returning " + value);
 		}
 		return value;
 	}
 
 	private static Object retrieveException(int index, Throwable exception) {
 		if (logger.isTraceEnabled()) {
-			logger.trace("oldRetrieve for index '" + index + "' with " + currentOldCacheEnvironment.get()
+			logger.trace("oldRetrieve for index '" + index + "' with " + oldCache.get().size()
 					+ " returning EXCEPTION " + exception);
 		}
 		throw new ContractError("Contract Error, old statement #" + index
 				+ " has thrown exception when evaluating the expression at the beginning of the method.", exception);
 	}
 
-	private static Map<Integer, Pair<Boolean, Object>> getCurrentOldCache() {
+	private static Map<OldIdentifier, OldValue> getCurrentOldCache() {
 		return oldCache.get().peekFirst();
 	}
 
-	public static void oldStore(Object value, int index) {
+	public static void oldStore(Object value, Class<?> contractClass, int index) {
+		System.out.println("XXX depth " + oldCache.get().size() + " storing " + index + " with value " + value);
 		if (logger.isTraceEnabled()) {
-			logger.trace("oldStore for index '" + index + "' with " + currentOldCacheEnvironment.get() + " storing "
-					+ value);
+			logger.trace("oldStore for index '" + index + "' with " + oldCache.get().size() + " storing " + value);
 		}
-		getCurrentOldCache().put(index, new Pair<Boolean, Object>(Boolean.FALSE, value));
+		getCurrentOldCache().put(new OldIdentifier(contractClass, index), new OldValue(false, value));
 	}
 
-	public static void oldStoreException(Object exception, int index) {
+	public static void oldStoreException(Object exception, Class<?> contractClass, int index) {
 		if (logger.isTraceEnabled()) {
-			logger.trace("oldStore for index '" + index + "' with " + currentOldCacheEnvironment.get()
-					+ " storing EXCEPTION " + exception);
+			logger.trace("oldStore for index '" + index + "' with " + oldCache.get().size() + " storing EXCEPTION "
+					+ exception);
 		}
-		getCurrentOldCache().put(index, new Pair<Boolean, Object>(Boolean.TRUE, exception));
+		getCurrentOldCache().put(new OldIdentifier(contractClass, index), new OldValue(true, exception));
 	}
 
 	public static void add() {
-		oldCache.get().addFirst(new HashMap<Integer, Pair<Boolean, Object>>());
+		oldCache.get().addFirst(new HashMap<OldIdentifier, OldValue>());
 	}
 
 	public static void remove() {

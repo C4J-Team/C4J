@@ -34,9 +34,14 @@ public class TransformationHelper {
 
 	public void setMethodIndex(ConstPool constPool, byte[] bytes, int index, StaticCall staticCall, String descriptor) {
 		int classIndex = constPool.addClassInfo(staticCall.getCallClass().getName());
-		int methodInfoIndex = constPool.addMethodrefInfo(classIndex,
-				staticCall.getCallMethod(), descriptor);
+		int methodInfoIndex = constPool.addMethodrefInfo(classIndex, staticCall.getCallMethod(), descriptor);
 		bytes[index] = (byte) (methodInfoIndex >>> 8);
 		bytes[index + 1] = (byte) methodInfoIndex;
+	}
+
+	public void setClassIndex(ConstPool constPool, byte[] bytes, int index, CtClass clazz) {
+		int classIndex = constPool.addClassInfo(clazz.getName());
+		bytes[index] = (byte) (classIndex >>> 8);
+		bytes[index + 1] = (byte) classIndex;
 	}
 }

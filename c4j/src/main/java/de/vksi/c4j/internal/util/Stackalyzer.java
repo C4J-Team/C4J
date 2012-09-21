@@ -50,11 +50,17 @@ public class Stackalyzer {
 
 	private static final String METHODREF_CONSTRUCTOR = "<init>";
 
+	private static class StackDepth extends Pair<Integer, Integer> {
+		public StackDepth(int index, int depth) {
+			super(index, depth);
+		}
+	}
+
 	public byte[] getDependenciesFor(CtBehavior contractBehavior, int indexOfDependentCall) throws BadBytecode,
 			NotFoundException, UsageError {
 		CodeAttribute ca = contractBehavior.getMethodInfo().getCodeAttribute();
 		CodeIterator ci = ca.iterator();
-		LinkedList<Pair<Integer, Integer>> stackDepth = new LinkedList<Pair<Integer, Integer>>();
+		LinkedList<StackDepth> stackDepth = new LinkedList<StackDepth>();
 		int depth = 0;
 		while (ci.hasNext()) {
 			int index = ci.next();
@@ -62,7 +68,7 @@ public class Stackalyzer {
 				break;
 			}
 			int op = ci.byteAt(index);
-			stackDepth.add(new Pair<Integer, Integer>(index, depth));
+			stackDepth.add(new StackDepth(index, depth));
 			depth += getOpcodeDelta(op, index, ci, contractBehavior.getMethodInfo().getConstPool());
 		}
 		int stackDepthForOldCall = depth;

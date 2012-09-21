@@ -1,6 +1,6 @@
 package de.vksi.c4j.internal.util;
 
-public class Pair<T, U> {
+public abstract class Pair<T, U> {
 	private T first;
 	private U second;
 

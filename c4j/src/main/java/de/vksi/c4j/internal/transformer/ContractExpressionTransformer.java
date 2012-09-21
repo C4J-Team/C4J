@@ -69,31 +69,30 @@ public class ContractExpressionTransformer extends AbstractContractClassTransfor
 	private void insertStoreDependenciesForClassInvariant(CtBehavior contractBehavior,
 			ContractMethodExpressionEditor expressionEditor) throws BadBytecode, CannotCompileException,
 			NotFoundException {
-		CtMethod beforeInvariant = CtNewMethod.make(CtClass.voidType,
-				contractBehavior.getName() + BEFORE_INVARIANT_METHOD_SUFFIX, new CtClass[0],
-				contractBehavior.getExceptionTypes(), null, contractBehavior.getDeclaringClass());
+		CtMethod beforeInvariant = CtNewMethod.make(CtClass.voidType, contractBehavior.getName()
+				+ BEFORE_INVARIANT_METHOD_SUFFIX, new CtClass[0], contractBehavior.getExceptionTypes(), null,
+				contractBehavior.getDeclaringClass());
 		contractBehavior.getDeclaringClass().addMethod(beforeInvariant);
 		transformationHelper.addBehaviorAnnotation(beforeInvariant, rootTransformer.getPool().get(
 				BeforeClassInvariant.class.getName()));
-		insertIntoBeforeInvariant(expressionEditor, beforeInvariant);
+		insertIntoBeforeInvariant(expressionEditor, beforeInvariant, contractBehavior.getDeclaringClass());
 	}
 
-	private void insertIntoBeforeInvariant(ContractMethodExpressionEditor expressionEditor, CtMethod beforeInvariant)
-			throws CannotCompileException, BadBytecode {
+	private void insertIntoBeforeInvariant(ContractMethodExpressionEditor expressionEditor, CtMethod beforeInvariant,
+			CtClass contractClass) throws CannotCompileException, BadBytecode {
 		if (!expressionEditor.getPreConditionExp().isEmpty()) {
 			expressionEditor.getPreConditionExp().insertBefore(beforeInvariant);
 		}
 		if (expressionEditor.hasStoreDependencies()) {
 			ConstPool constPool = beforeInvariant.getMethodInfo().getConstPool();
 			CodeAttribute attribute = beforeInvariant.getMethodInfo().getCodeAttribute();
-			insertOldStoreCalls(attribute, expressionEditor.getStoreDependencies(), constPool);
+			insertOldStoreCalls(attribute, expressionEditor.getStoreDependencies(), constPool, contractClass);
 			attribute.computeMaxStack();
 		}
 	}
 
 	private void insertStoreDependenciesForPostCondition(CtBehavior contractBehavior,
-			ContractMethodExpressionEditor expressionEditor)
-			throws BadBytecode, CannotCompileException {
+			ContractMethodExpressionEditor expressionEditor) throws BadBytecode, CannotCompileException {
 		if (!expressionEditor.getPreConditionExp().isEmpty()) {
 			IfExp isBeforeCondition = new IfExp(new StaticCallExp(Evaluator.isBefore));
 			isBeforeCondition.addIfBody(expressionEditor.getPreConditionExp());
@@ -102,7 +101,8 @@ public class ContractExpressionTransformer extends AbstractContractClassTransfor
 		if (expressionEditor.hasStoreDependencies()) {
 			ConstPool constPool = contractBehavior.getMethodInfo().getConstPool();
 			CodeAttribute attribute = contractBehavior.getMethodInfo().getCodeAttribute();
-			int ifBlockLength = insertOldStoreCalls(attribute, expressionEditor.getStoreDependencies(), constPool);
+			int ifBlockLength = insertOldStoreCalls(attribute, expressionEditor.getStoreDependencies(), constPool,
+					contractBehavior.getDeclaringClass());
 			insertJump(attribute.iterator(), ifBlockLength, constPool);
 		}
 	}
@@ -119,11 +119,12 @@ public class ContractExpressionTransformer extends AbstractContractClassTransfor
 	}
 
 	private int insertOldStoreCalls(CodeAttribute attribute, List<StoreDependency> storeDependencies,
-			ConstPool constPool) throws BadBytecode {
+			ConstPool constPool, CtClass contractClass) throws BadBytecode {
 		CodeIterator iterator = attribute.iterator();
 		int ifBlockLength = 0;
 		byte[] oldStoreBytes = getOldStoreBytes(constPool, OldCache.oldStore);
 		byte[] oldStoreExceptionBytes = getOldStoreBytes(constPool, OldCache.oldStoreException);
+		byte[] contractClassBytes = getContractClassBytes(constPool, contractClass);
 		for (StoreDependency storeDependency : storeDependencies) {
 			int startIndex = iterator.insert(storeDependency.getDependency());
 			if (storeDependency.isUnchangeable()) {
@@ -131,20 +132,24 @@ public class ContractExpressionTransformer extends AbstractContractClassTransfor
 				iterator.insert(registerUnchangeableBytes);
 			}
 			byte[] iloadBytes = getIloadBytes(storeDependency.getIndex());
+			iterator.insert(contractClassBytes);
 			iterator.insert(iloadBytes);
 			iterator.insert(oldStoreBytes);
 			byte[] gotoBytes = new byte[3];
 			gotoBytes[0] = (byte) Opcode.GOTO;
-			int gotoTarget = gotoBytes.length + iloadBytes.length + oldStoreExceptionBytes.length;
+			int gotoTarget = gotoBytes.length + contractClassBytes.length + iloadBytes.length + oldStoreBytes.length;
 			int gotoIndex = iterator.insert(gotoBytes);
+			iterator.insert(contractClassBytes);
 			iterator.insert(iloadBytes);
 			iterator.insert(oldStoreExceptionBytes);
 			iterator.write(new byte[] { (byte) (gotoTarget >> 8), (byte) gotoTarget }, gotoIndex + 1);
 			int tryLength = gotoIndex - startIndex;
-			ifBlockLength += tryLength + gotoBytes.length + iloadBytes.length + oldStoreExceptionBytes.length;
+			ifBlockLength += tryLength + gotoBytes.length + contractClassBytes.length + iloadBytes.length
+					+ oldStoreExceptionBytes.length;
 			int endIndex = startIndex + tryLength;
 			attribute.getExceptionTable().add(startIndex, endIndex, endIndex + gotoBytes.length, 0);
 		}
+		contractClass.debugWriteFile("tmp");
 		return ifBlockLength;
 	}
 
@@ -160,15 +165,21 @@ public class ContractExpressionTransformer extends AbstractContractClassTransfor
 		registerUnchangeableBytes[0] = (byte) Opcode.DUP;
 		registerUnchangeableBytes[1] = (byte) Opcode.INVOKESTATIC;
 		transformationHelper.setMethodIndex(constPool, registerUnchangeableBytes, 2,
-				PureEvaluator.registerUnchangeable,
-				"(Ljava/lang/Object;)V");
+				PureEvaluator.registerUnchangeable, "(Ljava/lang/Object;)V");
 		return registerUnchangeableBytes;
+	}
+
+	private byte[] getContractClassBytes(ConstPool constPool, CtClass contractClass) {
+		byte[] contractClassBytes = new byte[3];
+		contractClassBytes[0] = (byte) Opcode.LDC_W;
+		transformationHelper.setClassIndex(constPool, contractClassBytes, 1, contractClass);
+		return contractClassBytes;
 	}
 
 	private byte[] getOldStoreBytes(ConstPool constPool, StaticCall oldStoreCall) {
 		byte[] oldStoreBytes = new byte[3];
 		oldStoreBytes[0] = (byte) Opcode.INVOKESTATIC;
-		transformationHelper.setMethodIndex(constPool, oldStoreBytes, 1, oldStoreCall, "(Ljava/lang/Object;I)V");
+		transformationHelper.setMethodIndex(constPool, oldStoreBytes, 1, oldStoreCall, OldCache.oldStoreDescriptor);
 		return oldStoreBytes;
 	}
 

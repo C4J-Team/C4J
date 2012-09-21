@@ -8,7 +8,13 @@ import de.vksi.c4j.internal.util.Pair;
 public class TryExp extends StandaloneExp {
 	private StandaloneExp tryExp;
 	private StandaloneExp finallyExp;
-	private List<Pair<Class<?>, StandaloneExp>> catchClauses = new ArrayList<Pair<Class<?>, StandaloneExp>>();
+	private List<CatchClause> catchClauses = new ArrayList<CatchClause>();
+
+	private static class CatchClause extends Pair<Class<?>, StandaloneExp> {
+		public CatchClause(Class<?> catchClass, StandaloneExp catchExp) {
+			super(catchClass, catchExp);
+		}
+	}
 
 	public TryExp(StandaloneExp body) {
 		this.tryExp = body;
@@ -19,14 +25,14 @@ public class TryExp extends StandaloneExp {
 	}
 
 	public void addCatch(Class<?> catchClass, StandaloneExp catchExp) {
-		catchClauses.add(new Pair<Class<?>, StandaloneExp>(catchClass, catchExp));
+		catchClauses.add(new CatchClause(catchClass, catchExp));
 	}
 
 	@Override
 	public String getCode() {
 		StringBuilder code = new StringBuilder("\n").append("try {").append(tryExp.getCode()).append("\n").append("}");
 		int i = 1;
-		for (Pair<Class<?>, StandaloneExp> catchClause : catchClauses) {
+		for (CatchClause catchClause : catchClauses) {
 			code.append(" catch (").append(catchClause.getFirst().getName()).append(" e").append(i).append(") {")
 					.append(catchClause.getSecond().getCode()).append("\n").append("}");
 			i++;

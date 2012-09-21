@@ -4,7 +4,14 @@ import de.vksi.c4j.internal.util.ObjectMapper;
 import de.vksi.c4j.internal.util.Pair;
 
 public class ContractCache {
-	private static final ObjectMapper<Pair<Class<?>, Class<?>>, Object> contractCache = new ObjectMapper<Pair<Class<?>, Class<?>>, Object>();
+	private static final ObjectMapper<ContractCacheEntry, Object> contractCache = new ObjectMapper<ContractCacheEntry, Object>();
+
+	private static class ContractCacheEntry extends Pair<Class<?>, Class<?>> {
+		public ContractCacheEntry(Class<?> contractClass, Class<?> callingClass) {
+			super(contractClass, callingClass);
+		}
+
+	}
 
 	public static Object getContractFromCache(Object target, Class<?> contractClass, Class<?> callingClass)
 			throws InstantiationException, IllegalAccessException {
@@ -12,7 +19,7 @@ public class ContractCache {
 			return null;
 		}
 		Object contract;
-		Pair<Class<?>, Class<?>> classPair = new Pair<Class<?>, Class<?>>(contractClass, callingClass);
+		ContractCacheEntry classPair = new ContractCacheEntry(contractClass, callingClass);
 		if (contractCache.contains(target, classPair)) {
 			contract = contractCache.get(target, classPair);
 		} else {

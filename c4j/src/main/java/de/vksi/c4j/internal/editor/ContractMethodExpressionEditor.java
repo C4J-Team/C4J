@@ -60,8 +60,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 	}
 
 	public ContractMethodExpressionEditor(RootTransformer rootTransformer, ContractInfo contract,
-			AtomicInteger storeIndex)
-			throws NotFoundException {
+			AtomicInteger storeIndex) throws NotFoundException {
 		this.rootTransformer = rootTransformer;
 		this.contract = contract;
 		this.storeIndex = storeIndex;
@@ -166,7 +165,8 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		if (!rootTransformer.getXmlConfiguration().getConfiguration(contract.getTargetClass())
 				.isStrengtheningPreconditionsAllowed()) {
 			logger.error(("Found strengthening pre-condition in " + method.getLongName()
-					+ " which is already defined from " + definingClass.getName()) + " - ignoring the pre-condition.");
+					+ " which is already defined from " + definingClass.getName())
+					+ " - ignoring the pre-condition.");
 		}
 		AssignmentExp replacementExp = new AssignmentExp(NestedExp.RETURN_VALUE, BooleanExp.FALSE);
 		replacementExp.toStandalone().replace(methodCall);
@@ -184,7 +184,8 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		int newStoreIndex = storeIndex.getAndIncrement();
 		storeDependencies.add(new StoreDependency(dependencyBytes, false, newStoreIndex));
 		eraseOriginalCall(methodCall, dependencyBytes.length);
-		StaticCallExp oldCall = new StaticCallExp(OldCache.oldRetrieve, new ValueExp(newStoreIndex));
+		StaticCallExp oldCall = new StaticCallExp(OldCache.oldRetrieve, new ValueExp(contract.getContractClass()),
+				new ValueExp(newStoreIndex));
 		AssignmentExp assignmentExp = new AssignmentExp(NestedExp.RETURN_VALUE, oldCall);
 		methodCall.replace(assignmentExp.toStandalone().getCode());
 	}
@@ -210,7 +211,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		int newStoreIndex = storeIndex.getAndIncrement();
 		storeDependencies.add(new StoreDependency(dependencyBytes, true, newStoreIndex));
 		StaticCallExp oldCall = new StaticCallExp(UnchangedCache.isUnchanged, new StaticCallExp(OldCache.oldRetrieve,
-				new ValueExp(newStoreIndex)), NestedExp.PROCEED);
+				new ValueExp(contract.getContractClass()), new ValueExp(newStoreIndex)), NestedExp.PROCEED);
 		AssignmentExp assignmentExp = new AssignmentExp(NestedExp.RETURN_VALUE, oldCall);
 		methodCall.replace(assignmentExp.toStandalone().getCode());
 		contract.getMethodsContainingUnchanged().add(methodCall.where().getName() + methodCall.where().getSignature());
