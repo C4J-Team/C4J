@@ -43,9 +43,7 @@ public class OldCache {
 	}
 
 	public static Object oldRetrieve(Class<?> contractClass, int index) {
-		Pair<Boolean, Object> oldPair = getCurrentOldCache().get(new OldIdentifier(contractClass, index));
-		System.out.println("XXX depth " + oldCache.get().size() + " retrieving " + index + " with value "
-				+ oldPair.getSecond());
+		OldValue oldPair = getCurrentOldCache().get(new OldIdentifier(contractClass, index));
 		if (oldPair.getFirst().booleanValue()) {
 			return retrieveException(index, (Throwable) oldPair.getSecond());
 		} else {
@@ -74,7 +72,6 @@ public class OldCache {
 	}
 
 	public static void oldStore(Object value, Class<?> contractClass, int index) {
-		System.out.println("XXX depth " + oldCache.get().size() + " storing " + index + " with value " + value);
 		if (logger.isTraceEnabled()) {
 			logger.trace("oldStore for index '" + index + "' with " + oldCache.get().size() + " storing " + value);
 		}

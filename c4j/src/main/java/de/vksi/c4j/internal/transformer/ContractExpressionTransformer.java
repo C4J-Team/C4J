@@ -149,7 +149,6 @@ public class ContractExpressionTransformer extends AbstractContractClassTransfor
 			int endIndex = startIndex + tryLength;
 			attribute.getExceptionTable().add(startIndex, endIndex, endIndex + gotoBytes.length, 0);
 		}
-		contractClass.debugWriteFile("tmp");
 		return ifBlockLength;
 	}
 
