@@ -111,7 +111,7 @@ public class ContractExpressionTransformer extends AbstractContractClassTransfor
 		int jumpLength = ifBlockLength + 3;
 		byte[] ifBytes = new byte[6];
 		ifBytes[0] = (byte) Opcode.INVOKESTATIC;
-		transformationHelper.setMethodIndex(constPool, ifBytes, 1, Evaluator.isBefore, "()Z");
+		transformationHelper.setMethodIndex(constPool, ifBytes, 1, Evaluator.isBefore, Evaluator.isBeforeDescriptor);
 		ifBytes[3] = (byte) Opcode.IFEQ;
 		ifBytes[4] = (byte) (jumpLength >> 8);
 		ifBytes[5] = (byte) jumpLength;
@@ -165,7 +165,7 @@ public class ContractExpressionTransformer extends AbstractContractClassTransfor
 		registerUnchangeableBytes[0] = (byte) Opcode.DUP;
 		registerUnchangeableBytes[1] = (byte) Opcode.INVOKESTATIC;
 		transformationHelper.setMethodIndex(constPool, registerUnchangeableBytes, 2,
-				PureEvaluator.registerUnchangeable, "(Ljava/lang/Object;)V");
+				PureEvaluator.registerUnchangeable, PureEvaluator.registerUnchangeableDescriptor);
 		return registerUnchangeableBytes;
 	}
 
