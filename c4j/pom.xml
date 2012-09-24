@@ -24,6 +24,7 @@
 
 	<scm>
 		<connection>scm:git:git://github.com/C4J-Team/C4J.git</connection>
+		<developerConnection>scm:git:git@github.com:C4J-Team/C4J.git</developerConnection>
 		<url>https://github.com/C4J-Team/C4J/tree/master/c4j</url>
 	</scm>
 
