@@ -4,21 +4,13 @@
 	<parent>
 		<groupId>de.vksi.c4j</groupId>
 		<artifactId>c4j-parent</artifactId>
-		<version>4.0-Beta7-SNAPSHOT</version>
+		<version>6.0-RC1-SNAPSHOT</version>
 	</parent>
 	<artifactId>c4j-systemtest</artifactId>
 	<packaging>jar</packaging>
 
 	<build>
 		<plugins>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.4</version>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-				</configuration>
-			</plugin>
 			<plugin>
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>2.4</version>
@@ -42,7 +34,7 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>de.vksi.c4j</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>c4j</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -71,7 +63,7 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>de.vksi.c4j</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>c4j-systemtest-contractsdirectoryasjarfile</artifactId>
 			<version>${project.version}</version>
 			<scope>system</scope>

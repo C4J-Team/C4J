@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.vksi.c4j</groupId>
 	<artifactId>c4j-parent</artifactId>
-	<version>4.0-Beta7-SNAPSHOT</version>
+	<version>6.0-RC1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<properties>
@@ -18,4 +18,17 @@
 		<module>c4j-acceptancetest</module>
 		<module>c4j-systemtest</module>
 	</modules>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>

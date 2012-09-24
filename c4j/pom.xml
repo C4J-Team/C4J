@@ -1,16 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>de.vksi.c4j</groupId>
-		<artifactId>c4j-parent</artifactId>
-		<version>4.0-Beta7-SNAPSHOT</version>
-	</parent>
+	<groupId>de.vksi.c4j</groupId>
 	<artifactId>c4j</artifactId>
+	<version>6.0-RC1-SNAPSHOT</version>
 	<name>C4J - Contracts for Java</name>
 	<description>The C4J Contracts Framework for Java is, since version 4.0, using inheritance to provide classes and interfaces with contracts.</description>
-	<url>https://github.com/C4J-Team/C4J</url>
-	
+	<url>http://c4j.vksi.de/</url>
+
 	<licenses>
 		<license>
 			<name>Eclipse Public License, Version 1.0</name>
@@ -18,7 +15,7 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
-	
+
 	<developers>
 		<developer>
 			<name>Ben Romberg</name>
@@ -31,6 +28,10 @@
 	</scm>
 
 	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<junit.version>4.10</junit.version>
+		<mockito.version>1.9.0</mockito.version>
+		<hamcrest.version>1.3</hamcrest.version>
 		<log4j.artifactId>log4j</log4j.artifactId>
 		<log4j.version>1.2.16</log4j.version>
 		<javassist.artifactId>javassist</javassist.artifactId>
@@ -39,7 +40,7 @@
 		<premain.class>de.vksi.c4j.internal.Agent</premain.class>
 		<boot.class.path>${log4j.artifactId}-${log4j.version}.jar ${javassist.artifactId}-${javassist.version}.jar</boot.class.path>
 	</properties>
-	
+
 	<build>
 		<resources>
 			<resource>
@@ -47,6 +48,22 @@
 			</resource>
 		</resources>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.3.2</version>
+				<executions>
+					<execution>
+						<id>default</id>
+						<goals>
+							<goal>perform</goal>
+						</goals>
+						<configuration>
+							<pomFileName>c4j/pom.xml</pomFileName>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.4</version>
@@ -82,11 +99,11 @@
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
 					<archive>
-	                    <manifestEntries>
-	                        <Premain-Class>${premain.class}</Premain-Class>
+						<manifestEntries>
+							<Premain-Class>${premain.class}</Premain-Class>
 							<Boot-Class-Path>${boot.class.path}</Boot-Class-Path>
-	                    </manifestEntries>
-	                </archive>
+						</manifestEntries>
+					</archive>
 					<finalName>${project.artifactId}-current-all</finalName>
 					<appendAssemblyId>false</appendAssemblyId>
 					<outputDirectory>${dist.dir}</outputDirectory>
@@ -101,21 +118,21 @@
 				</executions>
 			</plugin>
 			<plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jaxb2-maven-plugin</artifactId>
-                <version>1.4</version>
-                <executions>
-                    <execution>
-                        <id>xjc</id>
-                        <goals>
-                            <goal>xjc</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <packageName>de.vksi.c4j.internal.configuration</packageName>
-                </configuration>
-            </plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jaxb2-maven-plugin</artifactId>
+				<version>1.4</version>
+				<executions>
+					<execution>
+						<id>xjc</id>
+						<goals>
+							<goal>xjc</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<packageName>de.vksi.c4j.internal.configuration</packageName>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
