@@ -1,12 +1,16 @@
 package de.vksi.c4j.internal.util;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javassist.CtClass;
+import javassist.CtMethod;
+import de.vksi.c4j.UsageError;
 
 public class ContractRegistry {
 	private Map<CtClass, ContractInfo> contractMap = new HashMap<CtClass, ContractInfo>();
@@ -42,7 +46,8 @@ public class ContractRegistry {
 		private CtClass targetClass;
 		private CtClass contractClass;
 		private Set<CtClass> innerContractClasses = new HashSet<CtClass>();
-		private Set<String> methodsContainingUnchanged = new HashSet<String>();
+		private Set<ContractMethod> methods = new HashSet<ContractMethod>();
+		private List<UsageError> errors = new ArrayList<UsageError>();
 
 		private ContractInfo(CtClass targetClass, CtClass contractClass) {
 			this.targetClass = targetClass;
@@ -62,6 +67,14 @@ public class ContractRegistry {
 			return contractClass;
 		}
 
+		public void addError(UsageError error) {
+			errors.add(error);
+		}
+
+		public List<UsageError> getErrors() {
+			return errors;
+		}
+
 		public Set<CtClass> getInnerContractClasses() {
 			return Collections.unmodifiableSet(innerContractClasses);
 		}
@@ -72,8 +85,55 @@ public class ContractRegistry {
 			return Collections.unmodifiableSet(allContractClasses);
 		}
 
-		public Set<String> getMethodsContainingUnchanged() {
-			return methodsContainingUnchanged;
+		public Set<CtMethod> getMethodsContainingUnchanged() {
+			Set<CtMethod> methodsContainingUnchanged = new HashSet<CtMethod>();
+			for (ContractMethod contractMethod : methods) {
+				if (contractMethod.containsUnchanged()) {
+					methodsContainingUnchanged.add(contractMethod.getMethod());
+				}
+			}
+			return Collections.unmodifiableSet(methodsContainingUnchanged);
 		}
+
+		public void addMethod(CtMethod method, boolean hasPreConditionOrDependencies, boolean hasPostCondition,
+				boolean containsUnchanged) {
+			methods.add(new ContractMethod(method, hasPreConditionOrDependencies, hasPostCondition, containsUnchanged));
+		}
+
+		public Set<ContractMethod> getMethods() {
+			return Collections.unmodifiableSet(methods);
+		}
+	}
+
+	public static class ContractMethod {
+		private CtMethod method;
+		private boolean hasPreConditionOrDependencies;
+		private boolean hasPostCondition;
+		private boolean containsUnchanged;
+
+		public ContractMethod(CtMethod method, boolean hasPreConditionOrDependencies, boolean hasPostCondition,
+				boolean containsUnchanged) {
+			this.method = method;
+			this.hasPreConditionOrDependencies = hasPreConditionOrDependencies;
+			this.hasPostCondition = hasPostCondition;
+			this.containsUnchanged = containsUnchanged;
+		}
+
+		public CtMethod getMethod() {
+			return method;
+		}
+
+		public boolean hasPreConditionOrDependencies() {
+			return hasPreConditionOrDependencies;
+		}
+
+		public boolean hasPostCondition() {
+			return hasPostCondition;
+		}
+
+		public boolean containsUnchanged() {
+			return containsUnchanged;
+		}
+
 	}
 }

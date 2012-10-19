@@ -30,4 +30,9 @@ public abstract class Pair<T, U> {
 	public int hashCode() {
 		return 31 * first.hashCode() + second.hashCode();
 	}
+
+	@Override
+	public String toString() {
+		return "[" + first.toString() + ", " + second.toString() + "]";
+	}
 }

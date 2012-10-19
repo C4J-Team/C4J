@@ -16,6 +16,7 @@ public class Evaluator {
 	public static final StaticCall getCurrentTarget = new StaticCall(Evaluator.class, "getCurrentTarget");
 	public static final StaticCall getPreCondition = new StaticCall(Evaluator.class, "getPreCondition");
 	public static final StaticCall getPostCondition = new StaticCall(Evaluator.class, "getPostCondition");
+	public static final StaticCall getInitializationCall = new StaticCall(Evaluator.class, "getInitializationCall");
 	public static final StaticCall getInvariant = new StaticCall(Evaluator.class, "getInvariant");
 	public static final StaticCall canExecuteCondition = new StaticCall(Evaluator.class, "canExecuteCondition");
 	public static final StaticCall canExecutePostCondition = new StaticCall(Evaluator.class, "canExecutePostCondition");
@@ -127,6 +128,14 @@ public class Evaluator {
 		beforeContract(target, returnType);
 		returnValue.set(actualReturnValue);
 		logger.info("Calling post-condition for " + methodName + " in contract "
+				+ reflectionHelper.getSimplerName(contractClass) + ".");
+		return ContractCache.getContractFromCache(target, contractClass, callingClass);
+	}
+
+	public static Object getInitializationCall(Object target, String methodName, Class<?> contractClass,
+			Class<?> callingClass) throws InstantiationException, IllegalAccessException {
+		beforeContract(target, null);
+		logger.info("Calling initializer for " + methodName + " in contract "
 				+ reflectionHelper.getSimplerName(contractClass) + ".");
 		return ContractCache.getContractFromCache(target, contractClass, callingClass);
 	}

@@ -12,6 +12,7 @@ import javassist.NotFoundException;
 import org.apache.log4j.Logger;
 
 import de.vksi.c4j.ClassInvariant;
+import de.vksi.c4j.InitializeContract;
 import de.vksi.c4j.internal.RootTransformer;
 import de.vksi.c4j.internal.transformer.ContractBehaviorTransformer;
 import de.vksi.c4j.internal.transformer.ContractExpressionTransformer;
@@ -34,6 +35,9 @@ public class AffectedBehaviorLocator {
 	public CtBehavior getAffectedBehavior(ContractInfo contractInfo, CtClass affectedClass, CtBehavior contractBehavior)
 			throws NotFoundException, CannotCompileException {
 		if (contractBehavior.hasAnnotation(ClassInvariant.class)) {
+			return null;
+		}
+		if (contractBehavior.hasAnnotation(InitializeContract.class)) {
 			return null;
 		}
 		if (contractBehavior.getName().endsWith(ContractExpressionTransformer.BEFORE_INVARIANT_METHOD_SUFFIX)) {

@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javassist.CannotCompileException;
-import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.CtNewMethod;
@@ -36,46 +35,48 @@ public class ContractExpressionTransformer extends AbstractContractClassTransfor
 	@Override
 	public void transform(ContractInfo contractInfo, CtClass currentContractClass) throws Exception {
 		AtomicInteger storeIndex = new AtomicInteger();
-		for (CtBehavior contractBehavior : currentContractClass.getDeclaredBehaviors()) {
+		for (CtMethod contractMethod : currentContractClass.getDeclaredMethods()) {
 			if (logger.isTraceEnabled()) {
-				logger.trace("transforming behavior " + contractBehavior.getLongName());
+				logger.trace("transforming behavior " + contractMethod.getLongName());
 			}
-			transform(contractInfo, contractBehavior, storeIndex);
+			transform(contractInfo, contractMethod, storeIndex);
 		}
 	}
 
-	public void transform(ContractInfo contractInfo, CtBehavior contractBehavior, AtomicInteger storeIndex)
+	public void transform(ContractInfo contractInfo, CtMethod contractMethod, AtomicInteger storeIndex)
 			throws Exception {
 		ContractMethodExpressionEditor expressionEditor = new ContractMethodExpressionEditor(rootTransformer,
 				contractInfo, storeIndex);
-		contractBehavior.instrument(expressionEditor);
+		contractMethod.instrument(expressionEditor);
+		contractInfo.addMethod(contractMethod, expressionEditor.hasPreConditionOrDependencies(), expressionEditor
+				.isPostConditionAvailable(), expressionEditor.containsUnchanged());
 		if (expressionEditor.getThrownException() != null) {
-			throw expressionEditor.getThrownException();
+			contractInfo.addError(expressionEditor.getThrownException());
 		}
-		if (expressionEditor.hasStoreDependencies() || !expressionEditor.getPreConditionExp().isEmpty()) {
-			insertStoreDependencies(contractBehavior, expressionEditor);
+		if (expressionEditor.hasPreDependencies()) {
+			insertStoreDependencies(contractMethod, expressionEditor);
 		}
 	}
 
-	private void insertStoreDependencies(CtBehavior contractBehavior, ContractMethodExpressionEditor expressionEditor)
+	private void insertStoreDependencies(CtMethod contractMethod, ContractMethodExpressionEditor expressionEditor)
 			throws BadBytecode, CannotCompileException, NotFoundException {
-		if (contractBehavior.hasAnnotation(ClassInvariant.class)) {
-			insertStoreDependenciesForClassInvariant(contractBehavior, expressionEditor);
+		if (contractMethod.hasAnnotation(ClassInvariant.class)) {
+			insertStoreDependenciesForClassInvariant(contractMethod, expressionEditor);
 		} else {
-			insertStoreDependenciesForPostCondition(contractBehavior, expressionEditor);
+			insertStoreDependenciesForPostCondition(contractMethod, expressionEditor);
 		}
 	}
 
-	private void insertStoreDependenciesForClassInvariant(CtBehavior contractBehavior,
+	private void insertStoreDependenciesForClassInvariant(CtMethod contractMethod,
 			ContractMethodExpressionEditor expressionEditor) throws BadBytecode, CannotCompileException,
 			NotFoundException {
-		CtMethod beforeInvariant = CtNewMethod.make(CtClass.voidType, contractBehavior.getName()
-				+ BEFORE_INVARIANT_METHOD_SUFFIX, new CtClass[0], contractBehavior.getExceptionTypes(), null,
-				contractBehavior.getDeclaringClass());
-		contractBehavior.getDeclaringClass().addMethod(beforeInvariant);
+		CtMethod beforeInvariant = CtNewMethod.make(CtClass.voidType, contractMethod.getName()
+				+ BEFORE_INVARIANT_METHOD_SUFFIX, new CtClass[0], contractMethod.getExceptionTypes(), null,
+				contractMethod.getDeclaringClass());
+		contractMethod.getDeclaringClass().addMethod(beforeInvariant);
 		transformationHelper.addBehaviorAnnotation(beforeInvariant, rootTransformer.getPool().get(
 				BeforeClassInvariant.class.getName()));
-		insertIntoBeforeInvariant(expressionEditor, beforeInvariant, contractBehavior.getDeclaringClass());
+		insertIntoBeforeInvariant(expressionEditor, beforeInvariant, contractMethod.getDeclaringClass());
 	}
 
 	private void insertIntoBeforeInvariant(ContractMethodExpressionEditor expressionEditor, CtMethod beforeInvariant,
@@ -91,18 +92,18 @@ public class ContractExpressionTransformer extends AbstractContractClassTransfor
 		}
 	}
 
-	private void insertStoreDependenciesForPostCondition(CtBehavior contractBehavior,
+	private void insertStoreDependenciesForPostCondition(CtMethod contractMethod,
 			ContractMethodExpressionEditor expressionEditor) throws BadBytecode, CannotCompileException {
 		if (!expressionEditor.getPreConditionExp().isEmpty()) {
 			IfExp isBeforeCondition = new IfExp(new StaticCallExp(Evaluator.isBefore));
 			isBeforeCondition.addIfBody(expressionEditor.getPreConditionExp());
-			isBeforeCondition.insertBefore(contractBehavior);
+			isBeforeCondition.insertBefore(contractMethod);
 		}
 		if (expressionEditor.hasStoreDependencies()) {
-			ConstPool constPool = contractBehavior.getMethodInfo().getConstPool();
-			CodeAttribute attribute = contractBehavior.getMethodInfo().getCodeAttribute();
+			ConstPool constPool = contractMethod.getMethodInfo().getConstPool();
+			CodeAttribute attribute = contractMethod.getMethodInfo().getCodeAttribute();
 			int ifBlockLength = insertOldStoreCalls(attribute, expressionEditor.getStoreDependencies(), constPool,
-					contractBehavior.getDeclaringClass());
+					contractMethod.getDeclaringClass());
 			insertJump(attribute.iterator(), ifBlockLength, constPool);
 		}
 	}

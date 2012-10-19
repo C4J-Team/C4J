@@ -65,7 +65,8 @@ public class ContractErrorHandler {
 	}
 
 	public enum ContractErrorSource {
-		PRE_CONDITION("pre-condition"), POST_CONDITION("post-condition"), CLASS_INVARIANT("class-invariant");
+		PRE_CONDITION("pre-condition"), POST_CONDITION("post-condition"), CLASS_INVARIANT("class-invariant"), INITIALIZER(
+				"initializer");
 
 		private String name;
 

@@ -1,11 +1,7 @@
 package de.vksi.c4j.internal.transformer;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import javassist.CannotCompileException;
 import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.NotFoundException;
@@ -19,14 +15,10 @@ import de.vksi.c4j.internal.compiler.StaticCallExp;
 import de.vksi.c4j.internal.compiler.TryExp;
 import de.vksi.c4j.internal.compiler.ValueExp;
 import de.vksi.c4j.internal.evaluator.Evaluator;
-import de.vksi.c4j.internal.util.AffectedBehaviorLocator;
-import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
-import de.vksi.c4j.internal.util.ListOrderedSet;
 import de.vksi.c4j.internal.util.ReflectionHelper;
 
 public abstract class ConditionTransformer extends AbstractAffectedClassTransformer {
 	protected ReflectionHelper reflectionHelper = new ReflectionHelper();
-	private AffectedBehaviorLocator affectedBehaviorLocator = new AffectedBehaviorLocator();
 
 	protected void catchWithHandleContractException(CtClass affectedClass, TryExp contractCallExp,
 			ContractErrorSource source) {
@@ -68,23 +60,5 @@ public abstract class ConditionTransformer extends AbstractAffectedClassTransfor
 		CastExp getContractInstance = new CastExp(contractBehavior.getDeclaringClass(), conditionCall);
 		return getContractInstance.appendCall(reflectionHelper.getContractBehaviorName(contractBehavior),
 				getArgsList(affectedClass, contractBehavior)).toStandalone();
-	}
-
-	protected Map<CtBehavior, List<CtBehavior>> getContractMap(ListOrderedSet<ContractInfo> contracts,
-			CtClass affectedClass) throws NotFoundException, CannotCompileException {
-		Map<CtBehavior, List<CtBehavior>> contractMap = new HashMap<CtBehavior, List<CtBehavior>>();
-		for (ContractInfo contractInfo : contracts) {
-			for (CtBehavior contractBehavior : contractInfo.getContractClass().getDeclaredMethods()) {
-				CtBehavior affectedBehavior = affectedBehaviorLocator.getAffectedBehavior(contractInfo, affectedClass,
-						contractBehavior);
-				if (affectedBehavior != null) {
-					if (!contractMap.containsKey(affectedBehavior)) {
-						contractMap.put(affectedBehavior, new ArrayList<CtBehavior>());
-					}
-					contractMap.get(affectedBehavior).add(contractBehavior);
-				}
-			}
-		}
-		return contractMap;
 	}
 }

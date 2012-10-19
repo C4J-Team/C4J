@@ -29,6 +29,7 @@ import de.vksi.c4j.internal.compiler.ValueExp;
 import de.vksi.c4j.internal.evaluator.Evaluator;
 import de.vksi.c4j.internal.evaluator.UnchangedCache;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
+import de.vksi.c4j.internal.util.ContractRegistry.ContractMethod;
 import de.vksi.c4j.internal.util.ListOrderedSet;
 
 /**
@@ -74,9 +75,7 @@ public class InvariantTransformer extends ConditionTransformer {
 
 	@Override
 	public void transform(ListOrderedSet<CtClass> involvedClasses, ListOrderedSet<ContractInfo> contracts,
-			CtClass affectedClass) throws Exception {
-		Map<CtBehavior, List<CtBehavior>> contractMap = getContractMap(contracts, affectedClass);
-
+			CtClass affectedClass, Map<CtBehavior, List<ContractMethod>> contractMap) throws Exception {
 		for (CtBehavior affectedBehavior : reflectionHelper.getDeclaredBehaviors(affectedClass, MODIFIABLE, DYNAMIC,
 				VISIBLE)) {
 			transformBehavior(affectedClass, affectedBehavior, contracts, contractMap);
@@ -84,7 +83,7 @@ public class InvariantTransformer extends ConditionTransformer {
 	}
 
 	private void transformBehavior(CtClass affectedClass, CtBehavior affectedBehavior,
-			ListOrderedSet<ContractInfo> contracts, Map<CtBehavior, List<CtBehavior>> contractMap)
+			ListOrderedSet<ContractInfo> contracts, Map<CtBehavior, List<ContractMethod>> contractMap)
 			throws CannotCompileException, Exception {
 		if (logger.isTraceEnabled()) {
 			logger.trace("transforming behavior " + affectedBehavior.getLongName());
@@ -106,7 +105,7 @@ public class InvariantTransformer extends ConditionTransformer {
 	}
 
 	private void transformWithoutInvariants(CtClass affectedClass, CtBehavior affectedBehavior,
-			Map<CtBehavior, List<CtBehavior>> contractMap) throws CannotCompileException {
+			Map<CtBehavior, List<ContractMethod>> contractMap) throws CannotCompileException {
 		if (contractMap.containsKey(affectedBehavior)) {
 			getBeforeContractMethodCall().insertBefore(affectedBehavior);
 			getAfterContractMethodCall().insertFinally(affectedBehavior);
@@ -171,4 +170,5 @@ public class InvariantTransformer extends ConditionTransformer {
 		return new StaticCallExp(Evaluator.getInvariant, NestedExp.THIS, new ValueExp(affectedClass.getSimpleName()),
 				new ValueExp(contractClass), new ValueExp(affectedClass));
 	}
+
 }

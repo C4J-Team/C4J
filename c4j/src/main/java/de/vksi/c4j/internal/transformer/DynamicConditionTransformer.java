@@ -14,6 +14,7 @@ import de.vksi.c4j.internal.compiler.NestedExp;
 import de.vksi.c4j.internal.compiler.StandaloneExp;
 import de.vksi.c4j.internal.compiler.StaticCallExp;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
+import de.vksi.c4j.internal.util.ContractRegistry.ContractMethod;
 import de.vksi.c4j.internal.util.ListOrderedSet;
 
 /**
@@ -49,15 +50,14 @@ import de.vksi.c4j.internal.util.ListOrderedSet;
 public class DynamicConditionTransformer extends PreAndPostConditionTransformer {
 	@Override
 	public void transform(ListOrderedSet<CtClass> involvedClasses, ListOrderedSet<ContractInfo> contracts,
-			CtClass affectedClass) throws Exception {
-		Map<CtBehavior, List<CtBehavior>> contractMap = getContractMap(contracts, affectedClass);
+			CtClass affectedClass, Map<CtBehavior, List<ContractMethod>> contractMap) throws Exception {
 		for (CtBehavior affectedBehavior : reflectionHelper.getDeclaredBehaviors(affectedClass, MODIFIABLE, DYNAMIC,
 				VISIBLE)) {
 			transform(affectedClass, affectedBehavior, contractMap.get(affectedBehavior));
 		}
 	}
 
-	public void transform(CtClass affectedClass, CtBehavior affectedBehavior, List<CtBehavior> contractList)
+	public void transform(CtClass affectedClass, CtBehavior affectedBehavior, List<ContractMethod> contractList)
 			throws Exception {
 		if (logger.isTraceEnabled()) {
 			logger.trace("transforming behavior " + affectedBehavior.getLongName());
@@ -75,4 +75,5 @@ public class DynamicConditionTransformer extends PreAndPostConditionTransformer 
 				NestedExp.THIS);
 		return getContractCallExp(affectedClass, contractBehavior, getConditionCall);
 	}
+
 }

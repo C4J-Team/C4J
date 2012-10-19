@@ -46,6 +46,17 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 	private StandaloneExp preConditionExp = new EmptyExp();
 	private UsageError thrownException;
 	private final AtomicInteger storeIndex;
+	private boolean preConditionAvailable;
+	private boolean postConditionAvailable;
+	private boolean containsUnchanged;
+
+	public boolean isPostConditionAvailable() {
+		return postConditionAvailable;
+	}
+
+	public boolean containsUnchanged() {
+		return containsUnchanged;
+	}
 
 	public UsageError getThrownException() {
 		return thrownException;
@@ -91,10 +102,16 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 				handleUnchangedMethodCall(methodCall);
 			} else if (method.getName().equals("preCondition")) {
 				handlePreConditionMethodCall(methodCall);
+			} else if (method.getName().equals("postCondition")) {
+				handlePostConditionMethodCall(methodCall);
 			} else if (method.getName().equals("maxTime")) {
 				handleMaxTimeMethodCall(methodCall);
 			}
 		}
+	}
+
+	private void handlePostConditionMethodCall(MethodCall methodCall) {
+		postConditionAvailable = true;
 	}
 
 	private void handleMaxTimeMethodCall(MethodCall methodCall) {
@@ -143,6 +160,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 			} catch (NotFoundException e) {
 			}
 		}
+		preConditionAvailable = true;
 	}
 
 	private void handleUndefinedDefaultPreCondition(MethodCall methodCall, CtBehavior method,
@@ -158,6 +176,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 			} catch (NotFoundException e) {
 			}
 		}
+		preConditionAvailable = true;
 	}
 
 	private void preConditionStrengthening(MethodCall methodCall, CtBehavior method, CtClass definingClass)
@@ -214,10 +233,18 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 				new ValueExp(contract.getContractClass()), new ValueExp(newStoreIndex)), NestedExp.PROCEED);
 		AssignmentExp assignmentExp = new AssignmentExp(NestedExp.RETURN_VALUE, oldCall);
 		methodCall.replace(assignmentExp.toStandalone().getCode());
-		contract.getMethodsContainingUnchanged().add(methodCall.where().getName() + methodCall.where().getSignature());
+		containsUnchanged = true;
 	}
 
 	public boolean hasStoreDependencies() {
 		return !getStoreDependencies().isEmpty();
+	}
+
+	public boolean hasPreDependencies() {
+		return hasStoreDependencies() || !getPreConditionExp().isEmpty();
+	}
+
+	public boolean hasPreConditionOrDependencies() {
+		return preConditionAvailable || hasPreDependencies();
 	}
 }

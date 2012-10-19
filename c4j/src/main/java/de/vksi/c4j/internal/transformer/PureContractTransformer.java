@@ -16,11 +16,9 @@ public class PureContractTransformer extends ContractDeclaredBehaviorTransformer
 	@Override
 	public void transform(ContractInfo contractInfo, CtBehavior contractBehavior) throws Exception {
 		if (contractBehavior.hasAnnotation(Pure.class)) {
-			throw new UsageError(
-					"Contract method "
-							+ contractBehavior.getLongName()
-							+ " is marked @Pure although already being already implicitly pure. "
-							+ "Consider using @PureTarget if the target method should be declared as being pure.");
+			contractInfo.addError(new UsageError("Contract method " + contractBehavior.getLongName()
+					+ " is marked @Pure although already being already implicitly pure. "
+					+ "Consider using @PureTarget if the target method should be declared as being pure."));
 		}
 		if (contractBehavior instanceof CtMethod
 				&& rootTransformer.getXmlConfiguration().getConfiguration(contractInfo.getContractClass())

@@ -150,8 +150,7 @@ public class PureInspector {
 			throws CannotCompileException {
 		boolean containsUnchanged = false;
 		for (ContractInfo contract : contracts) {
-			if (contract.getMethodsContainingUnchanged().contains(
-					affectedBehavior.getName() + affectedBehavior.getSignature())) {
+			if (contract.getMethodsContainingUnchanged().contains(affectedBehavior)) {
 				containsUnchanged = true;
 				break;
 			}

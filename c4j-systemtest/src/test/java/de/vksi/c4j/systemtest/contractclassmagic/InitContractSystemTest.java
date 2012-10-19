@@ -1,5 +1,6 @@
 package de.vksi.c4j.systemtest.contractclassmagic;
 
+import static de.vksi.c4j.Condition.preCondition;
 import static org.junit.Assert.assertTrue;
 
 import org.apache.log4j.Level;
@@ -17,8 +18,15 @@ public class InitContractSystemTest {
 	public TransformerAwareRule transformerAware = new TransformerAwareRule();
 
 	@Test
+	public void testInitContractCalledWithoutCondition() {
+		TargetClass target = new TargetClass();
+		assertTrue(target.initContractCalled);
+	}
+
+	@Test
 	public void testInitContractCalled() {
 		TargetClass target = new TargetClass();
+		target.method();
 		assertTrue(target.initContractCalled);
 	}
 
@@ -26,6 +34,9 @@ public class InitContractSystemTest {
 	public static class TargetClass {
 		@AllowPureAccess
 		protected boolean initContractCalled;
+
+		public void method() {
+		}
 	}
 
 	public static class ContractClass extends TargetClass {
@@ -36,16 +47,25 @@ public class InitContractSystemTest {
 		public void init() {
 			target.initContractCalled = true;
 		}
+
+		@Override
+		public void method() {
+			if (preCondition()) {
+			}
+		}
 	}
 
 	@Test(expected = AssertionError.class)
 	public void testInitContractPure() {
-		new TargetClassForUnpureInitContract();
+		new TargetClassForUnpureInitContract().method();
 	}
 
 	@ContractReference(ContractClassForUnpureInitContract.class)
 	public static class TargetClassForUnpureInitContract {
 		protected int value;
+
+		public void method() {
+		}
 	}
 
 	public static class ContractClassForUnpureInitContract extends TargetClassForUnpureInitContract {
@@ -55,6 +75,12 @@ public class InitContractSystemTest {
 		@InitializeContract
 		public void init() {
 			target.value = 3;
+		}
+
+		@Override
+		public void method() {
+			if (preCondition()) {
+			}
 		}
 	}
 

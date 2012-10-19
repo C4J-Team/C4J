@@ -1,10 +1,12 @@
 package de.vksi.c4j.internal.transformer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javassist.CannotCompileException;
 import javassist.CtBehavior;
 import javassist.CtClass;
+import javassist.CtConstructor;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 import de.vksi.c4j.internal.ContractErrorHandler.ContractErrorSource;
@@ -18,6 +20,7 @@ import de.vksi.c4j.internal.compiler.ThrowExp;
 import de.vksi.c4j.internal.compiler.TryExp;
 import de.vksi.c4j.internal.compiler.ValueExp;
 import de.vksi.c4j.internal.evaluator.Evaluator;
+import de.vksi.c4j.internal.util.ContractRegistry.ContractMethod;
 import de.vksi.c4j.internal.util.ObjectConverter;
 
 public abstract class PreAndPostConditionTransformer extends ConditionTransformer {
@@ -73,6 +76,27 @@ public abstract class PreAndPostConditionTransformer extends ConditionTransforme
 			return canExecuteConditionCall;
 		}
 	};
+	protected final BeforeConditionCallProvider beforeInitializerCallProvider = new BeforeConditionCallProvider() {
+		@Override
+		public StaticCallExp conditionCall(CtBehavior affectedBehavior, CtBehavior contractBehavior,
+				NestedExp targetReference) throws NotFoundException {
+			return new StaticCallExp(Evaluator.getInitializationCall, targetReference, new ValueExp(reflectionHelper
+					.getSimpleName(affectedBehavior)), new ValueExp(contractBehavior.getDeclaringClass()),
+					new ValueExp(affectedBehavior.getDeclaringClass()));
+		}
+
+		@Override
+		public ContractErrorSource getContractErrorSource() {
+			return ContractErrorSource.INITIALIZER;
+		}
+
+		@Override
+		public IfExp getCanExecuteConditionCall(StandaloneExp body) {
+			IfExp canExecuteConditionCall = new IfExp(new StaticCallExp(Evaluator.canExecuteCondition));
+			canExecuteConditionCall.addIfBody(body);
+			return canExecuteConditionCall;
+		}
+	};
 
 	private NestedExp getReturnTypeExp(CtBehavior contractBehavior) throws NotFoundException {
 		NestedExp returnTypeExp = NestedExp.NULL;
@@ -93,30 +117,74 @@ public abstract class PreAndPostConditionTransformer extends ConditionTransforme
 		return NestedExp.RETURN_VALUE;
 	}
 
-	protected void insertPreAndPostCondition(List<CtBehavior> contractList, CtClass affectedClass,
+	protected void insertPreAndPostCondition(List<ContractMethod> contractList, CtClass affectedClass,
 			CtBehavior affectedBehavior) throws NotFoundException, CannotCompileException {
 		if (logger.isTraceEnabled()) {
 			logger.trace("transforming behavior " + affectedBehavior.getLongName()
 					+ " for pre- and post-conditions with " + contractList.size() + " contract-method calls");
 		}
 
-		StandaloneExp callPreCondition = getConditionCall(contractList, affectedClass, affectedBehavior,
-				beforePreConditionCallProvider);
-		StandaloneExp callPostCondition = getConditionCall(contractList, affectedClass, affectedBehavior,
-				beforePostConditionCallProvider);
-		StandaloneExp catchExceptionCall = getCatchExceptionCall();
+		getCatchExceptionCall().insertCatch(rootTransformer.getPool().get(Throwable.class.getName()), affectedBehavior);
+		getConditionCall(getPostConditions(contractList), affectedClass, affectedBehavior,
+				beforePostConditionCallProvider).insertFinally(affectedBehavior);
+		getConditionCall(getPreConditions(contractList), affectedClass, affectedBehavior,
+				beforePreConditionCallProvider).insertBefore(affectedBehavior);
 
-		catchExceptionCall.insertCatch(rootTransformer.getPool().get(Throwable.class.getName()), affectedBehavior);
-		callPostCondition.insertFinally(affectedBehavior);
-		callPreCondition.insertBefore(affectedBehavior);
+		insertInitializersForConstructor(contractList, affectedClass, affectedBehavior);
 	}
 
-	protected IfExp getConditionCall(List<CtBehavior> contractList, CtClass affectedClass, CtBehavior affectedBehavior,
-			BeforeConditionCallProvider beforeConditionCallProvider) throws NotFoundException {
+	private void insertInitializersForConstructor(List<ContractMethod> contractList, CtClass affectedClass,
+			CtBehavior affectedBehavior) throws NotFoundException, CannotCompileException {
+		if (affectedBehavior instanceof CtConstructor) {
+			List<CtMethod> initializers = getInitializers(contractList);
+			if (!initializers.isEmpty()) {
+				StandaloneExp callInitializer = getConditionCall(initializers, affectedClass, affectedBehavior,
+						beforeInitializerCallProvider);
+				callInitializer.insertBefore(affectedBehavior);
+			}
+		}
+	}
+
+	private List<CtMethod> getPreConditions(List<ContractMethod> contractList) {
+		List<CtMethod> preConditions = new ArrayList<CtMethod>();
+		for (ContractMethod contractMethod : contractList) {
+			if (contractMethod.hasPreConditionOrDependencies()) {
+				preConditions.add(contractMethod.getMethod());
+			}
+		}
+		return preConditions;
+	}
+
+	private List<CtMethod> getInitializers(List<ContractMethod> contractList) {
+		List<CtMethod> initializers = new ArrayList<CtMethod>();
+		for (ContractMethod contractMethod : contractList) {
+			if (!contractMethod.hasPreConditionOrDependencies() && !contractMethod.hasPostCondition()) {
+				initializers.add(contractMethod.getMethod());
+			}
+		}
+		return initializers;
+	}
+
+	private List<CtMethod> getPostConditions(List<ContractMethod> contractList) {
+		List<CtMethod> postConditions = new ArrayList<CtMethod>();
+		for (ContractMethod contractMethod : contractList) {
+			if (contractMethod.hasPostCondition()) {
+				postConditions.add(contractMethod.getMethod());
+			}
+		}
+		return postConditions;
+	}
+
+	protected StandaloneExp getConditionCall(List<CtMethod> contractList, CtClass affectedClass,
+			CtBehavior affectedBehavior, BeforeConditionCallProvider beforeConditionCallProvider)
+			throws NotFoundException {
 		StandaloneExp conditionCalls = new EmptyExp();
 		for (CtBehavior contractBehavior : contractList) {
 			conditionCalls = conditionCalls.append(getSingleConditionCall(affectedClass, affectedBehavior,
 					beforeConditionCallProvider, contractBehavior));
+		}
+		if (conditionCalls.isEmpty()) {
+			return conditionCalls;
 		}
 		TryExp tryPreCondition = new TryExp(conditionCalls);
 		catchWithHandleContractException(affectedClass, tryPreCondition, beforeConditionCallProvider

@@ -2,11 +2,10 @@ package de.vksi.c4j.internal.transformer;
 
 import javassist.CannotCompileException;
 import javassist.CtClass;
-import de.vksi.c4j.UsageError;
 import de.vksi.c4j.internal.RootTransformer;
 import de.vksi.c4j.internal.Transformed;
-import de.vksi.c4j.internal.util.TransformationHelper;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
+import de.vksi.c4j.internal.util.TransformationHelper;
 
 public class ContractClassTransformer extends AbstractContractClassTransformer {
 	private AbstractContractClassTransformer[] transformers = new AbstractContractClassTransformer[] {
@@ -20,19 +19,18 @@ public class ContractClassTransformer extends AbstractContractClassTransformer {
 		if (logger.isDebugEnabled()) {
 			logger.debug("transforming contract " + contractClass.getName());
 		}
-		try {
-			for (AbstractContractClassTransformer transformer : transformers) {
-				transformer.transform(contractInfo, contractClass);
-			}
-		} catch (UsageError e) {
-			insertUsageException(e, contractClass);
+		for (AbstractContractClassTransformer transformer : transformers) {
+			transformer.transform(contractInfo, contractClass);
 		}
-		transformationHelper.addClassAnnotation(contractClass,
-				RootTransformer.INSTANCE.getPool().get(Transformed.class.getName()));
+		insertUsageException(contractInfo, contractClass);
+		transformationHelper.addClassAnnotation(contractClass, RootTransformer.INSTANCE.getPool().get(
+				Transformed.class.getName()));
 	}
 
-	private void insertUsageException(UsageError exception, CtClass contractClass) throws CannotCompileException {
-		exception.insertThrowExp(contractClass.makeClassInitializer());
+	private void insertUsageException(ContractInfo contractInfo, CtClass contractClass) throws CannotCompileException {
+		if (!contractInfo.getErrors().isEmpty()) {
+			contractInfo.getErrors().get(0).insertThrowExp(contractClass.makeClassInitializer());
+		}
 	}
 
 	protected AbstractContractClassTransformer[] getTransformers() {

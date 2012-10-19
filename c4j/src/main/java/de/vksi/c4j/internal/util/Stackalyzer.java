@@ -141,9 +141,11 @@ public class Stackalyzer {
 			NotFoundException, UsageError {
 		switch (op) {
 			case GETFIELD:
-			case GETSTATIC:
 				// either +0 or +1
 				return getStaticFieldDelta(index, ci, constPool) - 1;
+			case GETSTATIC:
+				// either +1 or +2
+				return getStaticFieldDelta(index, ci, constPool);
 			case PUTFIELD:
 				// either -2 or -3
 				return -1 * getStaticFieldDelta(index, ci, constPool) - 1;

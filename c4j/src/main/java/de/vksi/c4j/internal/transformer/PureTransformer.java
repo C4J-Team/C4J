@@ -1,6 +1,10 @@
 package de.vksi.c4j.internal.transformer;
 
 import static de.vksi.c4j.internal.util.BehaviorFilter.MODIFIABLE;
+
+import java.util.List;
+import java.util.Map;
+
 import javassist.CannotCompileException;
 import javassist.CtBehavior;
 import javassist.CtClass;
@@ -10,6 +14,7 @@ import javassist.NotFoundException;
 import de.vksi.c4j.Pure;
 import de.vksi.c4j.internal.RootTransformer;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
+import de.vksi.c4j.internal.util.ContractRegistry.ContractMethod;
 import de.vksi.c4j.internal.util.ListOrderedSet;
 import de.vksi.c4j.internal.util.PureInspector;
 import de.vksi.c4j.internal.util.ReflectionHelper;
@@ -23,7 +28,7 @@ public class PureTransformer extends AbstractAffectedClassTransformer {
 
 	@Override
 	public void transform(ListOrderedSet<CtClass> involvedClasses, ListOrderedSet<ContractInfo> contracts,
-			CtClass affectedClass) throws Exception {
+			CtClass affectedClass, Map<CtBehavior, List<ContractMethod>> contractMap) throws Exception {
 		for (CtBehavior affectedBehavior : reflectionHelper.getDeclaredBehaviors(affectedClass, MODIFIABLE)) {
 			normalizePure(involvedClasses, contracts, affectedBehavior);
 			applyPure(affectedClass, affectedBehavior, contracts);
@@ -31,8 +36,7 @@ public class PureTransformer extends AbstractAffectedClassTransformer {
 	}
 
 	private void applyPure(CtClass affectedClass, CtBehavior affectedBehavior, ListOrderedSet<ContractInfo> contracts)
-			throws CannotCompileException,
-			NotFoundException {
+			throws CannotCompileException, NotFoundException {
 		if (rootTransformer.getXmlConfiguration().getConfiguration(affectedClass).isPureValidate()) {
 			if (affectedBehavior.hasAnnotation(Pure.class)) {
 				pureInspector.verify((CtMethod) affectedBehavior, false);
@@ -51,8 +55,8 @@ public class PureTransformer extends AbstractAffectedClassTransformer {
 		CtMethod method = (CtMethod) behavior;
 		CtMethod pureOrigin = pureInspector.getPureOrigin(involvedClasses, contracts, method);
 		if (pureOrigin != null) {
-			transformationHelper.addBehaviorAnnotation(method,
-					RootTransformer.INSTANCE.getPool().get(Pure.class.getName()));
+			transformationHelper.addBehaviorAnnotation(method, RootTransformer.INSTANCE.getPool().get(
+					Pure.class.getName()));
 			if (logger.isDebugEnabled()) {
 				logger.debug("added @Pure from " + pureOrigin.getLongName() + " to " + method.getLongName());
 			}
