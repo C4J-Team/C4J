@@ -2,6 +2,7 @@ package de.vksi.c4j.systemtest.postcompiler;
 
 import java.io.File;
 
+import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -9,7 +10,7 @@ import org.junit.rules.TemporaryFolder;
 import de.vksi.c4j.PreTransformer;
 import de.vksi.c4j.systemtest.TransformerAwareRule;
 
-public class PreTransformerSystemTest {
+public class PreTransformerITCase {
 	@Rule
 	public TransformerAwareRule transformerAwareRule = new TransformerAwareRule();
 
@@ -18,6 +19,8 @@ public class PreTransformerSystemTest {
 
 	@Test
 	public void testPreTransformer() throws Throwable {
+		// cannot run together with all the other tests
+		Assume.assumeTrue(!TransformerAwareRule.haveTestsRun());
 		PreTransformer preTransformer = new PreTransformer(new File("."), destinationDir.getRoot());
 		preTransformer.transformAllClassFiles();
 	}

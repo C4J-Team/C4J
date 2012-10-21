@@ -22,6 +22,8 @@ public class TransformerAwareRule implements TestRule {
 	private static Map<String, Level> globalLogMap = new HashMap<String, Level>();
 	private static Map<String, Level> localLogMap = new HashMap<String, Level>();
 
+	private static int numTestsRun = 0;
+
 	private static boolean hasFatalLogMessage = false;
 
 	public void expectGlobalLog(Level level, String message) {
@@ -60,9 +62,14 @@ public class TransformerAwareRule implements TestRule {
 				bannedLogLevel = null;
 				bannedLogMessage = null;
 				base.evaluate();
+				numTestsRun++;
 				verify();
 			}
 		};
+	}
+
+	public static boolean haveTestsRun() {
+		return numTestsRun > 0;
 	}
 
 	protected void verify() throws Throwable {

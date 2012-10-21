@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.vksi.c4j</groupId>
 	<artifactId>c4j</artifactId>
-	<version>6.0-RC1</version>
+	<version>6.0-RC1-SNAPSHOT</version>
 	<name>C4J - Contracts for Java</name>
 	<description>The C4J Contracts Framework for Java is, since version 4.0, using inheritance to provide classes and interfaces with contracts.</description>
 	<url>http://c4j.vksi.de/</url>

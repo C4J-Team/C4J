@@ -86,9 +86,9 @@ public class InitContractSystemTest {
 
 	@Test
 	public void testInitContractWithParam() {
+		new TargetClassForInitContractWithParam();
 		transformerAware.expectGlobalLog(Level.WARN, "Ignoring @InitializeContract method "
 				+ ContractClassForInitContractWithParam.class.getName() + ".init(int)" + " as it expects parameters.");
-		new TargetClassForInitContractWithParam();
 	}
 
 	@ContractReference(ContractClassForInitContractWithParam.class)

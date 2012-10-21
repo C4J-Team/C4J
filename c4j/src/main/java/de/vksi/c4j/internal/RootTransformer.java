@@ -131,19 +131,14 @@ public class RootTransformer {
 				if (contractRegistry.hasRegisteredContract(type)) {
 					contracts.add(contractRegistry.getContractInfoForTargetClass(type));
 				} else {
-					verifyRegisterAndAddContract(contracts, type, externalContract);
+					CtClass contractClass = decideContractForType(type, externalContract);
+					if (verifyContract(type, contractClass, affectedClass)) {
+						contracts.add(contractRegistry.registerContract(type, contractClass));
+					}
 				}
 			}
 		}
 		return contracts;
-	}
-
-	private void verifyRegisterAndAddContract(ListOrderedSet<ContractInfo> contracts, CtClass type,
-			CtClass externalContract) throws NotFoundException {
-		CtClass contractClass = decideContractForType(type, externalContract);
-		if (verifyContract(type, contractClass)) {
-			contracts.add(contractRegistry.registerContract(type, contractClass));
-		}
 	}
 
 	private CtClass decideContractForType(CtClass type, CtClass externalContract) throws NotFoundException {
@@ -155,7 +150,8 @@ public class RootTransformer {
 		return externalContract;
 	}
 
-	private boolean verifyContract(CtClass targetClass, CtClass contractClass) throws NotFoundException {
+	private boolean verifyContract(CtClass targetClass, CtClass contractClass, CtClass affectedClass)
+			throws NotFoundException {
 		if (contractClass.hasAnnotation(Transformed.class)) {
 			logger.error("Ignoring contract class " + contractClass.getSimpleName() + " defined on "
 					+ targetClass.getSimpleName() + " as it has been loaded before the target type was loaded.");
@@ -169,6 +165,12 @@ public class RootTransformer {
 		if (contractClass.equals(targetClass)) {
 			logger.error("Ignoring contract " + contractClass.getSimpleName() + " defined on "
 					+ targetClass.getSimpleName() + " as the contract class is the same as the target class.");
+			return false;
+		}
+		if (contractClass.equals(affectedClass)) {
+			logger.error("Class " + contractClass.getSimpleName()
+					+ " cannot be its own contract-class. Try explicitly marking " + contractClass.getSimpleName()
+					+ " with @Contract.");
 			return false;
 		}
 		warnContractNotInheritingFromTarget(targetClass, contractClass);
