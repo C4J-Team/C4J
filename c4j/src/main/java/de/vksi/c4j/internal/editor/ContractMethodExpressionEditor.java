@@ -7,12 +7,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javassist.CannotCompileException;
 import javassist.CtBehavior;
 import javassist.CtClass;
+import javassist.CtField;
 import javassist.CtMethod;
+import javassist.Modifier;
 import javassist.NotFoundException;
 import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.Opcode;
 import javassist.expr.ExprEditor;
+import javassist.expr.FieldAccess;
 import javassist.expr.MethodCall;
 
 import org.apache.log4j.Logger;
@@ -78,6 +81,35 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 	}
 
 	@Override
+	public void edit(FieldAccess fieldAccess) throws CannotCompileException {
+		handleRemovedStaticFieldAccess(fieldAccess);
+	}
+
+	private void handleRemovedStaticFieldAccess(FieldAccess fieldAccess) throws CannotCompileException {
+		if (!fieldAccess.isStatic() || !fieldAccess.getClassName().equals(contract.getContractClass().getName())) {
+			return;
+		}
+		try {
+			contract.getContractClass().getField(fieldAccess.getFieldName());
+			// field was overridden explicitly in contract class
+			return;
+		} catch (NotFoundException e) {
+		}
+		CtField targetField;
+		try {
+			targetField = contract.getTargetClass().getField(fieldAccess.getFieldName());
+		} catch (NotFoundException e) {
+			return;
+		}
+		if (fieldAccess.isReader()) {
+			new AssignmentExp(NestedExp.RETURN_VALUE, new StaticCallExp(targetField)).toStandalone().replace(
+					fieldAccess);
+		} else {
+			new AssignmentExp(new StaticCallExp(targetField), NestedExp.arg(1)).toStandalone().replace(fieldAccess);
+		}
+	}
+
+	@Override
 	public void edit(MethodCall methodCall) throws CannotCompileException {
 		try {
 			editMethodCall(methodCall);
@@ -89,9 +121,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 	}
 
 	void editMethodCall(MethodCall methodCall) throws NotFoundException, CannotCompileException, BadBytecode {
-		if (invalidContractMethodCall(methodCall)) {
-			thrownException = new UsageError("Cannot call contract method " + methodCall.getMethodName()
-					+ " from contract method " + methodCall.where().getLongName() + ".");
+		if (removedContractMethodCall(methodCall)) {
 			return;
 		}
 		CtMethod method = methodCall.getMethod();
@@ -118,22 +148,29 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		preConditionExp = preConditionExp.append(new StaticCallExp(MaxTimeCache.setStartTime));
 	}
 
-	private boolean invalidContractMethodCall(MethodCall methodCall) {
+	private boolean removedContractMethodCall(MethodCall methodCall) throws CannotCompileException {
 		if (!methodCall.getClassName().equals(contract.getContractClass().getName())) {
 			return false;
 		}
-		CtMethod method;
+		CtMethod targetMethod;
 		try {
-			method = methodCall.getMethod();
-		} catch (NotFoundException e) {
-			return true;
-		}
-		try {
-			contract.getTargetClass().getMethod(method.getName(), method.getSignature());
+			targetMethod = contract.getTargetClass().getMethod(methodCall.getMethodName(), methodCall.getSignature());
 		} catch (NotFoundException e) {
 			return false;
 		}
+		if (!Modifier.isStatic(targetMethod.getModifiers())) {
+			thrownException = new UsageError("Cannot call contract method " + methodCall.getMethodName()
+					+ " from contract method " + methodCall.where().getLongName() + ".");
+			return true;
+		}
+		redirectStaticMethodCallToTargetClass(methodCall, targetMethod);
 		return true;
+	}
+
+	private void redirectStaticMethodCallToTargetClass(MethodCall methodCall, CtMethod targetMethod)
+			throws CannotCompileException {
+		new AssignmentExp(NestedExp.RETURN_VALUE, new StaticCallExp(targetMethod, NestedExp.ALL_ARGS)).toStandalone()
+				.replace(methodCall);
 	}
 
 	private void handlePreConditionMethodCall(MethodCall methodCall) throws NotFoundException, CannotCompileException {

@@ -2,6 +2,7 @@ package de.vksi.c4j.internal.compiler;
 
 import java.util.List;
 
+import javassist.CtField;
 import javassist.CtMethod;
 
 public class StaticCallExp extends NestedExp {
@@ -13,6 +14,10 @@ public class StaticCallExp extends NestedExp {
 
 	public StaticCallExp(StaticCall call, List<NestedExp> params) {
 		this(call, params.toArray(new NestedExp[0]));
+	}
+
+	public StaticCallExp(CtField staticField) {
+		code = staticField.getDeclaringClass().getName() + "#" + staticField.getName();
 	}
 
 	public StaticCallExp(CtMethod staticMethod, NestedExp... params) {

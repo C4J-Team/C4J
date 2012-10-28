@@ -8,9 +8,6 @@ import javassist.ClassPool;
 
 import org.junit.Test;
 
-import de.vksi.c4j.internal.compiler.BooleanExp;
-import de.vksi.c4j.internal.compiler.NestedExp;
-import de.vksi.c4j.internal.compiler.ValueExp;
 import de.vksi.c4j.internal.compiler.NestedExp.CodeNestedExp;
 
 public class NestedExpTest {
@@ -31,6 +28,11 @@ public class NestedExpTest {
 	}
 
 	@Test
+	public void testAllArgs() {
+		assertEquals("$$", NestedExp.ALL_ARGS.getCode());
+	}
+
+	@Test
 	public void testArg() {
 		assertEquals("$3", NestedExp.arg(3).getCode());
 	}
@@ -42,14 +44,14 @@ public class NestedExpTest {
 
 	@Test
 	public void testFieldForParentClass() throws Exception {
-		assertEquals(NestedExpTest.class.getName() + ".this.someField",
-				NestedExp.field("someField", ClassPool.getDefault().get(getClass().getName())).getCode());
+		assertEquals(NestedExpTest.class.getName() + ".this.someField", NestedExp.field("someField",
+				ClassPool.getDefault().get(getClass().getName())).getCode());
 	}
 
 	@Test
 	public void testFieldForParentNestedClass() throws Exception {
-		assertEquals(NestedClass.class.getCanonicalName() + ".this.someField",
-				NestedExp.field("someField", ClassPool.getDefault().get(NestedClass.class.getName())).getCode());
+		assertEquals(NestedClass.class.getCanonicalName() + ".this.someField", NestedExp.field("someField",
+				ClassPool.getDefault().get(NestedClass.class.getName())).getCode());
 	}
 
 	public static class NestedClass {
@@ -57,8 +59,8 @@ public class NestedExpTest {
 
 	@Test
 	public void testMethod() {
-		assertEquals("someMethod(\"firstValue\", \"secondValue\")",
-				NestedExp.method("someMethod", new ValueExp("firstValue"), new ValueExp("secondValue")).getCode());
+		assertEquals("someMethod(\"firstValue\", \"secondValue\")", NestedExp.method("someMethod",
+				new ValueExp("firstValue"), new ValueExp("secondValue")).getCode());
 	}
 
 	@Test
@@ -68,27 +70,26 @@ public class NestedExpTest {
 
 	@Test
 	public void testGetCodeForParams() {
-		assertEquals("(\"firstValue\", \"secondValue\")",
-				NestedExp.getCodeForParams(new ValueExp("firstValue"), new ValueExp("secondValue")));
+		assertEquals("(\"firstValue\", \"secondValue\")", NestedExp.getCodeForParams(new ValueExp("firstValue"),
+				new ValueExp("secondValue")));
 	}
 
 	@Test
 	public void testGetCodeForValues() {
-		assertEquals("\"firstValue\", \"secondValue\"",
-				NestedExp.getCodeForValues(new ValueExp("firstValue"), new ValueExp("secondValue")));
+		assertEquals("\"firstValue\", \"secondValue\"", NestedExp.getCodeForValues(new ValueExp("firstValue"),
+				new ValueExp("secondValue")));
 	}
 
 	@Test
 	public void testAppendCallWithArray() {
-		assertEquals("\"stringValue\".endsWith(\"Value\")",
-				new ValueExp("stringValue").appendCall("endsWith", new ValueExp("Value")).getCode());
+		assertEquals("\"stringValue\".endsWith(\"Value\")", new ValueExp("stringValue").appendCall("endsWith",
+				new ValueExp("Value")).getCode());
 	}
 
 	@Test
 	public void testAppendCallWithList() {
-		assertEquals("\"stringValue\".endsWith(\"Value\")",
-				new ValueExp("stringValue").appendCall("endsWith", Arrays.<NestedExp> asList(new ValueExp("Value")))
-						.getCode());
+		assertEquals("\"stringValue\".endsWith(\"Value\")", new ValueExp("stringValue").appendCall("endsWith",
+				Arrays.<NestedExp> asList(new ValueExp("Value"))).getCode());
 	}
 
 	@Test

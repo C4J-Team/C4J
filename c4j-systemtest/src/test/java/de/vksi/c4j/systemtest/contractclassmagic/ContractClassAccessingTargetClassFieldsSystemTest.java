@@ -1,6 +1,7 @@
 package de.vksi.c4j.systemtest.contractclassmagic;
 
 import static de.vksi.c4j.Condition.postCondition;
+import static de.vksi.c4j.Condition.preCondition;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -35,6 +36,30 @@ public class ContractClassAccessingTargetClassFieldsSystemTest {
 		public void method(int value, int param) {
 			if (postCondition()) {
 				assert target.value >= param;
+			}
+		}
+	}
+
+	@Test
+	public void testContractClassAccessingOverriddenTargetClassField() {
+		new TargetClassOverridden().method();
+	}
+
+	@ContractReference(ContractClassOverridden.class)
+	public static class TargetClassOverridden {
+		protected Boolean value = Boolean.TRUE;
+
+		public void method() {
+		}
+	}
+
+	public static class ContractClassOverridden extends TargetClassOverridden {
+		private Boolean value = Boolean.FALSE;
+
+		@Override
+		public void method() {
+			if (preCondition()) {
+				assert !value.booleanValue();
 			}
 		}
 	}

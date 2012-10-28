@@ -100,7 +100,7 @@ public class ContractBehaviorTransformer extends AbstractContractClassTransforme
 	private void addFieldsFromSuperclass(CtClass contractClass, CtClass superclass) throws CannotCompileException,
 			NotFoundException {
 		for (CtField superclassField : superclass.getFields()) {
-			if (!hasField(contractClass, superclassField)) {
+			if (!hasField(contractClass, superclassField) && !Modifier.isStatic(superclassField.getModifiers())) {
 				contractClass.addField(new CtField(superclassField, contractClass));
 			}
 		}
