@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  * contract, the class holding the contract is called the contract-class.
  * <p>
  * As alternatives to this annotation, the contract relationship can inversely be defined using the @{@link Contract}
- * annotation, or an external contract can be defined using {@link Configuration#getExternalContracts()}.
+ * annotation.
  */
 @Documented
 @Target(ElementType.TYPE)

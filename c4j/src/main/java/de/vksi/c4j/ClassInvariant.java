@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
  * being executed after the execution of any method in the target class.
  * <p>
  * Note that by default, a class-invariant is <em>not</em> being executed after pure methods. This behavior can be
- * configured using {@link Configuration#getPureBehaviors()}.
+ * configured using <code>&lt;pure-skip-invariants&gt;</code> in the local configuration.
  */
 @Documented
 @Target(ElementType.METHOD)

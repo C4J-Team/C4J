@@ -12,11 +12,8 @@ import java.lang.annotation.Target;
  * optional.
  * <p>
  * Note that defining a contract relation on the contract-class itself (and not on the target-type using @
- * {@link ContractReference}) only works when the contract directory is declared in
- * {@link Configuration#getContractsDirectory()} and is found during runtime.
- * <p>
- * As another alternative to this annotation, an external contract can be defined using
- * {@link Configuration#getExternalContracts()}.
+ * {@link ContractReference}) only works when the contract's package is contained within a
+ * <code>&lt;contract-scan-package&gt;</code> in the local configuration.
  */
 @Documented
 @Target(ElementType.TYPE)
