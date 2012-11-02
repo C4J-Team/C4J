@@ -17,7 +17,6 @@
 									</simpleContent>
 								</complexType>
 							</element>
-							<element name="strengthening-preconditions-allowed" type="boolean" minOccurs="0" default="false"/>
 							<element name="default-precondition" type="self:default-precondition-type" minOccurs="0" default="undefined"/>
 							<element name="pure-validate" type="boolean" minOccurs="0" default="false"/>
 							<element name="pure-skip-invariants" type="boolean" minOccurs="0" default="true"/>

@@ -71,10 +71,6 @@ public class XmlLocalConfiguration {
 		return xmlConfiguration.isPureSkipInvariants();
 	}
 
-	public boolean isStrengtheningPreconditionsAllowed() {
-		return xmlConfiguration.isStrengtheningPreconditionsAllowed();
-	}
-
 	public List<String> getRootPackage() {
 		return xmlConfiguration.getRootPackage();
 	}

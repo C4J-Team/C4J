@@ -218,12 +218,9 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 
 	private void preConditionStrengthening(MethodCall methodCall, CtBehavior method, CtClass definingClass)
 			throws CannotCompileException, NotFoundException {
-		if (!rootTransformer.getXmlConfiguration().getConfiguration(contract.getTargetClass())
-				.isStrengtheningPreconditionsAllowed()) {
-			logger.error(("Found strengthening pre-condition in " + method.getLongName()
-					+ " which is already defined from " + definingClass.getName())
-					+ " - ignoring the pre-condition.");
-		}
+		logger.error(("Found strengthening pre-condition in " + method.getLongName()
+				+ " which is already defined from " + definingClass.getName())
+				+ " - ignoring the pre-condition.");
 		AssignmentExp replacementExp = new AssignmentExp(NestedExp.RETURN_VALUE, BooleanExp.FALSE);
 		replacementExp.toStandalone().replace(methodCall);
 	}

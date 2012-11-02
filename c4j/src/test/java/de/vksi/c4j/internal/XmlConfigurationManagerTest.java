@@ -54,7 +54,6 @@ public class XmlConfigurationManagerTest {
 		assertThat(configuration.getDefaultPrecondition(), is(DefaultPreconditionType.UNDEFINED));
 		assertThat(configuration.isPureSkipInvariants(), is(true));
 		assertThat(configuration.isPureValidate(), is(false));
-		assertThat(configuration.isStrengtheningPreconditionsAllowed(), is(false));
 	}
 
 	@Test
