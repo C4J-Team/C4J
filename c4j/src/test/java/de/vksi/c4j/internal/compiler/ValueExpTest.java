@@ -6,9 +6,13 @@ import javassist.CtClass;
 
 import org.junit.Test;
 
-import de.vksi.c4j.internal.compiler.ValueExp;
-
 public class ValueExpTest {
+
+	@Test
+	public void testValueExpForBoolean() {
+		assertEquals("true", new ValueExp(true).getCode());
+		assertEquals("false", new ValueExp(false).getCode());
+	}
 
 	@Test
 	public void testValueExpForClass() {

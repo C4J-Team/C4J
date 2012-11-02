@@ -5,6 +5,10 @@ import javassist.CtClass;
 public class ValueExp extends NestedExp {
 	private String code;
 
+	public ValueExp(boolean value) {
+		code = getValueAsString(value);
+	}
+
 	public ValueExp(Class<?> value) {
 		code = getValueAsString(value);
 	}
@@ -49,6 +53,10 @@ public class ValueExp extends NestedExp {
 			return "(" + targetClass.getName() + ") " + value.toString();
 		}
 		return value.toString();
+	}
+
+	private String getValueAsString(boolean value) {
+		return Boolean.toString(value);
 	}
 
 	private String getValueAsString(Class<?> value) {

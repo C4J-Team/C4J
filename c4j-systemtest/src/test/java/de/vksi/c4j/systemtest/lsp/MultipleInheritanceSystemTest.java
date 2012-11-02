@@ -1,9 +1,11 @@
 package de.vksi.c4j.systemtest.lsp;
 
 import static de.vksi.c4j.Condition.preCondition;
+import static org.hamcrest.Matchers.containsString;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import de.vksi.c4j.ContractReference;
 import de.vksi.c4j.systemtest.TransformerAwareRule;
@@ -12,20 +14,27 @@ public class MultipleInheritanceSystemTest {
 	@Rule
 	public TransformerAwareRule transformerAware = new TransformerAwareRule();
 
+	@Rule
+	public ExpectedException expectedException = ExpectedException.none();
+
 	@Test
 	public void multipleInheritance_SameResults_Valid() throws Exception {
 		new TargetClass().method(2);
 	}
 
-	@Test(expected = AssertionError.class)
+	@Test
 	public void multipleInheritance_SameResults_Invalid() throws Exception {
+		expectedException.expect(AssertionError.class);
+		expectedException.expectMessage(containsString("(pre-condition)"));
 		new TargetClass().method(0);
 	}
 
-	//	@Test(expected = UsageError.class)
-	//	public void multipleInheritance_DifferentResults() throws Exception {
-	//		new TargetClass().method(1);
-	//	}
+	@Test
+	public void multipleInheritance_DifferentResults() throws Exception {
+		expectedException.expect(AssertionError.class);
+		expectedException.expectMessage(containsString("Invalid multiple inheritance"));
+		new TargetClass().method(1);
+	}
 
 	public static class TargetClass implements FirstInterface, SecondInterface {
 		@Override

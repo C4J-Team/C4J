@@ -1,6 +1,9 @@
 package de.vksi.c4j.internal.transformer;
 
+import static de.vksi.c4j.internal.ContractErrorHandler.ContractErrorSource.PRE_CONDITION;
+
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javassist.CannotCompileException;
@@ -9,6 +12,7 @@ import javassist.CtClass;
 import javassist.CtConstructor;
 import javassist.CtMethod;
 import javassist.NotFoundException;
+import de.vksi.c4j.internal.ContractErrorHandler;
 import de.vksi.c4j.internal.ContractErrorHandler.ContractErrorSource;
 import de.vksi.c4j.internal.RootTransformer;
 import de.vksi.c4j.internal.compiler.EmptyExp;
@@ -127,10 +131,38 @@ public abstract class PreAndPostConditionTransformer extends ConditionTransforme
 		getCatchExceptionCall().insertCatch(rootTransformer.getPool().get(Throwable.class.getName()), affectedBehavior);
 		getConditionCall(getPostConditions(contractList), affectedClass, affectedBehavior,
 				beforePostConditionCallProvider).insertFinally(affectedBehavior);
-		getConditionCall(getPreConditions(contractList), affectedClass, affectedBehavior,
-				beforePreConditionCallProvider).insertBefore(affectedBehavior);
+		getPreConditionCall(getPreConditions(contractList), affectedClass, affectedBehavior).insertBefore(
+				affectedBehavior);
 
 		insertInitializersForConstructor(contractList, affectedClass, affectedBehavior);
+	}
+
+	private StandaloneExp getPreConditionCall(List<CtMethod> preConditions, CtClass affectedClass,
+			CtBehavior affectedBehavior) throws NotFoundException {
+		StandaloneExp conditionCalls = new EmptyExp();
+		for (Iterator<CtMethod> iterator = preConditions.iterator(); iterator.hasNext();) {
+			CtMethod preCondition = iterator.next();
+			conditionCalls = conditionCalls.append(getPreConditionCall(affectedClass, affectedBehavior, preCondition,
+					!iterator.hasNext()));
+		}
+		if (conditionCalls.isEmpty()) {
+			return conditionCalls;
+		}
+		TryExp tryConditionCalls = new TryExp(conditionCalls);
+		tryConditionCalls.addFinally(getAfterContractCall());
+		return beforePreConditionCallProvider.getCanExecuteConditionCall(tryConditionCalls);
+	}
+
+	private StandaloneExp getPreConditionCall(CtClass affectedClass, CtBehavior affectedBehavior,
+			CtBehavior contractBehavior, boolean lastCall) throws NotFoundException {
+		StaticCallExp successCall = new StaticCallExp(ContractErrorHandler.handlePreConditionSuccess, new ValueExp(
+				PRE_CONDITION), new ValueExp(affectedClass));
+		TryExp tryPreCondition = new TryExp(getSingleConditionCall(affectedClass, affectedBehavior,
+				beforePreConditionCallProvider, contractBehavior).append(successCall));
+		tryPreCondition.addCatch(Throwable.class, new StaticCallExp(ContractErrorHandler.handlePreConditionException,
+				new ValueExp(PRE_CONDITION), tryPreCondition.getCatchClauseVar(1), new ValueExp(affectedClass),
+				new ValueExp(lastCall)).toStandalone());
+		return tryPreCondition;
 	}
 
 	private void insertInitializersForConstructor(List<ContractMethod> contractList, CtClass affectedClass,

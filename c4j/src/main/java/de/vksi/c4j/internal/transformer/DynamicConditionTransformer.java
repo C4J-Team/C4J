@@ -21,10 +21,18 @@ import de.vksi.c4j.internal.util.ListOrderedSet;
  * Transforming a method to look like the following block-comment: <code>
 	if (canExecuteCondition()) {
 		try {
-			preForContract1();
-			preForContract2();
-		} catch (Throwable e) {
-			handleContractException(e);
+			try {
+				preContract1();
+				handlePreConditionSuccess();
+			} catch (Throwable e) {
+				handlePreConditionException(e);
+			}
+			try {
+				preContract2();
+				handlePreConditionSuccess();
+			} catch (Throwable e) {
+				handlePreConditionException(e);
+			}
 		} finally {
 			afterContract();
 		}
