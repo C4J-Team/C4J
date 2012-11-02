@@ -30,7 +30,7 @@ public class PureTransformer extends AbstractAffectedClassTransformer {
 	public void transform(ListOrderedSet<CtClass> involvedClasses, ListOrderedSet<ContractInfo> contracts,
 			CtClass affectedClass, Map<CtBehavior, List<ContractMethod>> contractMap) throws Exception {
 		for (CtBehavior affectedBehavior : reflectionHelper.getDeclaredBehaviors(affectedClass, MODIFIABLE)) {
-			normalizePure(involvedClasses, contracts, affectedBehavior);
+			normalizePure(affectedClass, involvedClasses, contracts, affectedBehavior);
 			applyPure(affectedClass, affectedBehavior, contracts);
 		}
 	}
@@ -47,8 +47,8 @@ public class PureTransformer extends AbstractAffectedClassTransformer {
 		}
 	}
 
-	private void normalizePure(ListOrderedSet<CtClass> involvedClasses, ListOrderedSet<ContractInfo> contracts,
-			CtBehavior behavior) throws NotFoundException {
+	private void normalizePure(CtClass affectedClass, ListOrderedSet<CtClass> involvedClasses,
+			ListOrderedSet<ContractInfo> contracts, CtBehavior behavior) throws NotFoundException {
 		if (behavior instanceof CtConstructor) {
 			return;
 		}

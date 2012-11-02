@@ -1,9 +1,11 @@
 package de.vksi.c4j.systemtest.contractclassmagic;
 
 import static de.vksi.c4j.Condition.postCondition;
+import static org.hamcrest.Matchers.containsString;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import de.vksi.c4j.ContractReference;
 import de.vksi.c4j.Pure;
@@ -13,6 +15,9 @@ import de.vksi.c4j.systemtest.TransformerAwareRule;
 public class RecursiveSystemTest {
 	@Rule
 	public TransformerAwareRule transformerAware = new TransformerAwareRule();
+
+	@Rule
+	public ExpectedException expectedException = ExpectedException.none();
 
 	@Test
 	public void testCorrectEquals() {
@@ -42,9 +47,11 @@ public class RecursiveSystemTest {
 		}
 	}
 
-	@Test(expected = AssertionError.class)
+	@Test
 	public void testUnreflexiveEquals() {
 		TargetClassWithUnreflexiveEquals target = new TargetClassWithUnreflexiveEquals();
+		expectedException.expect(AssertionError.class);
+		expectedException.expectMessage(containsString("is reflexive"));
 		target.equals(target);
 	}
 
@@ -70,8 +77,10 @@ public class RecursiveSystemTest {
 		}
 	}
 
-	@Test(expected = AssertionError.class)
+	@Test
 	public void testUnsymmetricEquals() {
+		expectedException.expect(AssertionError.class);
+		expectedException.expectMessage(containsString("is symmetric"));
 		new TargetClassWithUnsymmetricEquals(3).equals(new TargetClassWithUnsymmetricEquals(4));
 	}
 
@@ -85,7 +94,7 @@ public class RecursiveSystemTest {
 
 		@Override
 		public boolean equals(Object obj) {
-			if (!(obj instanceof TargetClassWithUnreflexiveEquals)) {
+			if (!(obj instanceof TargetClassWithUnsymmetricEquals)) {
 				return false;
 			}
 			return this.value >= ((TargetClassWithUnsymmetricEquals) obj).value;

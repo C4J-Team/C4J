@@ -38,7 +38,9 @@ public class PureInspector {
 			CtMethod method) {
 		for (CtClass involvedClass : involvedClasses) {
 			CtMethod involvedMethod = getInvolvedMethod(method, involvedClass);
-			if (involvedMethod != null && involvedMethod.hasAnnotation(Pure.class)) {
+			if (involvedMethod != null
+					&& (involvedMethod.hasAnnotation(Pure.class) || rootTransformer.getXmlConfiguration()
+							.getConfiguration(method.getDeclaringClass()).getWhitelistMethods().contains(method))) {
 				return involvedMethod;
 			}
 		}
