@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import de.vksi.c4j.ClassInvariant;
 import de.vksi.c4j.ContractReference;
+import de.vksi.c4j.systemtest.TestUtil;
 import de.vksi.c4j.systemtest.TransformerAwareRule;
 
 public class MaxTimeSystemTest {
@@ -28,7 +29,7 @@ public class MaxTimeSystemTest {
 	public static class TargetClass {
 		public void sleep(long milliSeconds) throws InterruptedException {
 			if (milliSeconds > 0) {
-				Thread.sleep(milliSeconds);
+				TestUtil.waitAtLeast((double) milliSeconds / 1000);
 			}
 		}
 	}
