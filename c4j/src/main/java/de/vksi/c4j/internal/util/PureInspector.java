@@ -33,9 +33,10 @@ public class PureInspector {
 	private UnpureBehaviorExpressionEditor unpureBehaviorExpressionEditor = new UnpureBehaviorExpressionEditor();
 	private AffectedBehaviorLocator affectedBehaviorLocator = new AffectedBehaviorLocator();
 	private ArrayAccessEditor arrayAccessEditor = new ArrayAccessEditor();
+	private ReflectionHelper reflectionHelper = new ReflectionHelper();
 
 	public CtMethod getPureOrigin(ListOrderedSet<CtClass> involvedClasses, ListOrderedSet<ContractInfo> contracts,
-			CtMethod method) {
+			CtMethod method) throws NotFoundException {
 		for (CtClass involvedClass : involvedClasses) {
 			CtMethod involvedMethod = getInvolvedMethod(method, involvedClass);
 			if (involvedMethod != null
@@ -53,12 +54,9 @@ public class PureInspector {
 		return null;
 	}
 
-	private CtMethod getInvolvedMethod(CtMethod affectedBehavior, CtClass involvedClass) {
-		try {
-			return involvedClass.getDeclaredMethod(affectedBehavior.getName(), affectedBehavior.getParameterTypes());
-		} catch (NotFoundException e) {
-			return null;
-		}
+	private CtMethod getInvolvedMethod(CtMethod affectedBehavior, CtClass involvedClass) throws NotFoundException {
+		return reflectionHelper.getDeclaredMethod(involvedClass, affectedBehavior.getName(), affectedBehavior
+				.getParameterTypes());
 	}
 
 	public void verify(CtMethod affectedBehavior, boolean allowOwnStateChange) throws CannotCompileException,

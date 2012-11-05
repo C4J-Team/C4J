@@ -1,5 +1,6 @@
 package de.vksi.c4j.internal.util;
 
+import static de.vksi.c4j.internal.transformer.ContractBehaviorTransformer.CONSTRUCTOR_REPLACEMENT_NAME;
 import javassist.CannotCompileException;
 import javassist.CtBehavior;
 import javassist.CtClass;
@@ -14,7 +15,6 @@ import org.apache.log4j.Logger;
 import de.vksi.c4j.ClassInvariant;
 import de.vksi.c4j.InitializeContract;
 import de.vksi.c4j.internal.RootTransformer;
-import de.vksi.c4j.internal.transformer.ContractBehaviorTransformer;
 import de.vksi.c4j.internal.transformer.ContractExpressionTransformer;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
 
@@ -23,13 +23,9 @@ public class AffectedBehaviorLocator {
 	private InvolvedTypeInspector involvedTypeInspector = new InvolvedTypeInspector();
 	private Logger logger = Logger.getLogger(getClass());
 
-	public CtMethod getContractMethod(ContractInfo contract, CtMethod affectedMethod) {
-		try {
-			return contract.getContractClass().getDeclaredMethod(affectedMethod.getName(),
-					affectedMethod.getParameterTypes());
-		} catch (NotFoundException e) {
-			return null;
-		}
+	public CtMethod getContractMethod(ContractInfo contract, CtMethod affectedMethod) throws NotFoundException {
+		return reflectionHelper.getDeclaredMethod(contract.getContractClass(), affectedMethod.getName(), affectedMethod
+				.getParameterTypes());
 	}
 
 	public CtBehavior getAffectedBehavior(ContractInfo contractInfo, CtClass affectedClass, CtBehavior contractBehavior)
@@ -59,15 +55,7 @@ public class AffectedBehaviorLocator {
 	CtMethod getAffectedMethod(ContractInfo contractInfo, CtClass affectedClass, CtBehavior contractBehavior)
 			throws NotFoundException, CannotCompileException {
 		CtClass currentClass = affectedClass;
-		CtMethod affectedMethod = null;
-		while (affectedMethod == null && currentClass != null) {
-			try {
-				affectedMethod = currentClass.getDeclaredMethod(contractBehavior.getName(), contractBehavior
-						.getParameterTypes());
-			} catch (NotFoundException e) {
-			}
-			currentClass = currentClass.getSuperclass();
-		}
+		CtMethod affectedMethod = getAffectedMethodFromExtendedClasses(contractBehavior, currentClass);
 		if (affectedMethod == null) {
 			logger.warn("could not find a matching method in affected class " + affectedClass.getName()
 					+ " for method '" + contractBehavior.getName() + "' in contract class "
@@ -96,21 +84,33 @@ public class AffectedBehaviorLocator {
 		return affectedMethod;
 	}
 
+	private CtMethod getAffectedMethodFromExtendedClasses(CtBehavior contractBehavior, CtClass currentClass)
+			throws NotFoundException {
+		while (currentClass != null) {
+			CtMethod method = reflectionHelper.getDeclaredMethod(currentClass, contractBehavior.getName(),
+					contractBehavior.getParameterTypes());
+			if (method != null) {
+				return method;
+			}
+			currentClass = currentClass.getSuperclass();
+		}
+		return null;
+	}
+
 	private boolean hasContract(CtClass clazz, ContractInfo contractInfo) throws NotFoundException {
 		ListOrderedSet<CtClass> involvedTypes = involvedTypeInspector.inspect(clazz);
 		ListOrderedSet<ContractInfo> contracts = RootTransformer.INSTANCE.getContractsForTypes(involvedTypes, clazz);
 		return contracts.contains(contractInfo);
 	}
 
-	CtConstructor getAffectedConstructor(ContractInfo contractInfo, CtClass affectedClass, CtBehavior contractBehavior) {
+	CtConstructor getAffectedConstructor(ContractInfo contractInfo, CtClass affectedClass, CtBehavior contractBehavior)
+			throws NotFoundException {
 		if (contractInfo.getTargetClass().isInterface()) {
 			return null;
 		}
-		CtConstructor affectedConstructor;
-		try {
-			affectedConstructor = affectedClass.getDeclaredConstructor(getConstructorParameterTypes(affectedClass,
-					contractBehavior));
-		} catch (NotFoundException e) {
+		CtConstructor affectedConstructor = reflectionHelper.getDeclaredConstructor(affectedClass,
+				getConstructorParameterTypes(affectedClass, contractBehavior));
+		if (affectedConstructor == null) {
 			logger.warn("could not find a matching constructor in affected class " + affectedClass.getName()
 					+ " for constructor " + contractBehavior.getLongName());
 			return null;
@@ -118,13 +118,11 @@ public class AffectedBehaviorLocator {
 		if (contractBehavior instanceof CtMethod) {
 			return affectedConstructor;
 		}
-		try {
-			contractInfo.getContractClass().getDeclaredMethod(ContractBehaviorTransformer.CONSTRUCTOR_REPLACEMENT_NAME,
-					contractBehavior.getParameterTypes());
+		if (reflectionHelper.getDeclaredMethod(contractInfo.getContractClass(), CONSTRUCTOR_REPLACEMENT_NAME,
+				contractBehavior.getParameterTypes()) != null) {
 			return null;
-		} catch (NotFoundException e) {
-			return affectedConstructor;
 		}
+		return affectedConstructor;
 	}
 
 	private CtClass[] getConstructorParameterTypes(CtClass affectedClass, CtBehavior contractBehavior)

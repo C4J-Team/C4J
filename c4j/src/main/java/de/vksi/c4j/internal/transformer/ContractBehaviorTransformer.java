@@ -38,9 +38,8 @@ public class ContractBehaviorTransformer extends AbstractContractClassTransforme
 	private void checkMatchingStaticMethods(ContractInfo contractInfo) {
 		for (CtMethod contractMethod : reflectionHelper.getDeclaredMethods(contractInfo.getContractClass(),
 				BehaviorFilter.STATIC, BehaviorFilter.VISIBLE)) {
-			try {
-				contractInfo.getTargetClass().getMethod(contractMethod.getName(), contractMethod.getSignature());
-			} catch (NotFoundException e) {
+			if (reflectionHelper.getMethod(contractInfo.getTargetClass(), contractMethod.getName(), contractMethod
+					.getSignature()) == null) {
 				contractInfo.addError(new UsageError("Couldn't find matching target method for static contract method "
 						+ contractMethod.getLongName() + "."));
 			}
@@ -110,11 +109,6 @@ public class ContractBehaviorTransformer extends AbstractContractClassTransforme
 	}
 
 	private boolean hasField(CtClass contractClass, CtField superclassField) throws NotFoundException {
-		try {
-			contractClass.getField(superclassField.getName());
-			return true;
-		} catch (NotFoundException e) {
-			return false;
-		}
+		return reflectionHelper.getField(contractClass, superclassField.getName()) != null;
 	}
 }

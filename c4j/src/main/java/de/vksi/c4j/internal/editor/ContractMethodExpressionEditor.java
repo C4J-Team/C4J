@@ -37,6 +37,7 @@ import de.vksi.c4j.internal.evaluator.UnchangedCache;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
 import de.vksi.c4j.internal.util.InvolvedTypeInspector;
 import de.vksi.c4j.internal.util.ListOrderedSet;
+import de.vksi.c4j.internal.util.ReflectionHelper;
 import de.vksi.c4j.internal.util.Stackalyzer;
 
 public class ContractMethodExpressionEditor extends ExprEditor {
@@ -52,6 +53,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 	private boolean preConditionAvailable;
 	private boolean postConditionAvailable;
 	private boolean containsUnchanged;
+	private ReflectionHelper reflectionHelper = new ReflectionHelper();
 
 	public boolean isPostConditionAvailable() {
 		return postConditionAvailable;
@@ -89,16 +91,11 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		if (!fieldAccess.isStatic() || !fieldAccess.getClassName().equals(contract.getContractClass().getName())) {
 			return;
 		}
-		try {
-			contract.getContractClass().getField(fieldAccess.getFieldName());
-			// field was overridden explicitly in contract class
+		if (reflectionHelper.getField(contract.getContractClass(), fieldAccess.getFieldName()) != null) {
 			return;
-		} catch (NotFoundException e) {
 		}
-		CtField targetField;
-		try {
-			targetField = contract.getTargetClass().getField(fieldAccess.getFieldName());
-		} catch (NotFoundException e) {
+		CtField targetField = reflectionHelper.getField(contract.getTargetClass(), fieldAccess.getFieldName());
+		if (targetField == null) {
 			return;
 		}
 		if (fieldAccess.isReader()) {
@@ -152,10 +149,9 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		if (!methodCall.getClassName().equals(contract.getContractClass().getName())) {
 			return false;
 		}
-		CtMethod targetMethod;
-		try {
-			targetMethod = contract.getTargetClass().getMethod(methodCall.getMethodName(), methodCall.getSignature());
-		} catch (NotFoundException e) {
+		CtMethod targetMethod = reflectionHelper.getMethod(contract.getTargetClass(), methodCall.getMethodName(),
+				methodCall.getSignature());
+		if (targetMethod == null) {
 			return false;
 		}
 		if (!Modifier.isStatic(targetMethod.getModifiers())) {
@@ -190,11 +186,9 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 			ListOrderedSet<CtClass> involvedTypes) throws NotFoundException, CannotCompileException {
 		involvedTypes.remove(contract.getTargetClass());
 		for (CtClass involvedType : involvedTypes) {
-			try {
-				involvedType.getDeclaredMethod(method.getName(), method.getParameterTypes());
+			if (reflectionHelper.getDeclaredMethod(involvedType, method.getName(), method.getParameterTypes()) != null) {
 				preConditionStrengthening(methodCall, method, involvedType);
 				return;
-			} catch (NotFoundException e) {
 			}
 		}
 		preConditionAvailable = true;
@@ -206,18 +200,17 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 				.getTargetClass());
 		contracts.remove(contract);
 		for (ContractInfo otherContract : contracts) {
-			try {
-				otherContract.getTargetClass().getDeclaredMethod(method.getName(), method.getParameterTypes());
+			if (reflectionHelper.getDeclaredMethod(otherContract.getTargetClass(), method.getName(), method
+					.getParameterTypes()) != null) {
 				preConditionStrengthening(methodCall, method, otherContract.getContractClass());
 				return;
-			} catch (NotFoundException e) {
 			}
 		}
 		preConditionAvailable = true;
 	}
 
 	private void preConditionStrengthening(MethodCall methodCall, CtBehavior method, CtClass definingClass)
-			throws CannotCompileException, NotFoundException {
+			throws CannotCompileException {
 		logger.error(("Found strengthening pre-condition in " + method.getLongName()
 				+ " which is already defined from " + definingClass.getName())
 				+ " - ignoring the pre-condition.");

@@ -107,4 +107,36 @@ public class ReflectionHelper {
 		// for classes in the default package
 		return clazz.getName().substring(clazz.getName().lastIndexOf('.') + 1);
 	}
+
+	public CtConstructor getDeclaredConstructor(CtClass clazz, CtClass... parameters) {
+		try {
+			return clazz.getDeclaredConstructor(parameters);
+		} catch (NotFoundException e) {
+			return null;
+		}
+	}
+
+	public CtMethod getDeclaredMethod(CtClass clazz, String methodName, CtClass... parameters) {
+		try {
+			return clazz.getDeclaredMethod(methodName, parameters);
+		} catch (NotFoundException e) {
+			return null;
+		}
+	}
+
+	public CtMethod getMethod(CtClass clazz, String methodName, String signature) {
+		try {
+			return clazz.getMethod(methodName, signature);
+		} catch (NotFoundException e) {
+			return null;
+		}
+	}
+
+	public CtField getField(CtClass clazz, String fieldName) {
+		try {
+			return clazz.getField(fieldName);
+		} catch (NotFoundException e) {
+			return null;
+		}
+	}
 }
