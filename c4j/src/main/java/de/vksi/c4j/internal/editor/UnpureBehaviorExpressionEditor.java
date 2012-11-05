@@ -1,5 +1,6 @@
 package de.vksi.c4j.internal.editor;
 
+import static de.vksi.c4j.internal.util.ReflectionHelper.isClassInitializer;
 import javassist.CannotCompileException;
 import javassist.NotFoundException;
 import javassist.expr.ExprEditor;
@@ -9,11 +10,8 @@ import de.vksi.c4j.internal.compiler.NestedExp;
 import de.vksi.c4j.internal.compiler.StandaloneExp;
 import de.vksi.c4j.internal.compiler.StaticCallExp;
 import de.vksi.c4j.internal.evaluator.PureEvaluator;
-import de.vksi.c4j.internal.util.ReflectionHelper;
 
 public class UnpureBehaviorExpressionEditor extends ExprEditor {
-	private ReflectionHelper reflectionHelper = new ReflectionHelper();
-
 	@Override
 	public void edit(FieldAccess fieldAccess) throws CannotCompileException {
 		try {
@@ -32,8 +30,7 @@ public class UnpureBehaviorExpressionEditor extends ExprEditor {
 			return;
 		}
 		// class initializers may initialize their own fields
-		if (fieldAccess.isStatic() && reflectionHelper.isClassInitializer(fieldAccess.where())
-				&& isOwnFieldAccess(fieldAccess)) {
+		if (fieldAccess.isStatic() && isClassInitializer(fieldAccess.where()) && isOwnFieldAccess(fieldAccess)) {
 			return;
 		}
 		if (fieldAccess.getField().hasAnnotation(AllowPureAccess.class)) {

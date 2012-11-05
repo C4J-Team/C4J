@@ -1,5 +1,7 @@
 package de.vksi.c4j.internal.transformer;
 
+import static de.vksi.c4j.internal.util.TransformationHelper.addClassAnnotation;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,11 +20,9 @@ import de.vksi.c4j.internal.util.AffectedBehaviorLocator;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractMethod;
 import de.vksi.c4j.internal.util.ListOrderedSet;
-import de.vksi.c4j.internal.util.TransformationHelper;
 
 public class AffectedClassTransformer {
 	private Logger logger = Logger.getLogger(getClass());
-	private TransformationHelper transformationHelper = new TransformationHelper();
 	private AffectedBehaviorLocator affectedBehaviorLocator = new AffectedBehaviorLocator();
 	private AbstractAffectedClassTransformer[] transformers = new AbstractAffectedClassTransformer[] {
 			// beware: PureTransformer has to run first!
@@ -39,8 +39,7 @@ public class AffectedClassTransformer {
 		for (AbstractAffectedClassTransformer transformer : transformers) {
 			transformer.transform(involvedClasses, contracts, affectedClass, contractMap);
 		}
-		transformationHelper.addClassAnnotation(affectedClass, RootTransformer.INSTANCE.getPool().get(
-				Transformed.class.getName()));
+		addClassAnnotation(affectedClass, RootTransformer.INSTANCE.getPool().get(Transformed.class.getName()));
 	}
 
 	protected Map<CtBehavior, List<ContractMethod>> getContractMap(ListOrderedSet<ContractInfo> contracts,

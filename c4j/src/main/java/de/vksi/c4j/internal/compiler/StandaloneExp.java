@@ -1,5 +1,6 @@
 package de.vksi.c4j.internal.compiler;
 
+import static de.vksi.c4j.internal.util.ReflectionHelper.isInitializer;
 import javassist.CannotCompileException;
 import javassist.CtBehavior;
 import javassist.CtClass;
@@ -8,15 +9,11 @@ import javassist.expr.Expr;
 
 import org.apache.log4j.Logger;
 
-import de.vksi.c4j.internal.util.ReflectionHelper;
-
 public abstract class StandaloneExp extends Exp {
 
 	public static final StandaloneExp PROCEED_AND_ASSIGN = CodeStandaloneExp.fromNested("$_ = $proceed($$)");
 
 	private static final Logger logger = Logger.getLogger(StandaloneExp.class);
-
-	private ReflectionHelper reflectionHelper = new ReflectionHelper();
 
 	public StandaloneExp append(StandaloneExp other) {
 		return CodeStandaloneExp.fromStandalone(getCode() + other.getCode(), isEmpty() && other.isEmpty());
@@ -36,7 +33,7 @@ public abstract class StandaloneExp extends Exp {
 		if (logger.isTraceEnabled()) {
 			logger.trace("insert before " + behavior.getLongName() + ": " + this);
 		}
-		if (reflectionHelper.isInitializer(behavior)) {
+		if (isInitializer(behavior)) {
 			((CtConstructor) behavior).insertBeforeBody(getInsertCode(getCode()));
 		} else {
 			behavior.insertBefore(getInsertCode(getCode()));

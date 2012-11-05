@@ -1,5 +1,8 @@
 package de.vksi.c4j.internal.transformer;
 
+import static de.vksi.c4j.internal.util.ReflectionHelper.getDeclaredMethods;
+import static de.vksi.c4j.internal.util.ReflectionHelper.getField;
+import static de.vksi.c4j.internal.util.ReflectionHelper.getMethod;
 import javassist.CannotCompileException;
 import javassist.CtBehavior;
 import javassist.CtClass;
@@ -14,13 +17,10 @@ import de.vksi.c4j.UsageError;
 import de.vksi.c4j.internal.compiler.NestedExp;
 import de.vksi.c4j.internal.util.BehaviorFilter;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
-import de.vksi.c4j.internal.util.ReflectionHelper;
 
 public class ContractBehaviorTransformer extends AbstractContractClassTransformer {
 	public static final String CONSTRUCTOR_REPLACEMENT_NAME = "constructor$";
 	public static final String CLASS_INITIALIZER_REPLACEMENT_NAME = "classInitializer$";
-
-	private ReflectionHelper reflectionHelper = new ReflectionHelper();
 
 	@Override
 	public void transform(ContractInfo contractInfo, CtClass contractClass) throws Exception {
@@ -36,10 +36,9 @@ public class ContractBehaviorTransformer extends AbstractContractClassTransforme
 	}
 
 	private void checkMatchingStaticMethods(ContractInfo contractInfo) {
-		for (CtMethod contractMethod : reflectionHelper.getDeclaredMethods(contractInfo.getContractClass(),
-				BehaviorFilter.STATIC, BehaviorFilter.VISIBLE)) {
-			if (reflectionHelper.getMethod(contractInfo.getTargetClass(), contractMethod.getName(), contractMethod
-					.getSignature()) == null) {
+		for (CtMethod contractMethod : getDeclaredMethods(contractInfo.getContractClass(), BehaviorFilter.STATIC,
+				BehaviorFilter.VISIBLE)) {
+			if (getMethod(contractInfo.getTargetClass(), contractMethod.getName(), contractMethod.getSignature()) == null) {
 				contractInfo.addError(new UsageError("Couldn't find matching target method for static contract method "
 						+ contractMethod.getLongName() + "."));
 			}
@@ -109,6 +108,6 @@ public class ContractBehaviorTransformer extends AbstractContractClassTransforme
 	}
 
 	private boolean hasField(CtClass contractClass, CtField superclassField) throws NotFoundException {
-		return reflectionHelper.getField(contractClass, superclassField.getName()) != null;
+		return getField(contractClass, superclassField.getName()) != null;
 	}
 }

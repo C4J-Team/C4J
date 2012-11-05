@@ -1,5 +1,7 @@
 package de.vksi.c4j.internal;
 
+import static de.vksi.c4j.internal.util.CollectionsHelper.arrayContains;
+
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
@@ -21,7 +23,6 @@ import de.vksi.c4j.ContractReference;
 import de.vksi.c4j.internal.transformer.AffectedClassTransformer;
 import de.vksi.c4j.internal.transformer.ContractClassTransformer;
 import de.vksi.c4j.internal.util.BackdoorAnnotationLoader;
-import de.vksi.c4j.internal.util.CollectionsHelper;
 import de.vksi.c4j.internal.util.ContractRegistry;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
 import de.vksi.c4j.internal.util.InvolvedTypeInspector;
@@ -39,7 +40,6 @@ public class RootTransformer {
 	ContractClassTransformer contractClassTransformer;
 
 	private InvolvedTypeInspector involvedTypeInspector = new InvolvedTypeInspector();
-	private CollectionsHelper collectionsHelper = new CollectionsHelper();
 
 	private XmlConfigurationManager xmlConfiguration;
 	private Set<ClassLoader> classLoaders = new HashSet<ClassLoader>();
@@ -180,7 +180,7 @@ public class RootTransformer {
 	private void warnContractNotInheritingFromTarget(CtClass targetClass, CtClass contractClass)
 			throws NotFoundException {
 		if (targetClass.isInterface()) {
-			if (!collectionsHelper.arrayContains(contractClass.getInterfaces(), targetClass)) {
+			if (!arrayContains(contractClass.getInterfaces(), targetClass)) {
 				logWarnContractNotInheritingFromTarget(targetClass, contractClass);
 			}
 		} else {

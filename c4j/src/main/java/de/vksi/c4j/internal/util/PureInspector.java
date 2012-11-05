@@ -1,5 +1,7 @@
 package de.vksi.c4j.internal.util;
 
+import static de.vksi.c4j.internal.util.ReflectionHelper.getDeclaredMethod;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -33,7 +35,6 @@ public class PureInspector {
 	private UnpureBehaviorExpressionEditor unpureBehaviorExpressionEditor = new UnpureBehaviorExpressionEditor();
 	private AffectedBehaviorLocator affectedBehaviorLocator = new AffectedBehaviorLocator();
 	private ArrayAccessEditor arrayAccessEditor = new ArrayAccessEditor();
-	private ReflectionHelper reflectionHelper = new ReflectionHelper();
 
 	public CtMethod getPureOrigin(ListOrderedSet<CtClass> involvedClasses, ListOrderedSet<ContractInfo> contracts,
 			CtMethod method) throws NotFoundException {
@@ -55,8 +56,7 @@ public class PureInspector {
 	}
 
 	private CtMethod getInvolvedMethod(CtMethod affectedBehavior, CtClass involvedClass) throws NotFoundException {
-		return reflectionHelper.getDeclaredMethod(involvedClass, affectedBehavior.getName(), affectedBehavior
-				.getParameterTypes());
+		return getDeclaredMethod(involvedClass, affectedBehavior.getName(), affectedBehavior.getParameterTypes());
 	}
 
 	public void verify(CtMethod affectedBehavior, boolean allowOwnStateChange) throws CannotCompileException,

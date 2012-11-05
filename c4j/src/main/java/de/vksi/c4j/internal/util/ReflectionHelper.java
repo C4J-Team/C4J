@@ -15,7 +15,7 @@ import javassist.bytecode.MethodInfo;
 import de.vksi.c4j.internal.transformer.ContractBehaviorTransformer;
 
 public class ReflectionHelper {
-	private <T extends CtBehavior> List<T> filterBehaviors(T[] behaviors, BehaviorFilter... filters) {
+	private static <T extends CtBehavior> List<T> filterBehaviors(T[] behaviors, BehaviorFilter... filters) {
 		List<T> filteredList = new ArrayList<T>(behaviors.length);
 		behaviorLoop: for (T behavior : behaviors) {
 			for (BehaviorFilter filter : filters) {
@@ -28,11 +28,11 @@ public class ReflectionHelper {
 		return filteredList;
 	}
 
-	public List<CtMethod> getDeclaredMethods(CtClass clazz, BehaviorFilter... filters) {
+	public static List<CtMethod> getDeclaredMethods(CtClass clazz, BehaviorFilter... filters) {
 		return filterBehaviors(clazz.getDeclaredMethods(), filters);
 	}
 
-	public List<CtBehavior> getDeclaredBehaviors(CtClass clazz, BehaviorFilter... filters) {
+	public static List<CtBehavior> getDeclaredBehaviors(CtClass clazz, BehaviorFilter... filters) {
 		return filterBehaviors(clazz.getDeclaredBehaviors(), filters);
 	}
 
@@ -48,29 +48,29 @@ public class ReflectionHelper {
 		return Modifier.isPrivate(behavior.getModifiers());
 	}
 
-	public boolean constructorHasAdditionalParameter(CtClass affectedClass) throws NotFoundException {
+	public static boolean constructorHasAdditionalParameter(CtClass affectedClass) throws NotFoundException {
 		return affectedClass.getDeclaringClass() != null && !Modifier.isStatic(affectedClass.getModifiers());
 	}
 
-	public boolean isContractConstructor(CtBehavior contractBehavior) {
+	public static boolean isContractConstructor(CtBehavior contractBehavior) {
 		return isInitializer(contractBehavior)
 				|| contractBehavior.getName().equals(ContractBehaviorTransformer.CONSTRUCTOR_REPLACEMENT_NAME);
 	}
 
-	public boolean isInitializer(CtBehavior behavior) {
+	public static boolean isInitializer(CtBehavior behavior) {
 		return (behavior instanceof CtConstructor && !((CtConstructor) behavior).isClassInitializer());
 	}
 
-	public boolean isContractClassInitializer(CtBehavior contractBehavior) {
+	public static boolean isContractClassInitializer(CtBehavior contractBehavior) {
 		return isClassInitializer(contractBehavior)
 				|| contractBehavior.getName().equals(ContractBehaviorTransformer.CLASS_INITIALIZER_REPLACEMENT_NAME);
 	}
 
-	public boolean isClassInitializer(CtBehavior behavior) {
+	public static boolean isClassInitializer(CtBehavior behavior) {
 		return (behavior instanceof CtConstructor && ((CtConstructor) behavior).isClassInitializer());
 	}
 
-	public String getContractBehaviorName(CtBehavior contractBehavior) {
+	public static String getContractBehaviorName(CtBehavior contractBehavior) {
 		String contractBehaviorName;
 		if (isContractConstructor(contractBehavior)) {
 			contractBehaviorName = ContractBehaviorTransformer.CONSTRUCTOR_REPLACEMENT_NAME;
@@ -80,7 +80,7 @@ public class ReflectionHelper {
 		return contractBehaviorName;
 	}
 
-	public String getSimpleName(CtBehavior behavior) {
+	public static String getSimpleName(CtBehavior behavior) {
 		if (behavior instanceof CtConstructor) {
 			CtConstructor constructor = (CtConstructor) behavior;
 			return constructor.getDeclaringClass().getSimpleName()
@@ -91,7 +91,7 @@ public class ReflectionHelper {
 				+ Descriptor.toString(behavior.getSignature());
 	}
 
-	public String getSimpleName(CtField field) {
+	public static String getSimpleName(CtField field) {
 		return field.getDeclaringClass().getSimpleName() + "." + field.getName();
 	}
 
@@ -102,13 +102,13 @@ public class ReflectionHelper {
 	 * <p>
 	 * This is why we need our own alternative.
 	 */
-	public String getSimplerName(Class<?> clazz) {
+	public static String getSimplerName(Class<?> clazz) {
 		// because of lastIndexOf() returning -1 when nothing is found and the addition of 1, this even works
 		// for classes in the default package
 		return clazz.getName().substring(clazz.getName().lastIndexOf('.') + 1);
 	}
 
-	public CtConstructor getDeclaredConstructor(CtClass clazz, CtClass... parameters) {
+	public static CtConstructor getDeclaredConstructor(CtClass clazz, CtClass... parameters) {
 		try {
 			return clazz.getDeclaredConstructor(parameters);
 		} catch (NotFoundException e) {
@@ -116,7 +116,7 @@ public class ReflectionHelper {
 		}
 	}
 
-	public CtMethod getDeclaredMethod(CtClass clazz, String methodName, CtClass... parameters) {
+	public static CtMethod getDeclaredMethod(CtClass clazz, String methodName, CtClass... parameters) {
 		try {
 			return clazz.getDeclaredMethod(methodName, parameters);
 		} catch (NotFoundException e) {
@@ -124,7 +124,7 @@ public class ReflectionHelper {
 		}
 	}
 
-	public CtMethod getMethod(CtClass clazz, String methodName, String signature) {
+	public static CtMethod getMethod(CtClass clazz, String methodName, String signature) {
 		try {
 			return clazz.getMethod(methodName, signature);
 		} catch (NotFoundException e) {
@@ -132,7 +132,7 @@ public class ReflectionHelper {
 		}
 	}
 
-	public CtField getField(CtClass clazz, String fieldName) {
+	public static CtField getField(CtClass clazz, String fieldName) {
 		try {
 			return clazz.getField(fieldName);
 		} catch (NotFoundException e) {

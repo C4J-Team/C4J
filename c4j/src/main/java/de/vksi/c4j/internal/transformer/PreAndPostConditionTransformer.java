@@ -1,6 +1,7 @@
 package de.vksi.c4j.internal.transformer;
 
 import static de.vksi.c4j.internal.ContractErrorHandler.ContractErrorSource.PRE_CONDITION;
+import static de.vksi.c4j.internal.util.ReflectionHelper.getSimpleName;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -43,9 +44,9 @@ public abstract class PreAndPostConditionTransformer extends ConditionTransforme
 		@Override
 		public StaticCallExp conditionCall(CtBehavior affectedBehavior, CtBehavior contractBehavior,
 				NestedExp targetReference) throws NotFoundException {
-			return new StaticCallExp(Evaluator.getPreCondition, targetReference, new ValueExp(reflectionHelper
-					.getSimpleName(affectedBehavior)), new ValueExp(contractBehavior.getDeclaringClass()),
-					new ValueExp(affectedBehavior.getDeclaringClass()), getReturnTypeExp(contractBehavior));
+			return new StaticCallExp(Evaluator.getPreCondition, targetReference, new ValueExp(
+					getSimpleName(affectedBehavior)), new ValueExp(contractBehavior.getDeclaringClass()), new ValueExp(
+					affectedBehavior.getDeclaringClass()), getReturnTypeExp(contractBehavior));
 		}
 
 		@Override
@@ -62,9 +63,9 @@ public abstract class PreAndPostConditionTransformer extends ConditionTransforme
 		@Override
 		public StaticCallExp conditionCall(CtBehavior affectedBehavior, CtBehavior contractBehavior,
 				NestedExp targetReference) throws NotFoundException {
-			return new StaticCallExp(Evaluator.getPostCondition, targetReference, new ValueExp(reflectionHelper
-					.getSimpleName(affectedBehavior)), new ValueExp(contractBehavior.getDeclaringClass()),
-					new ValueExp(affectedBehavior.getDeclaringClass()), getReturnTypeExp(contractBehavior),
+			return new StaticCallExp(Evaluator.getPostCondition, targetReference, new ValueExp(
+					getSimpleName(affectedBehavior)), new ValueExp(contractBehavior.getDeclaringClass()), new ValueExp(
+					affectedBehavior.getDeclaringClass()), getReturnTypeExp(contractBehavior),
 					getReturnValueExp(affectedBehavior));
 		}
 
@@ -84,9 +85,9 @@ public abstract class PreAndPostConditionTransformer extends ConditionTransforme
 		@Override
 		public StaticCallExp conditionCall(CtBehavior affectedBehavior, CtBehavior contractBehavior,
 				NestedExp targetReference) throws NotFoundException {
-			return new StaticCallExp(Evaluator.getInitializationCall, targetReference, new ValueExp(reflectionHelper
-					.getSimpleName(affectedBehavior)), new ValueExp(contractBehavior.getDeclaringClass()),
-					new ValueExp(affectedBehavior.getDeclaringClass()));
+			return new StaticCallExp(Evaluator.getInitializationCall, targetReference, new ValueExp(
+					getSimpleName(affectedBehavior)), new ValueExp(contractBehavior.getDeclaringClass()), new ValueExp(
+					affectedBehavior.getDeclaringClass()));
 		}
 
 		@Override

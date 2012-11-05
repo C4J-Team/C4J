@@ -5,7 +5,7 @@ import de.vksi.c4j.internal.evaluator.MaxTimeCache;
 import de.vksi.c4j.internal.evaluator.UnchangedCache;
 
 /**
- * Provides a contract with methods, allowing the definition of pre- and post-conditions within contract-methods.
+ * Allows the definition of pre- and post-conditions within contract-methods.
  */
 public class Condition {
 	/**

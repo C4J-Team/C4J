@@ -1,5 +1,9 @@
 package de.vksi.c4j.internal.transformer;
 
+import static de.vksi.c4j.internal.util.ReflectionHelper.constructorHasAdditionalParameter;
+import static de.vksi.c4j.internal.util.ReflectionHelper.getContractBehaviorName;
+import static de.vksi.c4j.internal.util.ReflectionHelper.isContractConstructor;
+
 import java.util.List;
 
 import javassist.CtBehavior;
@@ -15,11 +19,8 @@ import de.vksi.c4j.internal.compiler.StaticCallExp;
 import de.vksi.c4j.internal.compiler.TryExp;
 import de.vksi.c4j.internal.compiler.ValueExp;
 import de.vksi.c4j.internal.evaluator.Evaluator;
-import de.vksi.c4j.internal.util.ReflectionHelper;
 
 public abstract class ConditionTransformer extends AbstractAffectedClassTransformer {
-	protected ReflectionHelper reflectionHelper = new ReflectionHelper();
-
 	protected void catchWithHandleContractException(CtClass affectedClass, TryExp contractCallExp,
 			ContractErrorSource source) {
 		contractCallExp
@@ -29,8 +30,7 @@ public abstract class ConditionTransformer extends AbstractAffectedClassTransfor
 	}
 
 	protected List<NestedExp> getArgsList(CtClass affectedClass, CtBehavior contractBehavior) throws NotFoundException {
-		if (reflectionHelper.isContractConstructor(contractBehavior)
-				&& reflectionHelper.constructorHasAdditionalParameter(affectedClass)) {
+		if (isContractConstructor(contractBehavior) && constructorHasAdditionalParameter(affectedClass)) {
 			return NestedExp.getArgsList(contractBehavior, 2);
 		}
 		return NestedExp.getArgsList(contractBehavior, 1);
@@ -58,7 +58,7 @@ public abstract class ConditionTransformer extends AbstractAffectedClassTransfor
 	protected StandaloneExp getContractCallExp(CtClass affectedClass, CtBehavior contractBehavior,
 			StaticCallExp conditionCall) throws NotFoundException {
 		CastExp getContractInstance = new CastExp(contractBehavior.getDeclaringClass(), conditionCall);
-		return getContractInstance.appendCall(reflectionHelper.getContractBehaviorName(contractBehavior),
+		return getContractInstance.appendCall(getContractBehaviorName(contractBehavior),
 				getArgsList(affectedClass, contractBehavior)).toStandalone();
 	}
 }

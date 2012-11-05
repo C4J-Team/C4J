@@ -1,5 +1,7 @@
 package de.vksi.c4j.internal.transformer;
 
+import static de.vksi.c4j.internal.util.ReflectionHelper.getSimpleName;
+
 import java.lang.ref.WeakReference;
 
 import javassist.CannotCompileException;
@@ -19,14 +21,12 @@ import de.vksi.c4j.internal.editor.TargetAccessEditor;
 import de.vksi.c4j.internal.evaluator.Evaluator;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
 import de.vksi.c4j.internal.util.Pair;
-import de.vksi.c4j.internal.util.ReflectionHelper;
 
 public class TargetTransformer extends AbstractContractClassTransformer {
 
 	public static final String TARGET_FIELD_NAME = "target$";
 	private static final String EXPECTED_TARGET_FIELD_NAME = "target";
 	private RootTransformer rootTransformer = RootTransformer.INSTANCE;
-	private ReflectionHelper reflectionHelper = new ReflectionHelper();
 
 	private static class WeakFieldMapping extends Pair<CtField, CtField> {
 		public WeakFieldMapping(CtField targetField, CtField weakField) {
@@ -41,12 +41,11 @@ public class TargetTransformer extends AbstractContractClassTransformer {
 			return;
 		}
 		if (!contractInfo.getTargetClass().subtypeOf(targetField.getFirst().getType())) {
-			logger.error("Target reference " + reflectionHelper.getSimpleName(targetField.getFirst())
-					+ " has incompatible type.");
+			logger.error("Target reference " + getSimpleName(targetField.getFirst()) + " has incompatible type.");
 			return;
 		}
 		if (!contractInfo.getTargetClass().equals(targetField.getFirst().getType())) {
-			logger.warn("Target reference " + reflectionHelper.getSimpleName(targetField.getFirst())
+			logger.warn("Target reference " + getSimpleName(targetField.getFirst())
 					+ " has weaker type than the target type would allow.");
 		}
 		TargetAccessEditor targetAccessEditor = new TargetAccessEditor(targetField);
@@ -90,8 +89,7 @@ public class TargetTransformer extends AbstractContractClassTransformer {
 					targetField = field;
 				}
 			} else if (field.getName().equals(EXPECTED_TARGET_FIELD_NAME)) {
-				logger.warn("Field " + reflectionHelper.getSimpleName(field)
-						+ " is possibly missing annotation @Target.");
+				logger.warn("Field " + getSimpleName(field) + " is possibly missing annotation @Target.");
 			}
 		}
 		return targetField;

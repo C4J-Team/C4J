@@ -1,5 +1,7 @@
 package de.vksi.c4j.internal.util;
 
+import static de.vksi.c4j.internal.util.ReflectionHelper.getContractBehaviorName;
+import static de.vksi.c4j.internal.util.ReflectionHelper.isContractConstructor;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -14,16 +16,13 @@ import org.junit.Test;
 
 import de.vksi.c4j.ClassInvariant;
 import de.vksi.c4j.internal.transformer.ContractBehaviorTransformer;
-import de.vksi.c4j.internal.util.ReflectionHelper;
 
 public class ReflectionHelperTest {
-	private ReflectionHelper helper;
 	private ClassPool pool;
 	private CtClass contractClass;
 
 	@Before
 	public void before() throws Throwable {
-		helper = new ReflectionHelper();
 		pool = ClassPool.getDefault();
 		contractClass = pool.get(ContractClass.class.getName());
 	}
@@ -43,36 +42,35 @@ public class ReflectionHelperTest {
 
 	@Test
 	public void testGetContractBehaviorNameForMethod() throws Exception {
-		assertEquals(helper.getContractBehaviorName(contractClass.getDeclaredMethod("contractMethod")),
-				"contractMethod");
+		assertEquals(getContractBehaviorName(contractClass.getDeclaredMethod("contractMethod")), "contractMethod");
 	}
 
 	@Test
 	public void testGetContractBehaviorNameForConstructor() throws Exception {
-		assertEquals(helper.getContractBehaviorName(contractClass.getDeclaredConstructor(new CtClass[0])),
+		assertEquals(getContractBehaviorName(contractClass.getDeclaredConstructor(new CtClass[0])),
 				ContractBehaviorTransformer.CONSTRUCTOR_REPLACEMENT_NAME);
 	}
 
 	@Test
 	public void testGetContractBehaviorNameForTransformedConstructor() throws Exception {
-		assertEquals(helper.getContractBehaviorName(contractClass
+		assertEquals(getContractBehaviorName(contractClass
 				.getDeclaredMethod(ContractBehaviorTransformer.CONSTRUCTOR_REPLACEMENT_NAME)),
 				ContractBehaviorTransformer.CONSTRUCTOR_REPLACEMENT_NAME);
 	}
 
 	@Test
 	public void testIsConstructorForMethod() throws Exception {
-		assertFalse(helper.isContractConstructor(contractClass.getDeclaredMethod("contractMethod")));
+		assertFalse(isContractConstructor(contractClass.getDeclaredMethod("contractMethod")));
 	}
 
 	@Test
 	public void testIsConstructorForConstructor() throws Exception {
-		assertTrue(helper.isContractConstructor(contractClass.getDeclaredConstructor(new CtClass[0])));
+		assertTrue(isContractConstructor(contractClass.getDeclaredConstructor(new CtClass[0])));
 	}
 
 	@Test
 	public void testIsConstructorForTransformedConstructor() throws Exception {
-		assertTrue(helper.isContractConstructor(contractClass
+		assertTrue(isContractConstructor(contractClass
 				.getDeclaredMethod(ContractBehaviorTransformer.CONSTRUCTOR_REPLACEMENT_NAME)));
 	}
 

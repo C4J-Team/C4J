@@ -1,5 +1,9 @@
 package de.vksi.c4j.internal.transformer;
 
+import static de.vksi.c4j.internal.util.TransformationHelper.addBehaviorAnnotation;
+import static de.vksi.c4j.internal.util.TransformationHelper.setClassIndex;
+import static de.vksi.c4j.internal.util.TransformationHelper.setMethodIndex;
+
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -24,13 +28,11 @@ import de.vksi.c4j.internal.evaluator.Evaluator;
 import de.vksi.c4j.internal.evaluator.OldCache;
 import de.vksi.c4j.internal.evaluator.PureEvaluator;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
-import de.vksi.c4j.internal.util.TransformationHelper;
 
 public class ContractExpressionTransformer extends AbstractContractClassTransformer {
 
 	public static final String BEFORE_INVARIANT_METHOD_SUFFIX = "$before";
 	private RootTransformer rootTransformer = RootTransformer.INSTANCE;
-	private TransformationHelper transformationHelper = new TransformationHelper();
 
 	@Override
 	public void transform(ContractInfo contractInfo, CtClass currentContractClass) throws Exception {
@@ -74,8 +76,7 @@ public class ContractExpressionTransformer extends AbstractContractClassTransfor
 				+ BEFORE_INVARIANT_METHOD_SUFFIX, new CtClass[0], contractMethod.getExceptionTypes(), null,
 				contractMethod.getDeclaringClass());
 		contractMethod.getDeclaringClass().addMethod(beforeInvariant);
-		transformationHelper.addBehaviorAnnotation(beforeInvariant, rootTransformer.getPool().get(
-				BeforeClassInvariant.class.getName()));
+		addBehaviorAnnotation(beforeInvariant, rootTransformer.getPool().get(BeforeClassInvariant.class.getName()));
 		insertIntoBeforeInvariant(expressionEditor, beforeInvariant, contractMethod.getDeclaringClass());
 	}
 
@@ -112,7 +113,7 @@ public class ContractExpressionTransformer extends AbstractContractClassTransfor
 		int jumpLength = ifBlockLength + 3;
 		byte[] ifBytes = new byte[6];
 		ifBytes[0] = (byte) Opcode.INVOKESTATIC;
-		transformationHelper.setMethodIndex(constPool, ifBytes, 1, Evaluator.isBefore, Evaluator.isBeforeDescriptor);
+		setMethodIndex(constPool, ifBytes, 1, Evaluator.isBefore, Evaluator.isBeforeDescriptor);
 		ifBytes[3] = (byte) Opcode.IFEQ;
 		ifBytes[4] = (byte) (jumpLength >> 8);
 		ifBytes[5] = (byte) jumpLength;
@@ -164,22 +165,22 @@ public class ContractExpressionTransformer extends AbstractContractClassTransfor
 		byte[] registerUnchangeableBytes = new byte[4];
 		registerUnchangeableBytes[0] = (byte) Opcode.DUP;
 		registerUnchangeableBytes[1] = (byte) Opcode.INVOKESTATIC;
-		transformationHelper.setMethodIndex(constPool, registerUnchangeableBytes, 2,
-				PureEvaluator.registerUnchangeable, PureEvaluator.registerUnchangeableDescriptor);
+		setMethodIndex(constPool, registerUnchangeableBytes, 2, PureEvaluator.registerUnchangeable,
+				PureEvaluator.registerUnchangeableDescriptor);
 		return registerUnchangeableBytes;
 	}
 
 	private byte[] getContractClassBytes(ConstPool constPool, CtClass contractClass) {
 		byte[] contractClassBytes = new byte[3];
 		contractClassBytes[0] = (byte) Opcode.LDC_W;
-		transformationHelper.setClassIndex(constPool, contractClassBytes, 1, contractClass);
+		setClassIndex(constPool, contractClassBytes, 1, contractClass);
 		return contractClassBytes;
 	}
 
 	private byte[] getOldStoreBytes(ConstPool constPool, StaticCall oldStoreCall) {
 		byte[] oldStoreBytes = new byte[3];
 		oldStoreBytes[0] = (byte) Opcode.INVOKESTATIC;
-		transformationHelper.setMethodIndex(constPool, oldStoreBytes, 1, oldStoreCall, OldCache.oldStoreDescriptor);
+		setMethodIndex(constPool, oldStoreBytes, 1, oldStoreCall, OldCache.oldStoreDescriptor);
 		return oldStoreBytes;
 	}
 

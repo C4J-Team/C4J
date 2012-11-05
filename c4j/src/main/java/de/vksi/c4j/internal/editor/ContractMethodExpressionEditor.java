@@ -1,5 +1,9 @@
 package de.vksi.c4j.internal.editor;
 
+import static de.vksi.c4j.internal.util.ReflectionHelper.getDeclaredMethod;
+import static de.vksi.c4j.internal.util.ReflectionHelper.getField;
+import static de.vksi.c4j.internal.util.ReflectionHelper.getMethod;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -37,7 +41,6 @@ import de.vksi.c4j.internal.evaluator.UnchangedCache;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
 import de.vksi.c4j.internal.util.InvolvedTypeInspector;
 import de.vksi.c4j.internal.util.ListOrderedSet;
-import de.vksi.c4j.internal.util.ReflectionHelper;
 import de.vksi.c4j.internal.util.Stackalyzer;
 
 public class ContractMethodExpressionEditor extends ExprEditor {
@@ -53,7 +56,6 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 	private boolean preConditionAvailable;
 	private boolean postConditionAvailable;
 	private boolean containsUnchanged;
-	private ReflectionHelper reflectionHelper = new ReflectionHelper();
 
 	public boolean isPostConditionAvailable() {
 		return postConditionAvailable;
@@ -91,10 +93,10 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		if (!fieldAccess.isStatic() || !fieldAccess.getClassName().equals(contract.getContractClass().getName())) {
 			return;
 		}
-		if (reflectionHelper.getField(contract.getContractClass(), fieldAccess.getFieldName()) != null) {
+		if (getField(contract.getContractClass(), fieldAccess.getFieldName()) != null) {
 			return;
 		}
-		CtField targetField = reflectionHelper.getField(contract.getTargetClass(), fieldAccess.getFieldName());
+		CtField targetField = getField(contract.getTargetClass(), fieldAccess.getFieldName());
 		if (targetField == null) {
 			return;
 		}
@@ -149,8 +151,8 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		if (!methodCall.getClassName().equals(contract.getContractClass().getName())) {
 			return false;
 		}
-		CtMethod targetMethod = reflectionHelper.getMethod(contract.getTargetClass(), methodCall.getMethodName(),
-				methodCall.getSignature());
+		CtMethod targetMethod = getMethod(contract.getTargetClass(), methodCall.getMethodName(), methodCall
+				.getSignature());
 		if (targetMethod == null) {
 			return false;
 		}
@@ -186,7 +188,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 			ListOrderedSet<CtClass> involvedTypes) throws NotFoundException, CannotCompileException {
 		involvedTypes.remove(contract.getTargetClass());
 		for (CtClass involvedType : involvedTypes) {
-			if (reflectionHelper.getDeclaredMethod(involvedType, method.getName(), method.getParameterTypes()) != null) {
+			if (getDeclaredMethod(involvedType, method.getName(), method.getParameterTypes()) != null) {
 				preConditionStrengthening(methodCall, method, involvedType);
 				return;
 			}
@@ -200,8 +202,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 				.getTargetClass());
 		contracts.remove(contract);
 		for (ContractInfo otherContract : contracts) {
-			if (reflectionHelper.getDeclaredMethod(otherContract.getTargetClass(), method.getName(), method
-					.getParameterTypes()) != null) {
+			if (getDeclaredMethod(otherContract.getTargetClass(), method.getName(), method.getParameterTypes()) != null) {
 				preConditionStrengthening(methodCall, method, otherContract.getContractClass());
 				return;
 			}

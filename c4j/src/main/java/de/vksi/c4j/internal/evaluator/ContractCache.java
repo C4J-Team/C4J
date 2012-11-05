@@ -10,7 +10,6 @@ public class ContractCache {
 		public ContractCacheEntry(Class<?> contractClass, Class<?> callingClass) {
 			super(contractClass, callingClass);
 		}
-
 	}
 
 	public static Object getContractFromCache(Object target, Class<?> contractClass, Class<?> callingClass)
@@ -18,14 +17,12 @@ public class ContractCache {
 		if (target == null) {
 			return null;
 		}
-		Object contract;
 		ContractCacheEntry classPair = new ContractCacheEntry(contractClass, callingClass);
 		if (contractCache.contains(target, classPair)) {
-			contract = contractCache.get(target, classPair);
-		} else {
-			contract = contractClass.newInstance();
-			contractCache.put(target, classPair, contract);
+			return contractCache.get(target, classPair);
 		}
+		Object contract = contractClass.newInstance();
+		contractCache.put(target, classPair, contract);
 		return contract;
 	}
 }

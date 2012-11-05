@@ -8,7 +8,7 @@ import javassist.bytecode.ConstPool;
 import de.vksi.c4j.internal.compiler.StaticCall;
 
 public class TransformationHelper {
-	public void addClassAnnotation(CtClass targetClass, CtClass annotationClass) throws NotFoundException {
+	public static void addClassAnnotation(CtClass targetClass, CtClass annotationClass) throws NotFoundException {
 		AnnotationsAttribute targetAttribute = (AnnotationsAttribute) targetClass.getClassFile().getAttribute(
 				AnnotationsAttribute.invisibleTag);
 		if (targetAttribute == null) {
@@ -20,7 +20,8 @@ public class TransformationHelper {
 				.getConstPool(), annotationClass));
 	}
 
-	public void addBehaviorAnnotation(CtBehavior targetBehavior, CtClass annotationClass) throws NotFoundException {
+	public static void addBehaviorAnnotation(CtBehavior targetBehavior, CtClass annotationClass)
+			throws NotFoundException {
 		AnnotationsAttribute targetAttribute = (AnnotationsAttribute) targetBehavior.getMethodInfo().getAttribute(
 				AnnotationsAttribute.invisibleTag);
 		if (targetAttribute == null) {
@@ -32,14 +33,15 @@ public class TransformationHelper {
 				.getConstPool(), annotationClass));
 	}
 
-	public void setMethodIndex(ConstPool constPool, byte[] bytes, int index, StaticCall staticCall, String descriptor) {
+	public static void setMethodIndex(ConstPool constPool, byte[] bytes, int index, StaticCall staticCall,
+			String descriptor) {
 		int classIndex = constPool.addClassInfo(staticCall.getCallClass().getName());
 		int methodInfoIndex = constPool.addMethodrefInfo(classIndex, staticCall.getCallMethod(), descriptor);
 		bytes[index] = (byte) (methodInfoIndex >>> 8);
 		bytes[index + 1] = (byte) methodInfoIndex;
 	}
 
-	public void setClassIndex(ConstPool constPool, byte[] bytes, int index, CtClass clazz) {
+	public static void setClassIndex(ConstPool constPool, byte[] bytes, int index, CtClass clazz) {
 		int classIndex = constPool.addClassInfo(clazz.getName());
 		bytes[index] = (byte) (classIndex >>> 8);
 		bytes[index + 1] = (byte) classIndex;

@@ -9,9 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * A Set containing Objects. Instead of relying on hashCode() for equality, this set relies on the == operator. It also
- * discards null values and counts, how many times an object has been added to the set. Only after it is removed the
- * same number of times it is being fully removed from this Set.
+ * A Set containing Objects. Instead of relying on hashCode() for equality, this set relies on the == operator.
  */
 public class ObjectIdentitySet implements Set<Object> {
 	private Map<Integer, List<Object>> map = new HashMap<Integer, List<Object>>();

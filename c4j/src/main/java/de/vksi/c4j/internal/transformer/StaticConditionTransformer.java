@@ -3,6 +3,7 @@ package de.vksi.c4j.internal.transformer;
 import static de.vksi.c4j.internal.util.BehaviorFilter.MODIFIABLE;
 import static de.vksi.c4j.internal.util.BehaviorFilter.STATIC;
 import static de.vksi.c4j.internal.util.BehaviorFilter.VISIBLE;
+import static de.vksi.c4j.internal.util.ReflectionHelper.getDeclaredBehaviors;
 
 import java.util.List;
 import java.util.Map;
@@ -17,7 +18,6 @@ import de.vksi.c4j.internal.compiler.StaticCallExp;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractMethod;
 import de.vksi.c4j.internal.util.ListOrderedSet;
-import de.vksi.c4j.internal.util.ReflectionHelper;
 
 /*
 try {
@@ -52,13 +52,10 @@ try {
 }
 */
 public class StaticConditionTransformer extends PreAndPostConditionTransformer {
-	private ReflectionHelper reflectionHelper = new ReflectionHelper();
-
 	@Override
 	public void transform(ListOrderedSet<CtClass> involvedClasses, ListOrderedSet<ContractInfo> contracts,
 			CtClass affectedClass, Map<CtBehavior, List<ContractMethod>> contractMap) throws Exception {
-		for (CtBehavior affectedBehavior : reflectionHelper.getDeclaredBehaviors(affectedClass, MODIFIABLE, STATIC,
-				VISIBLE)) {
+		for (CtBehavior affectedBehavior : getDeclaredBehaviors(affectedClass, MODIFIABLE, STATIC, VISIBLE)) {
 			transform(affectedClass, affectedBehavior, contractMap.get(affectedBehavior));
 		}
 	}

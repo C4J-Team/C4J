@@ -3,6 +3,7 @@ package de.vksi.c4j.internal.transformer;
 import static de.vksi.c4j.internal.util.BehaviorFilter.DYNAMIC;
 import static de.vksi.c4j.internal.util.BehaviorFilter.MODIFIABLE;
 import static de.vksi.c4j.internal.util.BehaviorFilter.VISIBLE;
+import static de.vksi.c4j.internal.util.ReflectionHelper.getDeclaredBehaviors;
 
 import java.util.List;
 import java.util.Map;
@@ -59,8 +60,7 @@ public class DynamicConditionTransformer extends PreAndPostConditionTransformer 
 	@Override
 	public void transform(ListOrderedSet<CtClass> involvedClasses, ListOrderedSet<ContractInfo> contracts,
 			CtClass affectedClass, Map<CtBehavior, List<ContractMethod>> contractMap) throws Exception {
-		for (CtBehavior affectedBehavior : reflectionHelper.getDeclaredBehaviors(affectedClass, MODIFIABLE, DYNAMIC,
-				VISIBLE)) {
+		for (CtBehavior affectedBehavior : getDeclaredBehaviors(affectedClass, MODIFIABLE, DYNAMIC, VISIBLE)) {
 			transform(affectedClass, affectedBehavior, contractMap.get(affectedBehavior));
 		}
 	}

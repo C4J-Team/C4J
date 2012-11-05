@@ -1,5 +1,7 @@
 package de.vksi.c4j.internal.evaluator;
 
+import static de.vksi.c4j.internal.util.ReflectionHelper.getSimplerName;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -7,7 +9,6 @@ import org.apache.log4j.Logger;
 
 import de.vksi.c4j.internal.ContractErrorHandler;
 import de.vksi.c4j.internal.compiler.StaticCall;
-import de.vksi.c4j.internal.util.ReflectionHelper;
 
 public class Evaluator {
 	public static final StaticCall isBefore = new StaticCall(Evaluator.class, "isBefore");
@@ -27,7 +28,6 @@ public class Evaluator {
 	public static final StaticCall setException = new StaticCall(Evaluator.class, "setException");
 
 	private static final Logger logger = Logger.getLogger(Evaluator.class);
-	private static final ReflectionHelper reflectionHelper = new ReflectionHelper();
 
 	private static final Map<Class<?>, Object> primitiveReturnValues = new HashMap<Class<?>, Object>() {
 		private static final long serialVersionUID = 5365905181961089260L;
@@ -87,8 +87,7 @@ public class Evaluator {
 			Class<?> callingClass, Class<?> returnType) throws InstantiationException, IllegalAccessException {
 		evaluationPhase.set(EvaluationPhase.BEFORE);
 		beforeContract(target, returnType);
-		logger.info("Calling pre-condition for " + methodName + " in contract "
-				+ reflectionHelper.getSimplerName(contractClass) + ".");
+		logger.info("Calling pre-condition for " + methodName + " in contract " + getSimplerName(contractClass) + ".");
 		return ContractCache.getContractFromCache(target, contractClass, callingClass);
 	}
 
@@ -104,8 +103,7 @@ public class Evaluator {
 			throws InstantiationException, IllegalAccessException {
 		evaluationPhase.set(EvaluationPhase.INVARIANT);
 		beforeContract(target, void.class);
-		logger.info("Calling invariant for " + className + " in contract "
-				+ reflectionHelper.getSimplerName(contractClass) + ".");
+		logger.info("Calling invariant for " + className + " in contract " + getSimplerName(contractClass) + ".");
 		return ContractCache.getContractFromCache(target, contractClass, callingClass);
 	}
 
@@ -128,16 +126,14 @@ public class Evaluator {
 		evaluationPhase.set(EvaluationPhase.AFTER);
 		beforeContract(target, returnType);
 		returnValue.set(actualReturnValue);
-		logger.info("Calling post-condition for " + methodName + " in contract "
-				+ reflectionHelper.getSimplerName(contractClass) + ".");
+		logger.info("Calling post-condition for " + methodName + " in contract " + getSimplerName(contractClass) + ".");
 		return ContractCache.getContractFromCache(target, contractClass, callingClass);
 	}
 
 	public static Object getInitializationCall(Object target, String methodName, Class<?> contractClass,
 			Class<?> callingClass) throws InstantiationException, IllegalAccessException {
 		beforeContract(target, null);
-		logger.info("Calling initializer for " + methodName + " in contract "
-				+ reflectionHelper.getSimplerName(contractClass) + ".");
+		logger.info("Calling initializer for " + methodName + " in contract " + getSimplerName(contractClass) + ".");
 		return ContractCache.getContractFromCache(target, contractClass, callingClass);
 	}
 

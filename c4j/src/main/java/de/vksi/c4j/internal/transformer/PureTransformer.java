@@ -1,6 +1,8 @@
 package de.vksi.c4j.internal.transformer;
 
 import static de.vksi.c4j.internal.util.BehaviorFilter.MODIFIABLE;
+import static de.vksi.c4j.internal.util.ReflectionHelper.getDeclaredBehaviors;
+import static de.vksi.c4j.internal.util.TransformationHelper.addBehaviorAnnotation;
 
 import java.util.List;
 import java.util.Map;
@@ -17,19 +19,15 @@ import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractMethod;
 import de.vksi.c4j.internal.util.ListOrderedSet;
 import de.vksi.c4j.internal.util.PureInspector;
-import de.vksi.c4j.internal.util.ReflectionHelper;
-import de.vksi.c4j.internal.util.TransformationHelper;
 
 public class PureTransformer extends AbstractAffectedClassTransformer {
 	private PureInspector pureInspector = new PureInspector();
-	private ReflectionHelper reflectionHelper = new ReflectionHelper();
-	private TransformationHelper transformationHelper = new TransformationHelper();
 	private RootTransformer rootTransformer = RootTransformer.INSTANCE;
 
 	@Override
 	public void transform(ListOrderedSet<CtClass> involvedClasses, ListOrderedSet<ContractInfo> contracts,
 			CtClass affectedClass, Map<CtBehavior, List<ContractMethod>> contractMap) throws Exception {
-		for (CtBehavior affectedBehavior : reflectionHelper.getDeclaredBehaviors(affectedClass, MODIFIABLE)) {
+		for (CtBehavior affectedBehavior : getDeclaredBehaviors(affectedClass, MODIFIABLE)) {
 			normalizePure(affectedClass, involvedClasses, contracts, affectedBehavior);
 			applyPure(affectedClass, affectedBehavior, contracts);
 		}
@@ -55,8 +53,7 @@ public class PureTransformer extends AbstractAffectedClassTransformer {
 		CtMethod method = (CtMethod) behavior;
 		CtMethod pureOrigin = pureInspector.getPureOrigin(involvedClasses, contracts, method);
 		if (pureOrigin != null) {
-			transformationHelper.addBehaviorAnnotation(method, RootTransformer.INSTANCE.getPool().get(
-					Pure.class.getName()));
+			addBehaviorAnnotation(method, RootTransformer.INSTANCE.getPool().get(Pure.class.getName()));
 			if (logger.isDebugEnabled()) {
 				logger.debug("added @Pure from " + pureOrigin.getLongName() + " to " + method.getLongName());
 			}

@@ -1,6 +1,11 @@
 package de.vksi.c4j.internal.util;
 
 import static de.vksi.c4j.internal.transformer.ContractBehaviorTransformer.CONSTRUCTOR_REPLACEMENT_NAME;
+import static de.vksi.c4j.internal.util.ReflectionHelper.constructorHasAdditionalParameter;
+import static de.vksi.c4j.internal.util.ReflectionHelper.getDeclaredConstructor;
+import static de.vksi.c4j.internal.util.ReflectionHelper.getDeclaredMethod;
+import static de.vksi.c4j.internal.util.ReflectionHelper.isContractClassInitializer;
+import static de.vksi.c4j.internal.util.ReflectionHelper.isContractConstructor;
 import javassist.CannotCompileException;
 import javassist.CtBehavior;
 import javassist.CtClass;
@@ -19,12 +24,11 @@ import de.vksi.c4j.internal.transformer.ContractExpressionTransformer;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
 
 public class AffectedBehaviorLocator {
-	private ReflectionHelper reflectionHelper = new ReflectionHelper();
 	private InvolvedTypeInspector involvedTypeInspector = new InvolvedTypeInspector();
 	private Logger logger = Logger.getLogger(getClass());
 
 	public CtMethod getContractMethod(ContractInfo contract, CtMethod affectedMethod) throws NotFoundException {
-		return reflectionHelper.getDeclaredMethod(contract.getContractClass(), affectedMethod.getName(), affectedMethod
+		return getDeclaredMethod(contract.getContractClass(), affectedMethod.getName(), affectedMethod
 				.getParameterTypes());
 	}
 
@@ -39,10 +43,10 @@ public class AffectedBehaviorLocator {
 		if (contractBehavior.getName().endsWith(ContractExpressionTransformer.BEFORE_INVARIANT_METHOD_SUFFIX)) {
 			return null;
 		}
-		if (reflectionHelper.isContractConstructor(contractBehavior)) {
+		if (isContractConstructor(contractBehavior)) {
 			return getAffectedConstructor(contractInfo, affectedClass, contractBehavior);
 		}
-		if (reflectionHelper.isContractClassInitializer(contractBehavior)) {
+		if (isContractClassInitializer(contractBehavior)) {
 			return affectedClass.getClassInitializer();
 		}
 		if (contractBehavior instanceof CtMethod) {
@@ -87,8 +91,8 @@ public class AffectedBehaviorLocator {
 	private CtMethod getAffectedMethodFromExtendedClasses(CtBehavior contractBehavior, CtClass currentClass)
 			throws NotFoundException {
 		while (currentClass != null) {
-			CtMethod method = reflectionHelper.getDeclaredMethod(currentClass, contractBehavior.getName(),
-					contractBehavior.getParameterTypes());
+			CtMethod method = getDeclaredMethod(currentClass, contractBehavior.getName(), contractBehavior
+					.getParameterTypes());
 			if (method != null) {
 				return method;
 			}
@@ -108,8 +112,8 @@ public class AffectedBehaviorLocator {
 		if (contractInfo.getTargetClass().isInterface()) {
 			return null;
 		}
-		CtConstructor affectedConstructor = reflectionHelper.getDeclaredConstructor(affectedClass,
-				getConstructorParameterTypes(affectedClass, contractBehavior));
+		CtConstructor affectedConstructor = getDeclaredConstructor(affectedClass, getConstructorParameterTypes(
+				affectedClass, contractBehavior));
 		if (affectedConstructor == null) {
 			logger.warn("could not find a matching constructor in affected class " + affectedClass.getName()
 					+ " for constructor " + contractBehavior.getLongName());
@@ -118,8 +122,8 @@ public class AffectedBehaviorLocator {
 		if (contractBehavior instanceof CtMethod) {
 			return affectedConstructor;
 		}
-		if (reflectionHelper.getDeclaredMethod(contractInfo.getContractClass(), CONSTRUCTOR_REPLACEMENT_NAME,
-				contractBehavior.getParameterTypes()) != null) {
+		if (getDeclaredMethod(contractInfo.getContractClass(), CONSTRUCTOR_REPLACEMENT_NAME, contractBehavior
+				.getParameterTypes()) != null) {
 			return null;
 		}
 		return affectedConstructor;
@@ -128,7 +132,7 @@ public class AffectedBehaviorLocator {
 	private CtClass[] getConstructorParameterTypes(CtClass affectedClass, CtBehavior contractBehavior)
 			throws NotFoundException {
 		CtClass[] parameterTypes = contractBehavior.getParameterTypes();
-		if (reflectionHelper.constructorHasAdditionalParameter(affectedClass)) {
+		if (constructorHasAdditionalParameter(affectedClass)) {
 			CtClass[] initialParameterTypes = parameterTypes;
 			parameterTypes = new CtClass[parameterTypes.length + 1];
 			parameterTypes[0] = affectedClass.getDeclaringClass();

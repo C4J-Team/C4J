@@ -1,5 +1,7 @@
 package de.vksi.c4j.internal.editor;
 
+import static de.vksi.c4j.internal.util.TransformationHelper.setMethodIndex;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -11,10 +13,8 @@ import javassist.bytecode.CodeAttribute;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.Opcode;
 import de.vksi.c4j.internal.evaluator.PureEvaluator;
-import de.vksi.c4j.internal.util.TransformationHelper;
 
 public class ArrayAccessEditor {
-	private TransformationHelper transformationHelper = new TransformationHelper();
 	private static final Set<Integer> ARRAY_STORE_OPCODES = new HashSet<Integer>();
 
 	static {
@@ -67,7 +67,7 @@ public class ArrayAccessEditor {
 		checkUnpureBytesLong[2] = Opcode.DUP2_X2;
 		checkUnpureBytesLong[3] = Opcode.POP;
 		checkUnpureBytesLong[4] = (byte) Opcode.INVOKESTATIC;
-		transformationHelper.setMethodIndex(affectedMethod.getMethodInfo().getConstPool(), checkUnpureBytesLong, 5,
+		setMethodIndex(affectedMethod.getMethodInfo().getConstPool(), checkUnpureBytesLong, 5,
 				PureEvaluator.checkUnpureAccess, "(Ljava/lang/Object;)V");
 		return checkUnpureBytesLong;
 	}
@@ -78,7 +78,7 @@ public class ArrayAccessEditor {
 		checkUnpureBytes[1] = Opcode.POP2;
 		checkUnpureBytes[2] = Opcode.DUP_X2;
 		checkUnpureBytes[3] = (byte) Opcode.INVOKESTATIC;
-		transformationHelper.setMethodIndex(affectedMethod.getMethodInfo().getConstPool(), checkUnpureBytes, 4,
+		setMethodIndex(affectedMethod.getMethodInfo().getConstPool(), checkUnpureBytes, 4,
 				PureEvaluator.checkUnpureAccess, "(Ljava/lang/Object;)V");
 		return checkUnpureBytes;
 	}
