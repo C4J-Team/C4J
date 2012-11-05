@@ -1,3 +1,16 @@
+C4J 6.0.0 (11/05/2012)
+=====
+New Features:
+* new version system, indicating compatibility to Java 6 and to allow having a separate version for Java 8
+* LSP fully implemented, now being sensitive that pre-conditions from multiple inherited interfaces must not be different
+
+Fixes:
+* fixed constructor-usage within old()
+* local configuration for top-level packages is found
+* performance improvement by avoiding calls to Thread.getStackTrace()
+* pure validation within class initializers allows write-access on own static fields
+* @Pure inheritance from pure registry
+
 C4J 4.0-Beta7 (08/15/2012)
 =====
 New Features:
@@ -5,7 +18,7 @@ New Features:
 * changed configuration to be xml-based using a local and a global configuration
 
 Fixes:
-* @AllowPureAcces is now usable with Objects
+* @AllowPureAccess is now usable with Objects
 * fixed various issues executing conditions in the correct order
 * old-expressions are no longer being evaluated in the post-condition
 * fixed various side-effect issues using old and unchanged in post-conditions and invariants
@@ -26,7 +39,7 @@ Fixes:
 * once a condition fails, no other conditions will be checked
 * class-invariants are no longer considered for private methods
 * removed false warning when using a constructor in a contract class
-* removed depracated Condition.pre() and Condition.post()
+* removed deprecated Condition.pre() and Condition.post()
 
 
 C4J 4.0-Beta5 (05/17/2012)
