@@ -10,10 +10,6 @@
 		<default-precondition>true</default-precondition>
 	</configuration>
 	<configuration>
-		<root-package>de.vksi.c4j.systemtest.config.strengtheningpreconditionallowed</root-package>
-		<strengthening-preconditions-allowed>true</strengthening-preconditions-allowed>
-	</configuration>
-	<configuration>
 		<root-package>de.vksi.c4j.systemtest.config.externalcontract</root-package>
 		<contract-scan-package>de.vksi.c4j.systemtest.config.externalcontract</contract-scan-package>
 	</configuration>
