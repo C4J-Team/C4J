@@ -15,10 +15,12 @@ body {
 pre, code {
 	font-family: monospace;
 }
+td {
+	vertical-align: top;
+}
 #content {
 	padding: 40px;
 	width: 800px;
-	vertical-align: top;
 }
 #navigation {
 	float: left;
