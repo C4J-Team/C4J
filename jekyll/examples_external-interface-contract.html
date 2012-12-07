@@ -1,0 +1,151 @@
+---
+layout: standard
+title: External interface contract example
+---
+<P>
+There are two ways to attach a contract to an interface, an "internal" way and an "external" way.
+The following example uses the external way,
+i.e. the contract class refers to its target interface
+by using the C4J Annotation @Contract and implementing the target interface.
+<BR>
+That means, that the source code of the target interface has not to be modified
+which is especially important for adding contracts to legacy systems.
+<BR>
+The target interface TimeOfDaySpec uses the external way and looks like this (complete listing):
+</P>
+<PRE class="prettyprint">
+package timeofday;
+
+public interface TimeOfDaySpec {
+   int HOUR_MIN = 0;
+   int HOUR_MAX = 23;
+   int MINUTE_MIN = 0;
+   int MINUTE_MAX = 59;
+   int SECOND_MIN = 0;
+   int SECOND_MAX = 59;
+
+   void setHour(int hour);
+
+   void setMinute(int minute);
+
+   void setSecond(int second);
+
+   int getHour();
+
+   int getMinute();
+
+   int getSecond();
+
+   boolean isBefore(TimeOfDaySpec other);
+}
+
+</PRE>
+<P>
+The corresponding contract class TimeOfDaySpecContract implements TimeOfDaySpec and looks like this (complete listing):
+</P>
+<PRE class="prettyprint">
+package timeofday;
+
+import static de.vksi.c4j.Condition.ignored;
+import static de.vksi.c4j.Condition.postCondition;
+import static de.vksi.c4j.Condition.preCondition;
+import static de.vksi.c4j.Condition.result;
+import static de.vksi.c4j.Condition.unchanged;
+import de.vksi.c4j.ClassInvariant;
+import de.vksi.c4j.Contract;
+import de.vksi.c4j.PureTarget;
+import de.vksi.c4j.Target;
+
+@Contract(forTarget = TimeOfDaySpec.class)
+public class TimeOfDaySpecContract implements TimeOfDaySpec {
+   @Target
+   private TimeOfDaySpec target;
+
+   @ClassInvariant
+   public void classInvariant() {
+      assert target.getHour() &gt;= HOUR_MIN : "hour &gt;= HOUR_MIN";
+      assert target.getHour() &lt;= HOUR_MAX : "hour &lt;= HOUR_MAX";
+      assert target.getMinute() &gt;= MINUTE_MIN : "minute &gt;= MINUTE_MIN";
+      assert target.getMinute() &lt;= MINUTE_MAX : "minute &lt;= MINUTE_MAX";
+      assert target.getSecond() &gt;= SECOND_MIN : "second &gt;= SECOND_MIN";
+      assert target.getSecond() &lt;= SECOND_MAX : "second &lt;= SECOND_MAX";
+   }
+
+   @Override
+   public void setHour(int hour) {
+      if (preCondition()) {
+         assert hour &gt;= HOUR_MIN : "hour &gt;= HOUR_MIN";
+         assert hour &lt;= HOUR_MAX : "hour &lt;= HOUR_MAX";
+      }
+      if (postCondition()) {
+         assert target.getHour() == hour : "hour set";
+         assert unchanged(target.getMinute()) : "minute unchanged";
+         assert unchanged(target.getSecond()) : "second unchanged";
+      }
+   }
+
+   @Override
+   public void setMinute(int minute) {
+      if (preCondition()) {
+         assert minute &gt;= MINUTE_MIN : "minute &gt;= MINUTE_MIN";
+         assert minute &lt;= MINUTE_MAX : "minute &lt;= MINUTE_MAX";
+      }
+      if (postCondition()) {
+         assert unchanged(target.getHour()) : "hour unchanged";
+         assert target.getMinute() == minute : "minute set";
+         assert unchanged(target.getSecond()) : "second unchanged";
+      }
+   }
+
+   @Override
+   public void setSecond(int second) {
+      if (preCondition()) {
+         assert second &gt;= SECOND_MIN : "second &gt;= SECOND_MIN";
+         assert second &lt;= SECOND_MAX : "second &lt;= SECOND_MAX";
+      }
+      if (postCondition()) {
+         assert unchanged(target.getHour()) : "hour unchanged";
+         assert unchanged(target.getMinute()) : "minute unchanged";
+         assert target.getSecond() == second : "second set";
+      }
+   }
+
+   @Override
+   @PureTarget
+   public int getHour() {
+      return ignored();
+   }
+
+   @Override
+   @PureTarget
+   public int getMinute() {
+      return ignored();
+   }
+
+   @Override
+   @PureTarget
+   public int getSecond() {
+      return ignored();
+   }
+
+   @Override
+   @PureTarget
+   public boolean isBefore(TimeOfDaySpec other) {
+      if (preCondition()) {
+         assert other != null : "other != null";
+      }
+      if (postCondition()) {
+         boolean result = result();
+         if (result) {
+            assert !other.isBefore(target) : "if isBefore then not other isBefore";
+         }
+      }
+      return ignored();
+   }
+}
+</PRE>
+<P>
+Please note that external contracts need a special configuration of C4J
+which is explained in the section
+<A href="configuration.html">Configuration</A>.
+</P>

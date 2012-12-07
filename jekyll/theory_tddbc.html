@@ -1,0 +1,164 @@
+---
+layout: standard
+title: TDD by Contract
+---
+<P>
+Test Driven Development (TDD) is a technique at the core of
+<A href="http://en.wikipedia.org/wiki/Agile_software_development" 
+target=_blank>agile software development</A>.
+This technique has been described by Kent Beck in his book
+<A href="http://www.amazon.de/Driven-Development-Example-Addison-Wesley-Signature/dp/0321146530/ref=sr_1_1?ie=UTF8&qid=1347098147&sr=8-1" 
+target=_blank>Test Driven Development by Example</A>.
+The goal of Test Driven Development is to accelerate feedback by conducting the so called TDD cycle.
+The TDD cycle consists of the three consecutive activities run in a circle: test, code and refactor.
+</P>
+
+<img src="img/theory_tddbc.png" align="left" vspace="7" hspace="7">
+The <I>TDD by Contract cycle</I> shown in the figure below illustrates the rationale of <I>TDD by Contract</I>:
+<ul>
+<LI>Java offers a clear separation of <I>implementation</I> (<I>class level</I>)
+and <I>design</I> (<I>interface level</I>).
+<LI>The TDD cycle is usualy conducted on the <I>implementation</I> level.
+<LI>But it is also possible - though rarly done - to conduct the TDD cycle on the <I>interface</I> level.
+<LI>On the <I>design level</I> colors indicate result at <I>compile time</I>,
+i.e. whether the emerging <I>interface</I> and its corresponding <I>interface contract</I> can be compiled (green) or not (red).
+<LI>On the <I>implementation level</I> colors indicate the result at <I>runtime</I>,
+i.e. whether the focused test on the emerging <I>class</I> runs successful (green) or fails (red).
+<LI>The idea of <I>TDD by Contract</I> is to start the TDD cycle on the <I>design level</I>.
+<LI>As a result we obtain
+a stable <I>interface</I> with its corresponding <I>interface contract</I>.
+<LI>The interface and its contract form a comprehensive <I>specification</I> of the new type.
+<LI>This specification is an <I>abstract data type</I> entirely written in Java.
+<LI>The <I>implementation</I> of this <I>abstract data tpye</I> is done
+by conducting the TDD cycle on the <I>implementation level</I>.
+</ul>
+As a result we obtain
+a <I>valid implementation</I> of the previously specified <I>abstract data type</I>.
+In other words: <I>TDD by Contract</I> encourages us to fully comply with the definition of
+<A href="theory_dbc.html">object oriented programming (OOP)</A> when we build software.
+
+<P>
+On an <I>design level</I> the TDD cycle comprises the activities
+<A href="theory_abc.html">Analysis by Contract</A>
+and
+<A href="theory_dbc.html">Design by Contract</A>
+and looks like this:
+<BR>
+<BR>
+<table border="0">
+  <tr>
+    <td><h3>Test</h3></td>
+    <td>
+	<P>
+	To add a new method to our <I>interface under test</I>,
+	we first write a test using this method.
+	As the method is not declared yet, the test case will not compile (becomes red).
+	This activity is called
+	<A href="theory_abc.html">Analysis by Contract</A>.
+	</P>
+	</td>
+  </tr>
+    <td><h3>Code</h3></td>
+    <td>
+	<P>
+	We declare the new method in the <I>interface under test</I> so that compiling the test case succeeds (becomes green).
+	In the corresponding <I>interface contract class</I> we add the pre- and postconditions of the new method
+	in order to specify its intended behaviour.
+	As the pre- and postconditions have to use the "vocabulary" of the emerging interface,
+	we might be summoned to declare new methods in the interface
+	in the case the actual "voacubulary" is not rich enough.
+	This recursive activity is depicted in the figure as a small selfreferencing red-green circle.
+    It is an important feature of  
+	<A href="theory_dbc.html">Design by Contract</A>
+	and leads to consistent and exhaustive and therefore stable interfaces.
+	</P>
+	</td>
+  </tr>    
+  <td><h3>Refactor</h3></td>
+    <td>
+	<P>
+	We clean up our <I>interface under test</I>, i.e. split one method into two
+	in order to adhere to the <I>command query separation</I> principle.
+	We check the result of this refactoring by compiling the test case.
+	When the test case can be successfully compiled (is green again)
+	we can be sure that our refactoring has not broken the interface.
+    In the case of having added a basic query
+    In the corresponding <I>interface contract class</I>
+    we reestablish the accordance of all <I>command postconditions</I>
+    with the <I>fourth</I> of the
+    <A href="six-principles.html">six principles</A>
+    if necessary, i.e. when having added a new <I>basic query</I> to the <I>interface under test</I>.
+	</P>
+	</td>
+  </tr>
+</table>
+<BR>
+Please note that on an <I>interface level</I> testing is done at <I>compile time</I>.
+Compiling the test case is possible by using the support of modern Java IDEs
+to create an empty class TimeOfDay which implements the interface TimeOfDaySpec
+and is auto-completed as the interface grows.
+By that, running the test case is possible, but all tests usualy fail (become red).
+<BR>
+<BR>
+The result of the TDD cycle on the <I>design level</I>
+is the comprehensive specification of the new type
+as an <I>abstract data type</I>.
+</P>
+
+<P>
+On an <I>implementation level</I> the TDD cycle comprises
+<A href="theory_ibc.html">Implementation by Contract</A>
+and
+<A href="theory_tbc.html">Testing by Contract</A>
+and looks like this:
+<BR>
+<BR>
+<table border="0">
+  <tr>
+    <td><h3>Test</h3></td>
+    <td>
+	<P>
+	To implement a feature in our <I>class under test</I>,
+	we first <I>write</I> (or if it already exists: <I>focus on</I>) a test using this feature
+	according to its specification given by the contract.
+	This activity is called
+	<A href="theory_tbc.html">Testing by Contract</A>.
+	As the feature usualy is not implemented yet, the test will fail (become red) when running JUnit.
+	</P>
+	</td>
+  </tr>
+    <td><h3>Code</h3></td>
+    <td>
+	<P>
+	We implement the new feature by adding a method or enriching an existing method
+	until the focused test succeeds (becomes green).
+	This activity is called
+	<A href="theory_ibc.html">Implementation by Contract</A>.
+	</P>
+	</td>
+  </tr>    
+  <td><h3>Refactor</h3></td>
+    <td>
+	<P>
+	We clean up our implementation, i.e. split a long method into two short ones
+	to ensure that each method has a single responsibility.
+	Please note that such a change has an impact on the <I>interface</I> and <I>interface contract</I> too,
+	so we shortly have to jump back on the <I>design level</I>.
+	Refactoring on the <I>implementation level</I> could enforce refactoring on the <I>design level</I>.
+	C4J's syntax was carefully designed to fully support modern IDE's refactoring functions.
+	We check the result of our refactoring by running the test case.
+	When all tests are green again
+	we can be sure that our refactoring has not broken the class.
+	</P>
+	</td>
+  </tr>
+</table>
+<BR>
+Please note that on an <I>implementation level</I> testing is done at <I>runtime</I>.
+Running the test case must show that all test are green.
+<BR>
+<BR>
+The result of the TDD cycle on the <I>implementation level</I>
+is a <I>valid implementation</I> of the previously specified <I>abstract data type</I>.
+</P>
+

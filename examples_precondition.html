@@ -1,0 +1,175 @@
+<html>
+<head>
+<title>C4J - Contracts for Java</title>
+<link rel="stylesheet" type="text/css" href="all.css" />
+<link href="prettify/prettify.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="prettify/prettify.js"></script>
+</head>
+
+<body onload="prettyPrint()">
+<table><tr><td id="navigation">
+<img src="c4j.png" alt="C4J Logo"/>
+<ul>
+<li><a href="index.html">Overview</a></li>
+<li><a href="ease-of-use.html">Ease of use</a></li>
+<li><a href="powerful.html">Powerful</a></li>
+<li><a href="six-principles.html">Six principles</a></li>
+<li><a href="examples.html">Examples</a></li>
+<li><a href="syntax.html">Syntax reference</a></li>
+<li><a href="inheritance.html">Inheritance of contracts</a></li>
+<li><a href="installation.html">Installation</a></li>
+<li><a href="configuration.html">Configuration</a></li>
+<li><a href="guidelines.html">Guidelines</a></li>
+<li><a href="under-the-hood.html">Under the Hood</a></li>
+<li><a href="theory.html">Theory</a></li>
+<li><a href="faq.html">FAQ</a></li>
+<li><a href="about.html">About</a></li>
+</ul>
+<ul>
+<li><a href="https://github.com/C4J-Team/C4J/downloads" target="_blank">Download C4J 6.0.0</a></li>
+<li><a href="http://c4j.sourceforge.net/" target="_blank">Download C4J 2.7.5</a></li>
+</ul>
+</td><td id="divider"></td><td id="content">
+<div class="head">Precondition Example</div>
+<P>
+A precondition states what a method requires in order to be able to perfom its intended task.
+If the precondition is violated,
+the caller of the method (the customer) has broken the contract.
+Therefore the method (the supplier) is no longer bonded to the contract,
+i.e. it will no longer ensure that the postconditions will hold.
+In other words a precondition is an <I>obligation</I> to the <I>customer</I> and a <I>right</I> to the <I>supplier</I>.
+</P>
+
+
+<P>
+The general structure of a <I>precondition</I> in C4J is like that:
+</P>
+
+<PRE class="prettyprint">
+      if (preCondition()) {
+         precondition clause 1
+         precondition clause 2
+         ...
+         precondition clause n
+      }
+</PRE>
+
+<P>
+A <I>precondition clause</I> in C4J can be any valid Java source code that contains an <I>assert</I> statement.
+</P>
+
+<P>
+What does that mean for our example?
+The target class TimeOfDay looks like this (partial listing):
+</P>
+<PRE class="prettyprint">
+@ContractReference(TimeOfDayContract.class)
+public class TimeOfDay {
+
+   public static final int HOUR_MIN = 0;
+   public static final int HOUR_MAX = 23;
+   public static final int MINUTE_MIN = 0;
+   public static final int MINUTE_MAX = 59;
+   public static final int SECOND_MIN = 0;
+   public static final int SECOND_MAX = 59;
+
+   private int hour;
+   private int minute;
+   private int second;
+
+   public TimeOfDay(int hour, int minute, int second) {
+      setHour(hour);
+      setMinute(minute);
+      setSecond(second);
+   }
+
+   public void setHour(int hour) {
+      this.hour = hour;
+   }
+
+   public void setMinute(int minute) {
+      this.minute = minute;
+   }
+
+   public void setSecond(int second) {
+      this.second = second;
+   }
+
+   @Pure
+   public int getHour() {
+      return hour;
+   }
+
+   @Pure
+   public int getMinute() {
+      return minute;
+   }
+
+   @Pure
+   public int getSecond() {
+      return second;
+   }
+}
+</PRE>
+<P>
+Constructors may also have preconditions.
+The corresponding contract class TimeOfDayContract extends TimeOfDay
+and shows a precondition for the constructor of class TimeOfDay (partial listing):
+</P>
+<PRE class="prettyprint">
+public class TimeOfDayContract extends TimeOfDay {
+
+   public TimeOfDayContract(int hour, int minute, int second) {
+      super(hour, minute, second);
+      if (preCondition()) {
+         assert hour >= HOUR_MIN : "hour >= HOUR_MIN";         // precondition clause 1
+         assert hour <= HOUR_MAX : "hour <= HOUR_MAX";         // precondition clause 2
+         assert minute >= MINUTE_MIN : "minute >= MINUTE_MIN"; // precondition clause 3
+         assert minute <= MINUTE_MAX : "minute <= MINUTE_MAX"; // precondition clause 4
+         assert second >= SECOND_MIN : "second >= SECOND_MIN"; // precondition clause 5
+         assert second <= SECOND_MAX : "second <= SECOND_MAX"; // precondition clause 6
+      }
+      if (postCondition()) {
+         ...
+      }
+   }
+</PRE>
+<P>
+Read as: <I>The overloaden constructor of class TimeOfDay has a precondition 
+with six precondition clauses.
+Precondition clauses 1 and 2 require that parameter hour is between HOUR_MIN and HOUR_MAX,
+precondition clauses 3 and 4 require that parameter minute must be between MINUTE_MIN and MINUTE_MAX and
+precondition clauses 5 and 6 require that parameter second must be between SECOND_MIN and SECOND_MAX.
+The customer must fulfill this obligation
+in order to expect the supplier to create a valid instance of class TimeOfDay.
+</I>
+</P>
+
+<P>
+Another example: The command setHour has a precondition (partial listing):
+</P>
+<PRE class="prettyprint">
+  public class TimeOfDayContract extends TimeOfDay {
+
+   ...
+
+   @Override
+   public void setHour(int hour) {
+      if (preCondition()) {
+         assert hour >= HOUR_MIN : "hour >= HOUR_MIN"; // precondition clause 1
+         assert hour <= HOUR_MAX : "hour <= HOUR_MAX"; // precondition clause 2
+      }
+      if (postCondition()) {
+         ...
+      }
+   }
+</PRE>
+<P>
+Read as: <I>The command setHour has a precondition with two precondition clauses
+which require that parameter hour is between HOUR_MIN and HOUR_MAX.
+The customer must fulfill this obligation
+in order to expect the supplier to set hour to the recommended value. </I>
+</P>
+</td></tr></table>
+</body>
+</html>

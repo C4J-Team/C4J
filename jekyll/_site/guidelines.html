@@ -1,0 +1,198 @@
+<html>
+<head>
+<title>C4J - Contracts for Java</title>
+<link rel="stylesheet" type="text/css" href="all.css" />
+<link href="prettify/prettify.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="prettify/prettify.js"></script>
+</head>
+
+<body onload="prettyPrint()">
+<table><tr><td id="navigation">
+<img src="c4j.png" alt="C4J Logo"/>
+<ul>
+<li><a href="index.html">Overview</a></li>
+<li><a href="ease-of-use.html">Ease of use</a></li>
+<li><a href="powerful.html">Powerful</a></li>
+<li><a href="six-principles.html">Six principles</a></li>
+<li><a href="examples.html">Examples</a></li>
+<li><a href="syntax.html">Syntax reference</a></li>
+<li><a href="inheritance.html">Inheritance of contracts</a></li>
+<li><a href="installation.html">Installation</a></li>
+<li><a href="configuration.html">Configuration</a></li>
+<li><a href="guidelines.html">Guidelines</a></li>
+<li><a href="under-the-hood.html">Under the Hood</a></li>
+<li><a href="theory.html">Theory</a></li>
+<li><a href="faq.html">FAQ</a></li>
+<li><a href="about.html">About</a></li>
+</ul>
+<ul>
+<li><a href="https://github.com/C4J-Team/C4J/downloads" target="_blank">Download C4J 6.0.0</a></li>
+<li><a href="http://c4j.sourceforge.net/" target="_blank">Download C4J 2.7.5</a></li>
+</ul>
+</td><td id="divider"></td><td id="content">
+<div class="head">Guidelines</div>
+<P>
+Experience with more than 2.000 students and professionals show
+that there are some guidelines which help to avoid the most common traps with C4J.
+</P>
+
+<P>
+Guideline 1 : <I>Set up your project as a maven project!</I>
+</P>
+
+The <I>extend assertions concept</I> by means of separating assertions into separate contract classes has one disadvantage:
+The number of sourcecode files you have to manage will double or triple
+as each <I>target class</I> has a corresponding <I>class contract</I> and/or <I>interface</I> with its <I>interface contract</I>.
+<BR>
+An approved way to deal with that complexity issue is
+to structure the project adhering to the directory structure of an idiomatic 
+<A href="http://en.wikipedia.org/wiki/Apache_Maven" target=_blank>Maven</A>
+project:
+<img src="img/guidelines_2.png" align="left" vspace="7" hspace="7">
+<ul>
+<LI><I>project home</I> : Contains the pom.xml and all subdirectories.
+<LI><I>src/contract/java</I> : Represents the <I>design level</I> and contains
+<I>interfaces</I>, <I>interface contracts</I> and <I>class contracts</I>.
+In the TimeOfDay example, these are in the package timeofday:
+<BR> - the <I>interface</I> TimeOfDaySpec and
+<BR> - its corresponding <I>interface contract</I> TimeOfDaySpecContract
+<BR>
+<LI><I>src/main/java</I> : Represents the <I>implementation level</I> and contains the deliverable Java sourcecode for the project,
+i.e. the <I>target classes</I>.
+In the TimeOfDay example, these are in the package timeofday:
+<BR> - the <I>target class</I> TimeOfDay, which implements TimeOfDaySpec and therefore inherits the TimeOfDaySpecContract contract.
+<BR>
+<LI><I>src/main/resources</I> : Contains the deliverable resources for the project.
+In the TimeOfDay example, these are such as the C4J configuration files:
+<BR> - <I>c4j.global.xml</I>
+<BR> - <I>c4j.local.xml</I>
+<BR> - <I>c4j-pure-registry.xml</I>
+<BR> - <I>logj.properties</I>.
+<LI><I>src/test/java</I> : Contains the testing classes (JUnit) for the project.
+In the TimeOfDay example, these are in the package timeofday:
+<BR> - the <I>application class</I> TimeOfDayDemo
+<BR> - the <I>JUnit test case</I> TimeOfDayTest
+<LI><I>src/test/resources</I> (optional) : Contains the resources necessary for testing.
+<BR>
+In the TimeOfDay example this directory for test resources is not necessary as there are no test resources.
+</LI>
+</ul>
+<BR>
+
+<P>
+Guideline 2 : <I>If you need local variables in a pre- or postcondition declare them inside the if statement body!</I>
+</P>
+
+<PRE class="prettyprint">
+public class TimeOfDaySpecContract implements TimeOfDaySpec {
+
+   ...
+
+   @Override
+   public void setHour(int hour) {
+   
+      // method body sourcecode before the precondition if statement will be skipped
+      int thisIntWillBeSkipped;
+      thisIntWillBeSkipped = 1;
+      
+      if (preCondition()) {
+         // this works fine
+         boolean localBooleanInPreConditionBody = false;
+         localBooleanInPreConditionBody = true;
+         ...
+      }
+      
+      // method body sourcecode between the precondition and postcondition if statements will be skipped
+      boolean thisBooleanWillBeSkipped;
+      thisBooleanWillBeSkipped = true;
+      
+      if (postCondition()) {
+         // this works fine
+         double localDoubleInPostConditionBody = 0.0;
+         localDoubleInPostConditionBody = 1.23;
+         ...
+      }
+      
+      // methody sourcecode after the postcondition if statement will be skipped
+      double thisDoubleWillBeSkipped;
+      thisDoubleWillBeSkipped = 1.23;
+   }
+}
+</PRE>
+
+<P>
+Guideline 3 : <I>If you need a stateful contract use private instance variables!</I>
+</P>
+
+<PRE class="prettyprint">
+public class TimeOfDaySpecContract implements TimeOfDaySpec {
+   private boolean setHourHasBeenCalled;
+
+   @Override
+   public void setHour(int hour) {
+   
+      ...
+      
+      if (postCondition()) {
+      
+         ...
+         
+         setHourHasBeenCalled = true;
+      }
+   }
+   
+   @Override
+   public int getHour() {
+   
+      if (preCondition()) {
+      
+         if (setHourHasBeenCalled) {
+            
+            ...
+         }
+      }
+      
+      ... 
+   }
+}
+</PRE>
+
+<P>
+Guideline 4 : <I>When using the old method do keep in mind that it returns a old reference to the object
+not a reference to a deep copy of the object!</I>
+</P>
+
+<PRE class="prettyprint">
+public class TimeOfDaySpecContract implements TimeOfDaySpec {
+
+   ...
+
+   @Override
+   public void setHour(int hour) {
+   
+      ...
+      
+      if (postCondition()) {
+         ...
+         assert unchanged(target.getMinute()) : "minute unchanged";
+         // recommended version:
+         // If minute is changed in the implemented setHour method, the assertion will definitely fail!
+         
+         assert target.getMinute() == old(target.getMinute()) : "minute unchanged";
+         // variation 1 : does work as intended as getMinute() returns the basic type int
+         // i.e. if minute is changed in the implemented setHour method,
+         // the assertion fails as target.getMinute() != old(target.getMinute()).
+         
+         assert target.getMinute() == old(target).getMinute() : "minute unchanged";
+         // variation 2 : does NOT work as intended as target is a reference type
+         // and therefore: target == old(target), so both references point to the same object!
+         // As a consequence target.getMinute() == old(target).getMinute() will always be true
+         // even if minute is changed in the implemented setHour method!
+         
+      }
+   }
+}
+</PRE>
+</td></tr></table>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<html>
+<head>
+<title>C4J - Contracts for Java</title>
+<link rel="stylesheet" type="text/css" href="all.css" />
+<link href="prettify/prettify.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="prettify/prettify.js"></script>
+</head>
+
+<body onload="prettyPrint()">
+<table><tr><td id="navigation">
+<img src="c4j.png" alt="C4J Logo"/>
+<ul>
+<li><a href="index.html">Overview</a></li>
+<li><a href="ease-of-use.html">Ease of use</a></li>
+<li><a href="powerful.html">Powerful</a></li>
+<li><a href="six-principles.html">Six principles</a></li>
+<li><a href="examples.html">Examples</a></li>
+<li><a href="syntax.html">Syntax reference</a></li>
+<li><a href="inheritance.html">Inheritance of contracts</a></li>
+<li><a href="installation.html">Installation</a></li>
+<li><a href="configuration.html">Configuration</a></li>
+<li><a href="guidelines.html">Guidelines</a></li>
+<li><a href="under-the-hood.html">Under the Hood</a></li>
+<li><a href="theory.html">Theory</a></li>
+<li><a href="faq.html">FAQ</a></li>
+<li><a href="about.html">About</a></li>
+</ul>
+<ul>
+<li><a href="https://github.com/C4J-Team/C4J/downloads" target="_blank">Download C4J 6.0.0</a></li>
+<li><a href="http://c4j.sourceforge.net/" target="_blank">Download C4J 2.7.5</a></li>
+</ul>
+</td><td id="divider"></td><td id="content">
+<div class="head">FAQ</div>
+Question: Is there any way to attach a contract class to an interface or class
+without modifying the source code of the target?
+<P>
+Answer: By using external contracts
+you do not need to modify the source code of the target interface or target class.
+This is especially useful for legacy systems and class libraries like the Java Class Library (JCL).
+For more information about this topic, please refer to the section
+<A href="examples_interface-contracts.html">external interface contracts</A>
+and
+<A href="examples_external-class-contracts.html">external class contracts</A>.
+</P>
+
+<BR>
+<BR>
+Question: What is the C4JCL project about?
+<P>
+Answer: C4JCL is an acronym for "Contracts for the Java Class Library".
+The vision of this Java community project is to enrich the Java Class Library (JCL)
+by contracts based on the C4J framework.
+</P>
+
+<BR>
+<BR>
+Question: What about unit tests? Do I still need them when using contracts?
+<P>
+Answer: Yes, unit test are still essential for writing high quality software.
+Unit tests activate the contracts by calling the target class' methods.
+And contracts help to make unit tests smaller and at the same time more powerful.
+Contracts which obey to the
+<A href="six-principles.html" target=blank>six contract principles</A>
+support unit tests in that way,
+that the software engineer writing a test class just has to follow three simple steps
+in order to write a thorough test:
+<BR>
+1. Write a test for each command of the target class.
+<BR>
+2. Write a test for each basic query of the target class.
+<BR>
+3. Write a test for each derived query of the target class.
+<BR>
+Having one test per method is sufficient
+as the contract's postconditions will check the effects of the methods automatically
+whether they fulfill the contract or not.
+</P>
+
+<BR>
+<BR>
+Question: I would like to use contracts not only for testing, but also for my productive system.
+But I do not like the idea that violating a contract will stop my whole system by throwing
+an Assertion Error. Is there any way telling C4J only to log the contract violation
+but not to throw an assertion error?
+<P>
+Answer: Contracts can also be activated for productive systems.
+You may use the C4J configuratino attribute "throw-error"
+to tell C4J that contract violations should only be logged
+and no assertion error should be thrown.
+For more information about this topic, please refer to the section
+<A href="configuration.html">configuration</A>.
+
+</P>
+
+<BR>
+<BR>
+Question: What is the difference between the first and second generation of C4J? 
+<P>
+Answer: The first generation of C4J -
+<A href="http://c4j.sourceforge.net/" target=blank>the versions 1.0 up to 2.7.5</A>
+- were not agile,
+i.e. native Eclipse refactoring is not supported,
+as name conventions like pre_ and post_ are used
+to link pre- and post-conditions to the target methods.
+The second generation of C4J - starting from version 6.0 - is agile,
+as no name conventions are required
+and inheritance relations between the class contract and the guarded class (or interface)
+allow the usage of the native Eclipse refactoring support.
+</P>
+
+<BR>
+<BR>
+Question: Who invented the concept of contract classes?
+<P>
+Answer: Jonas Bergström, Stockholm, the inventor of C4J (first generation).
+For more information about Jonas Bergström please refer to the topic
+<A href="about.html">About C4J</A>.
+</P>
+
+<BR>
+<BR>
+Question: What is the difference between an exception and an assertion? Isn't it the same?
+<P>
+Answer: Exceptions and AssertionErrors are not the same thing.
+AssertionErrors should be thrown by class, when its specification (its contract) has been violated.
+In contrast to this, an exception should be thrown when exceptional circumstances occur.
+Exceptional circumstances like the breaking of a network link are conditions,
+which are not covered (or could not be covered) by the specification of the class,
+i.e. by its contract. In other words: AssertionErrors refer to the correctness of a class,
+exceptions to its robustness.
+And they should be clearly separated to serve these very different quality aspects.
+</P>
+</td></tr></table>
+</body>
+</html>

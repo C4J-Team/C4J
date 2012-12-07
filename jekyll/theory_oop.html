@@ -1,0 +1,141 @@
+---
+layout: standard
+title: Object Oriented Programming
+---
+<p>
+In his book
+<A href="http://www.amazon.com/Object-Oriented-Software-Construction-CD-ROM-Edition/dp/0136291554/ref=sr_1_1?ie=UTF8&qid=1346939979&sr=8-1&keywords=Bertrand+Meyer+OOSE" 
+target=_blank>Object Oriented Software Construction</A> (1st edition 1988, 2nd edtion 1997)
+Bertrand Meyer gave a clear and precise definition of what <I>object oriented programming</I> (OOP) is:
+</p>
+<P>
+<I>Object oriented software construction is
+the building of software systems
+as structured collections of
+implementations of abstract data types.</I>
+</P>
+<BR>
+<I>Structured</I> means that there are <I>is a</I> and <I>has a</I> relations between the building blocks of the software system.
+<BR>
+<BR>
+These building blocks - called <I>classes</I> - are <I>implementations of abstract data types</I>.
+<BR>
+<BR>
+An <I>abstract data type</I> describes a data type with the help of four sections:
+<ul>
+<LI>name of the <I>type</I>,
+<LI>a list of all <I>public methods</I>,
+<LI>a list of all <I>preconditions</I> of all public methods and
+<LI>a list of all <I>postconditions</I> of all public methods.
+</ul>
+
+<P>
+Due to the
+<A href="http://en.wikipedia.org/wiki/Don%27t_repeat_yourself" 
+target=_blank>don't repeat yourself princile (DRY)</A>
+Bertrand Meyer added the <I>concept of class invariants</I> to this concept
+in order to avoid redundancy of postconditions,
+as all methods of an abstract data type might have some postconditions in common.
+Therefore a <I>class invariant</I> can be regarded as a <I>postcondition</I>
+which has to hold true for all methods of an abstract data type.
+</P>
+
+Accepting this definition of OOP as given and correct and
+accepting further that <I>analysis</I>, <I>design</I>, <I>implementation</I> and <I>test</I>
+are <I>essential activities</I> in the course of object oriented programming,
+there is a <I>first demand</I> on the <I>design level</I>
+of what an object oriented language has to be able to provide:
+<BR>
+<BR>
+<P>
+On a <I>design level</I> an <I>object oriented programming language</I> must be able
+to declare a new <I>type</I> by <I>defining</I> its <I>entire abstract data type</I>,
+i.e. the <I>specification</I> of the new <I>type</I>.
+</P>
+<BR>
+As the OOP definition above also demands the <I>implementation</I> of that <I>abstract data type</I>,
+there is a <I>second demand</I> on the <I>implementation level</I>
+of what an object oriented language has to be able to provide:
+<BR>
+<BR>
+<P>
+On an <I>implementation level</I> an <I>object oriented programming language</I> must be able
+to add a new <I>type</I> by <I>implementing</I> a <I>class</I> which fulfills the <I>specification</I>.
+</P>
+<BR>
+What does that mean to Java?
+Java seems to fulfill the <I>second demand</I>
+as it offers the <I>concept of classes</I>
+and allows us to write a <I>kind of specification</I>
+by using the <I>concept of javadoc comments</I>.
+But what about the <I>first demand</I>?
+Is is possible in Java to define an <I>entire abstract data type</I> on a <I>design level</I>?
+
+On a <I>design level</I> Java offers the <I>concept of interfaces</I> 
+to define a new <I>type</I> on an abstract level.
+But <I>interfaces</I> offer only <I>two</I> of the demanded <I>four</I> sections of an <I>abstract data type</I>:
+<ul>
+<LI>name of the <I>type</I> and
+<LI>a list of all <I>public methods</I>.
+</LI>
+</ul>
+
+<P>
+To overcome that inablity to <I>define</I> an <I>entire abstract data type</I>,
+Java 1.4 introduced the <I>assert</I> keyword
+to be able to define preconditions and postconditions as assert statements.
+As the <I>assert</I> keyword of Java is only applicable on an <I>implementation level</I>,
+i.e. in method bodies
+and furthermore is lost by overridding a method,
+ Java did not succeed to overcome that flaw.
+ The direction using assetions was right but but done halfhearted.
+</P>
+
+Java needs an <I>extended concept of assertions</I> in order to be able to address the missing two sections of an <I>abstract data type</I>:
+<ul>
+<LI><I>Preconditions</I> and
+<LI><I>postconditions</I> (including the <I>class invariant</I>)
+</ul>
+<BR>
+
+That is where the
+<A href="examples_interface-contracts.html">C4J concept of interface contracts</A>
+and
+<A href="examples_class-contracts.html">C4J concept of class contracts</A>
+comes in.
+These two concepts are added to Java by C4J.
+As a result, both demands on object oriented programming languages are fulfilled:
+<BR>
+<BR>
+<P>
+On a <I>design level</I> <I>interface contracts</I> enable Java
+to declare a new <I>type</I> by <I>defining</I> its <I>entire abstract data type</I>,
+i.e. the <I>specification</I> of the new <I>type</I>.
+This is done by two software development techniques called
+<A href="theory_abc.html">Analysis by Contract</A>
+and
+<A href="theory_dbc.html">Design by Contract</A>.
+
+</P>
+<BR>
+<P>
+On an <I>implementation level</I> <I>class contracts</I> enable Java
+to add a new <I>type</I> by <I>implementing</I> a <I>class</I> which fulfills the <I>specification</I>,
+i.e. by adding pre- and postconditions to methods,
+which can not be declared in interfaces in Java
+such as constructors or protected methods.
+This is done by two software development techniques called
+<A href="theory_ibc.html">Implementation by Contract</A>
+and
+<A href="theory_tbc.html">Testing by Contract</A>.
+By activating the interface and classs contracts,
+C4J checks at runtime whether the implementation fulfills the specification.
+</P>
+
+To sum up, <I>C4J extends the concept of assertions in Java to fulfill the definition of object oriented programming.</I>
+Or even shorter:
+<BR>
+<BR>
+<P>
+<I>C4J makes Java an object oriented programming language!</I>
+</P>

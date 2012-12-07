@@ -1,0 +1,241 @@
+<html>
+<head>
+<title>C4J - Contracts for Java</title>
+<link rel="stylesheet" type="text/css" href="all.css" />
+<link href="prettify/prettify.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="prettify/prettify.js"></script>
+</head>
+
+<body onload="prettyPrint()">
+<table><tr><td id="navigation">
+<img src="c4j.png" alt="C4J Logo"/>
+<ul>
+<li><a href="index.html">Overview</a></li>
+<li><a href="ease-of-use.html">Ease of use</a></li>
+<li><a href="powerful.html">Powerful</a></li>
+<li><a href="six-principles.html">Six principles</a></li>
+<li><a href="examples.html">Examples</a></li>
+<li><a href="syntax.html">Syntax reference</a></li>
+<li><a href="inheritance.html">Inheritance of contracts</a></li>
+<li><a href="installation.html">Installation</a></li>
+<li><a href="configuration.html">Configuration</a></li>
+<li><a href="guidelines.html">Guidelines</a></li>
+<li><a href="under-the-hood.html">Under the Hood</a></li>
+<li><a href="theory.html">Theory</a></li>
+<li><a href="faq.html">FAQ</a></li>
+<li><a href="about.html">About</a></li>
+</ul>
+<ul>
+<li><a href="https://github.com/C4J-Team/C4J/downloads" target="_blank">Download C4J 6.0.0</a></li>
+<li><a href="http://c4j.sourceforge.net/" target="_blank">Download C4J 2.7.5</a></li>
+</ul>
+</td><td id="divider"></td><td id="content">
+<div class="head">Testing by Contract</div>
+<p>
+Testing by Contract is a term coined by a paper of Per Madsen
+<A href="http://www.it-c.dk/people/kasper/NWPER2002/papers/madsen.pdf"
+target=_blank>Testing by Contract</A>.
+The idea is that the test case we have written in the
+<A href="theory_abc.html">Analysis by Contract</A>
+activity is sufficient to pass the class over to the integration and system tests,
+ideally performed by TestBots which simulate real world user behaviour.
+During these tests, any vialoation of the defined contract will by detected by C4J.
+</p>
+<P>
+A <I>precondition violation</I> indicates that the <I>caller</I> of the method (the <I>customer</I>) did not fulfill its obligations.
+<BR>
+That means, the error will be found in the body of the calling method (the <I>customer</I>).
+</P>
+<P>
+A <I>postcondition violation</I> indicates that the <I>method</I> (the <I>supplier</I>) did not fulfill its obligations.
+<BR>
+That means, the error will be found in the body of the called method (the <I>supplier</I>).
+</P>
+<BR>
+By that simple but powerful approach, C4J will lead us directly to the root cause of the problem and not only the symptoms.
+To experience this fine grained error detection and isolation mechanism, lets provoke some errors on customer and supplier side.
+
+<P>
+As a rule of thumb, 80 percent of all software errors have their root cause on the caller side.
+The reason is simple:
+As without contracts the preconditions are not stated explicitly,
+the probabilty is very high that the caller of a method deals with wrong assumtions
+of what this method requires in order to be able to perform its intended task.
+So let us start with the <I>caller</I> side, i.e. the <I>test case</I> TimeOfDayTest (partial listing):
+</P>
+<PRE class="prettyprint">
+public class TimeOfDayTest {
+   private TimeOfDaySpec classUnderTest;
+   
+   private final int HOUR = 23;   // experimental change from 12 to 23
+   
+   ...
+   
+   @Test
+   public void setHourTest() {
+      classUnderTest.setHour(HOUR + 1); // line 46
+      assertEquals(HOUR + 1, classUnderTest.getHour());
+   }
+
+   ...
+</PRE>
+
+<P>
+Running the modified test case TimeOfDayTest, C4J detects the precondition violation at once:
+</P>
+
+<PRE class="prettyprint">
+java.lang.AssertionError: hour &lt;= HOUR_MAX (pre-condition)
+   at timeofday.TimeOfDaySpecContract.setHour(TimeOfDaySpecContract.java:30)
+   at timeofday.TimeOfDay.setHour(TimeOfDay.java)
+   at timeofday.TimeOfDayTest.setHourTest(TimeOfDayTest.java:46)
+   ...
+</PRE>
+
+<P>
+Read as: <I>The method setHourTest of class TimeOfDayTest called at line 46
+the method setHour of class TimeOfDay and violated the precondition assertion</I>
+hour <= HOUR_MAX
+<I> which is defined in TimeOfDaySpecContract at line 30.</I>
+</P>
+
+<P>
+Following the above rule of thumb, only 20 percent of all software errors have their root cause on the supplier side.
+Most times these errors are hard to find as they are very subtle.
+So let us undo the above experimental change to our test case TimeOfDayTest
+and do some experiments on the <I>supplier</I> side, i.e. the <I>class under test</I> TimeOfDay (partial listing):
+</P>
+
+<PRE class="prettyprint">
+@ContractReference(TimeOfDayContract.class)
+public class TimeOfDay implements TimeOfDaySpec {
+   private int hour;
+   private int minute;
+   private int second;
+
+   public TimeOfDay(int hour, int minute, int second) {
+      setHour(hour);
+      setMinute(minute);
+      // setSecond(second); // experimental change
+   } // line 17
+</PRE>
+
+<P>
+Running the restored test case TimeOfDayTest with the modified class under test TimeOfDay,
+C4J detects the postcondition violation at once:
+</P>
+
+<PRE class="prettyprint">
+java.lang.AssertionError: second set (post-condition)
+   at timeofday.TimeOfDayContract.constructor$(TimeOfDayContract.java:25)
+   at timeofday.TimeOfDay.<init>(TimeOfDay.java:17)
+   at timeofday.TimeOfDayTest.setUp(TimeOfDayTest.java:21)
+   ...
+</PRE>
+
+<P>
+Read as: <I>The method setUp of class TimeOfDayTest called at line 21
+the constructor of class TimeOfDay which violated its postcondition assertion</I>
+second set
+<I> which is defined in TimeOfDayContract at line 25.
+That means the error must be found in the method body of the constructor of class TimeOfDay.</I>
+</P>
+
+<P>
+Lets try something more subtle.
+We restore TimeOfDay and insert an unexpected side effet (partial listing):
+</P>
+
+<PRE class="prettyprint">
+@ContractReference(TimeOfDayContract.class)
+public class TimeOfDay implements TimeOfDaySpec {
+   private int hour;
+   private int minute;
+   private int second;
+
+   ...
+   
+   @Override
+   public void setHour(int hour) {
+      this.hour = hour;
+      minute = 0; // new line added as experimental change
+   } // line 23
+</PRE>
+
+<P>
+Running the test case TimeOfDayTest again with the restored and newly modified class under test TimeOfDay,
+C4J detects the postcondition violation again at once:
+</P>
+
+<PRE class="prettyprint">
+java.lang.AssertionError: minute unchanged (post-condition)
+   at timeofday.TimeOfDaySpecContract.setHour(TimeOfDaySpecContract.java:34)
+   at timeofday.TimeOfDay.setHour(TimeOfDay.java:23)
+   at timeofday.TimeOfDayTest.setHourTest(TimeOfDayTest.java:46)
+   ...
+</PRE>
+
+<P>
+Read as: <I>The method setHourTest of class TimeOfDayTest called at line 46
+the method setHour of class TimeOfDay which violated its postcondition assertion</I>
+minute unchanged
+<I> which is defined in TimeOfDayContract at line 34.
+That means the error must be found in the method body of method setHour of class TimeOfDay.</I>
+</P>
+
+<P>
+What about adding an unexpected side effet to a query?
+Let us restore the class TimeOfDay again and manipulate an query (partial listing):
+</P>
+
+<PRE class="prettyprint">
+@ContractReference(TimeOfDayContract.class)
+public class TimeOfDay implements TimeOfDaySpec {
+   private int hour;
+   private int minute;
+   private int second;
+
+   ...
+   
+   @Override
+   public int getHour() {
+      second = 0; // line 36 added as an experimental change
+      return hour;
+   }
+</PRE>
+
+<P>
+Running the test case TimeOfDayTest again with the restored and newly modified class under test TimeOfDay,
+C4J detects the postcondition violation again at once:
+</P>
+
+<PRE class="prettyprint">
+java.lang.AssertionError: illegal write access on field second
+                          in pure method timeofday.TimeOfDay.getHour() on line 36 (post-condition)
+   at timeofday.TimeOfDay.getHour(TimeOfDay.java)
+   at timeofday.TimeOfDaySpecContract.setHour(TimeOfDaySpecContract.java:33)
+   at timeofday.TimeOfDay.setHour(TimeOfDay.java:22)
+   at timeofday.TimeOfDay.<init>(TimeOfDay.java:14)
+   at timeofday.TimeOfDayTest.setUp(TimeOfDayTest.java:21)
+   ...
+</PRE>
+
+<P>
+Read as: <I>The method setUp of class TimeOfDayTest called at line 21
+the constructor of class TimeOfDay which called at line 14
+method setHour of class TimeOfDay.
+The postcondition of method setHour defined in contract class TimeOfDaySpecContract called at line 33
+the pure method getHour of class TimeOfDay.
+During the execution of getHour C4J detected an</I>
+illegal write access on field second in pure method timeofday.TimeOfDay.getHour() in line 36
+<I> That means the error must be found in line 36 of the method body of method getHour of class TimeOfDay.</I>
+</P>
+
+<P>
+Please note that an illegal write access in a pure method is only detected
+if the automatic pure validation is activated as described in section 
+<A href="configuration.html">Configuration</A>.
+</P>
+</td></tr></table>
+</body>
+</html>

@@ -1,0 +1,129 @@
+<html>
+<head>
+<title>C4J - Contracts for Java</title>
+<link rel="stylesheet" type="text/css" href="all.css" />
+<link href="prettify/prettify.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="prettify/prettify.js"></script>
+</head>
+
+<body onload="prettyPrint()">
+<table><tr><td id="navigation">
+<img src="c4j.png" alt="C4J Logo"/>
+<ul>
+<li><a href="index.html">Overview</a></li>
+<li><a href="ease-of-use.html">Ease of use</a></li>
+<li><a href="powerful.html">Powerful</a></li>
+<li><a href="six-principles.html">Six principles</a></li>
+<li><a href="examples.html">Examples</a></li>
+<li><a href="syntax.html">Syntax reference</a></li>
+<li><a href="inheritance.html">Inheritance of contracts</a></li>
+<li><a href="installation.html">Installation</a></li>
+<li><a href="configuration.html">Configuration</a></li>
+<li><a href="guidelines.html">Guidelines</a></li>
+<li><a href="under-the-hood.html">Under the Hood</a></li>
+<li><a href="theory.html">Theory</a></li>
+<li><a href="faq.html">FAQ</a></li>
+<li><a href="about.html">About</a></li>
+</ul>
+<ul>
+<li><a href="https://github.com/C4J-Team/C4J/downloads" target="_blank">Download C4J 6.0.0</a></li>
+<li><a href="http://c4j.sourceforge.net/" target="_blank">Download C4J 2.7.5</a></li>
+</ul>
+</td><td id="divider"></td><td id="content">
+<div class="head">Implementation by Contract</div>
+<p>
+Implementation by Contract is a term not really coined yet,
+but we will use it for consistency purposes
+to keep the four necessary activities of programming - analysis, design, implementation and testing - complete.
+The core idea is based on conduction the TDD cycle on the implementation level:
+</p>
+<ul>
+<LI>focus on one test (red) at a time,
+<LI>code the necessary method or methods to run that test successfull (green) and
+<LI>refactor the class under test and - if nessary - the abstract data type (interface and interface contract) it implements without breaking that test (green).
+</ul>
+
+<P>
+Test per test the test case is turned from red to green following that iterative approach.
+This iterative implementation activity implements the abstract data type TimeOfDaySpec.
+The result is the target class TimeOfDay (complete listing):
+</P>
+<PRE class="prettyprint">
+package timeofday;
+
+import de.vksi.c4j.ContractReference;
+import de.vksi.c4j.Pure;
+
+@ContractReference(TimeOfDayContract.class)
+public class TimeOfDay implements TimeOfDaySpec {
+   private int hour;
+   private int minute;
+   private int second;
+
+   public TimeOfDay(int hour, int minute, int second) {
+      setHour(hour);
+      setMinute(minute);
+      setSecond(second);
+   }
+
+   @Override
+   public void setHour(int hour) {
+      this.hour = hour;
+   }
+
+   @Override
+   public void setMinute(int minute) {
+      this.minute = minute;
+   }
+
+   @Override
+   public void setSecond(int second) {
+      this.second = second;
+   }
+
+   @Override
+   public int getHour() {
+      return hour;
+   }
+
+   @Override
+   public int getMinute() {
+      return minute;
+   }
+
+   @Override
+   public int getSecond() {
+      return second;
+   }
+
+   @Override
+   public boolean isBefore(TimeOfDaySpec other) {
+      boolean result;
+      int seconds = 0;
+      int otherSeconds = 0;
+      seconds = getSeconds(this);
+      otherSeconds = getSeconds(other);
+      result = seconds &lt; otherSeconds;
+      return result;
+   }
+
+   @Pure
+   private int getSeconds(TimeOfDaySpec tod) {
+      int result = 0;
+      result = tod.getSecond() + tod.getMinute() * 60 + tod.getHour() * 3600;
+      return result;
+   }
+}
+</PRE>
+
+<P>
+The implementation looks simple and clean.
+In fact it is, as we do not have any need for exception handling or guards in our methods.
+<BR>
+It's the contract who protects our class.
+This will be seen in the next activity,
+<A href="theory_tbc.html">Testing by Contract</A>.
+</P>
+</td></tr></table>
+</body>
+</html>

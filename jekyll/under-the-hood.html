@@ -1,0 +1,197 @@
+---
+layout: standard
+title: Under the hood
+---
+<P>
+C4J use the <B>-javaagent</B> switch that was added to Java 1.5.
+The <I>javaagent concept</I> provides a way
+to hook on to the class loader,
+and return custom byte code for any class that is loaded by the Java runtime.
+C4J contains an <I>instrumentor class</I>
+that instruments all loaded classes
+that are protected by a contract class.
+</P>
+
+<P>
+<A href="http://www.jboss.com/products/javassist" target=_blank>Javassist</A>,
+an extremely easy to use byte code library,
+is used for instrumenting.
+</P>
+
+The C4J instrumentor class does the following on each class that is loaded:
+<ul>
+<LI>Does the target class or any of it's parents contain a valid ContractReference annotation?
+Or is an external contract attached to the target class or any of it's parents?
+If not, don't instrument this class. 
+<LI>If the target class has a <I>direct</I> contract (as opposed to <I>inherited</I> from a parent),
+insert a private member of the contract class in to the target class.
+<BR> 
+For each method in the target class:
+<BR>
+<LI>If a precondition exists in the contract or the parents contract, add a call to it at the beginning of the method. 
+<LI>If a postcondition exists in the contract or the parents contract, add a call to it at the end of the method. 
+<LI>If a classInvariant exists in the contract or the parents contract, add a call to it at the end of the method. 
+<BR>
+For all of the above:
+<LI>If both a <I>direct</I> contract and an <I>inherited</I> contract exist for the method,
+add method calls to both, 
+according to the rules of
+<A href="inheritance.html">contract inheritance</A>.
+</LI>
+</ul>
+
+<P>
+Apart from this C4J provides a number of features to facilitate the writing of contract classes.
+<BR>
+These features can be accessed by using C4J's
+<A href="syntax.html">annotations and static methods</A>.
+</P>
+
+<P>
+Please note that the syntax of first generation C4J contracts
+is <I>not compatible</I> to the syntax of second gneration C4J contracts
+as the C4J syntax had to be changed in order to fulfill agility requirements.
+The second generation C4J version number has a new meaning: 
+The version number now corresponds to the Java version number
+starting from which C4J is 
+<A href="http://en.wikipedia.org/wiki/Forward_compatibility" target=_blank>upward compatible</A>,
+i.e. C4J 6.x is compatible to Java 6, Java 7 and so on.
+</P>
+
+<P>
+Please be aware of the fact that for
+<A href="inheritance.html">contract inheritance</A>
+C4J deals in a way with the
+<A href="http://en.wikipedia.org/wiki/Liskov_substitution_principle" 
+target=_blank>Liskov substitution principle (LSP)</A>
+that is different to
+<A href="http://en.wikipedia.org/wiki/Eiffel_(programming_language)" target=_blank>Eiffel</A>.
+</P>
+
+<DIV id=bullets>
+In <A href="http://en.wikipedia.org/wiki/Eiffel_(programming_language)" target=_blank>Eiffel</A>
+contract inheritance is implemented like this:
+<LI>superclass <I>preconditions</I> and subclass <I>preconditions</I> of the same method are concatenated using <I>OR</I>.
+<LI>superclass <I>postconditions</I> and subclass <I>postconditions</I> of the same method are concatenated using <I>AND</I>.
+<LI>superclass <I>class invariants</I> and subclass <I>class invariants</I> are concatenated using <I>AND</I>.
+</LI>
+</DIV>
+
+<DIV id=bullets>
+Opposed to that, <I>first generation</I> C4J implements the
+<A href="inheritance.html">inheritance of contracts</A>
+like this:
+<LI>superclass <I>preconditions</I> and <I>valid</I> subclass <I>preconditions</I> of the same method are concatenated using <I>AND</I>.
+<LI>superclass <I>postconditions</I> and <I>valid</I> subclass <I>postconditions</I> of the same method are concatenated using <I>AND</I>.
+<LI>superclass <I>class invariants</I> and subclass <I>class invariants</I> are concatenated using <I>AND</I>.
+</LI>
+</DIV>
+
+<P>
+According to
+<A href="http://en.wikipedia.org/wiki/Liskov_substitution_principle" 
+target=_blank>LSP</A>
+<I>valid</I> subclass <I>preconditions</I> are preconditions which do not strengthen the superclass <I>preconditions</I>,
+i.e. the subclass <I>precondition</I> always has to prove <I>true</I> when the superclass <I>precondition</I> proves <I>true</I>.
+This is checked by C4J at runtime using the AND concatenation.
+If a subclass <I>precondition</I> is detected to break that rule at runtime,
+a C4J ERROR message is logged and the affected subclass <I>precondition</I> is discarded.
+</P>
+
+<P>
+According to
+<A href="http://en.wikipedia.org/wiki/Liskov_substitution_principle" 
+target=_blank>LSP</A>
+<I>valid</I> subclass <I>postconditions</I> are postconditions which do not weaken the superclass <I>postconditions</I>,
+i.e. the subclass <I>postcondition</I> always has to prove <I>false</I> when the superclass <I>postcondition</I> proves <I>false</I>.
+This is checked by C4J at runtime using the AND concatenation.
+If a subclass <I>postcondition</I> is detected to break that rule at runtime,
+a C4J ERROR message is logged and the affected subclass <I>postcondition</I> is discarded.
+</P>
+
+Please note that
+<A href="http://en.wikipedia.org/wiki/Eiffel_(programming_language)" target=_blank>Eiffel</A>
+does not detect invalid <I>preconditions</I> as they are concatenated using OR.
+That is the reason why Richard Mitchell and Jim McKim give the following guideline
+in their book
+<A href="http://www.amazon.com/Design-Contract-Example-Richard-Mitchell/dp/0201634600" 
+target=_blank>Design by Contract by Example</A>:
+<BR>
+<BR>
+
+<P>
+<I>Guideline 4: To support redefinition of features,
+guard each postcondition clause with its corresponding precondition.<I>
+</P>
+<BR>
+
+A questionable guideline as it creates a lot of redundancy and makes contracts complex.
+
+<P>
+C4J contracts do not need such a questionable guideline
+as the AND concatenation of preconditions guarantees the ability
+of redefining (overriding) features (methods) in subclasses.
+</P>
+
+<I>Second generation</I> C4J is even more rigid and implements the
+<A href="inheritance.html">inheritance of contracts</A>
+like this:
+<ul>
+<LI>superclass <I>preconditions</I> of a method are not allowed to be extended by <I>any</I> subclass.
+<LI>superclass <I>postconditions</I> and subclass <I>postconditions</I> of the same method are concatenated using <I>AND</I>.
+<LI>superclass <I>class invariants</I> and subclass <I>class invariants</I> are concatenated using <I>AND</I>.
+</ul>
+
+The rationale of that even more rigid implementation for <I>precondition inheritance</I> is:
+<ul>
+<LI>A <I>precondition</I> can only prove <I>false</I> or <I>true</I>.
+<LI>Case 1: The superclass <I>precondition</I> proves <I>false</I>.
+An AssertionError has to be thrown as a precondition violation is detected
+regardless whether the subclass <I>precondition</I> may prove <I>true</I> or <I>false</I>.
+The <I>AND concatenation</I> of superclass and subclass <I>preconditions</I> is perfectly right to implement that expected behaviour.
+<LI>Case 2: The superclass <I>precondition</I> proves <I>true</I>.
+For this case it matters, whether the subclass <I>precondition</I> proves <I>true</I> or <I>false</I>.
+<LI>Case 2.1: The subclass <I>precondition</I> proves <I>false</I>.
+That is a
+<A href="http://en.wikipedia.org/wiki/Liskov_substitution_principle" 
+target=_blank>LSP</A>
+violation as the subclass <I>precondition</I> <I>strengthens</I> its superclass <I>precondition</I>.
+<LI>Case 2.1: The subclass <I>precondition</I> proves <I>true</I>.
+That is in accordance with the
+<A href="http://en.wikipedia.org/wiki/Liskov_substitution_principle" 
+target=_blank>LSP</A>
+as the subclass <I>precondition</I> does not <I>strengthen</I> its superclass <I>precondition</I>.
+There are two subcases for this case.
+<LI>Case 2.1.1: The subclass <I>precondition</I> <I>equals</I> its superclass <I>precondition</I>,
+i.e. the subclass <I>precondition</I> always has to prove <I>true</I> when the superclass <I>precondition</I> proves <I>true</I>.
+<LI>Case 2.1.2: The subclass <I>precondition</I> </I>weakens</I> its superclass <I>precondition</I>,
+the subclass <I>precondition</I> always has to prove <I>true</I> when the superclass <I>precondition</I> proves <I>true</I>.
+<LI>As there is no difference in the effective result of case 2.1.1 and case 2.1.2
+you can merge them to one constraint:
+ As <A href="http://en.wikipedia.org/wiki/Liskov_substitution_principle" 
+target=_blank>LSP</A>
+says that <I>preconditions</I> may not be <I>strengthend</I>
+C4J demands that <I>superclass preconditions are not allowed to be extended
+which has the same effective result</I>.
+</ul>
+
+As C4J also supports <I>multiple inheritance of interfaces</I>.
+The implementation is the same for first and second generation C4J and looks like that:
+<ul>
+<LI>all superinterface <I>preconditions</I> of the same method are merged using <I>AND</I>.
+<LI>all superinterface <I>postconditions</I> of the same method are merged using <I>AND</I>.
+<LI>all superinterface <I>class invariants</I> are merged using <I>AND</I>.
+</ul>
+
+The C4J implementation of
+<A href="inheritance.html">contract inheritance</A>
+is in accordance to the LSP paper of Barbara Liskov
+<A href="http://reports-archive.adm.cs.cmu.edu/anon/1999/CMU-CS-99-156.pdf"
+target=_blank>Behavioral Subtyping Using Invariants and Constraints (1999)</A>.
+
+<P>
+Fore more information about the discussion of that topic
+please have a look at Jonas Bergströms answer in the
+<A href="http://sourceforge.net/projects/c4j/forums/forum/547819/topic/1607817"
+target=_blank>first generation C4J forum </A> (November 2006).
+</P>

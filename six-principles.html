@@ -1,0 +1,83 @@
+<html>
+<head>
+<title>C4J - Contracts for Java</title>
+<link rel="stylesheet" type="text/css" href="all.css" />
+<link href="prettify/prettify.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="prettify/prettify.js"></script>
+</head>
+
+<body onload="prettyPrint()">
+<table><tr><td id="navigation">
+<img src="c4j.png" alt="C4J Logo"/>
+<ul>
+<li><a href="index.html">Overview</a></li>
+<li><a href="ease-of-use.html">Ease of use</a></li>
+<li><a href="powerful.html">Powerful</a></li>
+<li><a href="six-principles.html">Six principles</a></li>
+<li><a href="examples.html">Examples</a></li>
+<li><a href="syntax.html">Syntax reference</a></li>
+<li><a href="inheritance.html">Inheritance of contracts</a></li>
+<li><a href="installation.html">Installation</a></li>
+<li><a href="configuration.html">Configuration</a></li>
+<li><a href="guidelines.html">Guidelines</a></li>
+<li><a href="under-the-hood.html">Under the Hood</a></li>
+<li><a href="theory.html">Theory</a></li>
+<li><a href="faq.html">FAQ</a></li>
+<li><a href="about.html">About</a></li>
+</ul>
+<ul>
+<li><a href="https://github.com/C4J-Team/C4J/downloads" target="_blank">Download C4J 6.0.0</a></li>
+<li><a href="http://c4j.sourceforge.net/" target="_blank">Download C4J 2.7.5</a></li>
+</ul>
+</td><td id="divider"></td><td id="content">
+<div class="head">Six principles</div>
+<p>
+In their book
+<A href="http://www.amazon.com/Design-Contract-Example-Richard-Mitchell/dp/0201634600" 
+target=_blank>Design by Contract by Example</A>
+Richard Mitchell and Jim McKim state six elementary principles how to write good contracts:
+</p>
+<br/>
+<P>
+Principle 1: <I>Separate queries from commands.</I>
+<BR>
+Queries return a result but do not change the visible properties of the object.
+Commands might change the object but do not return a result.
+</P>
+<BR>
+<P>
+Principle 2: <I>Separate basic queries from derived queries.</I>
+<BR>
+Derived queries can be specified in terms of basic queries.
+</P>
+<BR>
+<P>
+Principle 3: <I>For each derived query, write a postcondition that specifies what result will be returned, in terms of one or more basic queries.</I>
+<BR>
+Then, if we know the values of the basic queries, we also know the values of the derived queries.
+</P>
+<BR>
+<P>
+Principle 4: <I>For each command, write a postcondition that specifies the value of every basic query.</I>
+<BR>
+Now we know the total visible effect of each command.
+</P>
+<BR>
+<P>
+Principle 5: <I>For every query and command, decide on a suitable precondition.</I>
+<BR>
+Preconditions constrain when clients may call the queries and commands.
+</P>
+<BR>
+<P>
+Principle 6: <I>Write invariants to define unchanging properties of objects.</I>
+<BR>
+Concentrate on properties that help the reader build an appropriate conceptual model of the abstraction the class embodies.
+</P>
+<BR>
+<p>
+These six principles have been applied to all the examples on this website and the tutorials and case studies.
+</p>
+</td></tr></table>
+</body>
+</html>

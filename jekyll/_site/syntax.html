@@ -1,0 +1,362 @@
+<html>
+<head>
+<title>C4J - Contracts for Java</title>
+<link rel="stylesheet" type="text/css" href="all.css" />
+<link href="prettify/prettify.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="prettify/prettify.js"></script>
+</head>
+
+<body onload="prettyPrint()">
+<table><tr><td id="navigation">
+<img src="c4j.png" alt="C4J Logo"/>
+<ul>
+<li><a href="index.html">Overview</a></li>
+<li><a href="ease-of-use.html">Ease of use</a></li>
+<li><a href="powerful.html">Powerful</a></li>
+<li><a href="six-principles.html">Six principles</a></li>
+<li><a href="examples.html">Examples</a></li>
+<li><a href="syntax.html">Syntax reference</a></li>
+<li><a href="inheritance.html">Inheritance of contracts</a></li>
+<li><a href="installation.html">Installation</a></li>
+<li><a href="configuration.html">Configuration</a></li>
+<li><a href="guidelines.html">Guidelines</a></li>
+<li><a href="under-the-hood.html">Under the Hood</a></li>
+<li><a href="theory.html">Theory</a></li>
+<li><a href="faq.html">FAQ</a></li>
+<li><a href="about.html">About</a></li>
+</ul>
+<ul>
+<li><a href="https://github.com/C4J-Team/C4J/downloads" target="_blank">Download C4J 6.0.0</a></li>
+<li><a href="http://c4j.sourceforge.net/" target="_blank">Download C4J 2.7.5</a></li>
+</ul>
+</td><td id="divider"></td><td id="content">
+<div class="head">Syntax reference</div>
+<p>
+C4J provides these annotations to define special attributes of a class, method or variable:
+</p>
+<ul>
+<LI>@ContractReference
+<LI>@Contract
+<LI>@Target
+<LI>@ClassInvariant
+<LI>@Pure
+<LI>@PureTarget
+</ul>
+<P>
+Each of these annotations wil now be described by an example.
+</P>
+
+<P>
+@ContractReference annotates a class or an interface as guarded by the indicated contract class.
+</P>
+<PRE class="prettyprint">
+@ContractReference(TimeOfDayContract.class)
+public class TimeOfDay {
+   ...
+</PRE>
+<P>
+Read as: <I>The class TimeOfDay is guarded by the contract class TimeOfDayContract.</I>
+</P>
+
+<P>
+@Contract annotates an contract class as being an external contract for extended class or implemented interface.
+</P>
+<PRE class="prettyprint">
+@Contract
+public class TimeOfDayContract extends TimeOfDay {
+   ...
+</PRE>
+<P>
+Read as: <I>The contract class TimeOfDayContract guards the class TimeOfDay as an external contract.</I>
+</P>
+
+<P>
+@Target annotates an instance variable as being the reference to the guarded object (the target).
+There can be only one instance variable annoted as target reference.
+The name of the instance variable is arbitrary,
+but it is good contract coding style to name it <I>target</I>.
+The visibilty should be <I>private</I> as this reference will only be used within the class contract it is declared in.
+The type is always the type of the target class which is the class the contract class extends or the interface the contract class implements.
+</P>
+<PRE class="prettyprint">
+public class TimeOfDayContract extends TimeOfDay {
+   @Target
+   private TimeOfDay target;
+
+   ...   
+</PRE>
+<P>
+Read as: <I>The private instance variable target of type TimeOfDay
+is a reference to the guarded object (the target) of type TimeOfDay.</I>
+</P>
+
+<P>
+@ClassInvariant annotates a method as the class invariant of the guarded class.
+If more than one method is annoted as class invariant,
+all of them are concatenated to one big method.
+The name of the method is arbitrary,
+but it is good contract coding style to name it <I>classInvariant</I>.
+</P>
+<PRE class="prettyprint">
+public class TimeOfDayContract extends TimeOfDay {
+   @Target
+   private TimeOfDay target;
+
+   @ClassInvariant
+   public void classInvariant() {
+      assert target.getHour() >= HOUR_MIN : "hour >= HOUR_MIN";
+      assert target.getHour() <= HOUR_MAX : "hour <= HOUR_MAX";
+      assert target.getMinute() >= MINUTE_MIN : "minute >= MINUTE_MIN";
+      assert target.getMinute() <= MINUTE_MAX : "minute <= MINUTE_MAX";
+      assert target.getSecond() >= SECOND_MIN : "second >= SECOND_MIN";
+      assert target.getSecond() <= SECOND_MAX : "second <= SECOND_MAX";
+   }
+
+   ...
+</PRE>
+<P>
+Read as: <I>The public method classInvariant() is a class invariant.
+It ensures that getHour() always returns a value between HOUR_MIN and HOUR_MAX,
+getMinute() always returns a value between MINUTE_MIN and MINUTE_MAX and
+getSecond() always returns a value between SECOND_MIN and SECOND_MAX.</I>
+</P>
+
+<P>
+@Pure annotates pure methods, i.e. queries without side effects.
+A contract class is only allowed to use pure methods,
+as there must be no difference in the behavior of the guarded class
+whether the contract guards it or not.
+</P>
+<PRE class="prettyprint">
+@ContractReference(TimeOfDayContract.class)
+public class TimeOfDay {
+   public static final int HOUR_MIN = 0;
+   public static final int HOUR_MAX = 23;
+   public static final int MINUTE_MIN = 0;
+   public static final int MINUTE_MAX = 59;
+   public static final int SECOND_MIN = 0;
+   public static final int SECOND_MAX = 59;
+
+   private int hour;
+   private int minute;
+   private int second;
+
+   @Pure
+   public int getHour() {
+      return hour;
+   }
+
+   @Pure
+   public int getMinute() {
+      return minute;
+   }
+
+   @Pure
+   public int getSecond() {
+      return second;
+   }
+
+   ...   
+</PRE>
+<P>
+Read as: <I>The public methods getHour, getMinute and getSecond
+are pure, i.e. queries without any side effect
+which can therefore be used in contract classes.</I>
+</P>
+
+<P>
+@PureTarget annotates pure methods from an external contract class.
+</P>
+<PRE class="prettyprint">
+@Contract
+public class TimeOfDayContract extends TimeOfDay {
+   @Override
+   @PureTarget
+   public int getHour() {
+      return ignored();
+   }
+
+   @Override
+   @PureTarget
+   public int getMinute() {
+      return ignored();
+   }
+
+   @Override
+   @PureTarget
+   public int getSecond() {
+      return ignored();
+   }
+
+   ...   
+</PRE>
+<P>
+Read as: <I>The public methods getHour, getMinute and getSecond in the target class TimeOfDay
+are pure, i.e. queries without any side effect
+which can therefore be used in contract classes.</I>
+</P>
+
+<p>
+C4J provides these static methods to implement contract clauses:
+</p>
+<ul>
+<LI>preCondition()
+<LI>postCondition()
+<LI>ignored()
+<LI>result()
+<LI>old()
+<LI>unchanged()
+</ul>
+<P>
+Each of these static methods will now be described by an example.
+</P>
+
+<P>
+preCondition() allows us to implement a precondition for a method.
+</P>
+<PRE class="prettyprint">
+public class TimeOfDayContract extends TimeOfDay {
+   @Override
+   public void setHour(int hour) {
+      if (preCondition()) {
+         assert hour >= HOUR_MIN : "hour >= HOUR_MIN";
+         assert hour <= HOUR_MAX : "hour <= HOUR_MAX";
+      }
+   }
+
+   ...
+</PRE>
+<P>
+Read as: <I>The method setHour of class TimeOfDay has a precondition which requires
+that the value of the method parameter hour is between HOUR_MIN and HOUR_MAX.</I>
+</P>
+
+<P>
+postCondition() allows us to implement a postcondition for a method.
+</P>
+<PRE class="prettyprint">
+public class TimeOfDayContract extends TimeOfDay {
+   @Target
+   private TimeOfDay target;
+
+   @Override
+   public void setHour(int hour) {
+      if (postCondition()) {
+         assert target.getHour() == hour : "hour set";
+      }
+   }
+
+   ...
+</PRE>
+<P>
+Read as: <I>The method setHour of class TimeOfDay has a postcondition which ensures
+that the value of hour is successfully set,
+i.e. calling the method getHour() on target will return the value of hour.</I>
+</P>
+
+<P>
+ignored() is needed when the guarded method has a return value, i.e. is a query.
+A contract class has to extend the target class or implement the target interface.
+All methods of the target class or target interface have to be overridden in the contract class.
+As the overriding method in the contract class must have the same signature as the guarded method in the target class,
+it also has to return a dummy value of the right type.
+This dummy return value is created by calling ignored().
+</P>
+<PRE class="prettyprint">
+public class TimeOfDayContract extends TimeOfDay {
+   @Override
+   public int getHour() {
+      return ignored();
+   }
+
+   ...
+</PRE>
+<P>
+Read as: <I>The method getHour() of class TimeOfDay has a return value of type int.
+Therefore the corresponding method getHour of the contract class TimeOfDayContract
+needs a dummy return value of type int, which is created by calling ignored().</I>
+</P>
+
+<P>
+result() gives a postcondition access to the return value of the guarded method.
+It is good coding style to assign the return value of result()
+to a local variable named result, which has to have the same type as the return value of the guarded method.
+</P>
+<PRE>
+public class TimeOfDayContract extends TimeOfDay {
+   @Override
+   public int getHour() {
+      if(postCondition()) {
+         int result = result();
+         assert result >= HOUR_MIN : "result >= HOUR_MIN";
+         assert result <= HOUR_MAX : "result <= HOUR_MAX";
+      }
+      return ignored();
+   }
+
+   ...
+</PRE>
+<P>
+Read as: <I>The method setHour of class TimeOfDay has a postcondition which ensures
+that the returned value, i.e. the result of calling this method
+is between HOUR_MIN and HOUR_MAX.</I>
+</P>
+
+<P>
+old() allows us in postconditions to get access to the value of a target attribute as it has been in the precondition,
+i.e. before the guarded method has been executed.
+</P>
+<PRE class="prettyprint">
+public class TimeOfDayContract extends TimeOfDay {
+   @Target
+   private TimeOfDay target;
+
+   @Override
+   public void nextHour() {
+      if (postCondition()) {
+         if (old(target.getHour()) < HOUR_MAX) {
+            assert target.getHour() == old(target.getHour()) + 1 : "if old hour < HOUR_MAX then hour == old hour + 1";
+         }
+         else {
+            assert target.getHour() == HOUR_MIN : "if old hour == HOUR_MAX then hour == HOUR_MIN";
+         }
+      }
+   }
+
+   ...
+</PRE>
+<P>
+Read as: <I>The method nextHour of class TimeOfDay has a postcondition which ensures
+that hour will be set to the next valid hour between HOUR_MIN and HOUR_MAX.</I>
+</P>
+
+<P>
+unchanged() allows us in postconditions to ensure that a dedicated target attribute
+did not change since the call of the precondition,
+i.e. before the guarded method has been executed.
+By that we can exactly frame the intended side effect of the guarded method.
+</P>
+<PRE class="prettyprint">
+public class TimeOfDayContract extends TimeOfDay {
+   @Target
+   private TimeOfDay target;
+
+   @Override
+   public void setHour(int hour) {
+      if (postCondition()) {
+         assert target.getHour() == hour : "hour set";
+         assert unchanged(target.getMinute()) : "minute unchanged";
+         assert unchanged(target.getSecond()) : "second unchanged";
+      }
+   }
+
+   ...
+</PRE>
+<P>
+Read as: <I>The method setHour of class TimeOfDay has a postcondition which ensures
+that only hour will be set to a new value
+whereas minute and second will remain unchanged.</I>
+</P>
+</td></tr></table>
+</body>
+</html>

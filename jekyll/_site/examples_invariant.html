@@ -1,0 +1,112 @@
+<html>
+<head>
+<title>C4J - Contracts for Java</title>
+<link rel="stylesheet" type="text/css" href="all.css" />
+<link href="prettify/prettify.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="prettify/prettify.js"></script>
+</head>
+
+<body onload="prettyPrint()">
+<table><tr><td id="navigation">
+<img src="c4j.png" alt="C4J Logo"/>
+<ul>
+<li><a href="index.html">Overview</a></li>
+<li><a href="ease-of-use.html">Ease of use</a></li>
+<li><a href="powerful.html">Powerful</a></li>
+<li><a href="six-principles.html">Six principles</a></li>
+<li><a href="examples.html">Examples</a></li>
+<li><a href="syntax.html">Syntax reference</a></li>
+<li><a href="inheritance.html">Inheritance of contracts</a></li>
+<li><a href="installation.html">Installation</a></li>
+<li><a href="configuration.html">Configuration</a></li>
+<li><a href="guidelines.html">Guidelines</a></li>
+<li><a href="under-the-hood.html">Under the Hood</a></li>
+<li><a href="theory.html">Theory</a></li>
+<li><a href="faq.html">FAQ</a></li>
+<li><a href="about.html">About</a></li>
+</ul>
+<ul>
+<li><a href="https://github.com/C4J-Team/C4J/downloads" target="_blank">Download C4J 6.0.0</a></li>
+<li><a href="http://c4j.sourceforge.net/" target="_blank">Download C4J 2.7.5</a></li>
+</ul>
+</td><td id="divider"></td><td id="content">
+<div class="head">Class invariant example</div>
+<P>
+The target class TimeOfDay looks like this (partial listing):
+</P>
+<PRE class="prettyprint">
+@ContractReference(TimeOfDayContract.class)
+public class TimeOfDay {
+   public static final int HOUR_MIN = 0;
+   public static final int HOUR_MAX = 23;
+   public static final int MINUTE_MIN = 0;
+   public static final int MINUTE_MAX = 59;
+   public static final int SECOND_MIN = 0;
+   public static final int SECOND_MAX = 59;
+
+   private int hour;
+   private int minute;
+   private int second;
+
+   public TimeOfDay(int hour, int minute, int second) {
+      setHour(hour);
+      setMinute(minute);
+      setSecond(second);
+   }
+
+   public void setHour(int hour) {
+      this.hour = hour;
+   }
+
+   public void setMinute(int minute) {
+      this.minute = minute;
+   }
+
+   public void setSecond(int second) {
+      this.second = second;
+   }
+
+   @Pure
+   public int getHour() {
+      return hour;
+   }
+
+   @Pure
+   public int getMinute() {
+      return minute;
+   }
+
+   @Pure
+   public int getSecond() {
+      return second;
+   }
+}
+</PRE>
+<P>
+The corresponding contract class TimeOfDayContract extends TimeOfDay and looks like this (partial listing):
+</P>
+<PRE class="prettyprint">
+public class TimeOfDayContract extends TimeOfDay {
+   @Target
+   private TimeOfDay target;
+
+   @ClassInvariant
+   public void classInvariant() {
+      assert target.getHour() >= HOUR_MIN : "hour >= HOUR_MIN";
+      assert target.getHour() <= HOUR_MAX : "hour <= HOUR_MAX";
+      assert target.getMinute() >= MINUTE_MIN : "minute >= MINUTE_MIN";
+      assert target.getMinute() <= MINUTE_MAX : "minute <= MINUTE_MAX";
+      assert target.getSecond() >= SECOND_MIN : "second >= SECOND_MIN";
+      assert target.getSecond() <= SECOND_MAX : "second <= SECOND_MAX";
+   }
+}
+</PRE>
+<P>
+Read as: <I>The class invariant of class TimeOfDay says
+that getHour() always returns a value between HOUR_MIN and HOUR_MAX,
+getMinute() always returns a value between MINUTE_MIN and MINUTE_MAX and
+getSecond() always returns a value between SECOND_MIN and SECOND_MAX.</I>
+</P>
+</td></tr></table>
+</body>
+</html>

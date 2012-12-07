@@ -1,0 +1,80 @@
+---
+layout: standard
+title: Class invariant example
+---
+<P>
+The target class TimeOfDay looks like this (partial listing):
+</P>
+<PRE class="prettyprint">
+@ContractReference(TimeOfDayContract.class)
+public class TimeOfDay {
+   public static final int HOUR_MIN = 0;
+   public static final int HOUR_MAX = 23;
+   public static final int MINUTE_MIN = 0;
+   public static final int MINUTE_MAX = 59;
+   public static final int SECOND_MIN = 0;
+   public static final int SECOND_MAX = 59;
+
+   private int hour;
+   private int minute;
+   private int second;
+
+   public TimeOfDay(int hour, int minute, int second) {
+      setHour(hour);
+      setMinute(minute);
+      setSecond(second);
+   }
+
+   public void setHour(int hour) {
+      this.hour = hour;
+   }
+
+   public void setMinute(int minute) {
+      this.minute = minute;
+   }
+
+   public void setSecond(int second) {
+      this.second = second;
+   }
+
+   @Pure
+   public int getHour() {
+      return hour;
+   }
+
+   @Pure
+   public int getMinute() {
+      return minute;
+   }
+
+   @Pure
+   public int getSecond() {
+      return second;
+   }
+}
+</PRE>
+<P>
+The corresponding contract class TimeOfDayContract extends TimeOfDay and looks like this (partial listing):
+</P>
+<PRE class="prettyprint">
+public class TimeOfDayContract extends TimeOfDay {
+   @Target
+   private TimeOfDay target;
+
+   @ClassInvariant
+   public void classInvariant() {
+      assert target.getHour() >= HOUR_MIN : "hour >= HOUR_MIN";
+      assert target.getHour() <= HOUR_MAX : "hour <= HOUR_MAX";
+      assert target.getMinute() >= MINUTE_MIN : "minute >= MINUTE_MIN";
+      assert target.getMinute() <= MINUTE_MAX : "minute <= MINUTE_MAX";
+      assert target.getSecond() >= SECOND_MIN : "second >= SECOND_MIN";
+      assert target.getSecond() <= SECOND_MAX : "second <= SECOND_MAX";
+   }
+}
+</PRE>
+<P>
+Read as: <I>The class invariant of class TimeOfDay says
+that getHour() always returns a value between HOUR_MIN and HOUR_MAX,
+getMinute() always returns a value between MINUTE_MIN and MINUTE_MAX and
+getSecond() always returns a value between SECOND_MIN and SECOND_MAX.</I>
+</P>

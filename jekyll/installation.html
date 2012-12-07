@@ -1,0 +1,32 @@
+---
+layout: standard
+title: Installation
+---
+<P>
+As mentioned previously, the <B>-javaagent</B> switch that was added to Java 1.5
+is used to dynamically insert contract checking to your classes.
+<BR>
+Running a C4J enabled application from the command line looks as below,
+provided that your classpath contains the javassist.jar jar
+and your test classes
+(don't forget to enable assertions using the <B>-ea</B> switch):
+</P>
+
+<PRE class="prettyprint">
+  java -ea -javaagent:../c4j/c4j.jar timeofday.TimeOfDayDemo
+</PRE>
+
+<P>
+Using Eclipse JDT you can use the <I>JRE Definition</I> to specifiy
+a JRE with the name <I>c4j-jre</I> and the default VM arguments:
+
+<PRE class="prettyprint">
+  java -ea -javaagent:${project_loc:c4j}/c4j.jar
+</PRE>
+
+<P>
+with $(project_loc:c4j} returning the absolute file system path of the c4j project,
+which could be downloaded from this website and imported into Eclipse.
+Just add the c4j.jar to your Java Build Path Libraries - and your are done.
+<img src="img/installation_eclipse-java-build-path.png" align="left" vspace="7" hspace="7">
+</P>

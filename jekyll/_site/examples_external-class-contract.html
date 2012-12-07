@@ -1,0 +1,203 @@
+<html>
+<head>
+<title>C4J - Contracts for Java</title>
+<link rel="stylesheet" type="text/css" href="all.css" />
+<link href="prettify/prettify.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="prettify/prettify.js"></script>
+</head>
+
+<body onload="prettyPrint()">
+<table><tr><td id="navigation">
+<img src="c4j.png" alt="C4J Logo"/>
+<ul>
+<li><a href="index.html">Overview</a></li>
+<li><a href="ease-of-use.html">Ease of use</a></li>
+<li><a href="powerful.html">Powerful</a></li>
+<li><a href="six-principles.html">Six principles</a></li>
+<li><a href="examples.html">Examples</a></li>
+<li><a href="syntax.html">Syntax reference</a></li>
+<li><a href="inheritance.html">Inheritance of contracts</a></li>
+<li><a href="installation.html">Installation</a></li>
+<li><a href="configuration.html">Configuration</a></li>
+<li><a href="guidelines.html">Guidelines</a></li>
+<li><a href="under-the-hood.html">Under the Hood</a></li>
+<li><a href="theory.html">Theory</a></li>
+<li><a href="faq.html">FAQ</a></li>
+<li><a href="about.html">About</a></li>
+</ul>
+<ul>
+<li><a href="https://github.com/C4J-Team/C4J/downloads" target="_blank">Download C4J 6.0.0</a></li>
+<li><a href="http://c4j.sourceforge.net/" target="_blank">Download C4J 2.7.5</a></li>
+</ul>
+</td><td id="divider"></td><td id="content">
+<div class="head">External class contract example</div>
+<P>
+There are two ways to attach a contract to a class, an "internal" way and an "external" way.
+The following example uses the external way,
+i.e. the contract class refers to its target class
+by using the C4J Annotation @Contract and extending the target class.
+<BR>
+That means, that the source code of the target class has not to be modified
+which is especially important for adding contracts to legacy systems.
+<BR>
+The target class TimeOfDay uses the external way and looks like this (complete listing):
+</P>
+<PRE class="prettyprint">
+package timeofday;
+
+public class TimeOfDay {
+   public static final int HOUR_MIN = 0;
+   public static final int HOUR_MAX = 23;
+   public static final int MINUTE_MIN = 0;
+   public static final int MINUTE_MAX = 59;
+   public static final int SECOND_MIN = 0;
+   public static final int SECOND_MAX = 59;
+
+   private int hour;
+   private int minute;
+   private int second;
+
+   public TimeOfDay(int hour, int minute, int second) {
+      setHour(hour);
+      setMinute(minute);
+      setSecond(second);
+   }
+
+   public void setHour(int hour) {
+      this.hour = hour;
+   }
+
+   public void setMinute(int minute) {
+      this.minute = minute;
+   }
+
+   public void setSecond(int second) {
+      this.second = second;
+   }
+
+   public int getHour() {
+      return hour;
+   }
+
+   public int getMinute() {
+      return minute;
+   }
+
+   public int getSecond() {
+      return second;
+   }
+}
+</PRE>
+<P>
+The corresponding contract class TimeOfDayContract extends TimeOfDay and looks like this (complete listing):
+</P>
+<PRE class="prettyprint">
+package timeofday;
+
+import static de.vksi.c4j.Condition.ignored;
+import static de.vksi.c4j.Condition.postCondition;
+import static de.vksi.c4j.Condition.preCondition;
+import static de.vksi.c4j.Condition.unchanged;
+import de.vksi.c4j.ClassInvariant;
+import de.vksi.c4j.Contract;
+import de.vksi.c4j.PureTarget;
+import de.vksi.c4j.Target;
+
+@Contract(forTarget = TimeOfDay.class)
+public class TimeOfDayContract extends TimeOfDay {
+   @Target
+   private TimeOfDay target;
+
+   @ClassInvariant
+   public void classInvariant() {
+      assert target.getHour() &gt;= HOUR_MIN : "hour &gt;= HOUR_MIN";
+      assert target.getHour() &lt;= HOUR_MAX : "hour &lt;= HOUR_MAX";
+      assert target.getMinute() &gt;= MINUTE_MIN : "minute &gt;= MINUTE_MIN";
+      assert target.getMinute() &lt;= MINUTE_MAX : "minute &lt;= MINUTE_MAX";
+      assert target.getSecond() &gt;= SECOND_MIN : "second &gt;= SECOND_MIN";
+      assert target.getSecond() &lt;= SECOND_MAX : "second &lt;= SECOND_MAX";
+   }
+
+   public TimeOfDayContract(int hour, int minute, int second) {
+      super(hour, minute, second);
+      if (preCondition()) {
+         assert hour &gt;= HOUR_MIN : "hour &gt;= HOUR_MIN";
+         assert hour &lt;= HOUR_MAX : "hour &lt;= HOUR_MAX";
+         assert minute &gt;= MINUTE_MIN : "minute &gt;= MINUTE_MIN";
+         assert minute &lt;= MINUTE_MAX : "minute &lt;= MINUTE_MAX";
+         assert second &gt;= SECOND_MIN : "second &gt;= SECOND_MIN";
+         assert second &lt;= SECOND_MAX : "second &lt;= SECOND_MAX";
+      }
+      if (postCondition()) {
+         assert target.getHour() == hour : "hour set";
+         assert target.getMinute() == minute : "minute set";
+         assert target.getSecond() == second : "second set";
+      }
+   }
+
+   @Override
+   public void setHour(int hour) {
+      if (preCondition()) {
+         assert hour &gt;= HOUR_MIN : "hour &gt;= HOUR_MIN";
+         assert hour &lt;= HOUR_MAX : "hour &lt;= HOUR_MAX";
+      }
+      if (postCondition()) {
+         assert target.getHour() == hour : "hour set";
+         assert unchanged(target.getMinute()) : "minute unchanged";
+         assert unchanged(target.getSecond()) : "second unchanged";
+      }
+   }
+
+   @Override
+   public void setMinute(int minute) {
+      if (preCondition()) {
+         assert minute &gt;= MINUTE_MIN : "minute &gt;= MINUTE_MIN";
+         assert minute &lt;= MINUTE_MAX : "minute &lt;= MINUTE_MAX";
+      }
+      if (postCondition()) {
+         assert unchanged(target.getHour()) : "hour unchanged";
+         assert target.getMinute() == minute : "minute set";
+         assert unchanged(target.getSecond()) : "second unchanged";
+      }
+   }
+
+   @Override
+   public void setSecond(int second) {
+      if (preCondition()) {
+         assert second &gt;= SECOND_MIN : "second &gt;= SECOND_MIN";
+         assert second &lt;= SECOND_MAX : "second &lt;= SECOND_MAX";
+      }
+      if (postCondition()) {
+         assert unchanged(target.getHour()) : "hour unchanged";
+         assert unchanged(target.getMinute()) : "minute unchanged";
+         assert target.getSecond() == second : "second set";
+      }
+   }
+
+   @Override
+   @PureTarget
+   public int getHour() {
+      return ignored();
+   }
+
+   @Override
+   @PureTarget
+   public int getMinute() {
+      return ignored();
+   }
+
+   @Override
+   @PureTarget
+   public int getSecond() {
+      return ignored();
+   }
+}
+</PRE>
+<P>
+Please note that external contracts need a special configuration of C4J
+which is explained in the section
+<A href="configuration.html">Configuration</A>.
+</P>
+</td></tr></table>
+</body>
+</html>

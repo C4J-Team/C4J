@@ -1,0 +1,159 @@
+---
+layout: standard
+title: Analysis by Contract
+---
+<P>
+Analysis by Contract is a term coined by Richard Mitchell and Jim McKim in their book
+<A href="http://www.amazon.com/Design-Contract-Example-Richard-Mitchell/dp/0201634600" 
+target=_blank>Design by Contract by Example</A>.
+<BR>
+The idea is to define a new class on an abstract level from the viewpoint of an user
+in order to explore the business context the customer has in mind.
+This is done by implementing a test case from the user perspective,
+a user acceptance test.
+This idea is very close related to the concept of Test Driven Development (TDD).
+Analysis therfore is not a several week or month phase known from classical forward engineering approaches
+but a few minutes activity in a agile software engineering context.
+The result of this iterative analysis activity looks like this (complete listing):
+</P>
+<PRE class="prettyprint">
+package timeofday;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+public class TimeOfDayTest {
+   private TimeOfDaySpec classUnderTest;
+
+   private final int HOUR = 12;
+   private final int MINUTE = 27;
+   private final int SECOND = 54;
+
+   @Before
+   public void setUp() {
+      classUnderTest = new TimeOfDay(HOUR, MINUTE, SECOND);
+   }
+
+   @Test
+   public void getHourTest() {
+      assertEquals(HOUR, classUnderTest.getHour());
+   }
+
+   @Test
+   public void getMinuteTest() {
+      assertEquals(MINUTE, classUnderTest.getMinute());
+   }
+
+   @Test
+   public void getSecondTest() {
+      assertEquals(SECOND, classUnderTest.getSecond());
+   }
+
+   @Test
+   public void setHourTest() {
+      classUnderTest.setHour(HOUR + 1);
+      assertEquals(HOUR + 1, classUnderTest.getHour());
+   }
+
+   @Test
+   public void setMinuteTest() {
+      classUnderTest.setMinute(MINUTE + 1);
+      assertEquals(MINUTE + 1, classUnderTest.getMinute());
+   }
+
+   @Test
+   public void setSecondTest() {
+      classUnderTest.setSecond(SECOND + 1);
+      assertEquals(SECOND + 1, classUnderTest.getSecond());
+   }
+
+   @Test
+   public void isBeforeHourTest() {
+      TimeOfDaySpec other = new TimeOfDay(HOUR + 1, MINUTE, SECOND);
+      assertTrue(classUnderTest.isBefore(other));
+      assertFalse(other.isBefore(classUnderTest));
+   }
+
+   @Test
+   public void isBeforeMinuteTest() {
+      TimeOfDaySpec other = new TimeOfDay(HOUR, MINUTE + 1, SECOND);
+      assertTrue(classUnderTest.isBefore(other));
+      assertFalse(other.isBefore(classUnderTest));
+   }
+
+   @Test
+   public void isBeforeSecondTest() {
+      TimeOfDaySpec other = new TimeOfDay(HOUR, MINUTE, SECOND + 1);
+      assertTrue(classUnderTest.isBefore(other));
+      assertFalse(other.isBefore(classUnderTest));
+   }
+
+   @Test
+   public void isBeforeSameTest() {
+      TimeOfDaySpec other = classUnderTest;
+      assertFalse(classUnderTest.isBefore(other));
+      assertFalse(other.isBefore(classUnderTest));
+   }
+
+   @Test
+   public void isBeforeEqualsTest() {
+      TimeOfDaySpec other = new TimeOfDay(HOUR, MINUTE, SECOND);
+      classUnderTest.isBefore(other);
+      assertFalse(classUnderTest.isBefore(other));
+      assertFalse(other.isBefore(classUnderTest));
+   }
+}
+</PRE>
+
+<P>
+This test case is written test per test.
+And test per test the addressed interface TimeOfDaySpec
+- the <I>interface under test</I> - is growing.
+Compiling the test case is possible by using the support of modern Java IDEs
+to create an empty class TimeOfDay - the <I>class under test</I> -
+which implements the <I>interface under test</I> TimeOfDaySpec
+and is auto-completed each time the interface grows.
+<BR>
+Finally it looks like this (complete listing):
+</P>
+<PRE class="prettyprint">
+package timeofday;
+
+import de.vksi.c4j.Pure;
+
+public interface TimeOfDaySpec {
+   void setHour(int hour);
+
+   void setMinute(int minute);
+
+   void setSecond(int second);
+
+   @Pure
+   int getHour();
+
+   @Pure
+   int getMinute();
+
+   @Pure
+   int getSecond();
+
+   @Pure
+   boolean isBefore(TimeOfDaySpec other);
+}
+</PRE>
+
+<P>
+Please note that <I>command query separation</I> has already been accomplished to this interface,
+following the
+<A href="six-principles.html">six principles</A>.
+Methods annotated as pure are queries,
+all other methods are commands.
+Furthermore the queries have been separated into <I>basic</I> queries and <I>derived</I> queries,
+which is important for the next activity,
+<A href="theory_dbc.html">Design by Contract</A>.
+</P>

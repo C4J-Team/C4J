@@ -1,0 +1,28 @@
+---
+layout: standard
+title: Ease of Use
+---
+<P>
+Adding class invariants, preconditions, and postconditions to your regular Java objects is easy with C4J.
+Contracts for a class of an interface (the target) are implemented in a separate class (the contract).
+The contract is linked to the target at compile time using an annotation,
+and the contract code is tied to the target using instrumentation during class loading at runtime.
+</P>
+<P>
+Contracts implementations have a reference to the instance of the target that it is verifying.
+This reference is a private instance variable of the contract class annotated with <I>@Target</I>.
+This target reference is used to write assertions describing the visible state of the target. 
+The parameters the target method is invoked with are fully accessible to the contract class.
+Postconditions have also access to method return values and pre-invocation values
+(i.e. values of instance variables in the target prior to the method invocation).
+</P>
+<P>
+There are several reasons for defining contracts in plain Java and in a separate class:
+<ul>
+<LI>You don't have to learn any new language constructs. 
+<LI>You will get help from your IDE when implementing the contract (as opposed to implementing contracts in comment blocks). 
+<LI>It is possible to put break points in your contract if you want to debug them. 
+<LI>Separating the contract code from the application minimizes the risk of accidentally deploying the contracts together with your application. 
+<LI>You get to keep your beautiful production code nice and clean without all the ugly assertions.
+</ul>
+</P>

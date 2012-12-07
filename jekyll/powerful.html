@@ -1,0 +1,51 @@
+---
+layout: standard
+title: Powerful
+---
+<p>
+C4J uses the
+<A href="http://en.wikipedia.org/wiki/Assertion_(computing)" 
+target=_blank>assert mechanism</A>
+of Java and extends it to interfaces and inheritance
+by separating the assertions in separate contract classes.
+<BR>
+As contract classes are plain Java classes,
+software engineers have the <I>full power of Java to express even complicated assertions.</I>
+<BR>
+Furthermore contract classes are <I>stateful</I>,
+as each instance of a protected class has its own instance of its protecting contract class.
+<BR>
+Based on that simple and powerful concept C4J supports:
+</p>
+<ul>
+<LI>Class invariants. 
+<LI>Preconditions.
+<LI>Postconditions, with access to return- and old-values. 
+<LI>Access to the public members of the guarded class from the contract implementation. 
+<LI>Annotations like @Pure to explicitly mark methods as "pure" (even methods defined in interfaces). 
+<LI>Automatic validation of pure methods, i.e. automatic checking that as pure annotated methods really do not have any side effects.
+<LI>Access to the "old" values of target attributes in postconditions.
+<LI>Simple to use "unchanged" check in postconditions to ensure that a target attribute has not been changed by the method execution.
+<LI>Contracts for interfaces, i.e. define a contract for an interface and all implementing classes (and their sub classes) will verify the contract. <LI>Inheritance of contracts, i.e. extending classes or implementing interfaces inherits the parent's contracts, also for overridden methods. 
+<LI>Contracts for abstract methods, i.e. define a contract for an abstract method in an abstract class
+and all implementing classes (and their subclasses) will verify the contract.
+<LI>External contracts allowing to attach contracts to legacy code.
+<LI>Combinations of "internal" and "external" contracts in the same project.
+<LI>Combinations of "interface contracts" and "class contracts", works like contract refinement. 
+<LI>Contract refinement, i.e. extending classes may define their own contracts
+in which case they are merged with the parent contracts
+according to the
+<A href="http://en.wikipedia.org/wiki/Liskov_substitution_principle" 
+target=_blank>Liskov substitution principle</A>. 
+<LI>Logging of contract validations.
+<LI>Ability to configure which contracts should be activated and which not.
+<LI>Ability to configure how to react to a contract violation, i.e. throwing an assertion error and stop the application
+or just logging the contract violation and continue the execution of the application.
+<LI>Possibility to debug contracts in your favorite IDE. 
+<LI>Concurrency. 
+<LI>Writing contract classes using your favourite IDE's code completion features.
+<LI>Refactoring and other
+<A href="http://www.andrena.de/leistungen/ase-agile-software-engineering" 
+target=_blank>Agile Software Engineering (ASE)</A>
+techniques necessary in Scrum development teams.
+</ul>

@@ -1,0 +1,45 @@
+---
+layout: standard
+title: Inheritance of contracts
+---
+<P>
+C4J support full contract inheritance,
+both for target classes and for contracts themselves.
+If a class is protected by a contract,
+all extending classes will automatically enforce those contracts as well.
+Also, if a parent class is protected by a contract
+and an extending class is protected by another contract,
+the contracts will be combined for the extending class.
+<BR>
+The same mechanism is provided for interface inheritance:
+If an interface is protected by a contract,
+all extending interfaces will automatically enforce those contracts as well.
+Also, if a parent interface is protected by a contract
+and an extending interface is protected by another contract,
+the contracts will be combined for the extending interface.
+</P>
+
+Contract inheritance in C4J works as follows:
+<BR>
+<ul>
+<LI>Class invariants are merged (AND'ed),
+except for in constructors where only the target class' own class invariants are checked.
+By calling the super constructor,
+the parent invariant will be checked, too.
+<LI>Preconditions may not be strengthened,
+i.e. the contract in the extending class may not disallow a method call that the contract in the parent allows.
+<LI>Postconditions may not be weakened, i.e. the contract in the extending 
+class may not allow more outcomes than the contract in the parent. 
+<LI>Contracts defined on the same inheritance level, e.g. by implementing two 
+interfaces which both has contracts for the same methods, are merged. 
+</ul>
+
+<P>
+If contracts don't adhere to these rules,
+it will be discovered during runtime and a warning will be logged.
+</P>
+
+<P>
+For more information about this topic, please have a look at the section
+<A href="under-the-hood.html">Under the hood</A>.
+</P>

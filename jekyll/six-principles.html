@@ -1,0 +1,51 @@
+---
+layout: standard
+title: Six principles
+---
+<p>
+In their book
+<A href="http://www.amazon.com/Design-Contract-Example-Richard-Mitchell/dp/0201634600" 
+target=_blank>Design by Contract by Example</A>
+Richard Mitchell and Jim McKim state six elementary principles how to write good contracts:
+</p>
+<br/>
+<P>
+Principle 1: <I>Separate queries from commands.</I>
+<BR>
+Queries return a result but do not change the visible properties of the object.
+Commands might change the object but do not return a result.
+</P>
+<BR>
+<P>
+Principle 2: <I>Separate basic queries from derived queries.</I>
+<BR>
+Derived queries can be specified in terms of basic queries.
+</P>
+<BR>
+<P>
+Principle 3: <I>For each derived query, write a postcondition that specifies what result will be returned, in terms of one or more basic queries.</I>
+<BR>
+Then, if we know the values of the basic queries, we also know the values of the derived queries.
+</P>
+<BR>
+<P>
+Principle 4: <I>For each command, write a postcondition that specifies the value of every basic query.</I>
+<BR>
+Now we know the total visible effect of each command.
+</P>
+<BR>
+<P>
+Principle 5: <I>For every query and command, decide on a suitable precondition.</I>
+<BR>
+Preconditions constrain when clients may call the queries and commands.
+</P>
+<BR>
+<P>
+Principle 6: <I>Write invariants to define unchanging properties of objects.</I>
+<BR>
+Concentrate on properties that help the reader build an appropriate conceptual model of the abstraction the class embodies.
+</P>
+<BR>
+<p>
+These six principles have been applied to all the examples on this website and the tutorials and case studies.
+</p>

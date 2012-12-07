@@ -1,0 +1,173 @@
+<html>
+<head>
+<title>C4J - Contracts for Java</title>
+<link rel="stylesheet" type="text/css" href="all.css" />
+<link href="prettify/prettify.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="prettify/prettify.js"></script>
+</head>
+
+<body onload="prettyPrint()">
+<table><tr><td id="navigation">
+<img src="c4j.png" alt="C4J Logo"/>
+<ul>
+<li><a href="index.html">Overview</a></li>
+<li><a href="ease-of-use.html">Ease of use</a></li>
+<li><a href="powerful.html">Powerful</a></li>
+<li><a href="six-principles.html">Six principles</a></li>
+<li><a href="examples.html">Examples</a></li>
+<li><a href="syntax.html">Syntax reference</a></li>
+<li><a href="inheritance.html">Inheritance of contracts</a></li>
+<li><a href="installation.html">Installation</a></li>
+<li><a href="configuration.html">Configuration</a></li>
+<li><a href="guidelines.html">Guidelines</a></li>
+<li><a href="under-the-hood.html">Under the Hood</a></li>
+<li><a href="theory.html">Theory</a></li>
+<li><a href="faq.html">FAQ</a></li>
+<li><a href="about.html">About</a></li>
+</ul>
+<ul>
+<li><a href="https://github.com/C4J-Team/C4J/downloads" target="_blank">Download C4J 6.0.0</a></li>
+<li><a href="http://c4j.sourceforge.net/" target="_blank">Download C4J 2.7.5</a></li>
+</ul>
+</td><td id="divider"></td><td id="content">
+<div class="head">Examples</div>
+<P>
+A postcondition states what a method ensures if it has been called by fulfilling its precondition.
+If the postcondition is violated although the precondition holds,
+the method (the supplier) has broken the contract (implementation error).
+In other words a postcondition is a <I>right</I> to the <I>customer</I> and an <I>obligation</I> to the <I>supplier</I>.
+</P>
+
+<P>
+The general structure of a <I>postcondition</I> in C4J is like that:
+</P>
+
+<PRE class="prettyprint">
+      if (postCondition()) {
+         postcondition clause 1
+         postcondition clause 2
+         ...
+         postcondition clause n
+      }
+</PRE>
+
+<P>
+A <I>postcondition clause</I> in C4J can be any valid Java source code that contains an <I>assert</I> statement.
+</P>
+
+<P>
+What does that mean for our example?
+The target class TimeOfDay looks like this (partial listing):
+</P>
+<PRE class="prettyprint">
+@ContractReference(TimeOfDayContract.class)
+public class TimeOfDay {
+
+   public static final int HOUR_MIN = 0;
+   public static final int HOUR_MAX = 23;
+   public static final int MINUTE_MIN = 0;
+   public static final int MINUTE_MAX = 59;
+   public static final int SECOND_MIN = 0;
+   public static final int SECOND_MAX = 59;
+
+   private int hour;
+   private int minute;
+   private int second;
+
+   public TimeOfDay(int hour, int minute, int second) {
+      setHour(hour);
+      setMinute(minute);
+      setSecond(second);
+   }
+
+   public void setHour(int hour) {
+      this.hour = hour;
+   }
+
+   public void setMinute(int minute) {
+      this.minute = minute;
+   }
+
+   public void setSecond(int second) {
+      this.second = second;
+   }
+
+   @Pure
+   public int getHour() {
+      return hour;
+   }
+
+   @Pure
+   public int getMinute() {
+      return minute;
+   }
+
+   @Pure
+   public int getSecond() {
+      return second;
+   }
+}
+</PRE>
+<P>
+Constructors may also have postconditions.
+The corresponding contract class TimeOfDayContract extends TimeOfDay
+and shows a precondition for the constructor of class TimeOfDay (partial listing):
+</P>
+<PRE class="prettyprint">
+public class TimeOfDayContract extends TimeOfDay {
+
+   public TimeOfDayContract(int hour, int minute, int second) {
+      super(hour, minute, second);
+      if (preCondition()) {
+         ...
+      }
+      if (postCondition()) {
+         assert target.getHour() == hour : "hour set";       // postcondition clause 1
+         assert target.getMinute() == minute : "minute set"; // postcondition clause 2
+         assert target.getSecond() == second : "second set"; // postcondition clause 3
+      }
+   }
+</PRE>
+<P>
+Read as: <I>The overloaden constructor of class TimeOfDay
+has a postcondition with three postcondition clauses.
+Postcondition clauses 1 up to 6 ensure that if the precondition holds
+the parameters hour, minute and second will be successfully set
+when the constructor has finished.
+The supplier must fulfill this obligation
+if the customer has fulfilled his part of the contract, the precondition.
+</I>
+</P>
+
+<P>
+Another example: The command setHour has a postcondition (partial listing):
+</P>
+<PRE class="prettyprint">
+  public class TimeOfDayContract extends TimeOfDay {
+
+   ...
+
+   @Override
+   public void setHour(int hour) {
+      if (preCondition()) {
+         ...
+      }
+      if (postCondition()) {
+         assert target.getHour() == hour : "hour set";               // postcondition clause 1
+         assert unchanged(target.getMinute()) : "minute unchanged";  // postcondition clause 2
+         assert unchanged(target.getSecond()) : "second unchanged";  // postcondition clause 3
+      }
+   }
+</PRE>
+<P>
+Read as: <I>The command setHour has a postcondition with three postcondition clauses.
+Postcondition clause 1 ensures
+that if the precondition holds the value of getHour will be successfully changed to hour
+whereas postcondition 2 and 3 ensure the value of getMinute and getSecond will not have changed at all
+after the execution of setHour.
+The supplier must fulfill this obligation
+if the customer has fulfilled his part of the contract, the precondition.</I>
+</P>
+</td></tr></table>
+</body>
+</html>

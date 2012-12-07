@@ -1,0 +1,64 @@
+<html>
+<head>
+<title>C4J - Contracts for Java</title>
+<link rel="stylesheet" type="text/css" href="all.css" />
+<link href="prettify/prettify.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="prettify/prettify.js"></script>
+</head>
+
+<body onload="prettyPrint()">
+<table><tr><td id="navigation">
+<img src="c4j.png" alt="C4J Logo"/>
+<ul>
+<li><a href="index.html">Overview</a></li>
+<li><a href="ease-of-use.html">Ease of use</a></li>
+<li><a href="powerful.html">Powerful</a></li>
+<li><a href="six-principles.html">Six principles</a></li>
+<li><a href="examples.html">Examples</a></li>
+<li><a href="syntax.html">Syntax reference</a></li>
+<li><a href="inheritance.html">Inheritance of contracts</a></li>
+<li><a href="installation.html">Installation</a></li>
+<li><a href="configuration.html">Configuration</a></li>
+<li><a href="guidelines.html">Guidelines</a></li>
+<li><a href="under-the-hood.html">Under the Hood</a></li>
+<li><a href="theory.html">Theory</a></li>
+<li><a href="faq.html">FAQ</a></li>
+<li><a href="about.html">About</a></li>
+</ul>
+<ul>
+<li><a href="https://github.com/C4J-Team/C4J/downloads" target="_blank">Download C4J 6.0.0</a></li>
+<li><a href="http://c4j.sourceforge.net/" target="_blank">Download C4J 2.7.5</a></li>
+</ul>
+</td><td id="divider"></td><td id="content">
+<div class="head">Installation</div>
+<P>
+As mentioned previously, the <B>-javaagent</B> switch that was added to Java 1.5
+is used to dynamically insert contract checking to your classes.
+<BR>
+Running a C4J enabled application from the command line looks as below,
+provided that your classpath contains the javassist.jar jar
+and your test classes
+(don't forget to enable assertions using the <B>-ea</B> switch):
+</P>
+
+<PRE class="prettyprint">
+  java -ea -javaagent:../c4j/c4j.jar timeofday.TimeOfDayDemo
+</PRE>
+
+<P>
+Using Eclipse JDT you can use the <I>JRE Definition</I> to specifiy
+a JRE with the name <I>c4j-jre</I> and the default VM arguments:
+
+<PRE class="prettyprint">
+  java -ea -javaagent:${project_loc:c4j}/c4j.jar
+</PRE>
+
+<P>
+with $(project_loc:c4j} returning the absolute file system path of the c4j project,
+which could be downloaded from this website and imported into Eclipse.
+Just add the c4j.jar to your Java Build Path Libraries - and your are done.
+<img src="img/installation_eclipse-java-build-path.png" align="left" vspace="7" hspace="7">
+</P>
+</td></tr></table>
+</body>
+</html>

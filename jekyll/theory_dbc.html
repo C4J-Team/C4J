@@ -1,0 +1,160 @@
+---
+layout: standard
+title: Design by Contract
+---
+<P>
+Two of the four sections of an
+<A href="theory_oop.html">abstract data type</A>
+already exist in a Java interface: <I>type</I> and <I>public methods</I>.
+<I>Preconditions</I> and <I>postconditions</I> (including the <I>class invariant</I>) still have to be added
+in order to have a complete abstract data type (specification) of our data type TimeOfDay.
+That is where the concept of Java contract classes comes in.
+Following the 
+<A href="six-principles.html">six principles</A>
+the software engineer now adds systematically method per method
+the missing pre- and postconditions and also the missing class invariant.
+This iterative design activity completes the interface and therefore the design of the new type TimeOfDaySpec (complete listing):
+</P>
+<PRE class="prettyprint">
+package timeofday;
+
+import de.vksi.c4j.ContractReference;
+import de.vksi.c4j.Pure;
+
+@ContractReference(TimeOfDaySpecContract.class)
+public interface TimeOfDaySpec {
+   int HOUR_MIN = 0;
+   int HOUR_MAX = 23;
+   int MINUTE_MIN = 0;
+   int MINUTE_MAX = 59;
+   int SECOND_MIN = 0;
+   int SECOND_MAX = 59;
+
+   void setHour(int hour);
+
+   void setMinute(int minute);
+
+   void setSecond(int second);
+
+   @Pure
+   int getHour();
+
+   @Pure
+   int getMinute();
+
+   @Pure
+   int getSecond();
+
+   @Pure
+   boolean isBefore(TimeOfDaySpec other);
+}
+</PRE>
+
+<P>
+The corresponding interface contract TimeOfDaySpecContract
+adds the <I>preconditions</I>, <I>postconditions</I> and <I>class invariant</I>
+to the interface TimeOfDaySpec and looks like this (complete listing):
+</P>
+<PRE class="prettyprint">
+package timeofday;
+
+import static de.vksi.c4j.Condition.ignored;
+import static de.vksi.c4j.Condition.postCondition;
+import static de.vksi.c4j.Condition.preCondition;
+import static de.vksi.c4j.Condition.result;
+import static de.vksi.c4j.Condition.unchanged;
+import de.vksi.c4j.ClassInvariant;
+import de.vksi.c4j.Target;
+
+public class TimeOfDaySpecContract implements TimeOfDaySpec {
+   @Target
+   private TimeOfDaySpec target;
+
+   @ClassInvariant
+   public void classInvariant() {
+      assert target.getHour() &gt;= HOUR_MIN : "hour &gt;= HOUR_MIN";
+      assert target.getHour() &lt;= HOUR_MAX : "hour &lt;= HOUR_MAX";
+      assert target.getMinute() &gt;= MINUTE_MIN : "minute &gt;= MINUTE_MIN";
+      assert target.getMinute() &lt;= MINUTE_MAX : "minute &lt;= MINUTE_MAX";
+      assert target.getSecond() &gt;= SECOND_MIN : "second &gt;= SECOND_MIN";
+      assert target.getSecond() &lt;= SECOND_MAX : "second &lt;= SECOND_MAX";
+   }
+
+   @Override
+   public void setHour(int hour) {
+      if (preCondition()) {
+         assert hour &gt;= HOUR_MIN : "hour &gt;= HOUR_MIN";
+         assert hour &lt;= HOUR_MAX : "hour &lt;= HOUR_MAX";
+      }
+      if (postCondition()) {
+         assert target.getHour() == hour : "hour set";
+         assert unchanged(target.getMinute()) : "minute unchanged";
+         assert unchanged(target.getSecond()) : "second unchanged";
+      }
+   }
+
+   @Override
+   public void setMinute(int minute) {
+      if (preCondition()) {
+         assert minute &gt;= MINUTE_MIN : "minute &gt;= MINUTE_MIN";
+         assert minute &lt;= MINUTE_MAX : "minute &lt;= MINUTE_MAX";
+      }
+      if (postCondition()) {
+         assert unchanged(target.getHour()) : "hour unchanged";
+         assert target.getMinute() == minute : "minute set";
+         assert unchanged(target.getSecond()) : "second unchanged";
+      }
+   }
+
+   @Override
+   public void setSecond(int second) {
+      if (preCondition()) {
+         assert second &gt;= SECOND_MIN : "second &gt;= SECOND_MIN";
+         assert second &lt;= SECOND_MAX : "second &lt;= SECOND_MAX";
+      }
+      if (postCondition()) {
+         assert unchanged(target.getHour()) : "hour unchanged";
+         assert unchanged(target.getMinute()) : "minute unchanged";
+         assert target.getSecond() == second : "second set";
+      }
+   }
+
+   @Override
+   public int getHour() {
+      return ignored();
+   }
+
+   @Override
+   public int getMinute() {
+      return ignored();
+   }
+
+   @Override
+   public int getSecond() {
+      return ignored();
+   }
+
+   @Override
+   public boolean isBefore(TimeOfDaySpec other) {
+      if (preCondition()) {
+         assert other != null : "other != null";
+      }
+      if (postCondition()) {
+         boolean result = result();
+         if (result) {
+            assert !other.isBefore(target) : "if isBefore then not other isBefore";
+         }
+      }
+      return ignored();
+   }
+}
+</PRE>
+
+<P>
+Now we have the complete abstract data type written in Java,
+using an interface and an interface contract.
+Adhering to Bertrand Meyer's definition of OOP the next step now is to implement this abstract data type.
+Implementing an abstract data type means implementing the class.
+This will be the next activity,
+<A href="theory_ibc.html">Implementation by Contract</A>.
+</P>

@@ -1,0 +1,165 @@
+<html>
+<head>
+<title>C4J - Contracts for Java</title>
+<link rel="stylesheet" type="text/css" href="all.css" />
+<link href="prettify/prettify.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="prettify/prettify.js"></script>
+</head>
+
+<body onload="prettyPrint()">
+<table><tr><td id="navigation">
+<img src="c4j.png" alt="C4J Logo"/>
+<ul>
+<li><a href="index.html">Overview</a></li>
+<li><a href="ease-of-use.html">Ease of use</a></li>
+<li><a href="powerful.html">Powerful</a></li>
+<li><a href="six-principles.html">Six principles</a></li>
+<li><a href="examples.html">Examples</a></li>
+<li><a href="syntax.html">Syntax reference</a></li>
+<li><a href="inheritance.html">Inheritance of contracts</a></li>
+<li><a href="installation.html">Installation</a></li>
+<li><a href="configuration.html">Configuration</a></li>
+<li><a href="guidelines.html">Guidelines</a></li>
+<li><a href="under-the-hood.html">Under the Hood</a></li>
+<li><a href="theory.html">Theory</a></li>
+<li><a href="faq.html">FAQ</a></li>
+<li><a href="about.html">About</a></li>
+</ul>
+<ul>
+<li><a href="https://github.com/C4J-Team/C4J/downloads" target="_blank">Download C4J 6.0.0</a></li>
+<li><a href="http://c4j.sourceforge.net/" target="_blank">Download C4J 2.7.5</a></li>
+</ul>
+</td><td id="divider"></td><td id="content">
+<div class="head">Configuration</div>
+<P>
+The behaviour of C4J like aktivating or deactivating contracts or how to react to a contract violation
+can be controled by its configuration.
+</P>
+
+<DIV id=bullets>
+The C4J configuration is done be means of four configuration files in the source folder <I>src/main/resources</I>:
+<img src="img/configuration_resources.png" align="left" vspace="7" hspace="7">
+<ul>
+<LI><I>c4j-global.xml</I> allows you to tell C4J how to react to a <I>contract violation</I>.
+The default conctract violation action is to throw an assertion error.
+Furthermore C4J can be instructed to write the instrumented class files into a distinct directory.
+The default value for writing transformed classes is false.
+<LI><I>c4j-local.xml</I> allows you to activate or deactivate contracts.
+Furthermore the automated pure validation can be activated or deactivated for pure methods.
+As only pure methods are allowed to be used in contracts,
+a list of pure methods of libraries which do not use C4J can be imported by the usage of the pure-registry-import attribute.
+For external contracts the contract-scan-package attribute
+tells C4J where to find external contracts and link them
+to their corresponding target classes.
+This method is usualy used for legacy systems.
+<LI><I>c4j-pure-registry.xml</I> provides the list of pure methods in packages which do not use the C4J annotation @Pure
+but are frequently used in contracts, i.e. the equals method of class java.lang.Objet.
+<LI><I>log4j.properties</I> control the log4j tool used by C4J. It allows us to tell C4J what to log where and how.
+</LI>
+</ul>
+<BR>
+Logging can be done on different levels:
+<ul>
+<LI><I>ERROR</I>: Contract violations, wrong usage of C4J.
+<LI><I>WARN</I>: Reveals potential problems with C4J.
+<LI><I>INFO</I>: Shows contract method calls and which classes are guarded by which contracts.
+<LI><I>DEBUG</I>: Technical information about C4J.
+<LI><I>TRACE</I>: Deep technical information about C4J.
+</LI>
+</ul>
+<BR>
+</DIV>
+
+<P>
+The c4j-global.xml might look like this (complete listing):
+</P>
+
+<PRE class="prettyprint">
+&lt?xml version="1.0" encoding="UTF-8"?&gt
+&ltc4j-global xmlns="http://c4j.vksi.de/c4j-global/"&gt
+    &ltwrite-transformed-classes directory="c4j-classes"&gtfalse&lt/write-transformed-classes&gt
+    &ltcontract-violation-action&gt
+        &ltdefault&gt
+            &ltlog&gtfalse&lt/log&gt
+            &ltthrow-error&gttrue&lt/throw-error&gt
+        &lt/default&gt
+        &ltpackage name="timeofday"&gt
+            &ltlog&gtfalse&lt/log&gt
+            &ltthrow-error&gttrue&lt/throw-error&gt
+        &lt/package&gt
+        &ltclass name="timeofday.TimeOfDay"&gt
+            &ltlog&gtfalse&lt/log&gt
+            &ltthrow-error&gttrue&lt/throw-error&gt
+        &lt/class&gt
+    &lt/contract-violation-action&gt
+&lt/c4j-global&gt
+</PRE>
+
+
+<P>
+The c4j-local.xml might look like this (complete listing):
+</P>
+
+<PRE class="prettyprint">
+&lt?xml version="1.0" encoding="UTF-8"?&gt
+&ltc4j-local xmlns="http://c4j.vksi.de/c4j-local/"&gt
+    &ltconfiguration&gt
+        &ltroot-package&gttimeofday&lt/root-package&gt
+        &ltpure-validate&gttrue&lt/pure-validate&gt
+        &ltpure-registry-import&gtc4j-pure-registry.xml&lt/pure-registry-import&gt
+        &ltcontract-scan-package&gttimeofday&lt/contract-scan-package&gt&lt/configuration&gt
+&lt/c4j-local&gt
+</PRE>
+
+
+<P>
+The c4j-pure-registry.xml might look like this (complete listing):
+</P>
+
+<PRE class="prettyprint">
+&lt?xml version="1.0" encoding="UTF-8"?&gt
+&ltc4j-pure-registry xmlns="http://c4j.vksi.de/c4j-pure-registry/"&gt
+    &lttype name="java.lang.Boolean"&gt
+        &ltpure-method signature="booleanValue()"/&gt
+    &lt/type&gt
+    &lttype name="java.lang.Class"&gt
+        &ltpure-method signature="getName()"/&gt
+    &lt/type&gt
+    &lttype name="java.lang.Integer"&gt
+        &ltpure-method signature="intValue()"/&gt
+        &ltpure-method signature="valueOf(int)"/&gt
+    &lt/type&gt
+    &lttype name="java.lang.Object"&gt
+        &ltpure-method signature="getClass()"/&gt
+        &ltpure-method signature="equals(java.lang.Object)"/&gt
+        &ltpure-method signature="hashCode()"/&gt
+        &ltpure-method signature="toString()"/&gt
+    &lt/type&gt
+    &lttype name="java.lang.String"&gt
+        &ltpure-method signature="valueOf(java.lang.Object)"/&gt
+    &lt/type&gt
+    &lttype name="java.util.Collection"&gt
+        &ltpure-method signature="size()"/&gt
+        &ltpure-method signature="isEmpty()"/&gt
+    &lt/type&gt
+    &lttype name="java.util.List"&gt
+        &ltpure-method signature="get(int)"/&gt
+    &lt/type&gt
+&lt/c4j-pure-registry&gt
+</PRE>
+
+<P>
+The log4j.properties might look like this (complete listing):
+</P>
+
+<PRE class="prettyprint">
+log4j.rootLogger=INFO, ConsoleAppender
+
+log4j.appender.ConsoleAppender=org.apache.log4j.ConsoleAppender
+log4j.appender.ConsoleAppender.layout=org.apache.log4j.PatternLayout
+log4j.appender.ConsoleAppender.layout.ConversionPattern=C4J %-5p - %m%n
+</PRE>
+
+</td></tr></table>
+</body>
+</html>
