@@ -3,37 +3,29 @@
 {% include head.html %}
 <div class="head">Overview</div>
 <P>
-<EM>Contracts for Java</EM> (C4J) is a <I>Design by Contract</I> (DbC, see <A 
+<EM>Contracts for Java</EM> (C4J) is a <I>Contracts</I> (from Design by Contract, see <A 
 href="http://en.wikipedia.org/wiki/Design_by_contract" target=_blank>Wikipedia 
-DbC definition</A> and <A 
-href="http://archive.eiffel.com/doc/manuals/technology/contract/" 
-target=_blank>Eiffel DbC docs</A>) framework for Java 1.6 and later.
+DbC definition</A>) framework for Java 1.6 and later.
 The primary goal for C4J is ease of use.
-DbC is about design and quality, aspects of programming that a lot programmers don't spend enough time and energy on.
+Contracts are about design and quality, aspects of programming that a lot programmers don't spend enough time and energy on.
 <BR>
-Therefore a DBC framework must be simple and painless to use.
+Therefore a Contracts framework must be simple and painless to use.
 At the same time the framework must be powerful.
 <BR>
 C4J is simple <EM>and</EM> powerful. 
 </P>
 <P>
-We are not going to try to convince any readers that DbC indeed is a very powerful design and quality assurance technique,
+We are not going to try to convince any readers that Contracts are indeed a very powerful design and quality assurance technique,
 so if you are not already convinced of that, 
 please follow the links above and you may be convinced to try this tool out!
 These are our favorites though:<BR>
-<LI>To be able to define contracts at all,
-you are forced to separate your methods into <I>commands</I> and <I>queries (command query separation, CQS)</I>.
-<LI><I>Queries</I> are methods which have no side effects and can therefore be used for writing contracts.
-<LI><I>Commands</I> are methods which do have an <I>intended</I> side effect.
-<LI>This <I>side effect</I> changes the visible state of an object and can be described by a <I>contract</I>.
 <LI><I>Contracts</I> consist of <I>preconditions</I> and <I>postconditions</I>, which are systematically defined method by method.
-<LI>The <I>class invariant</I> ensures the <I>DRY principle (Do'nt Repeat Yourself)</I> for contracts by defining all those assertions,
+<LI>The <I>class invariant</I> ensures the <I>DRY principle (Don't Repeat Yourself)</I> for contracts by defining all those assertions,
 which must be fulfilled at any visible state of an object, only once.
 <LI>Contracts can be linked to classes and interfaces.
 <LI>Contracts are inherited by extending a class or by implementing an interface which is guarded by a contract.
 <LI>To be able to define meaningful contracts
 you are forced to split lengthy methods into small, well defined, methods with a single responsibility.
-<LI>By rewarding <I>CQS</I> and <I>single responsibility design</I>, DbC has very positive effects on the code quality, maintainability, and readability. 
 <LI>As your contracts are checked at runtime, your classes are validated against the <I>real</I> usage of your application, 
 not against some test cases that may not even be real use cases. 
 <LI>If you are dealing with legacy code that you are afraid of refactoring, 
