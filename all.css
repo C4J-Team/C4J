@@ -1,0 +1,40 @@
+/* colors: blue = #688ca4, orange = #ed8b25 */
+* {
+	font-family: arial, verdana, helvetica, sans-serif;
+}
+a {
+	color: #688ca4;
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
+body {
+	height: 100%;
+}
+#content {
+	padding: 40px;
+	width: 800px;
+}
+#navigation {
+	float: left;
+	font-size: 12pt;
+	font-weight: 700;
+	list-style-type: none;
+	padding: 20px;
+}
+#navigation a {
+	color: #ed8b25;
+}
+#navigation ul {
+	list-style-type: none;
+	padding: 20px;
+}
+#divider {
+	width: 10px;
+	background-color: #ccc;
+}
+.head {
+	font-size: 200%;
+	font-weight: 700;
+}
