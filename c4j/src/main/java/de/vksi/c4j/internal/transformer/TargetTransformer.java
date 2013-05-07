@@ -15,7 +15,6 @@ import de.vksi.c4j.internal.RootTransformer;
 import de.vksi.c4j.internal.compiler.AssignmentExp;
 import de.vksi.c4j.internal.compiler.ConstructorExp;
 import de.vksi.c4j.internal.compiler.NestedExp;
-import de.vksi.c4j.internal.compiler.StandaloneExp;
 import de.vksi.c4j.internal.compiler.StaticCallExp;
 import de.vksi.c4j.internal.editor.TargetAccessEditor;
 import de.vksi.c4j.internal.evaluator.Evaluator;
@@ -63,8 +62,7 @@ public class TargetTransformer extends AbstractContractClassTransformer {
 		CtConstructor defaultConstructor = contractClass.getDeclaredConstructor(new CtClass[0]);
 		ConstructorExp weakConstructorCall = new ConstructorExp(WeakReference.class, new StaticCallExp(
 				Evaluator.getCurrentTarget));
-		StandaloneExp initExp = new AssignmentExp(NestedExp.field(weakField), weakConstructorCall).toStandalone();
-		initExp.insertBefore(defaultConstructor);
+		new AssignmentExp(NestedExp.field(weakField), weakConstructorCall).insertBefore(defaultConstructor);
 	}
 
 	private WeakFieldMapping createWeakField(CtClass contractClass) throws NotFoundException, CannotCompileException {

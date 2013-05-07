@@ -101,10 +101,9 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 			return;
 		}
 		if (fieldAccess.isReader()) {
-			new AssignmentExp(NestedExp.RETURN_VALUE, new StaticCallExp(targetField)).toStandalone().replace(
-					fieldAccess);
+			new AssignmentExp(NestedExp.RETURN_VALUE, new StaticCallExp(targetField)).replace(fieldAccess);
 		} else {
-			new AssignmentExp(new StaticCallExp(targetField), NestedExp.arg(1)).toStandalone().replace(fieldAccess);
+			new AssignmentExp(new StaticCallExp(targetField), NestedExp.arg(1)).replace(fieldAccess);
 		}
 	}
 
@@ -167,7 +166,7 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 
 	private void redirectStaticMethodCallToTargetClass(MethodCall methodCall, CtMethod targetMethod)
 			throws CannotCompileException {
-		new AssignmentExp(NestedExp.RETURN_VALUE, new StaticCallExp(targetMethod, NestedExp.ALL_ARGS)).toStandalone()
+		new AssignmentExp(NestedExp.RETURN_VALUE, new StaticCallExp(targetMethod, NestedExp.ALL_ARGS))
 				.replace(methodCall);
 	}
 
@@ -215,26 +214,32 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 		logger.error(("Found strengthening pre-condition in " + method.getLongName()
 				+ " which is already defined from " + definingClass.getName())
 				+ " - ignoring the pre-condition.");
-		AssignmentExp replacementExp = new AssignmentExp(NestedExp.RETURN_VALUE, BooleanExp.FALSE);
-		replacementExp.toStandalone().replace(methodCall);
+		new AssignmentExp(NestedExp.RETURN_VALUE, BooleanExp.FALSE).replace(methodCall);
 	}
 
 	private void handleOldMethodCall(MethodCall methodCall) throws NotFoundException, BadBytecode,
 			CannotCompileException {
-		byte[] dependencyBytes;
-		try {
-			dependencyBytes = stackalyzer.getDependenciesFor(methodCall.where(), methodCall.indexOfBytecode());
-		} catch (UsageError e) {
-			thrownException = e;
-			return;
-		}
 		int newStoreIndex = storeIndex.getAndIncrement();
-		storeDependencies.add(new StoreDependency(dependencyBytes, false, newStoreIndex));
-		eraseOriginalCall(methodCall, dependencyBytes.length);
 		StaticCallExp oldCall = new StaticCallExp(OldCache.oldRetrieve, new ValueExp(contract.getContractClass()),
 				new ValueExp(newStoreIndex));
-		AssignmentExp assignmentExp = new AssignmentExp(NestedExp.RETURN_VALUE, oldCall);
-		methodCall.replace(assignmentExp.toStandalone().getCode());
+		byte[] dependencyBytes = addStoreDependency(methodCall, newStoreIndex, false);
+		if (dependencyBytes == null) {
+			return;
+		}
+		eraseOriginalCall(methodCall, dependencyBytes.length);
+		new AssignmentExp(NestedExp.RETURN_VALUE, oldCall).replace(methodCall);
+	}
+
+	private byte[] addStoreDependency(MethodCall methodCall, int newStoreIndex, boolean unchangeable)
+			throws BadBytecode, NotFoundException {
+		try {
+			byte[] dependencyBytes = stackalyzer.getDependenciesFor(methodCall.where(), methodCall.indexOfBytecode());
+			storeDependencies.add(new StoreDependency(dependencyBytes, unchangeable, newStoreIndex));
+			return dependencyBytes;
+		} catch (UsageError e) {
+			thrownException = e;
+			return null;
+		}
 	}
 
 	private void eraseOriginalCall(MethodCall methodCall, int length) {
@@ -248,19 +253,14 @@ public class ContractMethodExpressionEditor extends ExprEditor {
 
 	private void handleUnchangedMethodCall(MethodCall methodCall) throws CannotCompileException, NotFoundException,
 			BadBytecode {
-		byte[] dependencyBytes;
-		try {
-			dependencyBytes = stackalyzer.getDependenciesFor(methodCall.where(), methodCall.indexOfBytecode());
-		} catch (UsageError e) {
-			thrownException = e;
-			return;
-		}
 		int newStoreIndex = storeIndex.getAndIncrement();
-		storeDependencies.add(new StoreDependency(dependencyBytes, true, newStoreIndex));
 		StaticCallExp oldCall = new StaticCallExp(UnchangedCache.isUnchanged, new StaticCallExp(OldCache.oldRetrieve,
 				new ValueExp(contract.getContractClass()), new ValueExp(newStoreIndex)), NestedExp.PROCEED);
-		AssignmentExp assignmentExp = new AssignmentExp(NestedExp.RETURN_VALUE, oldCall);
-		methodCall.replace(assignmentExp.toStandalone().getCode());
+		byte[] dependencyBytes = addStoreDependency(methodCall, newStoreIndex, true);
+		if (dependencyBytes == null) {
+			return;
+		}
+		new AssignmentExp(NestedExp.RETURN_VALUE, oldCall).replace(methodCall);
 		containsUnchanged = true;
 	}
 

@@ -45,8 +45,7 @@ public abstract class ConditionTransformer extends AbstractAffectedClassTransfor
 	}
 
 	protected StandaloneExp getAfterContractCall() {
-		StandaloneExp afterContractExp = new StaticCallExp(Evaluator.afterContract).toStandalone();
-		return afterContractExp;
+		return new StaticCallExp(Evaluator.afterContract).toStandalone();
 	}
 
 	protected IfExp getCanExecuteConditionCall(StandaloneExp body) {

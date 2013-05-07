@@ -3,10 +3,12 @@ package de.vksi.c4j.internal.compiler;
 import java.util.ArrayList;
 import java.util.List;
 
+import javassist.CannotCompileException;
 import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.CtField;
 import javassist.NotFoundException;
+import javassist.expr.Expr;
 import de.vksi.c4j.internal.compiler.StandaloneExp.CodeStandaloneExp;
 
 public abstract class NestedExp extends Exp {
@@ -85,6 +87,31 @@ public abstract class NestedExp extends Exp {
 
 	public NestedExp appendAccess(String field) {
 		return new CodeNestedExp(getCode() + "." + field);
+	}
+
+	@Override
+	public void insertAfter(CtBehavior behavior) throws CannotCompileException {
+		toStandalone().insertAfter(behavior);
+	}
+
+	@Override
+	public void insertBefore(CtBehavior behavior) throws CannotCompileException {
+		toStandalone().insertBefore(behavior);
+	}
+
+	@Override
+	public void insertCatch(CtClass exceptionType, CtBehavior behavior) throws CannotCompileException {
+		toStandalone().insertCatch(exceptionType, behavior);
+	}
+
+	@Override
+	public void insertFinally(CtBehavior behavior) throws CannotCompileException {
+		toStandalone().insertFinally(behavior);
+	}
+
+	@Override
+	public void replace(Expr expression) throws CannotCompileException {
+		toStandalone().replace(expression);
 	}
 
 	protected static class CodeNestedExp extends NestedExp {

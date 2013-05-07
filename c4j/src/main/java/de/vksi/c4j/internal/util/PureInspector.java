@@ -22,7 +22,6 @@ import de.vksi.c4j.PureTarget;
 import de.vksi.c4j.internal.RootTransformer;
 import de.vksi.c4j.internal.compiler.ArrayExp;
 import de.vksi.c4j.internal.compiler.NestedExp;
-import de.vksi.c4j.internal.compiler.StandaloneExp;
 import de.vksi.c4j.internal.compiler.StaticCallExp;
 import de.vksi.c4j.internal.editor.ArrayAccessEditor;
 import de.vksi.c4j.internal.editor.PureBehaviorExpressionEditor;
@@ -109,8 +108,8 @@ public class PureInspector {
 			return;
 		}
 		ArrayExp unpureArray = new ArrayExp(Object.class, unpureObjects);
-		new StaticCallExp(PureEvaluator.registerUnpure, unpureArray).toStandalone().insertBefore(affectedBehavior);
-		new StaticCallExp(PureEvaluator.unregisterUnpure).toStandalone().insertFinally(affectedBehavior);
+		new StaticCallExp(PureEvaluator.registerUnpure, unpureArray).insertBefore(affectedBehavior);
+		new StaticCallExp(PureEvaluator.unregisterUnpure).insertFinally(affectedBehavior);
 	}
 
 	private Set<CtField> getAccessibleFields(CtBehavior affectedBehavior) {
@@ -141,9 +140,7 @@ public class PureInspector {
 		if (Modifier.isStatic(affectedBehavior.getModifiers())) {
 			return;
 		}
-		StandaloneExp checkUnpureAccessExp = new StaticCallExp(PureEvaluator.checkUnpureAccess, NestedExp.THIS)
-				.toStandalone();
-		checkUnpureAccessExp.insertBefore(affectedBehavior);
+		new StaticCallExp(PureEvaluator.checkUnpureAccess, NestedExp.THIS).insertBefore(affectedBehavior);
 	}
 
 	public void verifyUnchangeable(CtBehavior affectedBehavior, ListOrderedSet<ContractInfo> contracts)

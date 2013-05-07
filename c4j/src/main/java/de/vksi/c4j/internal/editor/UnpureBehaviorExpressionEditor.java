@@ -36,15 +36,13 @@ public class UnpureBehaviorExpressionEditor extends ExprEditor {
 		if (fieldAccess.getField().hasAnnotation(AllowPureAccess.class)) {
 			return;
 		}
-		StandaloneExp checkUnpureExp;
+		StaticCallExp checkUnpureExp;
 		if (fieldAccess.isStatic()) {
-			checkUnpureExp = new StaticCallExp(PureEvaluator.checkUnpureStatic).toStandalone();
+			checkUnpureExp = new StaticCallExp(PureEvaluator.checkUnpureStatic);
 		} else {
-			checkUnpureExp = new StaticCallExp(PureEvaluator.checkUnpureAccess, NestedExp.CALLING_OBJECT)
-					.toStandalone();
+			checkUnpureExp = new StaticCallExp(PureEvaluator.checkUnpureAccess, NestedExp.CALLING_OBJECT);
 		}
-		StandaloneExp replacementExp = checkUnpureExp.append(StandaloneExp.PROCEED_AND_ASSIGN);
-		replacementExp.replace(fieldAccess);
+		checkUnpureExp.toStandalone().append(StandaloneExp.PROCEED_AND_ASSIGN).replace(fieldAccess);
 	}
 
 	private boolean isOwnFieldAccess(FieldAccess fieldAccess) throws NotFoundException {
