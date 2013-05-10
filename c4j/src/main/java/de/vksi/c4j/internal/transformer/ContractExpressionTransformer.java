@@ -4,7 +4,9 @@ import static de.vksi.c4j.internal.util.TransformationHelper.addBehaviorAnnotati
 import static de.vksi.c4j.internal.util.TransformationHelper.setClassIndex;
 import static de.vksi.c4j.internal.util.TransformationHelper.setMethodIndex;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javassist.CannotCompileException;
@@ -22,7 +24,8 @@ import de.vksi.c4j.internal.RootTransformer;
 import de.vksi.c4j.internal.compiler.IfExp;
 import de.vksi.c4j.internal.compiler.StaticCall;
 import de.vksi.c4j.internal.compiler.StaticCallExp;
-import de.vksi.c4j.internal.editor.ContractMethodExpressionEditor;
+import de.vksi.c4j.internal.editor.ContractMethodConditionEditor;
+import de.vksi.c4j.internal.editor.InitializationGatheringEditor;
 import de.vksi.c4j.internal.editor.StoreDependency;
 import de.vksi.c4j.internal.evaluator.Evaluator;
 import de.vksi.c4j.internal.evaluator.OldCache;
@@ -37,74 +40,89 @@ public class ContractExpressionTransformer extends AbstractContractClassTransfor
 	@Override
 	public void transform(ContractInfo contractInfo, CtClass currentContractClass) throws Exception {
 		AtomicInteger storeIndex = new AtomicInteger();
+		Map<CtMethod, InitializationGatheringEditor> gatherMap = createInitializationGatheringMap(contractInfo,
+				currentContractClass, storeIndex);
 		for (CtMethod contractMethod : currentContractClass.getDeclaredMethods()) {
 			if (logger.isTraceEnabled()) {
 				logger.trace("transforming behavior " + contractMethod.getLongName());
 			}
-			transform(contractInfo, contractMethod, storeIndex);
+			transform(contractInfo, contractMethod, storeIndex, new ContractMethodDependencies(gatherMap,
+					contractMethod));
 		}
 	}
 
-	public void transform(ContractInfo contractInfo, CtMethod contractMethod, AtomicInteger storeIndex)
-			throws Exception {
-		ContractMethodExpressionEditor expressionEditor = new ContractMethodExpressionEditor(rootTransformer,
-				contractInfo, storeIndex);
+	private Map<CtMethod, InitializationGatheringEditor> createInitializationGatheringMap(ContractInfo contractInfo,
+			CtClass currentContractClass, AtomicInteger storeIndex) throws CannotCompileException {
+		Map<CtMethod, InitializationGatheringEditor> gatherMap = new HashMap<CtMethod, InitializationGatheringEditor>();
+		for (CtMethod contractMethod : currentContractClass.getDeclaredMethods()) {
+			InitializationGatheringEditor gatheringEditor = new InitializationGatheringEditor(storeIndex, contractInfo);
+			contractMethod.instrument(gatheringEditor);
+			gatherMap.put(contractMethod, gatheringEditor);
+		}
+		return gatherMap;
+	}
+
+	public void transform(ContractInfo contractInfo, CtMethod contractMethod, AtomicInteger storeIndex,
+			ContractMethodDependencies contractMethodDependencies) throws Exception {
+		ContractMethodConditionEditor expressionEditor = new ContractMethodConditionEditor(rootTransformer,
+				contractInfo);
 		contractMethod.instrument(expressionEditor);
-		contractInfo.addMethod(contractMethod, expressionEditor.hasPreConditionOrDependencies(), expressionEditor
-				.isPostConditionAvailable(), expressionEditor.containsUnchanged());
-		if (expressionEditor.getThrownException() != null) {
-			contractInfo.addError(expressionEditor.getThrownException());
+		contractInfo.addMethod(contractMethod, expressionEditor.hasPreCondition()
+				|| contractMethodDependencies.hasPreDependencies(), expressionEditor.isPostConditionAvailable(),
+				contractMethodDependencies.containsUnchanged());
+		if (contractMethodDependencies.getThrownException() != null) {
+			contractInfo.addError(contractMethodDependencies.getThrownException());
 		}
-		if (expressionEditor.hasPreDependencies()) {
-			insertStoreDependencies(contractMethod, expressionEditor);
+		if (contractMethodDependencies.hasPreDependencies()) {
+			insertStoreDependencies(contractMethod, contractMethodDependencies);
 		}
 	}
 
-	private void insertStoreDependencies(CtMethod contractMethod, ContractMethodExpressionEditor expressionEditor)
+	private void insertStoreDependencies(CtMethod contractMethod, ContractMethodDependencies contractMethodDependencies)
 			throws BadBytecode, CannotCompileException, NotFoundException {
 		if (contractMethod.hasAnnotation(ClassInvariant.class)) {
-			insertStoreDependenciesForClassInvariant(contractMethod, expressionEditor);
+			insertStoreDependenciesForClassInvariant(contractMethod, contractMethodDependencies);
 		} else {
-			insertStoreDependenciesForPostCondition(contractMethod, expressionEditor);
+			insertStoreDependenciesForPostCondition(contractMethod, contractMethodDependencies);
 		}
 	}
 
 	private void insertStoreDependenciesForClassInvariant(CtMethod contractMethod,
-			ContractMethodExpressionEditor expressionEditor) throws BadBytecode, CannotCompileException,
+			ContractMethodDependencies contractMethodDependencies) throws BadBytecode, CannotCompileException,
 			NotFoundException {
 		CtMethod beforeInvariant = CtNewMethod.make(CtClass.voidType, contractMethod.getName()
 				+ BEFORE_INVARIANT_METHOD_SUFFIX, new CtClass[0], contractMethod.getExceptionTypes(), null,
 				contractMethod.getDeclaringClass());
 		contractMethod.getDeclaringClass().addMethod(beforeInvariant);
 		addBehaviorAnnotation(beforeInvariant, rootTransformer.getPool().get(BeforeClassInvariant.class.getName()));
-		insertIntoBeforeInvariant(expressionEditor, beforeInvariant, contractMethod.getDeclaringClass());
+		insertIntoBeforeInvariant(contractMethodDependencies, beforeInvariant, contractMethod.getDeclaringClass());
 	}
 
-	private void insertIntoBeforeInvariant(ContractMethodExpressionEditor expressionEditor, CtMethod beforeInvariant,
-			CtClass contractClass) throws CannotCompileException, BadBytecode {
-		if (!expressionEditor.getPreConditionExp().isEmpty()) {
-			expressionEditor.getPreConditionExp().insertBefore(beforeInvariant);
+	private void insertIntoBeforeInvariant(ContractMethodDependencies contractMethodDependencies,
+			CtMethod beforeInvariant, CtClass contractClass) throws CannotCompileException, BadBytecode {
+		if (!contractMethodDependencies.getPreConditionExp().isEmpty()) {
+			contractMethodDependencies.getPreConditionExp().insertBefore(beforeInvariant);
 		}
-		if (expressionEditor.hasStoreDependencies()) {
+		if (contractMethodDependencies.hasStoreDependencies()) {
 			ConstPool constPool = beforeInvariant.getMethodInfo().getConstPool();
 			CodeAttribute attribute = beforeInvariant.getMethodInfo().getCodeAttribute();
-			insertOldStoreCalls(attribute, expressionEditor.getStoreDependencies(), constPool, contractClass);
+			insertOldStoreCalls(attribute, contractMethodDependencies.getStoreDependencies(), constPool, contractClass);
 			attribute.computeMaxStack();
 		}
 	}
 
 	private void insertStoreDependenciesForPostCondition(CtMethod contractMethod,
-			ContractMethodExpressionEditor expressionEditor) throws BadBytecode, CannotCompileException {
-		if (!expressionEditor.getPreConditionExp().isEmpty()) {
+			ContractMethodDependencies contractMethodDependencies) throws BadBytecode, CannotCompileException {
+		if (!contractMethodDependencies.getPreConditionExp().isEmpty()) {
 			IfExp isBeforeCondition = new IfExp(new StaticCallExp(Evaluator.isBefore));
-			isBeforeCondition.addIfBody(expressionEditor.getPreConditionExp());
+			isBeforeCondition.addIfBody(contractMethodDependencies.getPreConditionExp());
 			isBeforeCondition.insertBefore(contractMethod);
 		}
-		if (expressionEditor.hasStoreDependencies()) {
+		if (contractMethodDependencies.hasStoreDependencies()) {
 			ConstPool constPool = contractMethod.getMethodInfo().getConstPool();
 			CodeAttribute attribute = contractMethod.getMethodInfo().getCodeAttribute();
-			int ifBlockLength = insertOldStoreCalls(attribute, expressionEditor.getStoreDependencies(), constPool,
-					contractMethod.getDeclaringClass());
+			int ifBlockLength = insertOldStoreCalls(attribute, contractMethodDependencies.getStoreDependencies(),
+					constPool, contractMethod.getDeclaringClass());
 			insertJump(attribute.iterator(), ifBlockLength, constPool);
 		}
 	}
