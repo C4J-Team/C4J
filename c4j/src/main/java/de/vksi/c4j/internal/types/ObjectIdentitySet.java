@@ -1,4 +1,4 @@
-package de.vksi.c4j.internal.util;
+package de.vksi.c4j.internal.types;
 
 import java.util.ArrayList;
 import java.util.Collection;

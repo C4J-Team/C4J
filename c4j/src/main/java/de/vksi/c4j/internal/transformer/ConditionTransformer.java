@@ -9,8 +9,6 @@ import java.util.List;
 import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.NotFoundException;
-import de.vksi.c4j.internal.ContractErrorHandler;
-import de.vksi.c4j.internal.ContractErrorHandler.ContractErrorSource;
 import de.vksi.c4j.internal.compiler.CastExp;
 import de.vksi.c4j.internal.compiler.IfExp;
 import de.vksi.c4j.internal.compiler.NestedExp;
@@ -18,7 +16,9 @@ import de.vksi.c4j.internal.compiler.StandaloneExp;
 import de.vksi.c4j.internal.compiler.StaticCallExp;
 import de.vksi.c4j.internal.compiler.TryExp;
 import de.vksi.c4j.internal.compiler.ValueExp;
+import de.vksi.c4j.internal.evaluator.ContractErrorHandler;
 import de.vksi.c4j.internal.evaluator.Evaluator;
+import de.vksi.c4j.internal.evaluator.ContractErrorHandler.ContractErrorSource;
 
 public abstract class ConditionTransformer extends AbstractAffectedClassTransformer {
 	protected void catchWithHandleContractException(CtClass affectedClass, TryExp contractCallExp,

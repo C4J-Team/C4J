@@ -1,4 +1,4 @@
-package de.vksi.c4j.internal.util;
+package de.vksi.c4j.internal.types;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -10,7 +10,8 @@ import java.lang.ref.WeakReference;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.vksi.c4j.internal.util.ObjectMapper;
+import de.vksi.c4j.internal.types.ObjectMapper;import de.vksi.c4j.internal.util.TestUtil;
+
 
 public class ObjectMapperTest {
 	private ObjectMapper<String, DummyObject> mapper;

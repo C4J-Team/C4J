@@ -1,4 +1,4 @@
-package de.vksi.c4j.internal;
+package de.vksi.c4j.internal.configuration;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -15,11 +15,7 @@ import javassist.NotFoundException;
 import org.apache.log4j.Logger;
 
 import de.vksi.c4j.internal.classfile.ClassFilePool;
-import de.vksi.c4j.internal.configuration.C4JPureRegistry;
 import de.vksi.c4j.internal.configuration.C4JPureRegistry.Type;
-import de.vksi.c4j.internal.configuration.Empty;
-import de.vksi.c4j.internal.configuration.MethodByName;
-import de.vksi.c4j.internal.configuration.MethodBySignature;
 
 public class PureRegistryImporter {
 	private final URL pureRegistryUrl;

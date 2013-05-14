@@ -1,4 +1,4 @@
-package de.vksi.c4j.internal;
+package de.vksi.c4j.internal.evaluator;
 
 import org.apache.log4j.Logger;
 
@@ -6,7 +6,7 @@ import de.vksi.c4j.error.ContractError;
 import de.vksi.c4j.error.UsageError;
 import de.vksi.c4j.internal.compiler.StaticCall;
 import de.vksi.c4j.internal.configuration.ContractViolationAction;
-import de.vksi.c4j.internal.evaluator.Evaluator;
+import de.vksi.c4j.internal.configuration.XmlConfigurationManager;
 
 public class ContractErrorHandler {
 	public static final StaticCall handleContractException = new StaticCall(ContractErrorHandler.class,
@@ -77,7 +77,7 @@ public class ContractErrorHandler {
 	}
 
 	private static void contractAction(ContractErrorSource source, Error error, Class<?> affectedClass) {
-		ContractViolationAction contractViolationActions = RootTransformer.INSTANCE.getXmlConfiguration()
+		ContractViolationAction contractViolationActions = XmlConfigurationManager.INSTANCE
 				.getContractViolationAction(affectedClass);
 		if (contractViolationActions.isLog().booleanValue()) {
 			logger.error("Contract Violation in " + source.getName() + ".", error);

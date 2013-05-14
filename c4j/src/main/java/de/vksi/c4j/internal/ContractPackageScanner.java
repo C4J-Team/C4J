@@ -17,7 +17,7 @@ public class ContractPackageScanner {
 	private Logger logger = Logger.getLogger(ContractPackageScanner.class);
 	private final List<ContractScanPackage> contractScanPackages;
 	private final ClassLoader classLoader;
-	private Map<String, String> externalContracts = new HashMap<String, String>();
+	private final Map<String, String> externalContracts = new HashMap<String, String>();
 
 	public ContractPackageScanner(List<ContractScanPackage> contractScanPackages, ClassLoader classLoader)
 			throws Exception {
@@ -37,9 +37,8 @@ public class ContractPackageScanner {
 	}
 
 	private void scanPackage(ContractScanPackage contractScanPackage) throws Exception {
-		List<CtClass> classes = new ClasspathScanner(contractScanPackage.getValue(),
-				contractScanPackage.isIncludeSubpackages(), classLoader)
-				.getAllClasses();
+		List<CtClass> classes = new ClasspathScanner(contractScanPackage.getValue(), contractScanPackage
+				.isIncludeSubpackages(), classLoader).getAllClasses();
 		for (CtClass clazz : classes) {
 			handleClassFileInPackage(clazz);
 		}

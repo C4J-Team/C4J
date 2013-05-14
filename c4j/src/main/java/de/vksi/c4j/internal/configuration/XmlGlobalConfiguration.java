@@ -1,15 +1,10 @@
-package de.vksi.c4j.internal;
+package de.vksi.c4j.internal.configuration;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-
-import de.vksi.c4j.internal.configuration.C4JGlobal;
-import de.vksi.c4j.internal.configuration.ContractViolationAction;
-import de.vksi.c4j.internal.configuration.ContractViolationActionWithName;
-import de.vksi.c4j.internal.util.JaxbUnmarshaller;
 
 public class XmlGlobalConfiguration {
 	private final C4JGlobal xmlConfiguration;

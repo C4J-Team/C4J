@@ -7,7 +7,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import de.vksi.c4j.PreTransformer;
+import de.vksi.c4j.main.PreTransformer;
 import de.vksi.c4j.systemtest.TransformerAwareRule;
 
 public class PreTransformerITCase {

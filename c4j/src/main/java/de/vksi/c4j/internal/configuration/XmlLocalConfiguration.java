@@ -1,52 +1,49 @@
-package de.vksi.c4j.internal;
+package de.vksi.c4j.internal.configuration;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import javassist.CtClass;
 import javassist.CtMethod;
-import javassist.NotFoundException;
 
 import javax.xml.bind.JAXBException;
 
 import org.apache.log4j.Logger;
 
-import de.vksi.c4j.internal.classfile.ClassFilePool;
 import de.vksi.c4j.internal.configuration.C4JLocal.Configuration;
-import de.vksi.c4j.internal.configuration.C4JPureRegistry;
-import de.vksi.c4j.internal.configuration.DefaultPreconditionType;
-import de.vksi.c4j.internal.util.JaxbUnmarshaller;
+import de.vksi.c4j.internal.configuration.C4JLocal.Configuration.ContractScanPackage;
 
 public class XmlLocalConfiguration {
+	private static final Logger LOGGER = Logger.getLogger(XmlLocalConfiguration.class);
 
 	private final Configuration xmlConfiguration;
-	private Set<CtMethod> whitelistMethods = new HashSet<CtMethod>();
-	private Set<CtMethod> blacklistMethods = new HashSet<CtMethod>();
-	private Logger logger = Logger.getLogger(XmlLocalConfiguration.class);
-	private JaxbUnmarshaller jaxbUnmarshaller = new JaxbUnmarshaller();
-	private Map<String, String> externalContracts;
+	private final Set<CtMethod> whitelistMethods = new HashSet<CtMethod>();
+	private final Set<CtMethod> blacklistMethods = new HashSet<CtMethod>();
+	private final JaxbUnmarshaller jaxbUnmarshaller = new JaxbUnmarshaller();
+	private final ClassLoader classLoader;
 
 	public XmlLocalConfiguration(Configuration xmlConfiguration, ClassLoader classLoader) throws Exception {
 		this.xmlConfiguration = xmlConfiguration;
-		importPureRegistries(xmlConfiguration, classLoader);
-		externalContracts = new ContractPackageScanner(xmlConfiguration.getContractScanPackage(), classLoader)
-				.getExternalContracts();
+		this.classLoader = classLoader;
+		importPureRegistries(xmlConfiguration);
 	}
 
-	private void importPureRegistries(Configuration xmlConfiguration, ClassLoader classLoader) throws Exception {
+	public ClassLoader getClassLoader() {
+		return classLoader;
+	}
+
+	private void importPureRegistries(Configuration xmlConfiguration) throws Exception {
 		for (String pureRegistryXml : xmlConfiguration.getPureRegistryImport()) {
-			importPureRegistry(classLoader, pureRegistryXml);
+			importPureRegistry(pureRegistryXml);
 		}
 	}
 
-	private void importPureRegistry(ClassLoader classLoader, String pureRegistryXml) throws Exception {
+	private void importPureRegistry(String pureRegistryXml) throws Exception {
 		URL pureRegistryUrl = classLoader.getResource(pureRegistryXml);
 		if (pureRegistryUrl == null) {
-			logger.error("Could not find pure-registry " + pureRegistryXml);
+			LOGGER.error("Could not find pure-registry " + pureRegistryXml);
 			return;
 		}
 		importExistingPureRegistry(pureRegistryUrl);
@@ -75,19 +72,16 @@ public class XmlLocalConfiguration {
 		return xmlConfiguration.getRootPackage();
 	}
 
+	public List<ContractScanPackage> getContractScanPackages() {
+		return xmlConfiguration.getContractScanPackage();
+	}
+
 	public Set<CtMethod> getWhitelistMethods() {
 		return whitelistMethods;
 	}
 
 	public Set<CtMethod> getBlacklistMethods() {
 		return blacklistMethods;
-	}
-
-	public CtClass getExternalContract(CtClass type) throws NotFoundException {
-		if (externalContracts.containsKey(type.getName())) {
-			return ClassFilePool.INSTANCE.getClass(externalContracts.get(type.getName()));
-		}
-		return null;
 	}
 
 }

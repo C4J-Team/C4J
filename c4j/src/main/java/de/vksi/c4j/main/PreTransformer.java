@@ -1,4 +1,4 @@
-package de.vksi.c4j;
+package de.vksi.c4j.main;
 
 import java.io.File;
 import java.util.HashSet;
@@ -9,6 +9,7 @@ import javassist.NotFoundException;
 
 import org.apache.log4j.Logger;
 
+import de.vksi.c4j.ContractReference;
 import de.vksi.c4j.internal.RootTransformer;
 import de.vksi.c4j.internal.classfile.ClassFilePool;
 

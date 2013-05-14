@@ -1,4 +1,4 @@
-package de.vksi.c4j.internal;
+package de.vksi.c4j.internal.configuration;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -14,13 +14,11 @@ import javax.xml.bind.JAXBException;
 
 import org.apache.log4j.Logger;
 
-import de.vksi.c4j.internal.configuration.C4JGlobal;
-import de.vksi.c4j.internal.configuration.C4JLocal;
 import de.vksi.c4j.internal.configuration.C4JLocal.Configuration;
-import de.vksi.c4j.internal.configuration.ContractViolationAction;
-import de.vksi.c4j.internal.util.JaxbUnmarshaller;
 
 public class XmlConfigurationManager {
+	public static final XmlConfigurationManager INSTANCE = new XmlConfigurationManager();
+
 	public static final String C4J_LOCAL_XML = "c4j-local.xml";
 	public static final String C4J_GLOBAL_XML = "c4j-global.xml";
 	private Map<String, XmlLocalConfiguration> rootPackageToConfiguration = new HashMap<String, XmlLocalConfiguration>();
@@ -32,8 +30,9 @@ public class XmlConfigurationManager {
 
 	private JaxbUnmarshaller jaxbUnmarshaller = new JaxbUnmarshaller();
 	private Logger logger = Logger.getLogger(XmlConfigurationManager.class);
+	private final Set<LocalConfigurationCallback> localConfigurationCallbacks = new HashSet<LocalConfigurationCallback>();
 
-	public XmlConfigurationManager() {
+	private XmlConfigurationManager() {
 		try {
 			initDefaultLocalConfiguration();
 			initDefaultGlobalConfiguration();
@@ -51,7 +50,25 @@ public class XmlConfigurationManager {
 	private void initDefaultLocalConfiguration() throws Exception {
 		Configuration localXmlConfiguration = new Configuration();
 		jaxbUnmarshaller.setDefaultValues(localXmlConfiguration);
-		defaultLocalConfiguration = new XmlLocalConfiguration(localXmlConfiguration, ClassLoader.getSystemClassLoader());
+		defaultLocalConfiguration = createLocalConfiguration(localXmlConfiguration, ClassLoader.getSystemClassLoader());
+	}
+
+	private XmlLocalConfiguration createLocalConfiguration(Configuration localXmlConfiguration, ClassLoader classLoader)
+			throws Exception {
+		XmlLocalConfiguration xmlLocalConfiguration = new XmlLocalConfiguration(localXmlConfiguration, classLoader);
+		for (LocalConfigurationCallback callback : localConfigurationCallbacks) {
+			callback.scanExternalContracts(xmlLocalConfiguration);
+		}
+		return xmlLocalConfiguration;
+	}
+
+	public void registerAndFeedLocalConfigurationCallback(LocalConfigurationCallback localConfigurationCallback)
+			throws Exception {
+		localConfigurationCallbacks.add(localConfigurationCallback);
+		localConfigurationCallback.scanExternalContracts(defaultLocalConfiguration);
+		for (XmlLocalConfiguration xmlLocalConfiguration : rootPackageToConfiguration.values()) {
+			localConfigurationCallback.scanExternalContracts(xmlLocalConfiguration);
+		}
 	}
 
 	public void registerClassLoader(ClassLoader classLoader) throws Exception {
@@ -104,7 +121,7 @@ public class XmlConfigurationManager {
 
 	private void addConfigurations(C4JLocal localConfig, URL xmlUrl, ClassLoader classLoader) throws Exception {
 		for (Configuration config : localConfig.getConfiguration()) {
-			addConfiguration(new XmlLocalConfiguration(config, classLoader), xmlUrl);
+			addConfiguration(createLocalConfiguration(config, classLoader), xmlUrl);
 		}
 	}
 

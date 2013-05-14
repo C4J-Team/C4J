@@ -1,7 +1,7 @@
-package de.vksi.c4j.internal;
+package de.vksi.c4j.internal.configuration;
 
-import static de.vksi.c4j.internal.XmlConfigurationManager.C4J_GLOBAL_XML;
-import static de.vksi.c4j.internal.XmlConfigurationManager.C4J_LOCAL_XML;
+import static de.vksi.c4j.internal.configuration.XmlConfigurationManager.C4J_GLOBAL_XML;
+import static de.vksi.c4j.internal.configuration.XmlConfigurationManager.C4J_LOCAL_XML;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.eq;
@@ -18,7 +18,7 @@ import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import de.vksi.c4j.internal.configuration.DefaultPreconditionType;
+import de.vksi.c4j.internal.ClasspathResourceLoader;
 
 public class XmlConfigurationManagerTest {
 	private static final String C4J_GLOBAL_WRITE_TRUE_XML = "c4j-global_write-true.xml";
@@ -45,7 +45,7 @@ public class XmlConfigurationManagerTest {
 
 	@Before
 	public void before() {
-		manager = new XmlConfigurationManager();
+		manager = XmlConfigurationManager.INSTANCE;
 	}
 
 	@Test

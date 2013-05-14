@@ -1,4 +1,4 @@
-package de.vksi.c4j.internal.util;
+package de.vksi.c4j.internal.configuration;
 
 import java.io.InputStream;
 import java.lang.reflect.Field;

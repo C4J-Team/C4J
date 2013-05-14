@@ -7,7 +7,7 @@ import java.util.Deque;
 import org.apache.log4j.Logger;
 
 import de.vksi.c4j.internal.compiler.StaticCall;
-import de.vksi.c4j.internal.util.ObjectIdentitySet;
+import de.vksi.c4j.internal.types.ObjectIdentitySet;
 
 public class PureEvaluator {
 	public static final StaticCall registerUnpure = new StaticCall(PureEvaluator.class, "registerUnpure");

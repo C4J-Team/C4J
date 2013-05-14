@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import de.vksi.c4j.internal.ContractErrorHandler;
 import de.vksi.c4j.internal.compiler.StaticCall;
 
 public class Evaluator {

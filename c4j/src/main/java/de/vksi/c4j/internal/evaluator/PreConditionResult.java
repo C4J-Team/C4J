@@ -1,4 +1,4 @@
-package de.vksi.c4j.internal;
+package de.vksi.c4j.internal.evaluator;
 
 public class PreConditionResult {
 	private boolean hasError = false;

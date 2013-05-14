@@ -1,8 +1,10 @@
-package de.vksi.c4j.internal.util;
+package de.vksi.c4j.internal.types;
 
 import static org.junit.Assert.assertFalse;
 
 import org.junit.Test;
+
+import de.vksi.c4j.internal.types.ObjectIdentitySet;
 
 public class ObjectIdentitySetTest {
 	@Test

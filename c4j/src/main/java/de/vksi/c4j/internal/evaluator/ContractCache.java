@@ -1,7 +1,7 @@
 package de.vksi.c4j.internal.evaluator;
 
+import de.vksi.c4j.internal.types.ObjectMapper;
 import de.vksi.c4j.internal.types.Pair;
-import de.vksi.c4j.internal.util.ObjectMapper;
 
 public class ContractCache {
 	private static final ObjectMapper<ContractCacheEntry, Object> contractCache = new ObjectMapper<ContractCacheEntry, Object>();

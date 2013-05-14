@@ -1,7 +1,7 @@
 package de.vksi.c4j.internal.transformer;
 
-import static de.vksi.c4j.internal.ContractErrorHandler.ContractErrorSource.PRE_CONDITION;
 import static de.vksi.c4j.internal.classfile.ClassAnalyzer.getSimpleName;
+import static de.vksi.c4j.internal.evaluator.ContractErrorHandler.ContractErrorSource.PRE_CONDITION;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -13,8 +13,6 @@ import javassist.CtClass;
 import javassist.CtConstructor;
 import javassist.CtMethod;
 import javassist.NotFoundException;
-import de.vksi.c4j.internal.ContractErrorHandler;
-import de.vksi.c4j.internal.ContractErrorHandler.ContractErrorSource;
 import de.vksi.c4j.internal.classfile.ClassFilePool;
 import de.vksi.c4j.internal.compiler.EmptyExp;
 import de.vksi.c4j.internal.compiler.IfExp;
@@ -24,7 +22,9 @@ import de.vksi.c4j.internal.compiler.StaticCallExp;
 import de.vksi.c4j.internal.compiler.ThrowExp;
 import de.vksi.c4j.internal.compiler.TryExp;
 import de.vksi.c4j.internal.compiler.ValueExp;
+import de.vksi.c4j.internal.evaluator.ContractErrorHandler;
 import de.vksi.c4j.internal.evaluator.Evaluator;
+import de.vksi.c4j.internal.evaluator.ContractErrorHandler.ContractErrorSource;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractMethod;
 import de.vksi.c4j.internal.util.ObjectConverter;
 

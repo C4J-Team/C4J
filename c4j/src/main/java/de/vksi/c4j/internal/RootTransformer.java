@@ -3,7 +3,9 @@ package de.vksi.c4j.internal;
 import static de.vksi.c4j.internal.util.CollectionsHelper.arrayContains;
 
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javassist.CtClass;
@@ -18,6 +20,9 @@ import org.apache.log4j.PatternLayout;
 
 import de.vksi.c4j.ContractReference;
 import de.vksi.c4j.internal.classfile.ClassFilePool;
+import de.vksi.c4j.internal.configuration.LocalConfigurationCallback;
+import de.vksi.c4j.internal.configuration.XmlConfigurationManager;
+import de.vksi.c4j.internal.configuration.XmlLocalConfiguration;
 import de.vksi.c4j.internal.transformer.AffectedClassTransformer;
 import de.vksi.c4j.internal.transformer.ContractClassTransformer;
 import de.vksi.c4j.internal.util.ContractRegistry;
@@ -28,17 +33,18 @@ import de.vksi.c4j.internal.util.ListOrderedSet;
 public class RootTransformer {
 	public static final RootTransformer INSTANCE = new RootTransformer();
 
-	private Logger logger = Logger.getLogger(RootTransformer.class);
+	private static final Logger LOGGER = Logger.getLogger(RootTransformer.class);
 
 	ContractRegistry contractRegistry = new ContractRegistry();
 
 	AffectedClassTransformer targetClassTransformer;
 	ContractClassTransformer contractClassTransformer;
 
-	private InvolvedTypeInspector involvedTypeInspector = new InvolvedTypeInspector();
+	private final InvolvedTypeInspector involvedTypeInspector = new InvolvedTypeInspector();
 
-	private XmlConfigurationManager xmlConfiguration;
-	private Set<ClassLoader> classLoaders = new HashSet<ClassLoader>();
+	private final XmlConfigurationManager xmlConfiguration = XmlConfigurationManager.INSTANCE;
+	private final Set<ClassLoader> classLoaders = new HashSet<ClassLoader>();
+	private final Map<XmlLocalConfiguration, Map<String, String>> externalContracts = new HashMap<XmlLocalConfiguration, Map<String, String>>();
 
 	private RootTransformer() {
 	}
@@ -47,8 +53,25 @@ public class RootTransformer {
 		targetClassTransformer = new AffectedClassTransformer();
 		contractClassTransformer = new ContractClassTransformer();
 		loadLogger();
-		xmlConfiguration = new XmlConfigurationManager();
 		xmlConfiguration.registerClassLoader(ClassLoader.getSystemClassLoader());
+		xmlConfiguration.registerAndFeedLocalConfigurationCallback(new LocalConfigurationCallback() {
+
+			@Override
+			public void scanExternalContracts(XmlLocalConfiguration xmlLocalConfiguration) throws Exception {
+				externalContracts.put(xmlLocalConfiguration, new ContractPackageScanner(xmlLocalConfiguration
+						.getContractScanPackages(), xmlLocalConfiguration.getClassLoader()).getExternalContracts());
+			}
+
+		});
+	}
+
+	public CtClass getExternalContract(CtClass type, CtClass affectedClass) throws NotFoundException {
+		Map<String, String> localExternalContracts = externalContracts.get(xmlConfiguration
+				.getConfiguration(affectedClass));
+		if (localExternalContracts.containsKey(type.getName())) {
+			return ClassFilePool.INSTANCE.getClass(localExternalContracts.get(type.getName()));
+		}
+		return null;
 	}
 
 	private void loadLogger() {
@@ -57,14 +80,14 @@ public class RootTransformer {
 			Layout layout = new PatternLayout("C4J %-5p - %m%n");
 			Logger.getRootLogger().addAppender(new ConsoleAppender(layout));
 			Logger.getRootLogger().setLevel(Level.INFO);
-			logger.info("No Appender on RootLogger found, added a new ConsoleAppender on Level INFO.");
+			LOGGER.info("No Appender on RootLogger found, added a new ConsoleAppender on Level INFO.");
 		}
 	}
 
 	public byte[] transformType(CtClass affectedClass) throws Exception {
 		if (affectedClass.isInterface()) {
-			if (logger.isTraceEnabled()) {
-				logger.trace("transformation aborted, as class is an interface");
+			if (LOGGER.isTraceEnabled()) {
+				LOGGER.trace("transformation aborted, as class is an interface");
 			}
 			return null;
 		}
@@ -90,7 +113,7 @@ public class RootTransformer {
 		ListOrderedSet<CtClass> involvedTypes = involvedTypeInspector.inspect(affectedClass);
 		ListOrderedSet<ContractInfo> contracts = transformInvolvedContracts(affectedClass, involvedTypes);
 		for (ContractInfo contract : contracts) {
-			logger.info(affectedClass.getSimpleName() + " must fulfill contract "
+			LOGGER.info(affectedClass.getSimpleName() + " must fulfill contract "
 					+ contract.getContractClass().getSimpleName() + " (defined on "
 					+ contract.getTargetClass().getSimpleName() + ").");
 		}
@@ -118,7 +141,7 @@ public class RootTransformer {
 			throws NotFoundException {
 		ListOrderedSet<ContractInfo> contracts = new ListOrderedSet<ContractInfo>();
 		for (CtClass type : types) {
-			CtClass externalContract = xmlConfiguration.getConfiguration(affectedClass).getExternalContract(type);
+			CtClass externalContract = getExternalContract(type, affectedClass);
 			if (type.hasAnnotation(ContractReference.class) || externalContract != null) {
 				if (contractRegistry.hasRegisteredContract(type)) {
 					contracts.add(contractRegistry.getContractInfoForTargetClass(type));
@@ -143,22 +166,22 @@ public class RootTransformer {
 	private boolean verifyContract(CtClass targetClass, CtClass contractClass, CtClass affectedClass)
 			throws NotFoundException {
 		if (contractClass.hasAnnotation(Transformed.class)) {
-			logger.error("Ignoring contract class " + contractClass.getSimpleName() + " defined on "
+			LOGGER.error("Ignoring contract class " + contractClass.getSimpleName() + " defined on "
 					+ targetClass.getSimpleName() + " as it has been loaded before the target type was loaded.");
 			return false;
 		}
 		if (contractClass.isInterface()) {
-			logger.error("Ignoring contract " + contractClass.getSimpleName() + " defined on "
+			LOGGER.error("Ignoring contract " + contractClass.getSimpleName() + " defined on "
 					+ targetClass.getSimpleName() + " as the contract class is an interface.");
 			return false;
 		}
 		if (contractClass.equals(targetClass)) {
-			logger.error("Ignoring contract " + contractClass.getSimpleName() + " defined on "
+			LOGGER.error("Ignoring contract " + contractClass.getSimpleName() + " defined on "
 					+ targetClass.getSimpleName() + " as the contract class is the same as the target class.");
 			return false;
 		}
 		if (contractClass.equals(affectedClass)) {
-			logger.error("Class " + contractClass.getSimpleName()
+			LOGGER.error("Class " + contractClass.getSimpleName()
 					+ " cannot be its own contract-class. Try explicitly marking " + contractClass.getSimpleName()
 					+ " with @Contract.");
 			return false;
@@ -181,7 +204,7 @@ public class RootTransformer {
 	}
 
 	private void logWarnContractNotInheritingFromTarget(CtClass targetClass, CtClass contractClass) {
-		logger.warn("Contract type " + contractClass.getSimpleName()
+		LOGGER.warn("Contract type " + contractClass.getSimpleName()
 				+ " does not inherit from its non-final target type " + targetClass.getSimpleName() + ".");
 	}
 
@@ -200,7 +223,7 @@ public class RootTransformer {
 		try {
 			xmlConfiguration.registerClassLoader(loader);
 		} catch (Exception e) {
-			logger.error("Could not add ClassLoader " + loader.getClass().getName() + " to configuration.", e);
+			LOGGER.error("Could not add ClassLoader " + loader.getClass().getName() + " to configuration.", e);
 		}
 	}
 
