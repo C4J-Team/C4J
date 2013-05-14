@@ -16,10 +16,10 @@ import de.vksi.c4j.internal.compiler.AssignmentExp;
 import de.vksi.c4j.internal.compiler.ConstructorExp;
 import de.vksi.c4j.internal.compiler.NestedExp;
 import de.vksi.c4j.internal.compiler.StaticCallExp;
+import de.vksi.c4j.internal.contracts.ContractInfo;
 import de.vksi.c4j.internal.editor.TargetAccessEditor;
-import de.vksi.c4j.internal.evaluator.Evaluator;
+import de.vksi.c4j.internal.runtime.Evaluator;
 import de.vksi.c4j.internal.types.Pair;
-import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
 
 public class TargetTransformer extends AbstractContractClassTransformer {
 

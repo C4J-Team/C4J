@@ -11,7 +11,7 @@ import org.junit.Test;
 import de.vksi.c4j.ContractReference;
 import de.vksi.c4j.Pure;
 import de.vksi.c4j.Target;
-import de.vksi.c4j.internal.evaluator.PureEvaluator;
+import de.vksi.c4j.internal.runtime.PureEvaluator;
 import de.vksi.c4j.systemtest.TransformerAwareRule;
 
 public class UnchangedCleanupSystemTest {

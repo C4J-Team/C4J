@@ -5,8 +5,8 @@ import java.util.Map;
 
 import javassist.CtBehavior;
 import javassist.CtClass;
-import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
-import de.vksi.c4j.internal.util.ContractRegistry.ContractMethod;
+import de.vksi.c4j.internal.contracts.ContractInfo;
+import de.vksi.c4j.internal.contracts.ContractMethod;
 import de.vksi.c4j.internal.util.ListOrderedSet;
 
 public abstract class AbstractAffectedClassTransformer extends ClassTransformer {

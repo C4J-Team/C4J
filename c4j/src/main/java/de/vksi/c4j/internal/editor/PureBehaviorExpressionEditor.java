@@ -27,9 +27,10 @@ import de.vksi.c4j.internal.compiler.StaticCall;
 import de.vksi.c4j.internal.compiler.StaticCallExp;
 import de.vksi.c4j.internal.compiler.ThrowExp;
 import de.vksi.c4j.internal.compiler.ValueExp;
-import de.vksi.c4j.internal.evaluator.PureEvaluator;
-import de.vksi.c4j.internal.evaluator.PureEvaluator.ErrorType;
-import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
+import de.vksi.c4j.internal.contracts.ContractInfo;
+import de.vksi.c4j.internal.contracts.ContractRegistry;
+import de.vksi.c4j.internal.runtime.PureEvaluator;
+import de.vksi.c4j.internal.runtime.PureEvaluator.ErrorType;
 import de.vksi.c4j.internal.util.InvolvedTypeInspector;
 import de.vksi.c4j.internal.util.ListOrderedSet;
 import de.vksi.c4j.internal.util.PureInspector;
@@ -155,7 +156,7 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 	private void editNonStaticMethodCall(MethodCall methodCall, CtMethod method) throws NotFoundException,
 			CannotCompileException {
 		ListOrderedSet<CtClass> involvedTypes = involvedTypeInspector.inspect(method.getDeclaringClass());
-		ListOrderedSet<ContractInfo> contracts = RootTransformer.INSTANCE.getContractsForTypes(involvedTypes, method
+		ListOrderedSet<ContractInfo> contracts = ContractRegistry.INSTANCE.getContractsForTypes(involvedTypes, method
 				.getDeclaringClass());
 		if (pureInspector.getPureOrigin(involvedTypes, contracts, method) != null) {
 			return;

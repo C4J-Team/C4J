@@ -16,8 +16,9 @@ import org.junit.Test;
 import de.vksi.c4j.ClassInvariant;
 import de.vksi.c4j.ContractReference;
 import de.vksi.c4j.internal.RootTransformer;
+import de.vksi.c4j.internal.contracts.ContractInfo;
+import de.vksi.c4j.internal.contracts.ContractRegistry;
 import de.vksi.c4j.internal.transformer.ContractBehaviorTransformer;
-import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
 
 public class AffectedBehaviorLocatorTest {
 	private AffectedBehaviorLocator locator;
@@ -37,11 +38,10 @@ public class AffectedBehaviorLocatorTest {
 		contractClass = pool.get(ContractClass.class.getName());
 		targetClass = pool.get(TargetClass.class.getName());
 		indirectClass = pool.get(IndirectClass.class.getName());
-		ContractRegistry contractRegistry = new ContractRegistry();
-		contractInfo = contractRegistry.registerContract(targetClass, contractClass);
+		contractInfo = ContractRegistry.INSTANCE.registerContract(targetClass, contractClass);
 		targetInterface = pool.get(TargetInterface.class.getName());
 		contractClassForTargetInterface = pool.get(TargetInterfaceContract.class.getName());
-		contractInfoForTargetInterface = contractRegistry.registerContract(targetInterface,
+		contractInfoForTargetInterface = ContractRegistry.INSTANCE.registerContract(targetInterface,
 				contractClassForTargetInterface);
 	}
 

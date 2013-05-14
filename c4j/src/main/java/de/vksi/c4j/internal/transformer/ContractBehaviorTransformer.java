@@ -16,7 +16,7 @@ import de.vksi.c4j.InitializeContract;
 import de.vksi.c4j.error.UsageError;
 import de.vksi.c4j.internal.classfile.BehaviorFilter;
 import de.vksi.c4j.internal.compiler.NestedExp;
-import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
+import de.vksi.c4j.internal.contracts.ContractInfo;
 
 public class ContractBehaviorTransformer extends AbstractContractClassTransformer {
 	public static final String CONSTRUCTOR_REPLACEMENT_NAME = "constructor$";

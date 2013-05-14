@@ -14,16 +14,15 @@ import javassist.CtConstructor;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 import de.vksi.c4j.Pure;
-import de.vksi.c4j.internal.RootTransformer;
 import de.vksi.c4j.internal.classfile.ClassFilePool;
-import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
-import de.vksi.c4j.internal.util.ContractRegistry.ContractMethod;
+import de.vksi.c4j.internal.configuration.XmlConfigurationManager;
+import de.vksi.c4j.internal.contracts.ContractInfo;
+import de.vksi.c4j.internal.contracts.ContractMethod;
 import de.vksi.c4j.internal.util.ListOrderedSet;
 import de.vksi.c4j.internal.util.PureInspector;
 
 public class PureTransformer extends AbstractAffectedClassTransformer {
 	private PureInspector pureInspector = new PureInspector();
-	private RootTransformer rootTransformer = RootTransformer.INSTANCE;
 
 	@Override
 	public void transform(ListOrderedSet<CtClass> involvedClasses, ListOrderedSet<ContractInfo> contracts,
@@ -36,7 +35,7 @@ public class PureTransformer extends AbstractAffectedClassTransformer {
 
 	private void applyPure(CtClass affectedClass, CtBehavior affectedBehavior, ListOrderedSet<ContractInfo> contracts)
 			throws CannotCompileException, NotFoundException {
-		if (rootTransformer.getXmlConfiguration().getConfiguration(affectedClass).isPureValidate()) {
+		if (XmlConfigurationManager.INSTANCE.getConfiguration(affectedClass).isPureValidate()) {
 			if (affectedBehavior.hasAnnotation(Pure.class)) {
 				pureInspector.verify((CtMethod) affectedBehavior, false);
 			} else {

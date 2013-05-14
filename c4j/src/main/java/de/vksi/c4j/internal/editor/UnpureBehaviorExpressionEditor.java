@@ -9,7 +9,7 @@ import de.vksi.c4j.AllowPureAccess;
 import de.vksi.c4j.internal.compiler.NestedExp;
 import de.vksi.c4j.internal.compiler.StandaloneExp;
 import de.vksi.c4j.internal.compiler.StaticCallExp;
-import de.vksi.c4j.internal.evaluator.PureEvaluator;
+import de.vksi.c4j.internal.runtime.PureEvaluator;
 
 public class UnpureBehaviorExpressionEditor extends ExprEditor {
 	@Override

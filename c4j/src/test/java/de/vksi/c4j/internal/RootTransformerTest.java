@@ -16,9 +16,10 @@ import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 
 import de.vksi.c4j.ContractReference;
+import de.vksi.c4j.internal.contracts.ContractInfo;
+import de.vksi.c4j.internal.contracts.ContractRegistry;
 import de.vksi.c4j.internal.transformer.AffectedClassTransformer;
 import de.vksi.c4j.internal.transformer.ContractClassTransformer;
-import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
 import de.vksi.c4j.internal.util.ListOrderedSet;
 
 public class RootTransformerTest {
@@ -52,8 +53,8 @@ public class RootTransformerTest {
 	@Test
 	public void testTransformClassTargetClass() throws Exception {
 		assertNotNull(transformer.transformType(pool.get(TargetClass.class.getName())));
-		assertEquals(targetClass, transformer.contractRegistry.getContractInfo(contractClass).getTargetClass());
-		assertEquals(contractClass, transformer.contractRegistry.getContractInfo(contractClass).getContractClass());
+		assertEquals(targetClass, ContractRegistry.INSTANCE.getContractInfo(contractClass).getTargetClass());
+		assertEquals(contractClass, ContractRegistry.INSTANCE.getContractInfo(contractClass).getContractClass());
 		verify(targetClassTransformer).transform(any(ListOrderedSet.class),
 				argThat(new ArgumentMatcher<ListOrderedSet<ContractInfo>>() {
 					@Override
@@ -68,7 +69,7 @@ public class RootTransformerTest {
 
 	@Test
 	public void testTransformClassContractClass() throws Exception {
-		transformer.contractRegistry.registerContract(targetClass, contractClass);
+		ContractRegistry.INSTANCE.registerContract(targetClass, contractClass);
 		assertNotNull(transformer.transformType(pool.get(ContractClass.class.getName())));
 		verify(contractClassTransformer).transform(argThat(new ArgumentMatcher<ContractInfo>() {
 			@Override

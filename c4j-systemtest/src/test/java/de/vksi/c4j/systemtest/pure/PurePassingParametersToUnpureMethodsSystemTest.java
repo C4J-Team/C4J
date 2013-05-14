@@ -7,7 +7,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import de.vksi.c4j.Pure;
-import de.vksi.c4j.internal.evaluator.PureEvaluator;
+import de.vksi.c4j.internal.runtime.PureEvaluator;
 import de.vksi.c4j.systemtest.TransformerAwareRule;
 
 public class PurePassingParametersToUnpureMethodsSystemTest {

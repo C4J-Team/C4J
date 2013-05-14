@@ -19,9 +19,9 @@ import org.apache.log4j.Logger;
 
 import de.vksi.c4j.ClassInvariant;
 import de.vksi.c4j.InitializeContract;
-import de.vksi.c4j.internal.RootTransformer;
+import de.vksi.c4j.internal.contracts.ContractInfo;
+import de.vksi.c4j.internal.contracts.ContractRegistry;
 import de.vksi.c4j.internal.transformer.ContractExpressionTransformer;
-import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
 
 public class AffectedBehaviorLocator {
 	private InvolvedTypeInspector involvedTypeInspector = new InvolvedTypeInspector();
@@ -103,7 +103,7 @@ public class AffectedBehaviorLocator {
 
 	private boolean hasContract(CtClass clazz, ContractInfo contractInfo) throws NotFoundException {
 		ListOrderedSet<CtClass> involvedTypes = involvedTypeInspector.inspect(clazz);
-		ListOrderedSet<ContractInfo> contracts = RootTransformer.INSTANCE.getContractsForTypes(involvedTypes, clazz);
+		ListOrderedSet<ContractInfo> contracts = ContractRegistry.INSTANCE.getContractsForTypes(involvedTypes, clazz);
 		return contracts.contains(contractInfo);
 	}
 

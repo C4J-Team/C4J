@@ -8,8 +8,8 @@ import javassist.CtClass;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 
+import de.vksi.c4j.internal.contracts.ContractInfo;
 import de.vksi.c4j.internal.transformer.ContractDeclaredBehaviorTransformer;
-import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
 
 public class ContractDeclaredBehaviorTransformerTest {
 

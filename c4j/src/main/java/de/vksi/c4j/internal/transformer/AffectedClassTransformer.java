@@ -14,11 +14,11 @@ import javassist.NotFoundException;
 
 import org.apache.log4j.Logger;
 
-import de.vksi.c4j.internal.Transformed;
 import de.vksi.c4j.internal.classfile.ClassFilePool;
+import de.vksi.c4j.internal.contracts.ContractInfo;
+import de.vksi.c4j.internal.contracts.ContractMethod;
+import de.vksi.c4j.internal.contracts.Transformed;
 import de.vksi.c4j.internal.util.AffectedBehaviorLocator;
-import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
-import de.vksi.c4j.internal.util.ContractRegistry.ContractMethod;
 import de.vksi.c4j.internal.util.ListOrderedSet;
 
 public class AffectedClassTransformer {

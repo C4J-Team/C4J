@@ -1,4 +1,4 @@
-package de.vksi.c4j.internal;
+package de.vksi.c4j.internal.contracts;
 
 import java.util.HashMap;
 import java.util.List;

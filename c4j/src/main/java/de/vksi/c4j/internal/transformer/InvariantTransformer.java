@@ -18,7 +18,6 @@ import javassist.CtMethod;
 import javassist.NotFoundException;
 import de.vksi.c4j.ClassInvariant;
 import de.vksi.c4j.Pure;
-import de.vksi.c4j.internal.RootTransformer;
 import de.vksi.c4j.internal.compiler.BooleanExp;
 import de.vksi.c4j.internal.compiler.EmptyExp;
 import de.vksi.c4j.internal.compiler.NestedExp;
@@ -26,11 +25,12 @@ import de.vksi.c4j.internal.compiler.StandaloneExp;
 import de.vksi.c4j.internal.compiler.StaticCallExp;
 import de.vksi.c4j.internal.compiler.TryExp;
 import de.vksi.c4j.internal.compiler.ValueExp;
-import de.vksi.c4j.internal.evaluator.Evaluator;
-import de.vksi.c4j.internal.evaluator.UnchangedCache;
-import de.vksi.c4j.internal.evaluator.ContractErrorHandler.ContractErrorSource;
-import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
-import de.vksi.c4j.internal.util.ContractRegistry.ContractMethod;
+import de.vksi.c4j.internal.configuration.XmlConfigurationManager;
+import de.vksi.c4j.internal.contracts.ContractInfo;
+import de.vksi.c4j.internal.contracts.ContractMethod;
+import de.vksi.c4j.internal.runtime.Evaluator;
+import de.vksi.c4j.internal.runtime.UnchangedCache;
+import de.vksi.c4j.internal.runtime.ContractErrorHandler.ContractErrorSource;
 import de.vksi.c4j.internal.util.ListOrderedSet;
 
 /**
@@ -72,8 +72,6 @@ try {
 }
 */
 public class InvariantTransformer extends ConditionTransformer {
-	private RootTransformer rootTransformer = RootTransformer.INSTANCE;
-
 	@Override
 	public void transform(ListOrderedSet<CtClass> involvedClasses, ListOrderedSet<ContractInfo> contracts,
 			CtClass affectedClass, Map<CtBehavior, List<ContractMethod>> contractMap) throws Exception {
@@ -89,7 +87,7 @@ public class InvariantTransformer extends ConditionTransformer {
 			logger.trace("transforming behavior " + affectedBehavior.getLongName());
 		}
 		if (affectedBehavior.hasAnnotation(Pure.class)
-				&& rootTransformer.getXmlConfiguration().getConfiguration(affectedClass).isPureSkipInvariants()) {
+				&& XmlConfigurationManager.INSTANCE.getConfiguration(affectedClass).isPureSkipInvariants()) {
 			transformWithoutInvariants(affectedClass, affectedBehavior, contractMap);
 			return;
 		}

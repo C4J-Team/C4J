@@ -12,7 +12,7 @@ import de.vksi.c4j.error.UsageError;
 import de.vksi.c4j.internal.compiler.AssignmentExp;
 import de.vksi.c4j.internal.compiler.NestedExp;
 import de.vksi.c4j.internal.compiler.StaticCallExp;
-import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
+import de.vksi.c4j.internal.contracts.ContractInfo;
 
 public abstract class ContractMethodEditor extends ExprEditor {
 	private UsageError thrownException;

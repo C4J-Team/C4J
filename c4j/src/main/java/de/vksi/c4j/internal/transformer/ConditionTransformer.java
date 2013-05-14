@@ -16,9 +16,9 @@ import de.vksi.c4j.internal.compiler.StandaloneExp;
 import de.vksi.c4j.internal.compiler.StaticCallExp;
 import de.vksi.c4j.internal.compiler.TryExp;
 import de.vksi.c4j.internal.compiler.ValueExp;
-import de.vksi.c4j.internal.evaluator.ContractErrorHandler;
-import de.vksi.c4j.internal.evaluator.Evaluator;
-import de.vksi.c4j.internal.evaluator.ContractErrorHandler.ContractErrorSource;
+import de.vksi.c4j.internal.runtime.ContractErrorHandler;
+import de.vksi.c4j.internal.runtime.Evaluator;
+import de.vksi.c4j.internal.runtime.ContractErrorHandler.ContractErrorSource;
 
 public abstract class ConditionTransformer extends AbstractAffectedClassTransformer {
 	protected void catchWithHandleContractException(CtClass affectedClass, TryExp contractCallExp,

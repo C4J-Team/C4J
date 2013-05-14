@@ -23,11 +23,11 @@ import de.vksi.c4j.internal.RootTransformer;
 import de.vksi.c4j.internal.compiler.ArrayExp;
 import de.vksi.c4j.internal.compiler.NestedExp;
 import de.vksi.c4j.internal.compiler.StaticCallExp;
+import de.vksi.c4j.internal.contracts.ContractInfo;
 import de.vksi.c4j.internal.editor.ArrayAccessEditor;
 import de.vksi.c4j.internal.editor.PureBehaviorExpressionEditor;
 import de.vksi.c4j.internal.editor.UnpureBehaviorExpressionEditor;
-import de.vksi.c4j.internal.evaluator.PureEvaluator;
-import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
+import de.vksi.c4j.internal.runtime.PureEvaluator;
 
 public class PureInspector {
 	private RootTransformer rootTransformer = RootTransformer.INSTANCE;

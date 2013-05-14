@@ -14,7 +14,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
 
-import de.vksi.c4j.internal.ClasspathScanner;
+import de.vksi.c4j.internal.contracts.ClasspathScanner;
 import de.vksi.c4j.systemtest.TransformerAwareRule;
 
 public class RuleEnforcingTestBase {

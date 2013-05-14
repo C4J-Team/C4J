@@ -1,4 +1,4 @@
-package de.vksi.c4j.internal;
+package de.vksi.c4j.internal.contracts;
 
 import java.io.File;
 import java.io.FileInputStream;

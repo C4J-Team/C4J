@@ -7,8 +7,8 @@ import javassist.CtClass;
 
 import org.junit.Test;
 
-import de.vksi.c4j.internal.util.ContractRegistry;
-import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
+import de.vksi.c4j.internal.contracts.ContractInfo;
+import de.vksi.c4j.internal.contracts.ContractRegistry;
 
 public class ContractClassTransformerTest {
 
@@ -22,7 +22,7 @@ public class ContractClassTransformerTest {
 		CtClass targetClass = ClassPool.getDefault().get(TargetClass.class.getName());
 		CtClass contractClass = ClassPool.getDefault().get(ContractClass.class.getName());
 		contractClass.defrost();
-		ContractInfo contractInfo = new ContractRegistry().registerContract(targetClass, contractClass);
+		ContractInfo contractInfo = ContractRegistry.INSTANCE.registerContract(targetClass, contractClass);
 		transformer.transform(contractInfo, contractClass);
 		for (AbstractContractClassTransformer subTransformer : transformer.getTransformers()) {
 			verify(subTransformer).transform(contractInfo, contractClass);

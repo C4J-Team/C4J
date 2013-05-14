@@ -12,7 +12,7 @@ import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeAttribute;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.Opcode;
-import de.vksi.c4j.internal.evaluator.PureEvaluator;
+import de.vksi.c4j.internal.runtime.PureEvaluator;
 
 public class ArrayAccessEditor {
 	private static final Set<Integer> ARRAY_STORE_OPCODES = new HashSet<Integer>();

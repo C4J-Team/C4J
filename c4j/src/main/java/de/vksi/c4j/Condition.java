@@ -1,8 +1,8 @@
 package de.vksi.c4j;
 
-import de.vksi.c4j.internal.evaluator.Evaluator;
-import de.vksi.c4j.internal.evaluator.MaxTimeCache;
-import de.vksi.c4j.internal.evaluator.UnchangedCache;
+import de.vksi.c4j.internal.runtime.Evaluator;
+import de.vksi.c4j.internal.runtime.MaxTimeCache;
+import de.vksi.c4j.internal.runtime.UnchangedCache;
 
 /**
  * Allows the definition of pre- and post-conditions within contract-methods.

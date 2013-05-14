@@ -3,9 +3,9 @@ package de.vksi.c4j.internal.transformer;
 import static de.vksi.c4j.internal.util.TransformationHelper.addClassAnnotation;
 import javassist.CannotCompileException;
 import javassist.CtClass;
-import de.vksi.c4j.internal.Transformed;
 import de.vksi.c4j.internal.classfile.ClassFilePool;
-import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
+import de.vksi.c4j.internal.contracts.ContractInfo;
+import de.vksi.c4j.internal.contracts.Transformed;
 
 public class ContractClassTransformer extends AbstractContractClassTransformer {
 	private AbstractContractClassTransformer[] transformers = new AbstractContractClassTransformer[] {

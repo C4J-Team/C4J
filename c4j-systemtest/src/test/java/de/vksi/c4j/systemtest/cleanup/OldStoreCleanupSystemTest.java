@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import de.vksi.c4j.ContractReference;
 import de.vksi.c4j.Target;
-import de.vksi.c4j.internal.evaluator.OldCache;
+import de.vksi.c4j.internal.runtime.OldCache;
 import de.vksi.c4j.systemtest.TransformerAwareRule;
 
 public class OldStoreCleanupSystemTest {

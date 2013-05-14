@@ -21,10 +21,10 @@ import de.vksi.c4j.internal.compiler.NestedExp;
 import de.vksi.c4j.internal.compiler.StandaloneExp;
 import de.vksi.c4j.internal.compiler.StaticCallExp;
 import de.vksi.c4j.internal.compiler.ValueExp;
-import de.vksi.c4j.internal.evaluator.MaxTimeCache;
-import de.vksi.c4j.internal.evaluator.OldCache;
-import de.vksi.c4j.internal.evaluator.UnchangedCache;
-import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
+import de.vksi.c4j.internal.contracts.ContractInfo;
+import de.vksi.c4j.internal.runtime.MaxTimeCache;
+import de.vksi.c4j.internal.runtime.OldCache;
+import de.vksi.c4j.internal.runtime.UnchangedCache;
 import de.vksi.c4j.internal.util.Stackalyzer;
 
 public class InitializationGatheringEditor extends ContractMethodEditor {

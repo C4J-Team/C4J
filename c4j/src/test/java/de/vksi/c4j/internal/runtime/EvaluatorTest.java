@@ -1,4 +1,4 @@
-package de.vksi.c4j.internal.evaluator;
+package de.vksi.c4j.internal.runtime;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -9,8 +9,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.vksi.c4j.internal.evaluator.Evaluator;
-import de.vksi.c4j.internal.evaluator.Evaluator.EvaluationPhase;
+import de.vksi.c4j.internal.runtime.Evaluator;
+import de.vksi.c4j.internal.runtime.Evaluator.EvaluationPhase;
 
 public class EvaluatorTest {
 

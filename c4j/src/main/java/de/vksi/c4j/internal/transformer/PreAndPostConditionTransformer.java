@@ -1,7 +1,7 @@
 package de.vksi.c4j.internal.transformer;
 
 import static de.vksi.c4j.internal.classfile.ClassAnalyzer.getSimpleName;
-import static de.vksi.c4j.internal.evaluator.ContractErrorHandler.ContractErrorSource.PRE_CONDITION;
+import static de.vksi.c4j.internal.runtime.ContractErrorHandler.ContractErrorSource.PRE_CONDITION;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -22,10 +22,10 @@ import de.vksi.c4j.internal.compiler.StaticCallExp;
 import de.vksi.c4j.internal.compiler.ThrowExp;
 import de.vksi.c4j.internal.compiler.TryExp;
 import de.vksi.c4j.internal.compiler.ValueExp;
-import de.vksi.c4j.internal.evaluator.ContractErrorHandler;
-import de.vksi.c4j.internal.evaluator.Evaluator;
-import de.vksi.c4j.internal.evaluator.ContractErrorHandler.ContractErrorSource;
-import de.vksi.c4j.internal.util.ContractRegistry.ContractMethod;
+import de.vksi.c4j.internal.contracts.ContractMethod;
+import de.vksi.c4j.internal.runtime.ContractErrorHandler;
+import de.vksi.c4j.internal.runtime.Evaluator;
+import de.vksi.c4j.internal.runtime.ContractErrorHandler.ContractErrorSource;
 import de.vksi.c4j.internal.util.ObjectConverter;
 
 public abstract class PreAndPostConditionTransformer extends ConditionTransformer {

@@ -13,19 +13,19 @@ import javassist.expr.MethodCall;
 import org.apache.log4j.Logger;
 
 import de.vksi.c4j.Condition;
-import de.vksi.c4j.internal.RootTransformer;
 import de.vksi.c4j.internal.compiler.AssignmentExp;
 import de.vksi.c4j.internal.compiler.BooleanExp;
 import de.vksi.c4j.internal.compiler.NestedExp;
 import de.vksi.c4j.internal.compiler.StaticCallExp;
 import de.vksi.c4j.internal.configuration.DefaultPreconditionType;
-import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
+import de.vksi.c4j.internal.configuration.XmlConfigurationManager;
+import de.vksi.c4j.internal.contracts.ContractInfo;
+import de.vksi.c4j.internal.contracts.ContractRegistry;
 import de.vksi.c4j.internal.util.InvolvedTypeInspector;
 import de.vksi.c4j.internal.util.ListOrderedSet;
 
 public class ContractMethodConditionEditor extends ContractMethodEditor {
 	private Logger logger = Logger.getLogger(getClass());
-	private RootTransformer rootTransformer;
 	private InvolvedTypeInspector involvedTypeInspector = new InvolvedTypeInspector();
 	private boolean preConditionAvailable;
 	private boolean postConditionAvailable;
@@ -34,10 +34,8 @@ public class ContractMethodConditionEditor extends ContractMethodEditor {
 		return postConditionAvailable;
 	}
 
-	public ContractMethodConditionEditor(RootTransformer rootTransformer, ContractInfo contract)
-			throws NotFoundException {
+	public ContractMethodConditionEditor(ContractInfo contract) throws NotFoundException {
 		super(contract);
-		this.rootTransformer = rootTransformer;
 	}
 
 	@Override
@@ -87,7 +85,7 @@ public class ContractMethodConditionEditor extends ContractMethodEditor {
 		CtBehavior method = methodCall.where();
 		if (getContract().getContractClass().equals(method.getDeclaringClass())) {
 			ListOrderedSet<CtClass> involvedTypes = involvedTypeInspector.inspect(getContract().getTargetClass());
-			if (rootTransformer.getXmlConfiguration().getConfiguration(getContract().getTargetClass())
+			if (XmlConfigurationManager.INSTANCE.getConfiguration(getContract().getTargetClass())
 					.getDefaultPrecondition() == DefaultPreconditionType.TRUE) {
 				handleTrueDefaultPreCondition(methodCall, method, involvedTypes);
 			} else {
@@ -110,8 +108,8 @@ public class ContractMethodConditionEditor extends ContractMethodEditor {
 
 	private void handleUndefinedDefaultPreCondition(MethodCall methodCall, CtBehavior method,
 			ListOrderedSet<CtClass> involvedTypes) throws NotFoundException, CannotCompileException {
-		ListOrderedSet<ContractInfo> contracts = rootTransformer.getContractsForTypes(involvedTypes, getContract()
-				.getTargetClass());
+		ListOrderedSet<ContractInfo> contracts = ContractRegistry.INSTANCE.getContractsForTypes(involvedTypes,
+				getContract().getTargetClass());
 		contracts.remove(getContract());
 		for (ContractInfo otherContract : contracts) {
 			if (getDeclaredMethod(otherContract.getTargetClass(), method.getName(), method.getParameterTypes()) != null) {

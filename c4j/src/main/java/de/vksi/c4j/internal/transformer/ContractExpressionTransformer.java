@@ -20,23 +20,21 @@ import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import javassist.bytecode.Opcode;
 import de.vksi.c4j.ClassInvariant;
-import de.vksi.c4j.internal.RootTransformer;
 import de.vksi.c4j.internal.classfile.ClassFilePool;
 import de.vksi.c4j.internal.compiler.IfExp;
 import de.vksi.c4j.internal.compiler.StaticCall;
 import de.vksi.c4j.internal.compiler.StaticCallExp;
+import de.vksi.c4j.internal.contracts.ContractInfo;
 import de.vksi.c4j.internal.editor.ContractMethodConditionEditor;
 import de.vksi.c4j.internal.editor.InitializationGatheringEditor;
 import de.vksi.c4j.internal.editor.StoreDependency;
-import de.vksi.c4j.internal.evaluator.Evaluator;
-import de.vksi.c4j.internal.evaluator.OldCache;
-import de.vksi.c4j.internal.evaluator.PureEvaluator;
-import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
+import de.vksi.c4j.internal.runtime.Evaluator;
+import de.vksi.c4j.internal.runtime.OldCache;
+import de.vksi.c4j.internal.runtime.PureEvaluator;
 
 public class ContractExpressionTransformer extends AbstractContractClassTransformer {
 
 	public static final String BEFORE_INVARIANT_METHOD_SUFFIX = "$before";
-	private RootTransformer rootTransformer = RootTransformer.INSTANCE;
 
 	@Override
 	public void transform(ContractInfo contractInfo, CtClass currentContractClass) throws Exception {
@@ -65,8 +63,7 @@ public class ContractExpressionTransformer extends AbstractContractClassTransfor
 
 	public void transform(ContractInfo contractInfo, CtMethod contractMethod, AtomicInteger storeIndex,
 			ContractMethodDependencies contractMethodDependencies) throws Exception {
-		ContractMethodConditionEditor expressionEditor = new ContractMethodConditionEditor(rootTransformer,
-				contractInfo);
+		ContractMethodConditionEditor expressionEditor = new ContractMethodConditionEditor(contractInfo);
 		contractMethod.instrument(expressionEditor);
 		contractInfo.addMethod(contractMethod, expressionEditor.hasPreCondition()
 				|| contractMethodDependencies.hasPreDependencies(), expressionEditor.isPostConditionAvailable(),

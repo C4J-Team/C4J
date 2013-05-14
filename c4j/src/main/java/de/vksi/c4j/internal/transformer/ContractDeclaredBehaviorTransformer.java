@@ -2,7 +2,7 @@ package de.vksi.c4j.internal.transformer;
 
 import javassist.CtBehavior;
 import javassist.CtClass;
-import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
+import de.vksi.c4j.internal.contracts.ContractInfo;
 
 public abstract class ContractDeclaredBehaviorTransformer extends AbstractContractClassTransformer {
 
