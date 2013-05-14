@@ -2,8 +2,8 @@ package de.vksi.c4j.internal;
 
 import org.apache.log4j.Logger;
 
-import de.vksi.c4j.ContractError;
-import de.vksi.c4j.UsageError;
+import de.vksi.c4j.error.ContractError;
+import de.vksi.c4j.error.UsageError;
 import de.vksi.c4j.internal.compiler.StaticCall;
 import de.vksi.c4j.internal.configuration.ContractViolationAction;
 import de.vksi.c4j.internal.evaluator.Evaluator;

@@ -8,13 +8,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 
 import org.apache.log4j.Logger;
 
+import de.vksi.c4j.internal.classfile.ClassFilePool;
 import de.vksi.c4j.internal.configuration.C4JPureRegistry;
 import de.vksi.c4j.internal.configuration.C4JPureRegistry.Type;
 import de.vksi.c4j.internal.configuration.Empty;
@@ -22,7 +22,6 @@ import de.vksi.c4j.internal.configuration.MethodByName;
 import de.vksi.c4j.internal.configuration.MethodBySignature;
 
 public class PureRegistryImporter {
-	private ClassPool pool = RootTransformer.INSTANCE.getPool();
 	private final URL pureRegistryUrl;
 	private Logger logger = Logger.getLogger(PureRegistryImporter.class);
 	private Set<CtMethod> whitelistMethods = new HashSet<CtMethod>();
@@ -45,7 +44,7 @@ public class PureRegistryImporter {
 
 	private void importType(Type type) {
 		try {
-			CtClass typeClass = pool.get(type.getName());
+			CtClass typeClass = ClassFilePool.INSTANCE.getClass(type.getName());
 			importExistingType(type, typeClass);
 		} catch (NotFoundException e) {
 			logger.error("Could not find type " + type.getName() + " for pure-registry " + pureRegistryUrl);
@@ -105,7 +104,7 @@ public class PureRegistryImporter {
 
 	private CtMethod getMethodBySignature(String signature, CtClass typeClass) throws NotFoundException {
 		return typeClass.getDeclaredMethod(getMethodName(signature), getMethodParameters(signature).toArray(
-					new CtClass[0]));
+				new CtClass[0]));
 	}
 
 	private String getMethodName(String signature) {
@@ -125,7 +124,7 @@ public class PureRegistryImporter {
 	private void checkAndAddMethodParameter(List<CtClass> methodParameters, String parameter) throws NotFoundException {
 		parameter = parameter.trim();
 		if (!parameter.isEmpty()) {
-			methodParameters.add(pool.get(parameter));
+			methodParameters.add(ClassFilePool.INSTANCE.getClass(parameter));
 		}
 	}
 

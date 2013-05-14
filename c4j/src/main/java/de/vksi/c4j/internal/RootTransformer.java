@@ -6,10 +6,7 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
-import javassist.ByteArrayClassPath;
-import javassist.ClassPool;
 import javassist.CtClass;
-import javassist.LoaderClassPath;
 import javassist.Modifier;
 import javassist.NotFoundException;
 
@@ -20,9 +17,9 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 
 import de.vksi.c4j.ContractReference;
+import de.vksi.c4j.internal.classfile.ClassFilePool;
 import de.vksi.c4j.internal.transformer.AffectedClassTransformer;
 import de.vksi.c4j.internal.transformer.ContractClassTransformer;
-import de.vksi.c4j.internal.util.BackdoorAnnotationLoader;
 import de.vksi.c4j.internal.util.ContractRegistry;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
 import de.vksi.c4j.internal.util.InvolvedTypeInspector;
@@ -32,7 +29,6 @@ public class RootTransformer {
 	public static final RootTransformer INSTANCE = new RootTransformer();
 
 	private Logger logger = Logger.getLogger(RootTransformer.class);
-	ClassPool pool = ClassPool.getDefault();
 
 	ContractRegistry contractRegistry = new ContractRegistry();
 
@@ -43,10 +39,6 @@ public class RootTransformer {
 
 	private XmlConfigurationManager xmlConfiguration;
 	private Set<ClassLoader> classLoaders = new HashSet<ClassLoader>();
-
-	public ClassPool getPool() {
-		return pool;
-	}
 
 	private RootTransformer() {
 	}
@@ -126,7 +118,7 @@ public class RootTransformer {
 			throws NotFoundException {
 		ListOrderedSet<ContractInfo> contracts = new ListOrderedSet<ContractInfo>();
 		for (CtClass type : types) {
-			CtClass externalContract = xmlConfiguration.getConfiguration(affectedClass).getExternalContract(pool, type);
+			CtClass externalContract = xmlConfiguration.getConfiguration(affectedClass).getExternalContract(type);
 			if (type.hasAnnotation(ContractReference.class) || externalContract != null) {
 				if (contractRegistry.hasRegisteredContract(type)) {
 					contracts.add(contractRegistry.getContractInfoForTargetClass(type));
@@ -143,9 +135,7 @@ public class RootTransformer {
 
 	private CtClass decideContractForType(CtClass type, CtClass externalContract) throws NotFoundException {
 		if (type.hasAnnotation(ContractReference.class)) {
-			String contractClassString = new BackdoorAnnotationLoader(type).getClassValue(ContractReference.class,
-					"value");
-			return pool.get(contractClassString);
+			return ClassFilePool.INSTANCE.getClassFromAnnotationValue(type, ContractReference.class, "value");
 		}
 		return externalContract;
 	}
@@ -201,22 +191,12 @@ public class RootTransformer {
 			addClassLoader(loader);
 		}
 		if (classfileBuffer != null) {
-			addClassFile(classfileBuffer, className);
+			ClassFilePool.INSTANCE.addClassFile(classfileBuffer, className);
 		}
-	}
-
-	private void addClassFile(byte[] classfileBuffer, String className) {
-		if (logger.isTraceEnabled()) {
-			logger.trace("updating classpath with classfileBuffer for class " + className);
-		}
-		pool.insertClassPath(new ByteArrayClassPath(className, classfileBuffer));
 	}
 
 	private void addClassLoader(ClassLoader loader) {
-		if (logger.isTraceEnabled()) {
-			logger.trace("updating classpath with loader " + loader.getClass() + ", parent " + loader.getParent());
-		}
-		pool.insertClassPath(new LoaderClassPath(loader));
+		ClassFilePool.INSTANCE.addClassLoader(loader);
 		try {
 			xmlConfiguration.registerClassLoader(loader);
 		} catch (Exception e) {

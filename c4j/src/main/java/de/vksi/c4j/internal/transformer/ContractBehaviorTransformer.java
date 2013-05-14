@@ -13,7 +13,7 @@ import javassist.CtNewConstructor;
 import javassist.Modifier;
 import javassist.NotFoundException;
 import de.vksi.c4j.InitializeContract;
-import de.vksi.c4j.UsageError;
+import de.vksi.c4j.error.UsageError;
 import de.vksi.c4j.internal.compiler.NestedExp;
 import de.vksi.c4j.internal.util.BehaviorFilter;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;

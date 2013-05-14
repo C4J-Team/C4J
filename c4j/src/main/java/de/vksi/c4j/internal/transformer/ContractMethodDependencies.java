@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javassist.CtMethod;
-import de.vksi.c4j.UsageError;
+import de.vksi.c4j.error.UsageError;
 import de.vksi.c4j.internal.compiler.EmptyExp;
 import de.vksi.c4j.internal.compiler.StandaloneExp;
 import de.vksi.c4j.internal.editor.InitializationGatheringEditor;

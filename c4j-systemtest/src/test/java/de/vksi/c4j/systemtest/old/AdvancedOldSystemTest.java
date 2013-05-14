@@ -11,7 +11,7 @@ import org.junit.Test;
 import de.vksi.c4j.ContractReference;
 import de.vksi.c4j.Pure;
 import de.vksi.c4j.Target;
-import de.vksi.c4j.UsageError;
+import de.vksi.c4j.error.UsageError;
 import de.vksi.c4j.systemtest.TransformerAwareRule;
 
 public class AdvancedOldSystemTest {

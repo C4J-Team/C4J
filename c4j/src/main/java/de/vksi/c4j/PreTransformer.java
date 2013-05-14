@@ -1,7 +1,6 @@
 package de.vksi.c4j;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,7 +10,7 @@ import javassist.NotFoundException;
 import org.apache.log4j.Logger;
 
 import de.vksi.c4j.internal.RootTransformer;
-import de.vksi.c4j.internal.util.BackdoorAnnotationLoader;
+import de.vksi.c4j.internal.classfile.ClassFilePool;
 
 /**
  * EXPERIMENTAL!
@@ -47,8 +46,8 @@ public class PreTransformer {
 		Set<CtClass> contractClassFiles = new HashSet<CtClass>();
 		for (CtClass clazz : classFiles) {
 			if (clazz.hasAnnotation(ContractReference.class)) {
-				contractClassFiles.add(RootTransformer.INSTANCE.getPool().get(
-						new BackdoorAnnotationLoader(clazz).getClassValue(ContractReference.class, "value")));
+				contractClassFiles.add(ClassFilePool.INSTANCE.getClassFromAnnotationValue(clazz,
+						ContractReference.class, "value"));
 			}
 		}
 		return contractClassFiles;
@@ -60,7 +59,7 @@ public class PreTransformer {
 			if (file.isDirectory()) {
 				classes.addAll(searchClassFiles(file));
 			} else if (file.getName().endsWith(".class")) {
-				classes.add(RootTransformer.INSTANCE.getPool().makeClassIfNew(new FileInputStream(file)));
+				classes.add(ClassFilePool.INSTANCE.createClass(file));
 			}
 		}
 		return classes;

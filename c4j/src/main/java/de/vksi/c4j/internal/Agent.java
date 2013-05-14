@@ -8,6 +8,8 @@ import javassist.CtClass;
 
 import org.apache.log4j.Logger;
 
+import de.vksi.c4j.internal.classfile.ClassFilePool;
+
 public class Agent implements ClassFileTransformer {
 	private Logger logger = Logger.getLogger(Agent.class);
 	private RootTransformer rootTransformer = RootTransformer.INSTANCE;
@@ -28,7 +30,7 @@ public class Agent implements ClassFileTransformer {
 		}
 		try {
 			rootTransformer.updateClassPath(loader, classfileBuffer, className);
-			CtClass affectedClass = RootTransformer.INSTANCE.getPool().get(className);
+			CtClass affectedClass = ClassFilePool.INSTANCE.getClass(className);
 			return rootTransformer.transformType(affectedClass);
 		} catch (Exception e) {
 			lastException = e;

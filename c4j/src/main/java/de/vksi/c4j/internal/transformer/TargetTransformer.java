@@ -11,7 +11,7 @@ import javassist.CtConstructor;
 import javassist.CtField;
 import javassist.NotFoundException;
 import de.vksi.c4j.Target;
-import de.vksi.c4j.internal.RootTransformer;
+import de.vksi.c4j.internal.classfile.ClassFilePool;
 import de.vksi.c4j.internal.compiler.AssignmentExp;
 import de.vksi.c4j.internal.compiler.ConstructorExp;
 import de.vksi.c4j.internal.compiler.NestedExp;
@@ -25,7 +25,6 @@ public class TargetTransformer extends AbstractContractClassTransformer {
 
 	public static final String TARGET_FIELD_NAME = "target$";
 	private static final String EXPECTED_TARGET_FIELD_NAME = "target";
-	private RootTransformer rootTransformer = RootTransformer.INSTANCE;
 
 	private static class WeakFieldMapping extends Pair<CtField, CtField> {
 		public WeakFieldMapping(CtField targetField, CtField weakField) {
@@ -66,7 +65,7 @@ public class TargetTransformer extends AbstractContractClassTransformer {
 	}
 
 	private WeakFieldMapping createWeakField(CtClass contractClass) throws NotFoundException, CannotCompileException {
-		CtClass weakReferenceClass = rootTransformer.getPool().get(WeakReference.class.getName());
+		CtClass weakReferenceClass = ClassFilePool.INSTANCE.getClass(WeakReference.class);
 		CtField targetField = getTargetField(contractClass);
 		if (targetField == null) {
 			return null;

@@ -1,4 +1,4 @@
-package de.vksi.c4j;
+package de.vksi.c4j.error;
 
 /**
  * Thrown if there was an exception during execution of a contract.

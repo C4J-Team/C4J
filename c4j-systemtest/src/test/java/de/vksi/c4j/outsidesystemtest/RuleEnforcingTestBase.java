@@ -23,7 +23,7 @@ public class RuleEnforcingTestBase {
 	private final Class<? extends TestRule> ruleClass = TransformerAwareRule.class;
 
 	public void enforceRuleInPackage(String packageName) throws Exception {
-		List<CtClass> classes = new ClasspathScanner(pool, packageName, true, Thread.currentThread()
+		List<CtClass> classes = new ClasspathScanner(packageName, true, Thread.currentThread()
 				.getContextClassLoader()).getAllClasses();
 		for (CtClass clazz : classes) {
 			handleClassFileInPackage(clazz);

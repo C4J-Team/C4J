@@ -8,7 +8,7 @@ import javassist.NotFoundException;
 import javassist.bytecode.BadBytecode;
 import javassist.expr.ExprEditor;
 import javassist.expr.MethodCall;
-import de.vksi.c4j.UsageError;
+import de.vksi.c4j.error.UsageError;
 import de.vksi.c4j.internal.compiler.AssignmentExp;
 import de.vksi.c4j.internal.compiler.NestedExp;
 import de.vksi.c4j.internal.compiler.StaticCallExp;

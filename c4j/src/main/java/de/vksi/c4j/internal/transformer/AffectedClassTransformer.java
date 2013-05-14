@@ -14,8 +14,8 @@ import javassist.NotFoundException;
 
 import org.apache.log4j.Logger;
 
-import de.vksi.c4j.internal.RootTransformer;
 import de.vksi.c4j.internal.Transformed;
+import de.vksi.c4j.internal.classfile.ClassFilePool;
 import de.vksi.c4j.internal.util.AffectedBehaviorLocator;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractMethod;
@@ -39,7 +39,7 @@ public class AffectedClassTransformer {
 		for (AbstractAffectedClassTransformer transformer : transformers) {
 			transformer.transform(involvedClasses, contracts, affectedClass, contractMap);
 		}
-		addClassAnnotation(affectedClass, RootTransformer.INSTANCE.getPool().get(Transformed.class.getName()));
+		addClassAnnotation(affectedClass, ClassFilePool.INSTANCE.getClass(Transformed.class));
 	}
 
 	protected Map<CtBehavior, List<ContractMethod>> getContractMap(ListOrderedSet<ContractInfo> contracts,

@@ -15,6 +15,7 @@ import javassist.CtMethod;
 import javassist.NotFoundException;
 import de.vksi.c4j.Pure;
 import de.vksi.c4j.internal.RootTransformer;
+import de.vksi.c4j.internal.classfile.ClassFilePool;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractMethod;
 import de.vksi.c4j.internal.util.ListOrderedSet;
@@ -53,7 +54,7 @@ public class PureTransformer extends AbstractAffectedClassTransformer {
 		CtMethod method = (CtMethod) behavior;
 		CtMethod pureOrigin = pureInspector.getPureOrigin(involvedClasses, contracts, method);
 		if (pureOrigin != null) {
-			addBehaviorAnnotation(method, RootTransformer.INSTANCE.getPool().get(Pure.class.getName()));
+			addBehaviorAnnotation(method, ClassFilePool.INSTANCE.getClass(Pure.class));
 			if (logger.isDebugEnabled()) {
 				logger.debug("added @Pure from " + pureOrigin.getLongName() + " to " + method.getLongName());
 			}

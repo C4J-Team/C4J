@@ -10,7 +10,7 @@ import java.util.Set;
 
 import javassist.CtClass;
 import javassist.CtMethod;
-import de.vksi.c4j.UsageError;
+import de.vksi.c4j.error.UsageError;
 
 public class ContractRegistry {
 	private Map<CtClass, ContractInfo> contractMap = new HashMap<CtClass, ContractInfo>();

@@ -3,8 +3,8 @@ package de.vksi.c4j.internal.transformer;
 import static de.vksi.c4j.internal.util.TransformationHelper.addClassAnnotation;
 import javassist.CannotCompileException;
 import javassist.CtClass;
-import de.vksi.c4j.internal.RootTransformer;
 import de.vksi.c4j.internal.Transformed;
+import de.vksi.c4j.internal.classfile.ClassFilePool;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
 
 public class ContractClassTransformer extends AbstractContractClassTransformer {
@@ -22,7 +22,7 @@ public class ContractClassTransformer extends AbstractContractClassTransformer {
 			transformer.transform(contractInfo, contractClass);
 		}
 		insertUsageException(contractInfo, contractClass);
-		addClassAnnotation(contractClass, RootTransformer.INSTANCE.getPool().get(Transformed.class.getName()));
+		addClassAnnotation(contractClass, ClassFilePool.INSTANCE.getClass(Transformed.class));
 	}
 
 	private void insertUsageException(ContractInfo contractInfo, CtClass contractClass) throws CannotCompileException {

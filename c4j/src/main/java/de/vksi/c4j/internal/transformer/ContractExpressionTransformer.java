@@ -21,6 +21,7 @@ import javassist.bytecode.ConstPool;
 import javassist.bytecode.Opcode;
 import de.vksi.c4j.ClassInvariant;
 import de.vksi.c4j.internal.RootTransformer;
+import de.vksi.c4j.internal.classfile.ClassFilePool;
 import de.vksi.c4j.internal.compiler.IfExp;
 import de.vksi.c4j.internal.compiler.StaticCall;
 import de.vksi.c4j.internal.compiler.StaticCallExp;
@@ -94,7 +95,7 @@ public class ContractExpressionTransformer extends AbstractContractClassTransfor
 				+ BEFORE_INVARIANT_METHOD_SUFFIX, new CtClass[0], contractMethod.getExceptionTypes(), null,
 				contractMethod.getDeclaringClass());
 		contractMethod.getDeclaringClass().addMethod(beforeInvariant);
-		addBehaviorAnnotation(beforeInvariant, rootTransformer.getPool().get(BeforeClassInvariant.class.getName()));
+		addBehaviorAnnotation(beforeInvariant, ClassFilePool.INSTANCE.getClass(BeforeClassInvariant.class));
 		insertIntoBeforeInvariant(contractMethodDependencies, beforeInvariant, contractMethod.getDeclaringClass());
 	}
 

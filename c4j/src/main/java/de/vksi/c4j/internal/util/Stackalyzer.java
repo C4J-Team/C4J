@@ -43,8 +43,8 @@ import javassist.bytecode.CodeAttribute;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import javassist.bytecode.Opcode;
-import de.vksi.c4j.UsageError;
-import de.vksi.c4j.internal.RootTransformer;
+import de.vksi.c4j.error.UsageError;
+import de.vksi.c4j.internal.classfile.ClassFilePool;
 
 public class Stackalyzer {
 
@@ -172,15 +172,14 @@ public class Stackalyzer {
 
 	private int getStaticFieldDelta(int index, CodeIterator ci, ConstPool constPool) throws NotFoundException {
 		int fieldIndex = ci.u16bitAt(index + 1);
-		CtClass fieldClass = RootTransformer.INSTANCE.getPool().get(constPool.getFieldrefClassName(fieldIndex));
+		CtClass fieldClass = ClassFilePool.INSTANCE.getClass(constPool.getFieldrefClassName(fieldIndex));
 		return getTypeDelta(fieldClass.getField(constPool.getFieldrefName(fieldIndex)).getType());
 	}
 
 	private CtBehavior getBehaviorFromInterfaceMethodrefInfo(int index, CodeIterator ci, ConstPool constPool)
 			throws NotFoundException {
 		int methodIndex = ci.u16bitAt(index + 1);
-		CtClass behaviorClass = RootTransformer.INSTANCE.getPool().get(
-				constPool.getInterfaceMethodrefClassName(methodIndex));
+		CtClass behaviorClass = ClassFilePool.INSTANCE.getClass(constPool.getInterfaceMethodrefClassName(methodIndex));
 		String behaviorName = constPool.getInterfaceMethodrefName(methodIndex);
 		String behaviorDescriptor = constPool.getInterfaceMethodrefType(methodIndex);
 		return getBehaviorFromInfo(behaviorClass, behaviorName, behaviorDescriptor);
@@ -189,7 +188,7 @@ public class Stackalyzer {
 	private CtBehavior getBehaviorFromMethodrefInfo(int index, CodeIterator ci, ConstPool constPool)
 			throws NotFoundException {
 		int methodIndex = ci.u16bitAt(index + 1);
-		CtClass behaviorClass = RootTransformer.INSTANCE.getPool().get(constPool.getMethodrefClassName(methodIndex));
+		CtClass behaviorClass = ClassFilePool.INSTANCE.getClass(constPool.getMethodrefClassName(methodIndex));
 		String behaviorName = constPool.getMethodrefName(methodIndex);
 		String behaviorDescriptor = constPool.getMethodrefType(methodIndex);
 		return getBehaviorFromInfo(behaviorClass, behaviorName, behaviorDescriptor);

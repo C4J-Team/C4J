@@ -15,7 +15,7 @@ import javassist.CtMethod;
 import javassist.NotFoundException;
 import de.vksi.c4j.internal.ContractErrorHandler;
 import de.vksi.c4j.internal.ContractErrorHandler.ContractErrorSource;
-import de.vksi.c4j.internal.RootTransformer;
+import de.vksi.c4j.internal.classfile.ClassFilePool;
 import de.vksi.c4j.internal.compiler.EmptyExp;
 import de.vksi.c4j.internal.compiler.IfExp;
 import de.vksi.c4j.internal.compiler.NestedExp;
@@ -29,8 +29,6 @@ import de.vksi.c4j.internal.util.ContractRegistry.ContractMethod;
 import de.vksi.c4j.internal.util.ObjectConverter;
 
 public abstract class PreAndPostConditionTransformer extends ConditionTransformer {
-	private RootTransformer rootTransformer = RootTransformer.INSTANCE;
-
 	protected interface BeforeConditionCallProvider {
 		StaticCallExp conditionCall(CtBehavior affectedBehavior, CtBehavior contractBehavior, NestedExp targetReference)
 				throws NotFoundException;
@@ -129,7 +127,7 @@ public abstract class PreAndPostConditionTransformer extends ConditionTransforme
 					+ " for pre- and post-conditions with " + contractList.size() + " contract-method calls");
 		}
 
-		getCatchExceptionCall().insertCatch(rootTransformer.getPool().get(Throwable.class.getName()), affectedBehavior);
+		getCatchExceptionCall().insertCatch(ClassFilePool.INSTANCE.getClass(Throwable.class), affectedBehavior);
 		getConditionCall(getPostConditions(contractList), affectedClass, affectedBehavior,
 				beforePostConditionCallProvider).insertFinally(affectedBehavior);
 		getPreConditionCall(getPreConditions(contractList), affectedClass, affectedBehavior).insertBefore(

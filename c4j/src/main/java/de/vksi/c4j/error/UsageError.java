@@ -1,4 +1,4 @@
-package de.vksi.c4j;
+package de.vksi.c4j.error;
 
 import javassist.CannotCompileException;
 import javassist.CtBehavior;

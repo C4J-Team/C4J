@@ -8,10 +8,8 @@ import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import javassist.ByteArrayClassPath;
 import javassist.ClassPool;
 import javassist.CtClass;
-import javassist.LoaderClassPath;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -85,28 +83,6 @@ public class RootTransformerTest {
 	@Test
 	public void testTransformClassUninvolvedClass() throws Exception {
 		assertNotNull(transformer.transformType(pool.get(UninvolvedClass.class.getName())));
-	}
-
-	@Test
-	public void testUpdateClassPathWithClassLoader() {
-		ClassPool poolMock = mock(ClassPool.class);
-		ClassPool oldPool = transformer.pool;
-		transformer.pool = poolMock;
-		ClassLoader classLoader = mock(ClassLoader.class);
-		transformer.updateClassPath(classLoader, null, null);
-		transformer.pool = oldPool;
-		verify(poolMock).insertClassPath(any(LoaderClassPath.class));
-	}
-
-	@Test
-	public void testUpdateClassPathWithByteArray() {
-		ClassPool poolMock = mock(ClassPool.class);
-		ClassPool oldPool = transformer.pool;
-		transformer.pool = poolMock;
-		ClassLoader classLoader = mock(ClassLoader.class);
-		transformer.updateClassPath(classLoader, null, null);
-		transformer.pool = oldPool;
-		verify(poolMock).insertClassPath(any(ByteArrayClassPath.class));
 	}
 
 	public interface EmptyInterface {

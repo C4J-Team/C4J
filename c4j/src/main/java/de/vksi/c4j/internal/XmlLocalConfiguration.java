@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.NotFoundException;
@@ -16,6 +15,7 @@ import javax.xml.bind.JAXBException;
 
 import org.apache.log4j.Logger;
 
+import de.vksi.c4j.internal.classfile.ClassFilePool;
 import de.vksi.c4j.internal.configuration.C4JLocal.Configuration;
 import de.vksi.c4j.internal.configuration.C4JPureRegistry;
 import de.vksi.c4j.internal.configuration.DefaultPreconditionType;
@@ -83,9 +83,9 @@ public class XmlLocalConfiguration {
 		return blacklistMethods;
 	}
 
-	public CtClass getExternalContract(ClassPool pool, CtClass type) throws NotFoundException {
+	public CtClass getExternalContract(CtClass type) throws NotFoundException {
 		if (externalContracts.containsKey(type.getName())) {
-			return pool.get(externalContracts.get(type.getName()));
+			return ClassFilePool.INSTANCE.getClass(externalContracts.get(type.getName()));
 		}
 		return null;
 	}

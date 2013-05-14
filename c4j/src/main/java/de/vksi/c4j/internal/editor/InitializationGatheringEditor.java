@@ -14,7 +14,7 @@ import javassist.bytecode.CodeIterator;
 import javassist.bytecode.Opcode;
 import javassist.expr.MethodCall;
 import de.vksi.c4j.Condition;
-import de.vksi.c4j.UsageError;
+import de.vksi.c4j.error.UsageError;
 import de.vksi.c4j.internal.compiler.AssignmentExp;
 import de.vksi.c4j.internal.compiler.EmptyExp;
 import de.vksi.c4j.internal.compiler.NestedExp;

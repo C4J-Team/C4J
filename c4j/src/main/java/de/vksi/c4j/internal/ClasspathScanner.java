@@ -13,10 +13,11 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import javassist.ClassPool;
 import javassist.CtClass;
 
 import org.apache.log4j.Logger;
+
+import de.vksi.c4j.internal.classfile.ClassFilePool;
 
 public class ClasspathScanner {
 	private static final String FILE_EXT_CLASS = ".class";
@@ -25,12 +26,10 @@ public class ClasspathScanner {
 	private final String packageName;
 	private final boolean includeSubpackages;
 	private final ClassLoader classLoader;
-	private final ClassPool pool;
 	private List<CtClass> classes = new ArrayList<CtClass>();
 
-	public ClasspathScanner(ClassPool pool, String packageName, boolean includeSubpackages, ClassLoader classLoader)
+	public ClasspathScanner(String packageName, boolean includeSubpackages, ClassLoader classLoader)
 			throws Exception {
-		this.pool = pool;
 		this.packageName = packageName;
 		this.includeSubpackages = includeSubpackages;
 		this.classLoader = classLoader;
@@ -129,7 +128,7 @@ public class ClasspathScanner {
 	}
 
 	private void handleClassFileInPackage(InputStream inputStream) throws Exception {
-		CtClass loadedClass = pool.makeClassIfNew(inputStream);
+		CtClass loadedClass = ClassFilePool.INSTANCE.createClass(inputStream);
 		classes.add(loadedClass);
 	}
 }

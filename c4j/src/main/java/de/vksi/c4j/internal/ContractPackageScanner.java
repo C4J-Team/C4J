@@ -10,8 +10,8 @@ import org.apache.log4j.Logger;
 
 import de.vksi.c4j.Contract;
 import de.vksi.c4j.Contract.InheritedType;
+import de.vksi.c4j.internal.classfile.BackdoorAnnotationLoader;
 import de.vksi.c4j.internal.configuration.C4JLocal.Configuration.ContractScanPackage;
-import de.vksi.c4j.internal.util.BackdoorAnnotationLoader;
 
 public class ContractPackageScanner {
 	private Logger logger = Logger.getLogger(ContractPackageScanner.class);
@@ -37,8 +37,8 @@ public class ContractPackageScanner {
 	}
 
 	private void scanPackage(ContractScanPackage contractScanPackage) throws Exception {
-		List<CtClass> classes = new ClasspathScanner(RootTransformer.INSTANCE.getPool(),
-				contractScanPackage.getValue(), contractScanPackage.isIncludeSubpackages(), classLoader)
+		List<CtClass> classes = new ClasspathScanner(contractScanPackage.getValue(),
+				contractScanPackage.isIncludeSubpackages(), classLoader)
 				.getAllClasses();
 		for (CtClass clazz : classes) {
 			handleClassFileInPackage(clazz);
