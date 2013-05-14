@@ -1,6 +1,6 @@
 package de.vksi.c4j.internal.compiler;
 
-import static de.vksi.c4j.internal.util.ReflectionHelper.isInitializer;
+import static de.vksi.c4j.internal.classfile.ClassAnalyzer.isInitializer;
 import javassist.CannotCompileException;
 import javassist.CtBehavior;
 import javassist.CtClass;

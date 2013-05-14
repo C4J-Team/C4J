@@ -1,6 +1,6 @@
 package de.vksi.c4j.internal.editor;
 
-import static de.vksi.c4j.internal.util.ReflectionHelper.getMethod;
+import static de.vksi.c4j.internal.classfile.ClassAnalyzer.getMethod;
 import javassist.CannotCompileException;
 import javassist.CtMethod;
 import javassist.Modifier;

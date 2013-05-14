@@ -1,4 +1,4 @@
-package de.vksi.c4j.internal.util;
+package de.vksi.c4j.internal.classfile;
 
 import javassist.CtBehavior;
 
@@ -6,25 +6,25 @@ public enum BehaviorFilter {
 	MODIFIABLE {
 		@Override
 		public boolean filter(CtBehavior behavior) {
-			return ReflectionHelper.isModifiable(behavior);
+			return ClassAnalyzer.isModifiable(behavior);
 		}
 	},
 	DYNAMIC {
 		@Override
 		public boolean filter(CtBehavior behavior) {
-			return ReflectionHelper.isDynamic(behavior);
+			return ClassAnalyzer.isDynamic(behavior);
 		}
 	},
 	STATIC {
 		@Override
 		public boolean filter(CtBehavior behavior) {
-			return !ReflectionHelper.isDynamic(behavior);
+			return !ClassAnalyzer.isDynamic(behavior);
 		}
 	},
 	VISIBLE {
 		@Override
 		public boolean filter(CtBehavior behavior) {
-			return !ReflectionHelper.isPrivate(behavior);
+			return !ClassAnalyzer.isPrivate(behavior);
 		}
 	};
 

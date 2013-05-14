@@ -11,11 +11,6 @@ import javassist.CtMethod;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.vksi.c4j.internal.compiler.ArrayExp;
-import de.vksi.c4j.internal.compiler.NestedExp;
-import de.vksi.c4j.internal.compiler.ValueExp;
-import de.vksi.c4j.internal.util.ObjectConverter;
-
 public class ArrayExpTest {
 
 	private ClassPool pool;
@@ -31,10 +26,8 @@ public class ArrayExpTest {
 
 	@Test
 	public void testArrayExpWithList() {
-		assertEquals(
-				"new java.lang.String[] { \"one\", \"two\", \"three\" }",
-				new ArrayExp(String.class, Arrays.<NestedExp> asList(new ValueExp("one"), new ValueExp("two"),
-						new ValueExp("three"))).getCode());
+		assertEquals("new java.lang.String[] { \"one\", \"two\", \"three\" }", new ArrayExp(String.class, Arrays
+				.<NestedExp> asList(new ValueExp("one"), new ValueExp("two"), new ValueExp("three"))).getCode());
 	}
 
 	@Test
@@ -52,18 +45,6 @@ public class ArrayExpTest {
 	public void testForParamTypes() throws Exception {
 		assertEquals("new java.lang.Class[] { int.class, java.lang.String.class }", ArrayExp.forParamTypes(dummyMethod)
 				.getCode());
-	}
-
-	@Test
-	public void testForArgs() throws Exception {
-		assertEquals("new java.lang.Object[] { " + ObjectConverter.toObject.getCode() + "($1), "
-				+ ObjectConverter.toObject.getCode() + "($2) }", ArrayExp.forArgs(dummyMethod).getCode());
-	}
-
-	@Test
-	public void testForArgsWithStartIndex() throws Exception {
-		assertEquals("new java.lang.Object[] { " + ObjectConverter.toObject.getCode() + "($5), "
-				+ ObjectConverter.toObject.getCode() + "($6) }", ArrayExp.forArgs(dummyMethod, 5).getCode());
 	}
 
 	public static class DummyClass {

@@ -7,14 +7,14 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import de.vksi.c4j.ContractReference;
-import de.vksi.c4j.internal.util.ReflectionHelper;
+import de.vksi.c4j.internal.classfile.ClassAnalyzer;
 import de.vksi.c4j.systemtest.TransformerAwareRule;
 
 public class ExplicitlyLoadContractClassBeforeTargetClassSystemTest {
 	@Rule
 	public TransformerAwareRule transformerAwareRule = new TransformerAwareRule();
 
-	private ReflectionHelper reflectionHelper = new ReflectionHelper();
+	private ClassAnalyzer reflectionHelper = new ClassAnalyzer();
 
 	@Test
 	public void testLoadContractClassBeforeTargetClass1() {

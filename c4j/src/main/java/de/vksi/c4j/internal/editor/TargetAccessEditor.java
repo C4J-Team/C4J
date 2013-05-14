@@ -8,7 +8,7 @@ import javassist.expr.FieldAccess;
 import de.vksi.c4j.internal.compiler.AssignmentExp;
 import de.vksi.c4j.internal.compiler.CastExp;
 import de.vksi.c4j.internal.compiler.NestedExp;
-import de.vksi.c4j.internal.util.Pair;
+import de.vksi.c4j.internal.types.Pair;
 
 public class TargetAccessEditor extends ExprEditor {
 	private Pair<CtField, CtField> targetField;

@@ -1,7 +1,7 @@
 package de.vksi.c4j.internal.editor;
 
-import static de.vksi.c4j.internal.util.ReflectionHelper.getDeclaredMethod;
-import static de.vksi.c4j.internal.util.ReflectionHelper.getField;
+import static de.vksi.c4j.internal.classfile.ClassAnalyzer.getDeclaredMethod;
+import static de.vksi.c4j.internal.classfile.ClassAnalyzer.getField;
 import javassist.CannotCompileException;
 import javassist.CtBehavior;
 import javassist.CtClass;

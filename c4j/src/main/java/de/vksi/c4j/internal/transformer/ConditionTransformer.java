@@ -1,8 +1,8 @@
 package de.vksi.c4j.internal.transformer;
 
-import static de.vksi.c4j.internal.util.ReflectionHelper.constructorHasAdditionalParameter;
-import static de.vksi.c4j.internal.util.ReflectionHelper.getContractBehaviorName;
-import static de.vksi.c4j.internal.util.ReflectionHelper.isContractConstructor;
+import static de.vksi.c4j.internal.classfile.ClassAnalyzer.constructorHasAdditionalParameter;
+import static de.vksi.c4j.internal.util.ContractBehaviorHelper.getContractBehaviorName;
+import static de.vksi.c4j.internal.util.ContractBehaviorHelper.isContractConstructor;
 
 import java.util.List;
 

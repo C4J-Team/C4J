@@ -1,4 +1,4 @@
-package de.vksi.c4j.internal.util;
+package de.vksi.c4j.internal.types;
 
 public abstract class Pair<T, U> {
 	private final T first;

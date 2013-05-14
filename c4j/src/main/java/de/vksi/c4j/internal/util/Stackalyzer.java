@@ -45,6 +45,7 @@ import javassist.bytecode.ConstPool;
 import javassist.bytecode.Opcode;
 import de.vksi.c4j.error.UsageError;
 import de.vksi.c4j.internal.classfile.ClassFilePool;
+import de.vksi.c4j.internal.types.Pair;
 
 public class Stackalyzer {
 

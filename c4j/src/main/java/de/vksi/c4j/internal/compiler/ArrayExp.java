@@ -6,7 +6,6 @@ import java.util.List;
 import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.NotFoundException;
-import de.vksi.c4j.internal.util.ObjectConverter;
 
 public class ArrayExp extends NestedExp {
 
@@ -30,18 +29,6 @@ public class ArrayExp extends NestedExp {
 			paramTypes.add(new ValueExp(paramClass));
 		}
 		return new ArrayExp(Class.class, paramTypes);
-	}
-
-	public static ArrayExp forArgs(CtBehavior behavior) throws NotFoundException {
-		return ArrayExp.forArgs(behavior, 1);
-	}
-
-	public static ArrayExp forArgs(CtBehavior behavior, int startIndex) throws NotFoundException {
-		List<NestedExp> args = new ArrayList<NestedExp>();
-		for (int i = 0; i < behavior.getParameterTypes().length; i++) {
-			args.add(new StaticCallExp(ObjectConverter.toObject, NestedExp.arg(i + startIndex)));
-		}
-		return new ArrayExp(Object.class, args);
 	}
 
 	@Override

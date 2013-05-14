@@ -1,9 +1,9 @@
 package de.vksi.c4j.internal.transformer;
 
-import static de.vksi.c4j.internal.util.BehaviorFilter.MODIFIABLE;
-import static de.vksi.c4j.internal.util.BehaviorFilter.STATIC;
-import static de.vksi.c4j.internal.util.BehaviorFilter.VISIBLE;
-import static de.vksi.c4j.internal.util.ReflectionHelper.getDeclaredBehaviors;
+import static de.vksi.c4j.internal.classfile.BehaviorFilter.MODIFIABLE;
+import static de.vksi.c4j.internal.classfile.BehaviorFilter.STATIC;
+import static de.vksi.c4j.internal.classfile.BehaviorFilter.VISIBLE;
+import static de.vksi.c4j.internal.classfile.ClassAnalyzer.getDeclaredBehaviors;
 
 import java.util.List;
 import java.util.Map;

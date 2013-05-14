@@ -1,4 +1,4 @@
-package de.vksi.c4j.internal.util;
+package de.vksi.c4j.internal.classfile;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -12,9 +12,8 @@ import javassist.CtMethod;
 import javassist.NotFoundException;
 import javassist.bytecode.Descriptor;
 import javassist.bytecode.MethodInfo;
-import de.vksi.c4j.internal.transformer.ContractBehaviorTransformer;
 
-public class ReflectionHelper {
+public class ClassAnalyzer {
 	private static <T extends CtBehavior> List<T> filterBehaviors(T[] behaviors, BehaviorFilter... filters) {
 		List<T> filteredList = new ArrayList<T>(behaviors.length);
 		behaviorLoop: for (T behavior : behaviors) {
@@ -36,15 +35,15 @@ public class ReflectionHelper {
 		return filterBehaviors(clazz.getDeclaredBehaviors(), filters);
 	}
 
-	static boolean isModifiable(CtBehavior behavior) {
+	public static boolean isModifiable(CtBehavior behavior) {
 		return !Modifier.isNative(behavior.getModifiers()) && !Modifier.isAbstract(behavior.getModifiers());
 	}
 
-	static boolean isDynamic(CtBehavior behavior) {
+	public static boolean isDynamic(CtBehavior behavior) {
 		return !Modifier.isStatic(behavior.getModifiers());
 	}
 
-	static boolean isPrivate(CtBehavior behavior) {
+	public static boolean isPrivate(CtBehavior behavior) {
 		return Modifier.isPrivate(behavior.getModifiers());
 	}
 
@@ -52,32 +51,12 @@ public class ReflectionHelper {
 		return affectedClass.getDeclaringClass() != null && !Modifier.isStatic(affectedClass.getModifiers());
 	}
 
-	public static boolean isContractConstructor(CtBehavior contractBehavior) {
-		return isInitializer(contractBehavior)
-				|| contractBehavior.getName().equals(ContractBehaviorTransformer.CONSTRUCTOR_REPLACEMENT_NAME);
-	}
-
 	public static boolean isInitializer(CtBehavior behavior) {
 		return (behavior instanceof CtConstructor && !((CtConstructor) behavior).isClassInitializer());
 	}
 
-	public static boolean isContractClassInitializer(CtBehavior contractBehavior) {
-		return isClassInitializer(contractBehavior)
-				|| contractBehavior.getName().equals(ContractBehaviorTransformer.CLASS_INITIALIZER_REPLACEMENT_NAME);
-	}
-
 	public static boolean isClassInitializer(CtBehavior behavior) {
 		return (behavior instanceof CtConstructor && ((CtConstructor) behavior).isClassInitializer());
-	}
-
-	public static String getContractBehaviorName(CtBehavior contractBehavior) {
-		String contractBehaviorName;
-		if (isContractConstructor(contractBehavior)) {
-			contractBehaviorName = ContractBehaviorTransformer.CONSTRUCTOR_REPLACEMENT_NAME;
-		} else {
-			contractBehaviorName = contractBehavior.getName();
-		}
-		return contractBehaviorName;
 	}
 
 	public static String getSimpleName(CtBehavior behavior) {

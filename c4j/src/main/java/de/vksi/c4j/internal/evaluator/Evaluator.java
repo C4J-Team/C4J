@@ -1,6 +1,6 @@
 package de.vksi.c4j.internal.evaluator;
 
-import static de.vksi.c4j.internal.util.ReflectionHelper.getSimplerName;
+import static de.vksi.c4j.internal.classfile.ClassAnalyzer.getSimplerName;
 
 import java.util.HashMap;
 import java.util.Map;

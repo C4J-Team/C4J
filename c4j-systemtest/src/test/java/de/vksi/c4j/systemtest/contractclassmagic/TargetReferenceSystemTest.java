@@ -6,13 +6,13 @@ import org.junit.Test;
 
 import de.vksi.c4j.ContractReference;
 import de.vksi.c4j.Target;
-import de.vksi.c4j.internal.util.ReflectionHelper;
+import de.vksi.c4j.internal.classfile.ClassAnalyzer;
 import de.vksi.c4j.systemtest.TransformerAwareRule;
 
 public class TargetReferenceSystemTest {
 	@Rule
 	public TransformerAwareRule transformerAware = new TransformerAwareRule();
-	private ReflectionHelper reflectionHelper = new ReflectionHelper();
+	private ClassAnalyzer reflectionHelper = new ClassAnalyzer();
 
 	@Test
 	public void testTargetHasWeakerType() {

@@ -1,13 +1,10 @@
 package de.vksi.c4j.internal.util;
 
-import static de.vksi.c4j.internal.util.ReflectionHelper.getContractBehaviorName;
-import static de.vksi.c4j.internal.util.ReflectionHelper.isContractConstructor;
+import static de.vksi.c4j.internal.util.ContractBehaviorHelper.getContractBehaviorName;
+import static de.vksi.c4j.internal.util.ContractBehaviorHelper.isContractConstructor;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
-import java.util.Arrays;
-
 import javassist.ClassPool;
 import javassist.CtClass;
 
@@ -17,27 +14,14 @@ import org.junit.Test;
 import de.vksi.c4j.ClassInvariant;
 import de.vksi.c4j.internal.transformer.ContractBehaviorTransformer;
 
-public class ReflectionHelperTest {
-	private ClassPool pool;
+public class ContractBehaviorHelperTest {
 	private CtClass contractClass;
+	private ClassPool pool;
 
 	@Before
 	public void before() throws Throwable {
 		pool = ClassPool.getDefault();
 		contractClass = pool.get(ContractClass.class.getName());
-	}
-
-	@Test
-	public void testIsModifiable() throws Throwable {
-		CtClass objectClass = pool.get(Object.class.getName());
-		assertTrue(ReflectionHelper.isModifiable(objectClass.getDeclaredMethod("finalize")));
-		assertFalse(ReflectionHelper.isModifiable(objectClass.getDeclaredMethod("hashCode")));
-	}
-
-	@Test
-	public void testIsDynamic() throws Throwable {
-		assertTrue(ReflectionHelper.isDynamic(pool.get(Object.class.getName()).getDeclaredMethod("finalize")));
-		assertFalse(ReflectionHelper.isDynamic(pool.get(Arrays.class.getName()).getDeclaredMethod("asList")));
 	}
 
 	@Test
@@ -109,5 +93,4 @@ public class ReflectionHelperTest {
 		public void otherMethod() {
 		}
 	}
-
 }

@@ -3,7 +3,7 @@ package de.vksi.c4j.internal.compiler;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.vksi.c4j.internal.util.Pair;
+import de.vksi.c4j.internal.types.Pair;
 
 public class TryExp extends StandaloneExp {
 	private StandaloneExp tryExp;

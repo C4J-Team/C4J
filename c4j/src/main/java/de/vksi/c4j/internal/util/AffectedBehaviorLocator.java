@@ -1,11 +1,11 @@
 package de.vksi.c4j.internal.util;
 
+import static de.vksi.c4j.internal.classfile.ClassAnalyzer.constructorHasAdditionalParameter;
+import static de.vksi.c4j.internal.classfile.ClassAnalyzer.getDeclaredConstructor;
+import static de.vksi.c4j.internal.classfile.ClassAnalyzer.getDeclaredMethod;
 import static de.vksi.c4j.internal.transformer.ContractBehaviorTransformer.CONSTRUCTOR_REPLACEMENT_NAME;
-import static de.vksi.c4j.internal.util.ReflectionHelper.constructorHasAdditionalParameter;
-import static de.vksi.c4j.internal.util.ReflectionHelper.getDeclaredConstructor;
-import static de.vksi.c4j.internal.util.ReflectionHelper.getDeclaredMethod;
-import static de.vksi.c4j.internal.util.ReflectionHelper.isContractClassInitializer;
-import static de.vksi.c4j.internal.util.ReflectionHelper.isContractConstructor;
+import static de.vksi.c4j.internal.util.ContractBehaviorHelper.isContractClassInitializer;
+import static de.vksi.c4j.internal.util.ContractBehaviorHelper.isContractConstructor;
 import javassist.CannotCompileException;
 import javassist.CtBehavior;
 import javassist.CtClass;

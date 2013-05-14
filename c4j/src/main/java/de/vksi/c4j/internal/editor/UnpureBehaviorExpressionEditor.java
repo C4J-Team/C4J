@@ -1,6 +1,6 @@
 package de.vksi.c4j.internal.editor;
 
-import static de.vksi.c4j.internal.util.ReflectionHelper.isClassInitializer;
+import static de.vksi.c4j.internal.classfile.ClassAnalyzer.isClassInitializer;
 import javassist.CannotCompileException;
 import javassist.NotFoundException;
 import javassist.expr.ExprEditor;

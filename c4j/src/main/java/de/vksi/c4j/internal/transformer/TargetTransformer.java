@@ -1,6 +1,6 @@
 package de.vksi.c4j.internal.transformer;
 
-import static de.vksi.c4j.internal.util.ReflectionHelper.getSimpleName;
+import static de.vksi.c4j.internal.classfile.ClassAnalyzer.getSimpleName;
 
 import java.lang.ref.WeakReference;
 
@@ -18,8 +18,8 @@ import de.vksi.c4j.internal.compiler.NestedExp;
 import de.vksi.c4j.internal.compiler.StaticCallExp;
 import de.vksi.c4j.internal.editor.TargetAccessEditor;
 import de.vksi.c4j.internal.evaluator.Evaluator;
+import de.vksi.c4j.internal.types.Pair;
 import de.vksi.c4j.internal.util.ContractRegistry.ContractInfo;
-import de.vksi.c4j.internal.util.Pair;
 
 public class TargetTransformer extends AbstractContractClassTransformer {
 

@@ -1,6 +1,6 @@
 package de.vksi.c4j.internal.util;
 
-import static de.vksi.c4j.internal.util.ReflectionHelper.getDeclaredMethod;
+import static de.vksi.c4j.internal.classfile.ClassAnalyzer.getDeclaredMethod;
 
 import java.util.ArrayList;
 import java.util.Collections;

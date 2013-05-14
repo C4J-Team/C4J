@@ -1,7 +1,7 @@
 package de.vksi.c4j.internal.transformer;
 
 import static de.vksi.c4j.internal.ContractErrorHandler.ContractErrorSource.PRE_CONDITION;
-import static de.vksi.c4j.internal.util.ReflectionHelper.getSimpleName;
+import static de.vksi.c4j.internal.classfile.ClassAnalyzer.getSimpleName;
 
 import java.util.ArrayList;
 import java.util.Iterator;

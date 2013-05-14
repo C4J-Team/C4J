@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 
 import de.vksi.c4j.error.ContractError;
 import de.vksi.c4j.internal.compiler.StaticCall;
-import de.vksi.c4j.internal.util.Pair;
+import de.vksi.c4j.internal.types.Pair;
 
 public class OldCache {
 	public static final StaticCall oldRetrieve = new StaticCall(OldCache.class, "oldRetrieve");
