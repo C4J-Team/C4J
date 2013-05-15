@@ -163,6 +163,29 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>de.andrena.tools.macker</groupId>
+				<artifactId>macker-maven-plugin</artifactId>
+				<version>1.0.0</version>
+				<configuration>
+					<rule>macker-rules.xml</rule>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>de.andrena.tools.macker</groupId>
+						<artifactId>macker</artifactId>
+						<version>1.0.1-SNAPSHOT</version>
+					</dependency>
+				</dependencies>
+				<executions>
+					<execution>
+						<phase>compile</phase>
+						<goals>
+							<goal>macker</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -202,4 +225,18 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>sonatype-nexus-snapshots</id>
+			<name>Sonatype Nexus Snapshots</name>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 </project>

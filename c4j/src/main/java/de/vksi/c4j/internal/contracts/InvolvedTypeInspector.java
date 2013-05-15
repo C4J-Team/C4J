@@ -1,4 +1,4 @@
-package de.vksi.c4j.internal.transformer.util;
+package de.vksi.c4j.internal.contracts;
 
 import de.vksi.c4j.internal.types.ListOrderedSet;
 import javassist.CtClass;

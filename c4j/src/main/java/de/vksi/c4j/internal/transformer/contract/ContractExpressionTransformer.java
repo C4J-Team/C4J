@@ -1,4 +1,4 @@
-package de.vksi.c4j.internal.transformer;
+package de.vksi.c4j.internal.transformer.contract;
 
 import static de.vksi.c4j.internal.transformer.util.TransformationHelper.addBehaviorAnnotation;
 import static de.vksi.c4j.internal.transformer.util.TransformationHelper.setClassIndex;
@@ -27,6 +27,7 @@ import de.vksi.c4j.internal.classfile.ClassFilePool;
 import de.vksi.c4j.internal.compiler.IfExp;
 import de.vksi.c4j.internal.compiler.StaticCall;
 import de.vksi.c4j.internal.compiler.StaticCallExp;
+import de.vksi.c4j.internal.contracts.BeforeClassInvariant;
 import de.vksi.c4j.internal.contracts.ContractInfo;
 import de.vksi.c4j.internal.runtime.Evaluator;
 import de.vksi.c4j.internal.runtime.OldCache;

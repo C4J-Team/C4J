@@ -1,12 +1,17 @@
-package de.vksi.c4j.internal.transformer;
+package de.vksi.c4j.internal.transformer.contract;
 
 import static de.vksi.c4j.internal.transformer.util.TransformationHelper.addClassAnnotation;
 import javassist.CannotCompileException;
+import javassist.CtBehavior;
 import javassist.CtClass;
 
 import org.apache.log4j.Logger;
 
+import de.vksi.c4j.error.UsageError;
 import de.vksi.c4j.internal.classfile.ClassFilePool;
+import de.vksi.c4j.internal.compiler.ConstructorExp;
+import de.vksi.c4j.internal.compiler.ThrowExp;
+import de.vksi.c4j.internal.compiler.ValueExp;
 import de.vksi.c4j.internal.contracts.ContractInfo;
 import de.vksi.c4j.internal.contracts.Transformed;
 
@@ -32,8 +37,12 @@ public class ContractClassTransformer extends AbstractContractClassTransformer {
 
 	private void insertUsageException(ContractInfo contractInfo, CtClass contractClass) throws CannotCompileException {
 		if (!contractInfo.getErrors().isEmpty()) {
-			contractInfo.getErrors().get(0).insertThrowExp(contractClass.makeClassInitializer());
+			insertThrowUsageError(contractClass.makeClassInitializer(), contractInfo.getErrors().get(0).getMessage());
 		}
+	}
+
+	private void insertThrowUsageError(CtBehavior behavior, String message) throws CannotCompileException {
+		new ThrowExp(new ConstructorExp(UsageError.class, new ValueExp(message))).insertBefore(behavior);
 	}
 
 	protected AbstractContractClassTransformer[] getTransformers() {

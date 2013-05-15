@@ -21,6 +21,7 @@ import de.vksi.c4j.ClassInvariant;
 import de.vksi.c4j.InitializeContract;
 import de.vksi.c4j.internal.contracts.ContractInfo;
 import de.vksi.c4j.internal.contracts.ContractRegistry;
+import de.vksi.c4j.internal.contracts.InvolvedTypeInspector;
 import de.vksi.c4j.internal.types.ListOrderedSet;
 
 public class AffectedBehaviorLocator {

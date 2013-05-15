@@ -1,4 +1,4 @@
-package de.vksi.c4j.internal.transformer;
+package de.vksi.c4j.internal.transformer.contract;
 
 import javassist.CtClass;
 import de.vksi.c4j.internal.contracts.ContractInfo;

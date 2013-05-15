@@ -1,4 +1,4 @@
-package de.vksi.c4j.internal.transformer;
+package de.vksi.c4j.internal.transformer.affected;
 
 import java.util.List;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package de.vksi.c4j.internal.transformer;
+package de.vksi.c4j.internal.transformer.contract;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;

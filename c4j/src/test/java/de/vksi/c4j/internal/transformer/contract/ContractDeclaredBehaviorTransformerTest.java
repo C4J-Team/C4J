@@ -1,4 +1,4 @@
-package de.vksi.c4j.internal.transformer;
+package de.vksi.c4j.internal.transformer.contract;
 
 import static org.mockito.Mockito.mock;
 import javassist.ClassPool;
@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 import org.junit.Test;
 
 import de.vksi.c4j.internal.contracts.ContractInfo;
-import de.vksi.c4j.internal.transformer.ContractDeclaredBehaviorTransformer;
 
 public class ContractDeclaredBehaviorTransformerTest {
 

@@ -1,0 +1,176 @@
+<?xml version="1.0"?>
+<!DOCTYPE macker PUBLIC "-//innig//DTD Macker 0.4//EN" "http://innig.net/macker/dtd/macker-0.4.dtd">
+<macker>
+    <ruleset name="Module rules">
+    	<pattern name="all-internal" class="de.vksi.c4j.internal.**"/>
+        <pattern name="c4j" class="de.vksi.c4j.*"/>
+        <pattern name="c4j.error" class="de.vksi.c4j.error.*"/>
+        <pattern name="c4j.main" class="de.vksi.c4j.main.*"/>
+        <pattern name="internal" class="de.vksi.c4j.internal.*"/>
+        <pattern name="internal.classfile" class="de.vksi.c4j.internal.classfile.*"/>
+        <pattern name="internal.compiler" class="de.vksi.c4j.internal.compiler.*"/>
+        <pattern name="internal.configuration" class="de.vksi.c4j.internal.configuration.*"/>
+        <pattern name="internal.contracts" class="de.vksi.c4j.internal.contracts.*"/>
+        <pattern name="internal.runtime" class="de.vksi.c4j.internal.runtime.*"/>
+        <pattern name="internal.transformer" class="de.vksi.c4j.internal.transformer.**"/>
+        <pattern name="internal.transformer.affected" class="de.vksi.c4j.internal.transformer.affected.*"/>
+        <pattern name="internal.transformer.contract" class="de.vksi.c4j.internal.transformer.contract.*"/>
+        <pattern name="internal.transformer.editor" class="de.vksi.c4j.internal.transformer.editor.*"/>
+        <pattern name="internal.transformer.util" class="de.vksi.c4j.internal.transformer.util.*"/>
+        <pattern name="internal.types" class="de.vksi.c4j.internal.types.*"/>
+
+        <access-rule>
+            <deny>
+                <to pattern="c4j"/>
+                <allow>
+                    <from>
+                        <include pattern="c4j"/>
+                        <include pattern="c4j.main"/>
+                        <include pattern="internal"/>
+                        <include pattern="internal.contracts"/>
+                        <include pattern="internal.transformer"/>
+                    </from>
+                </allow>
+            </deny>
+            <deny>
+                <to pattern="c4j.error"/>
+                <allow>
+                    <from>
+                        <include pattern="c4j.error"/>
+                        <include pattern="internal.contracts"/>
+                        <include pattern="internal.runtime"/>
+                        <include pattern="internal.transformer"/>
+                    </from>
+                </allow>
+            </deny>
+            <deny>
+                <to pattern="c4j.main"/>
+                <allow>
+                    <from>
+                        <include pattern="c4j.main"/>
+                    </from>
+                </allow>
+            </deny>
+            <deny>
+                <to pattern="internal"/>
+                <allow>
+                    <from>
+                        <include pattern="c4j.main"/>
+                        <include pattern="internal"/>
+                    </from>
+                </allow>
+            </deny>
+            <deny>
+                <to pattern="internal.classfile"/>
+                <allow>
+                    <from>
+                        <include pattern="c4j.main"/>
+                        <include pattern="internal"/>
+                        <include pattern="internal.classfile"/>
+                        <include pattern="internal.configuration"/>
+                        <include pattern="internal.contracts"/>
+                        <include pattern="internal.compiler"/>
+                        <include pattern="internal.runtime"/>
+                        <include pattern="internal.transformer"/>
+                    </from>
+                </allow>
+            </deny>
+            <deny>
+                <to pattern="internal.compiler"/>
+                <allow>
+                    <from>
+                        <include pattern="internal.compiler"/>
+                        <include pattern="internal.runtime"/>
+                        <include pattern="internal.transformer"/>
+                    </from>
+                </allow>
+            </deny>
+            <deny>
+                <to pattern="internal.configuration"/>
+                <allow>
+                    <from>
+                        <include pattern="internal"/>
+                        <include pattern="internal.compiler"/>
+                        <include pattern="internal.configuration"/>
+                        <include pattern="internal.contracts"/>
+                        <include pattern="internal.runtime"/>
+                        <include pattern="internal.transformer"/>
+                    </from>
+                </allow>
+            </deny>
+            <deny>
+                <to pattern="internal.contracts"/>
+                <allow>
+                    <from>
+                        <include pattern="internal"/>
+                        <include pattern="internal.contracts"/>
+                        <include pattern="internal.transformer"/>
+                    </from>
+                </allow>
+            </deny>
+            <deny>
+                <to pattern="internal.runtime"/>
+                <allow>
+                    <from>
+                        <include pattern="c4j"/>
+                        <include pattern="internal.runtime"/>
+                        <include pattern="internal.transformer"/>
+                    </from>
+                </allow>
+            </deny>
+            <deny>
+                <to pattern="internal.transformer"/>
+                <allow>
+                    <from>
+                        <include pattern="internal"/>
+                        <include pattern="internal.transformer"/>
+                    </from>
+                </allow>
+            </deny>
+            <deny>
+                <to pattern="internal.transformer.affected"/>
+                <allow>
+                    <from>
+                        <include pattern="internal"/>
+                        <include pattern="internal.transformer.affected"/>
+                    </from>
+                </allow>
+            </deny>
+            <deny>
+                <to pattern="internal.transformer.contract"/>
+                <allow>
+                    <from>
+                        <include pattern="internal"/>
+                        <include pattern="internal.transformer.contract"/>
+                    </from>
+                </allow>
+            </deny>
+            <deny>
+                <to pattern="internal.transformer.editor"/>
+                <allow>
+                    <from>
+                        <include pattern="internal.transformer.affected"/>
+                        <include pattern="internal.transformer.contract"/>
+                        <include pattern="internal.transformer.editor"/>
+                    </from>
+                </allow>
+            </deny>
+            <deny>
+                <to pattern="internal.transformer.util"/>
+                <allow>
+                    <from>
+                        <include pattern="internal.transformer"/>
+                    </from>
+                </allow>
+            </deny>
+            <deny>
+                <to pattern="internal.types"/>
+                <allow>
+                    <from>
+                        <include pattern="all-internal"/>
+                    </from>
+                </allow>
+            </deny>
+        </access-rule>
+    </ruleset>
+</macker>

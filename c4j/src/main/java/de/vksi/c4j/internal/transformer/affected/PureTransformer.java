@@ -1,4 +1,4 @@
-package de.vksi.c4j.internal.transformer;
+package de.vksi.c4j.internal.transformer.affected;
 
 import static de.vksi.c4j.internal.classfile.BehaviorFilter.MODIFIABLE;
 import static de.vksi.c4j.internal.classfile.ClassAnalyzer.getDeclaredBehaviors;

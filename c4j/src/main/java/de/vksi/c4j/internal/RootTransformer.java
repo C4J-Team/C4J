@@ -19,10 +19,10 @@ import de.vksi.c4j.internal.configuration.XmlConfigurationManager;
 import de.vksi.c4j.internal.configuration.XmlLocalConfiguration;
 import de.vksi.c4j.internal.contracts.ContractInfo;
 import de.vksi.c4j.internal.contracts.ContractRegistry;
+import de.vksi.c4j.internal.contracts.InvolvedTypeInspector;
 import de.vksi.c4j.internal.contracts.Transformed;
-import de.vksi.c4j.internal.transformer.AffectedClassTransformer;
-import de.vksi.c4j.internal.transformer.ContractClassTransformer;
-import de.vksi.c4j.internal.transformer.util.InvolvedTypeInspector;
+import de.vksi.c4j.internal.transformer.affected.AffectedClassTransformer;
+import de.vksi.c4j.internal.transformer.contract.ContractClassTransformer;
 import de.vksi.c4j.internal.types.ListOrderedSet;
 
 public class RootTransformer {

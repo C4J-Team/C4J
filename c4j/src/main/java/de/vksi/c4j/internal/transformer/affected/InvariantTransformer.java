@@ -1,4 +1,4 @@
-package de.vksi.c4j.internal.transformer;
+package de.vksi.c4j.internal.transformer.affected;
 
 import static de.vksi.c4j.internal.classfile.BehaviorFilter.DYNAMIC;
 import static de.vksi.c4j.internal.classfile.BehaviorFilter.MODIFIABLE;
@@ -29,6 +29,7 @@ import de.vksi.c4j.internal.compiler.StaticCallExp;
 import de.vksi.c4j.internal.compiler.TryExp;
 import de.vksi.c4j.internal.compiler.ValueExp;
 import de.vksi.c4j.internal.configuration.XmlConfigurationManager;
+import de.vksi.c4j.internal.contracts.BeforeClassInvariant;
 import de.vksi.c4j.internal.contracts.ContractInfo;
 import de.vksi.c4j.internal.contracts.ContractMethod;
 import de.vksi.c4j.internal.runtime.ContractErrorHandler.ContractErrorSource;

@@ -29,9 +29,9 @@ import de.vksi.c4j.internal.compiler.ValueExp;
 import de.vksi.c4j.internal.configuration.XmlConfigurationManager;
 import de.vksi.c4j.internal.contracts.ContractInfo;
 import de.vksi.c4j.internal.contracts.ContractRegistry;
+import de.vksi.c4j.internal.contracts.InvolvedTypeInspector;
 import de.vksi.c4j.internal.runtime.PureEvaluator;
 import de.vksi.c4j.internal.runtime.PureEvaluator.ErrorType;
-import de.vksi.c4j.internal.transformer.util.InvolvedTypeInspector;
 import de.vksi.c4j.internal.types.ListOrderedSet;
 
 public class PureBehaviorExpressionEditor extends ExprEditor {

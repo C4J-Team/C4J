@@ -1,4 +1,4 @@
-package de.vksi.c4j.internal.transformer;
+package de.vksi.c4j.internal.transformer.contract;
 
 import static de.vksi.c4j.internal.classfile.ClassAnalyzer.getDeclaredMethods;
 import static de.vksi.c4j.internal.classfile.ClassAnalyzer.getField;
