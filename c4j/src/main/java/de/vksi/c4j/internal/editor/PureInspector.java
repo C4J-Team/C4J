@@ -1,4 +1,4 @@
-package de.vksi.c4j.internal.util;
+package de.vksi.c4j.internal.editor;
 
 import static de.vksi.c4j.internal.classfile.ClassAnalyzer.getDeclaredMethod;
 
@@ -19,18 +19,16 @@ import javassist.NotFoundException;
 import de.vksi.c4j.AllowPureAccess;
 import de.vksi.c4j.Pure;
 import de.vksi.c4j.PureTarget;
-import de.vksi.c4j.internal.RootTransformer;
 import de.vksi.c4j.internal.compiler.ArrayExp;
 import de.vksi.c4j.internal.compiler.NestedExp;
 import de.vksi.c4j.internal.compiler.StaticCallExp;
+import de.vksi.c4j.internal.configuration.XmlConfigurationManager;
 import de.vksi.c4j.internal.contracts.ContractInfo;
-import de.vksi.c4j.internal.editor.ArrayAccessEditor;
-import de.vksi.c4j.internal.editor.PureBehaviorExpressionEditor;
-import de.vksi.c4j.internal.editor.UnpureBehaviorExpressionEditor;
 import de.vksi.c4j.internal.runtime.PureEvaluator;
+import de.vksi.c4j.internal.types.ListOrderedSet;
+import de.vksi.c4j.internal.util.AffectedBehaviorLocator;
 
 public class PureInspector {
-	private RootTransformer rootTransformer = RootTransformer.INSTANCE;
 	private UnpureBehaviorExpressionEditor unpureBehaviorExpressionEditor = new UnpureBehaviorExpressionEditor();
 	private AffectedBehaviorLocator affectedBehaviorLocator = new AffectedBehaviorLocator();
 	private ArrayAccessEditor arrayAccessEditor = new ArrayAccessEditor();
@@ -40,8 +38,8 @@ public class PureInspector {
 		for (CtClass involvedClass : involvedClasses) {
 			CtMethod involvedMethod = getInvolvedMethod(method, involvedClass);
 			if (involvedMethod != null
-					&& (involvedMethod.hasAnnotation(Pure.class) || rootTransformer.getXmlConfiguration()
-							.getConfiguration(method.getDeclaringClass()).getWhitelistMethods().contains(method))) {
+					&& (involvedMethod.hasAnnotation(Pure.class) || XmlConfigurationManager.INSTANCE.getConfiguration(
+							method.getDeclaringClass()).getWhitelistMethods().contains(method))) {
 				return involvedMethod;
 			}
 		}
@@ -60,7 +58,7 @@ public class PureInspector {
 
 	public void verify(CtMethod affectedBehavior, boolean allowOwnStateChange) throws CannotCompileException,
 			NotFoundException {
-		PureBehaviorExpressionEditor editor = new PureBehaviorExpressionEditor(affectedBehavior, rootTransformer, this,
+		PureBehaviorExpressionEditor editor = new PureBehaviorExpressionEditor(affectedBehavior, this,
 				allowOwnStateChange);
 		affectedBehavior.instrument(editor);
 		arrayAccessEditor.instrumentArrayAccesses(affectedBehavior);
@@ -133,7 +131,7 @@ public class PureInspector {
 	}
 
 	public void checkUnpureAccess(CtBehavior affectedBehavior) throws CannotCompileException {
-		if (!rootTransformer.getXmlConfiguration().isWithinRootPackages(affectedBehavior.getDeclaringClass())) {
+		if (!XmlConfigurationManager.INSTANCE.isWithinRootPackages(affectedBehavior.getDeclaringClass())) {
 			return;
 		}
 		affectedBehavior.instrument(unpureBehaviorExpressionEditor);

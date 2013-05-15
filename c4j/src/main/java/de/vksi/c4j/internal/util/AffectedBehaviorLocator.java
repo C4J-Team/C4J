@@ -22,6 +22,7 @@ import de.vksi.c4j.InitializeContract;
 import de.vksi.c4j.internal.contracts.ContractInfo;
 import de.vksi.c4j.internal.contracts.ContractRegistry;
 import de.vksi.c4j.internal.transformer.ContractExpressionTransformer;
+import de.vksi.c4j.internal.types.ListOrderedSet;
 
 public class AffectedBehaviorLocator {
 	private InvolvedTypeInspector involvedTypeInspector = new InvolvedTypeInspector();

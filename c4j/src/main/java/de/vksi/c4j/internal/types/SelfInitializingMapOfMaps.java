@@ -1,6 +1,7 @@
-package de.vksi.c4j.internal.util;
+package de.vksi.c4j.internal.types;
 
 import java.util.Map;
+
 
 public abstract class SelfInitializingMapOfMaps<S, T extends Map<?, ?>> extends AbstractSelfInitializingMap<S, T> {
 	public int size() {

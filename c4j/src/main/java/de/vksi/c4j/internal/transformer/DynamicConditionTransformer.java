@@ -16,7 +16,7 @@ import de.vksi.c4j.internal.compiler.StandaloneExp;
 import de.vksi.c4j.internal.compiler.StaticCallExp;
 import de.vksi.c4j.internal.contracts.ContractInfo;
 import de.vksi.c4j.internal.contracts.ContractMethod;
-import de.vksi.c4j.internal.util.ListOrderedSet;
+import de.vksi.c4j.internal.types.ListOrderedSet;
 
 /**
  * Transforming a method to look like the following block-comment: <code>

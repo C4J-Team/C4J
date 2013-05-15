@@ -31,7 +31,7 @@ import de.vksi.c4j.internal.contracts.ContractMethod;
 import de.vksi.c4j.internal.runtime.Evaluator;
 import de.vksi.c4j.internal.runtime.UnchangedCache;
 import de.vksi.c4j.internal.runtime.ContractErrorHandler.ContractErrorSource;
-import de.vksi.c4j.internal.util.ListOrderedSet;
+import de.vksi.c4j.internal.types.ListOrderedSet;
 
 /**
  * Transforming a method to look like the following block-comment:

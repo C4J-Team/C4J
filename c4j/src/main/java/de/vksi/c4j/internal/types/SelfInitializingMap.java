@@ -1,6 +1,7 @@
-package de.vksi.c4j.internal.util;
+package de.vksi.c4j.internal.types;
 
 import java.util.Collection;
+
 
 public abstract class SelfInitializingMap<S, T extends Collection<?>> extends AbstractSelfInitializingMap<S, T> {
 	@Override

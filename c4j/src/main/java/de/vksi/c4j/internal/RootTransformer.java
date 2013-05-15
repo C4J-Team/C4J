@@ -22,8 +22,8 @@ import de.vksi.c4j.internal.contracts.ContractRegistry;
 import de.vksi.c4j.internal.contracts.Transformed;
 import de.vksi.c4j.internal.transformer.AffectedClassTransformer;
 import de.vksi.c4j.internal.transformer.ContractClassTransformer;
+import de.vksi.c4j.internal.types.ListOrderedSet;
 import de.vksi.c4j.internal.util.InvolvedTypeInspector;
-import de.vksi.c4j.internal.util.ListOrderedSet;
 
 public class RootTransformer {
 	public static final RootTransformer INSTANCE = new RootTransformer();

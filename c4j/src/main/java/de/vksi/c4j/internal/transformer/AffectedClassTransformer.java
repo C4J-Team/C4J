@@ -18,8 +18,8 @@ import de.vksi.c4j.internal.classfile.ClassFilePool;
 import de.vksi.c4j.internal.contracts.ContractInfo;
 import de.vksi.c4j.internal.contracts.ContractMethod;
 import de.vksi.c4j.internal.contracts.Transformed;
+import de.vksi.c4j.internal.types.ListOrderedSet;
 import de.vksi.c4j.internal.util.AffectedBehaviorLocator;
-import de.vksi.c4j.internal.util.ListOrderedSet;
 
 public class AffectedClassTransformer {
 	private Logger logger = Logger.getLogger(getClass());

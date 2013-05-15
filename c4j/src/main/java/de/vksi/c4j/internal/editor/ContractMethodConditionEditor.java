@@ -21,8 +21,8 @@ import de.vksi.c4j.internal.configuration.DefaultPreconditionType;
 import de.vksi.c4j.internal.configuration.XmlConfigurationManager;
 import de.vksi.c4j.internal.contracts.ContractInfo;
 import de.vksi.c4j.internal.contracts.ContractRegistry;
+import de.vksi.c4j.internal.types.ListOrderedSet;
 import de.vksi.c4j.internal.util.InvolvedTypeInspector;
-import de.vksi.c4j.internal.util.ListOrderedSet;
 
 public class ContractMethodConditionEditor extends ContractMethodEditor {
 	private Logger logger = Logger.getLogger(getClass());

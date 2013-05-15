@@ -18,7 +18,6 @@ import org.apache.log4j.Logger;
 
 import de.vksi.c4j.AllowPureAccess;
 import de.vksi.c4j.Pure;
-import de.vksi.c4j.internal.RootTransformer;
 import de.vksi.c4j.internal.compiler.CastExp;
 import de.vksi.c4j.internal.compiler.ConstructorExp;
 import de.vksi.c4j.internal.compiler.NestedExp;
@@ -27,30 +26,28 @@ import de.vksi.c4j.internal.compiler.StaticCall;
 import de.vksi.c4j.internal.compiler.StaticCallExp;
 import de.vksi.c4j.internal.compiler.ThrowExp;
 import de.vksi.c4j.internal.compiler.ValueExp;
+import de.vksi.c4j.internal.configuration.XmlConfigurationManager;
 import de.vksi.c4j.internal.contracts.ContractInfo;
 import de.vksi.c4j.internal.contracts.ContractRegistry;
 import de.vksi.c4j.internal.runtime.PureEvaluator;
 import de.vksi.c4j.internal.runtime.PureEvaluator.ErrorType;
+import de.vksi.c4j.internal.types.ListOrderedSet;
 import de.vksi.c4j.internal.util.InvolvedTypeInspector;
-import de.vksi.c4j.internal.util.ListOrderedSet;
-import de.vksi.c4j.internal.util.PureInspector;
 
 public class PureBehaviorExpressionEditor extends ExprEditor {
 
 	private static final String C4J_INTERNAL_PACKAGE = "de.vksi.c4j.internal";
 	private Logger logger = Logger.getLogger(getClass());
 	private CtMethod affectedMethod;
-	private RootTransformer rootTransformer;
 	private PureInspector pureInspector;
 	private boolean allowOwnStateChange;
 	// necessary to work around bug https://issues.jboss.org/browse/JASSIST-149
 	private ThrowExp pureError = null;
 	private InvolvedTypeInspector involvedTypeInspector = new InvolvedTypeInspector();
 
-	public PureBehaviorExpressionEditor(CtMethod affectedMethod, RootTransformer rootTransformer,
-			PureInspector pureInspector, boolean allowOwnStateChange) throws CannotCompileException {
+	public PureBehaviorExpressionEditor(CtMethod affectedMethod, PureInspector pureInspector,
+			boolean allowOwnStateChange) throws CannotCompileException {
 		this.affectedMethod = affectedMethod;
-		this.rootTransformer = rootTransformer;
 		this.pureInspector = pureInspector;
 		this.allowOwnStateChange = allowOwnStateChange;
 	}
@@ -62,8 +59,8 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 	private void replaceWithPureCheck(MethodCall methodCall) throws NotFoundException, CannotCompileException {
 		CtMethod method = methodCall.getMethod();
 		StaticCall checkMethod = PureEvaluator.checkExternalAccess;
-		if (rootTransformer.getXmlConfiguration().getConfiguration(affectedMethod.getDeclaringClass())
-				.getBlacklistMethods().contains(method)) {
+		if (XmlConfigurationManager.INSTANCE.getConfiguration(affectedMethod.getDeclaringClass()).getBlacklistMethods()
+				.contains(method)) {
 			checkMethod = PureEvaluator.checkExternalBlacklistAccess;
 		}
 		StandaloneExp checkUnpureAccessExp = new StaticCallExp(checkMethod, NestedExp.CALLING_OBJECT, new ValueExp(
@@ -139,8 +136,8 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 		if (isSynthetic(method)) {
 			return;
 		}
-		if (rootTransformer.getXmlConfiguration().getConfiguration(affectedMethod.getDeclaringClass())
-				.getWhitelistMethods().contains(method)) {
+		if (XmlConfigurationManager.INSTANCE.getConfiguration(affectedMethod.getDeclaringClass()).getWhitelistMethods()
+				.contains(method)) {
 			return;
 		}
 		if (method.hasAnnotation(Pure.class)) {
@@ -161,7 +158,7 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 		if (pureInspector.getPureOrigin(involvedTypes, contracts, method) != null) {
 			return;
 		}
-		if (rootTransformer.getXmlConfiguration().isWithinRootPackages(method.getDeclaringClass())) {
+		if (XmlConfigurationManager.INSTANCE.isWithinRootPackages(method.getDeclaringClass())) {
 			return;
 		}
 		replaceWithPureCheck(methodCall);
@@ -171,8 +168,8 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 		if (method.getDeclaringClass().getPackageName().startsWith(C4J_INTERNAL_PACKAGE)) {
 			return;
 		}
-		if (rootTransformer.getXmlConfiguration().isWithinRootPackages(method.getDeclaringClass())
-				|| rootTransformer.getXmlConfiguration().getConfiguration(affectedMethod.getDeclaringClass())
+		if (XmlConfigurationManager.INSTANCE.isWithinRootPackages(method.getDeclaringClass())
+				|| XmlConfigurationManager.INSTANCE.getConfiguration(affectedMethod.getDeclaringClass())
 						.getBlacklistMethods().contains(method)) {
 			pureError("illegal access on static method " + method.getLongName() + " in pure method "
 					+ affectedMethod.getLongName() + " on line " + methodCall.getLineNumber());

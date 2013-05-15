@@ -1,6 +1,6 @@
 package de.vksi.c4j.internal.contracts;
 
-import static de.vksi.c4j.internal.util.CollectionsHelper.arrayContains;
+import static de.vksi.c4j.internal.types.CollectionsHelper.arrayContains;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +15,7 @@ import de.vksi.c4j.ContractReference;
 import de.vksi.c4j.internal.classfile.ClassFilePool;
 import de.vksi.c4j.internal.configuration.XmlConfigurationManager;
 import de.vksi.c4j.internal.configuration.XmlLocalConfiguration;
-import de.vksi.c4j.internal.util.ListOrderedSet;
+import de.vksi.c4j.internal.types.ListOrderedSet;
 
 public class ContractRegistry {
 	public static final ContractRegistry INSTANCE = new ContractRegistry();

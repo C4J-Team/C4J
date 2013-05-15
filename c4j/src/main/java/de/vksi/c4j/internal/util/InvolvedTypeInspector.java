@@ -1,5 +1,6 @@
 package de.vksi.c4j.internal.util;
 
+import de.vksi.c4j.internal.types.ListOrderedSet;
 import javassist.CtClass;
 import javassist.NotFoundException;
 

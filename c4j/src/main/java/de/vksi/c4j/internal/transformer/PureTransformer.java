@@ -18,8 +18,8 @@ import de.vksi.c4j.internal.classfile.ClassFilePool;
 import de.vksi.c4j.internal.configuration.XmlConfigurationManager;
 import de.vksi.c4j.internal.contracts.ContractInfo;
 import de.vksi.c4j.internal.contracts.ContractMethod;
-import de.vksi.c4j.internal.util.ListOrderedSet;
-import de.vksi.c4j.internal.util.PureInspector;
+import de.vksi.c4j.internal.editor.PureInspector;
+import de.vksi.c4j.internal.types.ListOrderedSet;
 
 public class PureTransformer extends AbstractAffectedClassTransformer {
 	private PureInspector pureInspector = new PureInspector();

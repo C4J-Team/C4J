@@ -7,7 +7,7 @@ import javassist.CtBehavior;
 import javassist.CtClass;
 import de.vksi.c4j.internal.contracts.ContractInfo;
 import de.vksi.c4j.internal.contracts.ContractMethod;
-import de.vksi.c4j.internal.util.ListOrderedSet;
+import de.vksi.c4j.internal.types.ListOrderedSet;
 
 public abstract class AbstractAffectedClassTransformer extends ClassTransformer {
 	public abstract void transform(ListOrderedSet<CtClass> involvedClasses, ListOrderedSet<ContractInfo> contracts,
