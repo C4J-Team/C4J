@@ -1,4 +1,4 @@
-package de.vksi.c4j.internal.util;
+package de.vksi.c4j.testutil;
 
 import java.lang.ref.WeakReference;
 

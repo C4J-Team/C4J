@@ -1,11 +1,11 @@
-package de.vksi.c4j.internal.util;
+package de.vksi.c4j.internal.transformer.util;
 
 import static de.vksi.c4j.internal.classfile.ClassAnalyzer.constructorHasAdditionalParameter;
 import static de.vksi.c4j.internal.classfile.ClassAnalyzer.getDeclaredConstructor;
 import static de.vksi.c4j.internal.classfile.ClassAnalyzer.getDeclaredMethod;
-import static de.vksi.c4j.internal.transformer.ContractBehaviorTransformer.CONSTRUCTOR_REPLACEMENT_NAME;
-import static de.vksi.c4j.internal.util.ContractBehaviorHelper.isContractClassInitializer;
-import static de.vksi.c4j.internal.util.ContractBehaviorHelper.isContractConstructor;
+import static de.vksi.c4j.internal.transformer.util.ContractClassMemberHelper.BEFORE_INVARIANT_METHOD_SUFFIX;
+import static de.vksi.c4j.internal.transformer.util.ContractClassMemberHelper.isContractClassInitializer;
+import static de.vksi.c4j.internal.transformer.util.ContractClassMemberHelper.isContractConstructor;
 import javassist.CannotCompileException;
 import javassist.CtBehavior;
 import javassist.CtClass;
@@ -21,7 +21,6 @@ import de.vksi.c4j.ClassInvariant;
 import de.vksi.c4j.InitializeContract;
 import de.vksi.c4j.internal.contracts.ContractInfo;
 import de.vksi.c4j.internal.contracts.ContractRegistry;
-import de.vksi.c4j.internal.transformer.ContractExpressionTransformer;
 import de.vksi.c4j.internal.types.ListOrderedSet;
 
 public class AffectedBehaviorLocator {
@@ -41,7 +40,7 @@ public class AffectedBehaviorLocator {
 		if (contractBehavior.hasAnnotation(InitializeContract.class)) {
 			return null;
 		}
-		if (contractBehavior.getName().endsWith(ContractExpressionTransformer.BEFORE_INVARIANT_METHOD_SUFFIX)) {
+		if (contractBehavior.getName().endsWith(BEFORE_INVARIANT_METHOD_SUFFIX)) {
 			return null;
 		}
 		if (isContractConstructor(contractBehavior)) {
@@ -123,8 +122,8 @@ public class AffectedBehaviorLocator {
 		if (contractBehavior instanceof CtMethod) {
 			return affectedConstructor;
 		}
-		if (getDeclaredMethod(contractInfo.getContractClass(), CONSTRUCTOR_REPLACEMENT_NAME, contractBehavior
-				.getParameterTypes()) != null) {
+		if (getDeclaredMethod(contractInfo.getContractClass(), ContractClassMemberHelper.CONSTRUCTOR_REPLACEMENT_NAME,
+				contractBehavior.getParameterTypes()) != null) {
 			return null;
 		}
 		return affectedConstructor;

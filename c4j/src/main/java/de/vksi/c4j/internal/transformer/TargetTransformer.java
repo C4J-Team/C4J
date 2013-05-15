@@ -17,13 +17,13 @@ import de.vksi.c4j.internal.compiler.ConstructorExp;
 import de.vksi.c4j.internal.compiler.NestedExp;
 import de.vksi.c4j.internal.compiler.StaticCallExp;
 import de.vksi.c4j.internal.contracts.ContractInfo;
-import de.vksi.c4j.internal.editor.TargetAccessEditor;
 import de.vksi.c4j.internal.runtime.Evaluator;
+import de.vksi.c4j.internal.transformer.editor.TargetAccessEditor;
+import de.vksi.c4j.internal.transformer.util.ContractClassMemberHelper;
 import de.vksi.c4j.internal.types.Pair;
 
 public class TargetTransformer extends AbstractContractClassTransformer {
 
-	public static final String TARGET_FIELD_NAME = "target$";
 	private static final String EXPECTED_TARGET_FIELD_NAME = "target";
 
 	private static class WeakFieldMapping extends Pair<CtField, CtField> {
@@ -70,7 +70,7 @@ public class TargetTransformer extends AbstractContractClassTransformer {
 		if (targetField == null) {
 			return null;
 		}
-		CtField weakTargetField = new CtField(weakReferenceClass, TARGET_FIELD_NAME, contractClass);
+		CtField weakTargetField = new CtField(weakReferenceClass, ContractClassMemberHelper.TARGET_FIELD_NAME, contractClass);
 		contractClass.addField(weakTargetField);
 		return new WeakFieldMapping(targetField, weakTargetField);
 	}

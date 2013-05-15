@@ -19,8 +19,8 @@ import de.vksi.c4j.internal.configuration.C4JLocal.Configuration;
 public class XmlConfigurationManager {
 	public static final XmlConfigurationManager INSTANCE = new XmlConfigurationManager();
 
-	public static final String C4J_LOCAL_XML = "c4j-local.xml";
-	public static final String C4J_GLOBAL_XML = "c4j-global.xml";
+	public static final String C4J_LOCAL_XML = "c4j-local.xml".toString();
+	public static final String C4J_GLOBAL_XML = "c4j-global.xml".toString();
 	private Map<String, XmlLocalConfiguration> rootPackageToConfiguration = new HashMap<String, XmlLocalConfiguration>();
 	private XmlLocalConfiguration defaultLocalConfiguration;
 	private XmlGlobalConfiguration globalConfiguration;

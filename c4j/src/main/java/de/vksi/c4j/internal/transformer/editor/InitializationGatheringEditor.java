@@ -1,4 +1,4 @@
-package de.vksi.c4j.internal.editor;
+package de.vksi.c4j.internal.transformer.editor;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -25,7 +25,7 @@ import de.vksi.c4j.internal.contracts.ContractInfo;
 import de.vksi.c4j.internal.runtime.MaxTimeCache;
 import de.vksi.c4j.internal.runtime.OldCache;
 import de.vksi.c4j.internal.runtime.UnchangedCache;
-import de.vksi.c4j.internal.util.Stackalyzer;
+import de.vksi.c4j.internal.transformer.util.Stackalyzer;
 
 public class InitializationGatheringEditor extends ContractMethodEditor {
 

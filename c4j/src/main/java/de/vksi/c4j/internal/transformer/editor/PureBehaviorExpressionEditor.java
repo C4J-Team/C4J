@@ -1,4 +1,4 @@
-package de.vksi.c4j.internal.editor;
+package de.vksi.c4j.internal.transformer.editor;
 
 import java.lang.reflect.Modifier;
 
@@ -31,8 +31,8 @@ import de.vksi.c4j.internal.contracts.ContractInfo;
 import de.vksi.c4j.internal.contracts.ContractRegistry;
 import de.vksi.c4j.internal.runtime.PureEvaluator;
 import de.vksi.c4j.internal.runtime.PureEvaluator.ErrorType;
+import de.vksi.c4j.internal.transformer.util.InvolvedTypeInspector;
 import de.vksi.c4j.internal.types.ListOrderedSet;
-import de.vksi.c4j.internal.util.InvolvedTypeInspector;
 
 public class PureBehaviorExpressionEditor extends ExprEditor {
 

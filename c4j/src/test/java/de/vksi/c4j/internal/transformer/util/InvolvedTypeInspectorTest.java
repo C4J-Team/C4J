@@ -1,4 +1,4 @@
-package de.vksi.c4j.internal.util;
+package de.vksi.c4j.internal.transformer.util;
 
 import static org.junit.Assert.assertEquals;
 import javassist.ClassPool;
@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import de.vksi.c4j.ContractReference;
 import de.vksi.c4j.internal.RootTransformerTest.SuperClass;
-import de.vksi.c4j.internal.util.InvolvedTypeInspector;
+import de.vksi.c4j.internal.transformer.util.InvolvedTypeInspector;
 
 public class InvolvedTypeInspectorTest {
 

@@ -26,7 +26,7 @@ import de.vksi.c4j.internal.contracts.ContractMethod;
 import de.vksi.c4j.internal.runtime.ContractErrorHandler;
 import de.vksi.c4j.internal.runtime.Evaluator;
 import de.vksi.c4j.internal.runtime.ContractErrorHandler.ContractErrorSource;
-import de.vksi.c4j.internal.util.ObjectConverter;
+import de.vksi.c4j.internal.transformer.util.ObjectConverter;
 
 public abstract class PreAndPostConditionTransformer extends ConditionTransformer {
 	protected interface BeforeConditionCallProvider {

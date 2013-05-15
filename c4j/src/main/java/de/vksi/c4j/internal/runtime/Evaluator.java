@@ -11,7 +11,7 @@ import de.vksi.c4j.internal.compiler.StaticCall;
 
 public class Evaluator {
 	public static final StaticCall isBefore = new StaticCall(Evaluator.class, "isBefore");
-	public static final String isBeforeDescriptor = "()Z";
+	public static final String isBeforeDescriptor = "()Z".toString();
 	public static final StaticCall isAfter = new StaticCall(Evaluator.class, "isAfter");
 	public static final StaticCall getReturnValue = new StaticCall(Evaluator.class, "getReturnValue");
 	public static final StaticCall getCurrentTarget = new StaticCall(Evaluator.class, "getCurrentTarget");

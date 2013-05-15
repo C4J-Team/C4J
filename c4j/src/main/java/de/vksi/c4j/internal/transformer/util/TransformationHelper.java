@@ -1,4 +1,4 @@
-package de.vksi.c4j.internal.util;
+package de.vksi.c4j.internal.transformer.util;
 
 import javassist.CtBehavior;
 import javassist.CtClass;

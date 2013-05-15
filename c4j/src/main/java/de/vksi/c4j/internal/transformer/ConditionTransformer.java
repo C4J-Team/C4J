@@ -1,8 +1,7 @@
 package de.vksi.c4j.internal.transformer;
 
 import static de.vksi.c4j.internal.classfile.ClassAnalyzer.constructorHasAdditionalParameter;
-import static de.vksi.c4j.internal.util.ContractBehaviorHelper.getContractBehaviorName;
-import static de.vksi.c4j.internal.util.ContractBehaviorHelper.isContractConstructor;
+import static de.vksi.c4j.internal.transformer.util.ContractClassMemberHelper.getContractBehaviorName;
 
 import java.util.List;
 
@@ -17,8 +16,9 @@ import de.vksi.c4j.internal.compiler.StaticCallExp;
 import de.vksi.c4j.internal.compiler.TryExp;
 import de.vksi.c4j.internal.compiler.ValueExp;
 import de.vksi.c4j.internal.runtime.ContractErrorHandler;
-import de.vksi.c4j.internal.runtime.Evaluator;
 import de.vksi.c4j.internal.runtime.ContractErrorHandler.ContractErrorSource;
+import de.vksi.c4j.internal.runtime.Evaluator;
+import de.vksi.c4j.internal.transformer.util.ContractClassMemberHelper;
 
 public abstract class ConditionTransformer extends AbstractAffectedClassTransformer {
 	protected void catchWithHandleContractException(CtClass affectedClass, TryExp contractCallExp,
@@ -30,7 +30,8 @@ public abstract class ConditionTransformer extends AbstractAffectedClassTransfor
 	}
 
 	protected List<NestedExp> getArgsList(CtClass affectedClass, CtBehavior contractBehavior) throws NotFoundException {
-		if (isContractConstructor(contractBehavior) && constructorHasAdditionalParameter(affectedClass)) {
+		if (ContractClassMemberHelper.isContractConstructor(contractBehavior)
+				&& constructorHasAdditionalParameter(affectedClass)) {
 			return NestedExp.getArgsList(contractBehavior, 2);
 		}
 		return NestedExp.getArgsList(contractBehavior, 1);

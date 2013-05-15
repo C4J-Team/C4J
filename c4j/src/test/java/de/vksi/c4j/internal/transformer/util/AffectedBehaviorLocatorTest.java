@@ -1,4 +1,4 @@
-package de.vksi.c4j.internal.util;
+package de.vksi.c4j.internal.transformer.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -18,7 +18,8 @@ import de.vksi.c4j.ContractReference;
 import de.vksi.c4j.internal.RootTransformer;
 import de.vksi.c4j.internal.contracts.ContractInfo;
 import de.vksi.c4j.internal.contracts.ContractRegistry;
-import de.vksi.c4j.internal.transformer.ContractBehaviorTransformer;
+import de.vksi.c4j.internal.transformer.util.AffectedBehaviorLocator;
+import de.vksi.c4j.internal.transformer.util.ContractClassMemberHelper;
 
 public class AffectedBehaviorLocatorTest {
 	private AffectedBehaviorLocator locator;
@@ -92,7 +93,7 @@ public class AffectedBehaviorLocatorTest {
 	@Test
 	public void testGetAffectedConstructorForSynthetic() throws Exception {
 		assertEquals(targetClass.getDeclaredConstructor(new CtClass[0]), locator.getAffectedConstructor(contractInfo,
-				targetClass, contractClass.getDeclaredMethod(ContractBehaviorTransformer.CONSTRUCTOR_REPLACEMENT_NAME,
+				targetClass, contractClass.getDeclaredMethod(ContractClassMemberHelper.CONSTRUCTOR_REPLACEMENT_NAME,
 						new CtClass[0])));
 	}
 

@@ -1,8 +1,8 @@
 package de.vksi.c4j.internal.transformer;
 
-import static de.vksi.c4j.internal.util.TransformationHelper.addBehaviorAnnotation;
-import static de.vksi.c4j.internal.util.TransformationHelper.setClassIndex;
-import static de.vksi.c4j.internal.util.TransformationHelper.setMethodIndex;
+import static de.vksi.c4j.internal.transformer.util.TransformationHelper.addBehaviorAnnotation;
+import static de.vksi.c4j.internal.transformer.util.TransformationHelper.setClassIndex;
+import static de.vksi.c4j.internal.transformer.util.TransformationHelper.setMethodIndex;
 
 import java.util.HashMap;
 import java.util.List;
@@ -25,16 +25,15 @@ import de.vksi.c4j.internal.compiler.IfExp;
 import de.vksi.c4j.internal.compiler.StaticCall;
 import de.vksi.c4j.internal.compiler.StaticCallExp;
 import de.vksi.c4j.internal.contracts.ContractInfo;
-import de.vksi.c4j.internal.editor.ContractMethodConditionEditor;
-import de.vksi.c4j.internal.editor.InitializationGatheringEditor;
-import de.vksi.c4j.internal.editor.StoreDependency;
 import de.vksi.c4j.internal.runtime.Evaluator;
 import de.vksi.c4j.internal.runtime.OldCache;
 import de.vksi.c4j.internal.runtime.PureEvaluator;
+import de.vksi.c4j.internal.transformer.editor.ContractMethodConditionEditor;
+import de.vksi.c4j.internal.transformer.editor.InitializationGatheringEditor;
+import de.vksi.c4j.internal.transformer.editor.StoreDependency;
+import de.vksi.c4j.internal.transformer.util.ContractClassMemberHelper;
 
 public class ContractExpressionTransformer extends AbstractContractClassTransformer {
-
-	public static final String BEFORE_INVARIANT_METHOD_SUFFIX = "$before";
 
 	@Override
 	public void transform(ContractInfo contractInfo, CtClass currentContractClass) throws Exception {
@@ -89,7 +88,7 @@ public class ContractExpressionTransformer extends AbstractContractClassTransfor
 			ContractMethodDependencies contractMethodDependencies) throws BadBytecode, CannotCompileException,
 			NotFoundException {
 		CtMethod beforeInvariant = CtNewMethod.make(CtClass.voidType, contractMethod.getName()
-				+ BEFORE_INVARIANT_METHOD_SUFFIX, new CtClass[0], contractMethod.getExceptionTypes(), null,
+				+ ContractClassMemberHelper.BEFORE_INVARIANT_METHOD_SUFFIX, new CtClass[0], contractMethod.getExceptionTypes(), null,
 				contractMethod.getDeclaringClass());
 		contractMethod.getDeclaringClass().addMethod(beforeInvariant);
 		addBehaviorAnnotation(beforeInvariant, ClassFilePool.INSTANCE.getClass(BeforeClassInvariant.class));

@@ -10,8 +10,7 @@ import java.lang.ref.WeakReference;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.vksi.c4j.internal.types.ObjectMapper;import de.vksi.c4j.internal.util.TestUtil;
-
+import de.vksi.c4j.testutil.TestUtil;
 
 public class ObjectMapperTest {
 	private ObjectMapper<String, DummyObject> mapper;

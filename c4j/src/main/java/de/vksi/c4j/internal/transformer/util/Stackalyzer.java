@@ -1,4 +1,4 @@
-package de.vksi.c4j.internal.util;
+package de.vksi.c4j.internal.transformer.util;
 
 import static javassist.bytecode.Opcode.ALOAD;
 import static javassist.bytecode.Opcode.ALOAD_1;

@@ -1,4 +1,4 @@
-package de.vksi.c4j.internal.editor;
+package de.vksi.c4j.internal.transformer.editor;
 
 import static de.vksi.c4j.internal.classfile.ClassAnalyzer.getDeclaredMethod;
 
@@ -25,8 +25,8 @@ import de.vksi.c4j.internal.compiler.StaticCallExp;
 import de.vksi.c4j.internal.configuration.XmlConfigurationManager;
 import de.vksi.c4j.internal.contracts.ContractInfo;
 import de.vksi.c4j.internal.runtime.PureEvaluator;
+import de.vksi.c4j.internal.transformer.util.AffectedBehaviorLocator;
 import de.vksi.c4j.internal.types.ListOrderedSet;
-import de.vksi.c4j.internal.util.AffectedBehaviorLocator;
 
 public class PureInspector {
 	private UnpureBehaviorExpressionEditor unpureBehaviorExpressionEditor = new UnpureBehaviorExpressionEditor();

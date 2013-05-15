@@ -1,4 +1,4 @@
-package de.vksi.c4j.internal.editor;
+package de.vksi.c4j.internal.transformer.editor;
 
 import static de.vksi.c4j.internal.classfile.ClassAnalyzer.getDeclaredMethod;
 import static de.vksi.c4j.internal.classfile.ClassAnalyzer.getField;
@@ -21,8 +21,8 @@ import de.vksi.c4j.internal.configuration.DefaultPreconditionType;
 import de.vksi.c4j.internal.configuration.XmlConfigurationManager;
 import de.vksi.c4j.internal.contracts.ContractInfo;
 import de.vksi.c4j.internal.contracts.ContractRegistry;
+import de.vksi.c4j.internal.transformer.util.InvolvedTypeInspector;
 import de.vksi.c4j.internal.types.ListOrderedSet;
-import de.vksi.c4j.internal.util.InvolvedTypeInspector;
 
 public class ContractMethodConditionEditor extends ContractMethodEditor {
 	private Logger logger = Logger.getLogger(getClass());

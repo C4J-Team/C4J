@@ -1,4 +1,4 @@
-package de.vksi.c4j.internal.editor;
+package de.vksi.c4j.internal.transformer.editor;
 
 public class StoreDependency {
 	private final byte[] dependency;

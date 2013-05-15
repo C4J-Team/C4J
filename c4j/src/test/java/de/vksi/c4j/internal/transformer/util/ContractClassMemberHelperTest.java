@@ -1,7 +1,7 @@
-package de.vksi.c4j.internal.util;
+package de.vksi.c4j.internal.transformer.util;
 
-import static de.vksi.c4j.internal.util.ContractBehaviorHelper.getContractBehaviorName;
-import static de.vksi.c4j.internal.util.ContractBehaviorHelper.isContractConstructor;
+import static de.vksi.c4j.internal.transformer.util.ContractClassMemberHelper.getContractBehaviorName;
+import static de.vksi.c4j.internal.transformer.util.ContractClassMemberHelper.isContractConstructor;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -12,9 +12,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.vksi.c4j.ClassInvariant;
-import de.vksi.c4j.internal.transformer.ContractBehaviorTransformer;
+import de.vksi.c4j.internal.transformer.util.ContractClassMemberHelper;
 
-public class ContractBehaviorHelperTest {
+public class ContractClassMemberHelperTest {
+
 	private CtClass contractClass;
 	private ClassPool pool;
 
@@ -32,14 +33,14 @@ public class ContractBehaviorHelperTest {
 	@Test
 	public void testGetContractBehaviorNameForConstructor() throws Exception {
 		assertEquals(getContractBehaviorName(contractClass.getDeclaredConstructor(new CtClass[0])),
-				ContractBehaviorTransformer.CONSTRUCTOR_REPLACEMENT_NAME);
+				ContractClassMemberHelper.CONSTRUCTOR_REPLACEMENT_NAME);
 	}
 
 	@Test
 	public void testGetContractBehaviorNameForTransformedConstructor() throws Exception {
 		assertEquals(getContractBehaviorName(contractClass
-				.getDeclaredMethod(ContractBehaviorTransformer.CONSTRUCTOR_REPLACEMENT_NAME)),
-				ContractBehaviorTransformer.CONSTRUCTOR_REPLACEMENT_NAME);
+				.getDeclaredMethod(ContractClassMemberHelper.CONSTRUCTOR_REPLACEMENT_NAME)),
+				ContractClassMemberHelper.CONSTRUCTOR_REPLACEMENT_NAME);
 	}
 
 	@Test
@@ -55,7 +56,7 @@ public class ContractBehaviorHelperTest {
 	@Test
 	public void testIsConstructorForTransformedConstructor() throws Exception {
 		assertTrue(isContractConstructor(contractClass
-				.getDeclaredMethod(ContractBehaviorTransformer.CONSTRUCTOR_REPLACEMENT_NAME)));
+				.getDeclaredMethod(ContractClassMemberHelper.CONSTRUCTOR_REPLACEMENT_NAME)));
 	}
 
 	public static class TargetClass {

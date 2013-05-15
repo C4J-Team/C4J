@@ -1,6 +1,6 @@
 package de.vksi.c4j.internal.transformer;
 
-import static de.vksi.c4j.internal.util.TransformationHelper.addClassAnnotation;
+import static de.vksi.c4j.internal.transformer.util.TransformationHelper.addClassAnnotation;
 import javassist.CannotCompileException;
 import javassist.CtClass;
 import de.vksi.c4j.internal.classfile.ClassFilePool;

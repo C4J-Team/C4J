@@ -14,7 +14,7 @@ import de.vksi.c4j.internal.types.Pair;
 public class OldCache {
 	public static final StaticCall oldRetrieve = new StaticCall(OldCache.class, "oldRetrieve");
 	public static final StaticCall oldStore = new StaticCall(OldCache.class, "oldStore");
-	public static final String oldStoreDescriptor = "(Ljava/lang/Object;Ljava/lang/Class;I)V";
+	public static final String oldStoreDescriptor = "(Ljava/lang/Object;Ljava/lang/Class;I)V".toString();
 	public static final StaticCall oldStoreException = new StaticCall(OldCache.class, "oldStoreException");
 
 	private static class OldIdentifier extends Pair<Class<?>, Integer> {

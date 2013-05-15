@@ -12,7 +12,7 @@ import de.vksi.c4j.internal.types.ObjectIdentitySet;
 public class PureEvaluator {
 	public static final StaticCall registerUnpure = new StaticCall(PureEvaluator.class, "registerUnpure");
 	public static final StaticCall registerUnchangeable = new StaticCall(PureEvaluator.class, "registerUnchangeable");
-	public static final String registerUnchangeableDescriptor = "(Ljava/lang/Object;)V";
+	public static final String registerUnchangeableDescriptor = "(Ljava/lang/Object;)V".toString();
 	public static final StaticCall unregisterUnpure = new StaticCall(PureEvaluator.class, "unregisterUnpure");
 	public static final StaticCall checkUnpureAccess = new StaticCall(PureEvaluator.class, "checkUnpureAccess");
 	public static final StaticCall checkExternalAccess = new StaticCall(PureEvaluator.class, "checkExternalAccess");

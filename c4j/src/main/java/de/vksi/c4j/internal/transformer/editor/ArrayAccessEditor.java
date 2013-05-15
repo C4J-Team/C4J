@@ -1,6 +1,6 @@
-package de.vksi.c4j.internal.editor;
+package de.vksi.c4j.internal.transformer.editor;
 
-import static de.vksi.c4j.internal.util.TransformationHelper.setMethodIndex;
+import static de.vksi.c4j.internal.transformer.util.TransformationHelper.setMethodIndex;
 
 import java.util.Collections;
 import java.util.HashSet;

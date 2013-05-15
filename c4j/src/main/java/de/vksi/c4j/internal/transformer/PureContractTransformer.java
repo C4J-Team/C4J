@@ -6,7 +6,7 @@ import de.vksi.c4j.Pure;
 import de.vksi.c4j.error.UsageError;
 import de.vksi.c4j.internal.configuration.XmlConfigurationManager;
 import de.vksi.c4j.internal.contracts.ContractInfo;
-import de.vksi.c4j.internal.editor.PureInspector;
+import de.vksi.c4j.internal.transformer.editor.PureInspector;
 
 public class PureContractTransformer extends ContractDeclaredBehaviorTransformer {
 

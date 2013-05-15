@@ -17,11 +17,9 @@ import de.vksi.c4j.error.UsageError;
 import de.vksi.c4j.internal.classfile.BehaviorFilter;
 import de.vksi.c4j.internal.compiler.NestedExp;
 import de.vksi.c4j.internal.contracts.ContractInfo;
+import de.vksi.c4j.internal.transformer.util.ContractClassMemberHelper;
 
 public class ContractBehaviorTransformer extends AbstractContractClassTransformer {
-	public static final String CONSTRUCTOR_REPLACEMENT_NAME = "constructor$";
-	public static final String CLASS_INITIALIZER_REPLACEMENT_NAME = "classInitializer$";
-
 	@Override
 	public void transform(ContractInfo contractInfo, CtClass contractClass) throws Exception {
 		if (contractClass.equals(contractInfo.getContractClass())) {
@@ -48,7 +46,7 @@ public class ContractBehaviorTransformer extends AbstractContractClassTransforme
 	private void renameStaticInitializer(CtClass contractClass, CtClass targetClass) throws CannotCompileException,
 			NotFoundException {
 		if (contractClass.getClassInitializer() != null && targetClass.getClassInitializer() != null) {
-			contractClass.addMethod(contractClass.getClassInitializer().toMethod(CLASS_INITIALIZER_REPLACEMENT_NAME,
+			contractClass.addMethod(contractClass.getClassInitializer().toMethod(ContractClassMemberHelper.CLASS_INITIALIZER_REPLACEMENT_NAME,
 					contractClass));
 			contractClass.removeConstructor(contractClass.getClassInitializer());
 		}
@@ -83,7 +81,7 @@ public class ContractBehaviorTransformer extends AbstractContractClassTransforme
 	private void replaceConstructors(CtClass contractClass) throws CannotCompileException, NotFoundException {
 		// getConstructors() excludes the static initializer
 		for (CtConstructor constructor : contractClass.getConstructors()) {
-			contractClass.addMethod(constructor.toMethod(CONSTRUCTOR_REPLACEMENT_NAME, contractClass));
+			contractClass.addMethod(constructor.toMethod(ContractClassMemberHelper.CONSTRUCTOR_REPLACEMENT_NAME, contractClass));
 		}
 		if (contractClass.getSuperclass() != null) {
 			CtClass oldSuperclass = contractClass.getSuperclass();

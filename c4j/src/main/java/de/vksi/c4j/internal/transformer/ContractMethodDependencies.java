@@ -11,8 +11,8 @@ import javassist.CtMethod;
 import de.vksi.c4j.error.UsageError;
 import de.vksi.c4j.internal.compiler.EmptyExp;
 import de.vksi.c4j.internal.compiler.StandaloneExp;
-import de.vksi.c4j.internal.editor.InitializationGatheringEditor;
-import de.vksi.c4j.internal.editor.StoreDependency;
+import de.vksi.c4j.internal.transformer.editor.InitializationGatheringEditor;
+import de.vksi.c4j.internal.transformer.editor.StoreDependency;
 
 public class ContractMethodDependencies {
 

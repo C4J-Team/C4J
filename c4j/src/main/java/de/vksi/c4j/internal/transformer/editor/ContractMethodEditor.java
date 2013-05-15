@@ -1,4 +1,4 @@
-package de.vksi.c4j.internal.editor;
+package de.vksi.c4j.internal.transformer.editor;
 
 import static de.vksi.c4j.internal.classfile.ClassAnalyzer.getMethod;
 import javassist.CannotCompileException;
