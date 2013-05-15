@@ -11,6 +11,9 @@ import java.util.Map;
 import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.NotFoundException;
+
+import org.apache.log4j.Logger;
+
 import de.vksi.c4j.internal.compiler.NestedExp;
 import de.vksi.c4j.internal.compiler.StandaloneExp;
 import de.vksi.c4j.internal.compiler.StaticCallExp;
@@ -57,6 +60,8 @@ import de.vksi.c4j.internal.types.ListOrderedSet;
 	}</code>
  */
 public class DynamicConditionTransformer extends PreAndPostConditionTransformer {
+	private static final Logger LOGGER = Logger.getLogger(DynamicConditionTransformer.class);
+
 	@Override
 	public void transform(ListOrderedSet<CtClass> involvedClasses, ListOrderedSet<ContractInfo> contracts,
 			CtClass affectedClass, Map<CtBehavior, List<ContractMethod>> contractMap) throws Exception {
@@ -67,8 +72,8 @@ public class DynamicConditionTransformer extends PreAndPostConditionTransformer 
 
 	public void transform(CtClass affectedClass, CtBehavior affectedBehavior, List<ContractMethod> contractList)
 			throws Exception {
-		if (logger.isTraceEnabled()) {
-			logger.trace("transforming behavior " + affectedBehavior.getLongName());
+		if (LOGGER.isTraceEnabled()) {
+			LOGGER.trace("transforming behavior " + affectedBehavior.getLongName());
 		}
 		if (contractList != null) {
 			insertPreAndPostCondition(contractList, affectedClass, affectedBehavior);

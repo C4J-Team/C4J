@@ -22,7 +22,7 @@ import de.vksi.c4j.internal.classfile.ClassFilePool;
  * -javaagent JVM argument. The -ea argument will still be necessary in order to enable the assert statement.
  */
 public class PreTransformer {
-	private Logger logger = Logger.getLogger(PreTransformer.class);
+	private static final Logger LOGGER = Logger.getLogger(PreTransformer.class);
 	private RootTransformer rootTransformer = RootTransformer.INSTANCE;
 
 	private final File sourceDir;
@@ -37,9 +37,9 @@ public class PreTransformer {
 		Set<CtClass> classFiles = searchClassFiles(sourceDir);
 		Set<CtClass> contractClassFiles = getContractClasses(classFiles);
 		classFiles.removeAll(contractClassFiles);
-		logger.info("transforming non-contracts");
+		LOGGER.info("transforming non-contracts");
 		transformClasses(classFiles);
-		logger.info("transforming contracts");
+		LOGGER.info("transforming contracts");
 		transformClasses(contractClassFiles);
 	}
 
@@ -76,9 +76,9 @@ public class PreTransformer {
 		try {
 			rootTransformer.transformType(clazz);
 			clazz.writeFile(destinationDir.getAbsolutePath());
-			logger.info("transformed " + clazz.getName() + " to " + destinationDir.getAbsolutePath());
+			LOGGER.info("transformed " + clazz.getName() + " to " + destinationDir.getAbsolutePath());
 		} catch (Exception e) {
-			logger.fatal("failed to transform " + clazz.getName(), e);
+			LOGGER.fatal("failed to transform " + clazz.getName(), e);
 		}
 	}
 }

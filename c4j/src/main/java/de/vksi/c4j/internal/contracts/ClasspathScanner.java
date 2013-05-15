@@ -22,14 +22,13 @@ import de.vksi.c4j.internal.classfile.ClassFilePool;
 public class ClasspathScanner {
 	private static final String FILE_EXT_CLASS = ".class";
 	private static final String PROTOCOL_FILE = "file";
-	private Logger logger = Logger.getLogger(ClasspathScanner.class);
+	private static final Logger LOGGER = Logger.getLogger(ClasspathScanner.class);
 	private final String packageName;
 	private final boolean includeSubpackages;
 	private final ClassLoader classLoader;
 	private List<CtClass> classes = new ArrayList<CtClass>();
 
-	public ClasspathScanner(String packageName, boolean includeSubpackages, ClassLoader classLoader)
-			throws Exception {
+	public ClasspathScanner(String packageName, boolean includeSubpackages, ClassLoader classLoader) throws Exception {
 		this.packageName = packageName;
 		this.includeSubpackages = includeSubpackages;
 		this.classLoader = classLoader;
@@ -43,7 +42,7 @@ public class ClasspathScanner {
 	private void scanPackage() throws IOException, Exception {
 		Enumeration<URL> packageResources = classLoader.getResources(getPackagePath(packageName));
 		if (packageResources == null) {
-			logger.error("Couldn't find package " + packageName);
+			LOGGER.error("Couldn't find package " + packageName);
 		}
 		scanExistingPackages(packageName, includeSubpackages, packageResources);
 	}
@@ -69,7 +68,7 @@ public class ClasspathScanner {
 			scanPackageInJarFile((JarURLConnection) packageUrlConnection, includeSubpackages, packageName);
 			return;
 		}
-		logger.error("Cannot scan packages in protocol " + packageUrl.getProtocol() + " for package " + packageUrl);
+		LOGGER.error("Cannot scan packages in protocol " + packageUrl.getProtocol() + " for package " + packageUrl);
 	}
 
 	private void scanPackageInJarFile(JarURLConnection packageUrlConnection, boolean includeSubpackages,
@@ -102,11 +101,11 @@ public class ClasspathScanner {
 	private void scanPackageInFileSystem(URL packageUrl, boolean includeSubpackages) throws Exception {
 		File packageAsFile = new File(packageUrl.toURI());
 		if (!packageAsFile.exists()) {
-			logger.error("Cannot scan package " + packageUrl + " as it doesn't exist.");
+			LOGGER.error("Cannot scan package " + packageUrl + " as it doesn't exist.");
 			return;
 		}
 		if (!packageAsFile.isDirectory()) {
-			logger.error("Cannot scan package " + packageUrl + " as it is not a directory.");
+			LOGGER.error("Cannot scan package " + packageUrl + " as it is not a directory.");
 			return;
 		}
 		scanPackageAsDirectory(packageAsFile, includeSubpackages);

@@ -16,6 +16,9 @@ import javassist.CtClass;
 import javassist.CtConstructor;
 import javassist.CtMethod;
 import javassist.NotFoundException;
+
+import org.apache.log4j.Logger;
+
 import de.vksi.c4j.ClassInvariant;
 import de.vksi.c4j.Pure;
 import de.vksi.c4j.internal.compiler.BooleanExp;
@@ -28,9 +31,9 @@ import de.vksi.c4j.internal.compiler.ValueExp;
 import de.vksi.c4j.internal.configuration.XmlConfigurationManager;
 import de.vksi.c4j.internal.contracts.ContractInfo;
 import de.vksi.c4j.internal.contracts.ContractMethod;
+import de.vksi.c4j.internal.runtime.ContractErrorHandler.ContractErrorSource;
 import de.vksi.c4j.internal.runtime.Evaluator;
 import de.vksi.c4j.internal.runtime.UnchangedCache;
-import de.vksi.c4j.internal.runtime.ContractErrorHandler.ContractErrorSource;
 import de.vksi.c4j.internal.types.ListOrderedSet;
 
 /**
@@ -72,6 +75,8 @@ try {
 }
 */
 public class InvariantTransformer extends ConditionTransformer {
+	private static final Logger LOGGER = Logger.getLogger(InvariantTransformer.class);
+
 	@Override
 	public void transform(ListOrderedSet<CtClass> involvedClasses, ListOrderedSet<ContractInfo> contracts,
 			CtClass affectedClass, Map<CtBehavior, List<ContractMethod>> contractMap) throws Exception {
@@ -83,8 +88,8 @@ public class InvariantTransformer extends ConditionTransformer {
 	private void transformBehavior(CtClass affectedClass, CtBehavior affectedBehavior,
 			ListOrderedSet<ContractInfo> contracts, Map<CtBehavior, List<ContractMethod>> contractMap)
 			throws CannotCompileException, Exception {
-		if (logger.isTraceEnabled()) {
-			logger.trace("transforming behavior " + affectedBehavior.getLongName());
+		if (LOGGER.isTraceEnabled()) {
+			LOGGER.trace("transforming behavior " + affectedBehavior.getLongName());
 		}
 		if (affectedBehavior.hasAnnotation(Pure.class)
 				&& XmlConfigurationManager.INSTANCE.getConfiguration(affectedClass).isPureSkipInvariants()) {

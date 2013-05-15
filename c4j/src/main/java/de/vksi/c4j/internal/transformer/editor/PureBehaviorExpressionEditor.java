@@ -37,7 +37,8 @@ import de.vksi.c4j.internal.types.ListOrderedSet;
 public class PureBehaviorExpressionEditor extends ExprEditor {
 
 	private static final String C4J_INTERNAL_PACKAGE = "de.vksi.c4j.internal";
-	private Logger logger = Logger.getLogger(getClass());
+	private static final Logger LOGGER = Logger.getLogger(PureBehaviorExpressionEditor.class);
+
 	private CtMethod affectedMethod;
 	private PureInspector pureInspector;
 	private boolean allowOwnStateChange;
@@ -66,11 +67,11 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 		StandaloneExp checkUnpureAccessExp = new StaticCallExp(checkMethod, NestedExp.CALLING_OBJECT, new ValueExp(
 				method.getLongName())).toStandalone();
 		StandaloneExp replacementExp = checkUnpureAccessExp.append(StandaloneExp.PROCEED_AND_ASSIGN);
-		if (logger.isDebugEnabled()) {
-			logger.debug("possible call to external unpure method " + method.getLongName());
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("possible call to external unpure method " + method.getLongName());
 		}
-		if (logger.isTraceEnabled()) {
-			logger.trace("replacement-code: " + replacementExp.getCode());
+		if (LOGGER.isTraceEnabled()) {
+			LOGGER.trace("replacement-code: " + replacementExp.getCode());
 		}
 		replacementExp.replace(methodCall);
 	}
@@ -104,10 +105,10 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 	}
 
 	private void pureError(String errorMsg) throws CannotCompileException {
-		logger.error(errorMsg);
+		LOGGER.error(errorMsg);
 		pureError = getThrowable(errorMsg);
-		if (logger.isTraceEnabled()) {
-			logger.trace("pure error replacement code: " + pureError.getCode());
+		if (LOGGER.isTraceEnabled()) {
+			LOGGER.trace("pure error replacement code: " + pureError.getCode());
 		}
 	}
 

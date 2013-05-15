@@ -22,7 +22,8 @@ import de.vksi.c4j.internal.transformer.util.AffectedBehaviorLocator;
 import de.vksi.c4j.internal.types.ListOrderedSet;
 
 public class AffectedClassTransformer {
-	private Logger logger = Logger.getLogger(getClass());
+	private static final Logger LOGGER = Logger.getLogger(AffectedClassTransformer.class);
+
 	private AffectedBehaviorLocator affectedBehaviorLocator = new AffectedBehaviorLocator();
 	private AbstractAffectedClassTransformer[] transformers = new AbstractAffectedClassTransformer[] {
 			// beware: PureTransformer has to run first!
@@ -32,8 +33,8 @@ public class AffectedClassTransformer {
 
 	public void transform(ListOrderedSet<CtClass> involvedClasses, ListOrderedSet<ContractInfo> contracts,
 			CtClass affectedClass) throws Exception {
-		if (logger.isDebugEnabled()) {
-			logger.debug("transforming class " + affectedClass.getName());
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("transforming class " + affectedClass.getName());
 		}
 		Map<CtBehavior, List<ContractMethod>> contractMap = getContractMap(contracts, affectedClass);
 		for (AbstractAffectedClassTransformer transformer : transformers) {

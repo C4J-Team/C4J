@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
 
 public class BackdoorAnnotationLoader {
 	private AnnotationsAttribute annotationsAttribute;
-	private static final Logger logger = Logger.getLogger(BackdoorAnnotationLoader.class);
+	private static final Logger LOGGER = Logger.getLogger(BackdoorAnnotationLoader.class);
 
 	public BackdoorAnnotationLoader(CtClass clazz) {
 		annotationsAttribute = (AnnotationsAttribute) clazz.getClassFile2()
@@ -41,7 +41,7 @@ public class BackdoorAnnotationLoader {
 			return null;
 		}
 		if (!(memberValue instanceof ClassMemberValue)) {
-			logger.fatal(annotationClass.getName() + "." + key + " is not a value of type Class.");
+			LOGGER.fatal(annotationClass.getName() + "." + key + " is not a value of type Class.");
 			return null;
 		}
 		return ((ClassMemberValue) memberValue).getValue();
@@ -57,7 +57,7 @@ public class BackdoorAnnotationLoader {
 			return null;
 		}
 		if (!(memberValue instanceof ArrayMemberValue)) {
-			logger.fatal(annotationClass.getName() + "." + key + " is not a value of type Array.");
+			LOGGER.fatal(annotationClass.getName() + "." + key + " is not a value of type Array.");
 			return null;
 		}
 		String[] values = getClassArrayValues(annotationClass.getName(), key, ((ArrayMemberValue) memberValue)
@@ -71,7 +71,7 @@ public class BackdoorAnnotationLoader {
 			if (arrayValue[i] == null) {
 				values[i] = null;
 			} else if (!(arrayValue[i] instanceof ClassMemberValue)) {
-				logger.fatal(annotationName + "." + key + ", element " + i + " is not a value of type Class-Array.");
+				LOGGER.fatal(annotationName + "." + key + ", element " + i + " is not a value of type Class-Array.");
 				values[i] = null;
 			} else {
 				values[i] = ((ClassMemberValue) arrayValue[i]).getValue();

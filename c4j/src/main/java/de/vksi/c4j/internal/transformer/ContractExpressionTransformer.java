@@ -19,6 +19,9 @@ import javassist.bytecode.CodeAttribute;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import javassist.bytecode.Opcode;
+
+import org.apache.log4j.Logger;
+
 import de.vksi.c4j.ClassInvariant;
 import de.vksi.c4j.internal.classfile.ClassFilePool;
 import de.vksi.c4j.internal.compiler.IfExp;
@@ -34,6 +37,7 @@ import de.vksi.c4j.internal.transformer.editor.StoreDependency;
 import de.vksi.c4j.internal.transformer.util.ContractClassMemberHelper;
 
 public class ContractExpressionTransformer extends AbstractContractClassTransformer {
+	private static final Logger LOGGER = Logger.getLogger(ContractExpressionTransformer.class);
 
 	@Override
 	public void transform(ContractInfo contractInfo, CtClass currentContractClass) throws Exception {
@@ -41,8 +45,8 @@ public class ContractExpressionTransformer extends AbstractContractClassTransfor
 		Map<CtMethod, InitializationGatheringEditor> gatherMap = createInitializationGatheringMap(contractInfo,
 				currentContractClass, storeIndex);
 		for (CtMethod contractMethod : currentContractClass.getDeclaredMethods()) {
-			if (logger.isTraceEnabled()) {
-				logger.trace("transforming behavior " + contractMethod.getLongName());
+			if (LOGGER.isTraceEnabled()) {
+				LOGGER.trace("transforming behavior " + contractMethod.getLongName());
 			}
 			transform(contractInfo, contractMethod, storeIndex, new ContractMethodDependencies(gatherMap,
 					contractMethod));
@@ -88,8 +92,8 @@ public class ContractExpressionTransformer extends AbstractContractClassTransfor
 			ContractMethodDependencies contractMethodDependencies) throws BadBytecode, CannotCompileException,
 			NotFoundException {
 		CtMethod beforeInvariant = CtNewMethod.make(CtClass.voidType, contractMethod.getName()
-				+ ContractClassMemberHelper.BEFORE_INVARIANT_METHOD_SUFFIX, new CtClass[0], contractMethod.getExceptionTypes(), null,
-				contractMethod.getDeclaringClass());
+				+ ContractClassMemberHelper.BEFORE_INVARIANT_METHOD_SUFFIX, new CtClass[0], contractMethod
+				.getExceptionTypes(), null, contractMethod.getDeclaringClass());
 		contractMethod.getDeclaringClass().addMethod(beforeInvariant);
 		addBehaviorAnnotation(beforeInvariant, ClassFilePool.INSTANCE.getClass(BeforeClassInvariant.class));
 		insertIntoBeforeInvariant(contractMethodDependencies, beforeInvariant, contractMethod.getDeclaringClass());

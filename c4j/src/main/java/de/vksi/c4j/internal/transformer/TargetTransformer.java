@@ -10,6 +10,9 @@ import javassist.CtClass;
 import javassist.CtConstructor;
 import javassist.CtField;
 import javassist.NotFoundException;
+
+import org.apache.log4j.Logger;
+
 import de.vksi.c4j.Target;
 import de.vksi.c4j.internal.classfile.ClassFilePool;
 import de.vksi.c4j.internal.compiler.AssignmentExp;
@@ -23,6 +26,7 @@ import de.vksi.c4j.internal.transformer.util.ContractClassMemberHelper;
 import de.vksi.c4j.internal.types.Pair;
 
 public class TargetTransformer extends AbstractContractClassTransformer {
+	private static final Logger LOGGER = Logger.getLogger(TargetTransformer.class);
 
 	private static final String EXPECTED_TARGET_FIELD_NAME = "target";
 
@@ -39,17 +43,17 @@ public class TargetTransformer extends AbstractContractClassTransformer {
 			return;
 		}
 		if (!contractInfo.getTargetClass().subtypeOf(targetField.getFirst().getType())) {
-			logger.error("Target reference " + getSimpleName(targetField.getFirst()) + " has incompatible type.");
+			LOGGER.error("Target reference " + getSimpleName(targetField.getFirst()) + " has incompatible type.");
 			return;
 		}
 		if (!contractInfo.getTargetClass().equals(targetField.getFirst().getType())) {
-			logger.warn("Target reference " + getSimpleName(targetField.getFirst())
+			LOGGER.warn("Target reference " + getSimpleName(targetField.getFirst())
 					+ " has weaker type than the target type would allow.");
 		}
 		TargetAccessEditor targetAccessEditor = new TargetAccessEditor(targetField);
 		for (CtBehavior contractBehavior : contractClass.getDeclaredBehaviors()) {
-			if (logger.isTraceEnabled()) {
-				logger.trace("instrumenting " + contractBehavior.getLongName());
+			if (LOGGER.isTraceEnabled()) {
+				LOGGER.trace("instrumenting " + contractBehavior.getLongName());
 			}
 			contractBehavior.instrument(targetAccessEditor);
 		}
@@ -70,7 +74,8 @@ public class TargetTransformer extends AbstractContractClassTransformer {
 		if (targetField == null) {
 			return null;
 		}
-		CtField weakTargetField = new CtField(weakReferenceClass, ContractClassMemberHelper.TARGET_FIELD_NAME, contractClass);
+		CtField weakTargetField = new CtField(weakReferenceClass, ContractClassMemberHelper.TARGET_FIELD_NAME,
+				contractClass);
 		contractClass.addField(weakTargetField);
 		return new WeakFieldMapping(targetField, weakTargetField);
 	}
@@ -80,13 +85,13 @@ public class TargetTransformer extends AbstractContractClassTransformer {
 		for (CtField field : contractClass.getDeclaredFields()) {
 			if (field.hasAnnotation(Target.class)) {
 				if (targetField != null) {
-					logger.error("Contract " + contractClass.getSimpleName()
+					LOGGER.error("Contract " + contractClass.getSimpleName()
 							+ " has multiple fields annotated with @Target, only the first one is being set.");
 				} else {
 					targetField = field;
 				}
 			} else if (field.getName().equals(EXPECTED_TARGET_FIELD_NAME)) {
-				logger.warn("Field " + getSimpleName(field) + " is possibly missing annotation @Target.");
+				LOGGER.warn("Field " + getSimpleName(field) + " is possibly missing annotation @Target.");
 			}
 		}
 		return targetField;

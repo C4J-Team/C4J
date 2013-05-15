@@ -14,7 +14,7 @@ import de.vksi.c4j.internal.classfile.BackdoorAnnotationLoader;
 import de.vksi.c4j.internal.configuration.C4JLocal.Configuration.ContractScanPackage;
 
 public class ContractPackageScanner {
-	private Logger logger = Logger.getLogger(ContractPackageScanner.class);
+	private static final Logger LOGGER = Logger.getLogger(ContractPackageScanner.class);
 	private final List<ContractScanPackage> contractScanPackages;
 	private final ClassLoader classLoader;
 	private final Map<String, String> externalContracts = new HashMap<String, String>();
@@ -70,7 +70,7 @@ public class ContractPackageScanner {
 			addExternalContract(loadedClass.getClassFile().getInterfaces()[0], contractClass);
 			return;
 		}
-		logger.error("Contract "
+		LOGGER.error("Contract "
 				+ loadedClass.getName()
 				+ " was found in ContractsDirectory, but could not be mapped to a target class. "
 				+ "Extend from the target class or implement the target interface (while not implementing any other interfaces) "

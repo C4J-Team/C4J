@@ -29,7 +29,7 @@ public class OldCache {
 		}
 	}
 
-	private static final Logger logger = Logger.getLogger(OldCache.class);
+	private static final Logger LOGGER = Logger.getLogger(OldCache.class);
 
 	private static final ThreadLocal<Deque<Map<OldIdentifier, OldValue>>> oldCache = new ThreadLocal<Deque<Map<OldIdentifier, OldValue>>>() {
 		@Override
@@ -52,15 +52,15 @@ public class OldCache {
 	}
 
 	private static Object retrieveValue(int index, Object value) {
-		if (logger.isTraceEnabled()) {
-			logger.trace("oldRetrieve for index '" + index + "' with " + oldCache.get().size() + " returning " + value);
+		if (LOGGER.isTraceEnabled()) {
+			LOGGER.trace("oldRetrieve for index '" + index + "' with " + oldCache.get().size() + " returning " + value);
 		}
 		return value;
 	}
 
 	private static Object retrieveException(int index, Throwable exception) {
-		if (logger.isTraceEnabled()) {
-			logger.trace("oldRetrieve for index '" + index + "' with " + oldCache.get().size()
+		if (LOGGER.isTraceEnabled()) {
+			LOGGER.trace("oldRetrieve for index '" + index + "' with " + oldCache.get().size()
 					+ " returning EXCEPTION " + exception);
 		}
 		throw new ContractError("Contract Error, old statement #" + index
@@ -72,15 +72,15 @@ public class OldCache {
 	}
 
 	public static void oldStore(Object value, Class<?> contractClass, int index) {
-		if (logger.isTraceEnabled()) {
-			logger.trace("oldStore for index '" + index + "' with " + oldCache.get().size() + " storing " + value);
+		if (LOGGER.isTraceEnabled()) {
+			LOGGER.trace("oldStore for index '" + index + "' with " + oldCache.get().size() + " storing " + value);
 		}
 		getCurrentOldCache().put(new OldIdentifier(contractClass, index), new OldValue(false, value));
 	}
 
 	public static void oldStoreException(Object exception, Class<?> contractClass, int index) {
-		if (logger.isTraceEnabled()) {
-			logger.trace("oldStore for index '" + index + "' with " + oldCache.get().size() + " storing EXCEPTION "
+		if (LOGGER.isTraceEnabled()) {
+			LOGGER.trace("oldStore for index '" + index + "' with " + oldCache.get().size() + " storing EXCEPTION "
 					+ exception);
 		}
 		getCurrentOldCache().put(new OldIdentifier(contractClass, index), new OldValue(true, exception));

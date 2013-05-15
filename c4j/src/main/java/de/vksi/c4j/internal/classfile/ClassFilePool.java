@@ -17,7 +17,7 @@ import org.apache.log4j.Logger;
 public class ClassFilePool {
 	public static final ClassFilePool INSTANCE = new ClassFilePool();
 
-	private static final Logger logger = Logger.getLogger(ClassFilePool.class);
+	private static final Logger LOGGER = Logger.getLogger(ClassFilePool.class);
 
 	private ClassPool pool = createClassPool();
 
@@ -33,15 +33,15 @@ public class ClassFilePool {
 	}
 
 	public void addClassLoader(ClassLoader loader) {
-		if (logger.isTraceEnabled()) {
-			logger.trace("updating classpath with loader " + loader.getClass() + ", parent " + loader.getParent());
+		if (LOGGER.isTraceEnabled()) {
+			LOGGER.trace("updating classpath with loader " + loader.getClass() + ", parent " + loader.getParent());
 		}
 		pool.insertClassPath(new LoaderClassPath(loader));
 	}
 
 	public void addClassFile(byte[] classfileBuffer, String className) {
-		if (logger.isTraceEnabled()) {
-			logger.trace("updating classpath with classfileBuffer for class " + className);
+		if (LOGGER.isTraceEnabled()) {
+			LOGGER.trace("updating classpath with classfileBuffer for class " + className);
 		}
 		pool.insertClassPath(new ByteArrayClassPath(className, classfileBuffer));
 	}

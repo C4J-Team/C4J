@@ -13,7 +13,7 @@ public abstract class StandaloneExp extends Exp {
 
 	public static final StandaloneExp PROCEED_AND_ASSIGN = CodeStandaloneExp.fromNested("$_ = $proceed($$)");
 
-	private static final Logger logger = Logger.getLogger(StandaloneExp.class);
+	private static final Logger LOGGER = Logger.getLogger(StandaloneExp.class);
 
 	public StandaloneExp append(StandaloneExp other) {
 		return CodeStandaloneExp.fromStandalone(getCode() + other.getCode(), isEmpty() && other.isEmpty());
@@ -30,8 +30,8 @@ public abstract class StandaloneExp extends Exp {
 		if (isEmpty()) {
 			return;
 		}
-		if (logger.isTraceEnabled()) {
-			logger.trace("insert before " + behavior.getLongName() + ": " + this);
+		if (LOGGER.isTraceEnabled()) {
+			LOGGER.trace("insert before " + behavior.getLongName() + ": " + this);
 		}
 		if (isInitializer(behavior)) {
 			((CtConstructor) behavior).insertBeforeBody(getInsertCode(getCode()));
@@ -44,8 +44,8 @@ public abstract class StandaloneExp extends Exp {
 		if (isEmpty()) {
 			return;
 		}
-		if (logger.isTraceEnabled()) {
-			logger.trace("insert after " + behavior.getLongName() + ": " + this);
+		if (LOGGER.isTraceEnabled()) {
+			LOGGER.trace("insert after " + behavior.getLongName() + ": " + this);
 		}
 		behavior.insertAfter(getInsertCode(getCode()));
 	}
@@ -54,8 +54,8 @@ public abstract class StandaloneExp extends Exp {
 		if (isEmpty()) {
 			return;
 		}
-		if (logger.isTraceEnabled()) {
-			logger.trace("insert catch " + behavior.getLongName() + " for " + exceptionType.getName() + ": " + this);
+		if (LOGGER.isTraceEnabled()) {
+			LOGGER.trace("insert catch " + behavior.getLongName() + " for " + exceptionType.getName() + ": " + this);
 		}
 		behavior.addCatch(getInsertCode(getCode()), exceptionType);
 	}
@@ -64,8 +64,8 @@ public abstract class StandaloneExp extends Exp {
 		if (isEmpty()) {
 			return;
 		}
-		if (logger.isTraceEnabled()) {
-			logger.trace("insert finally " + behavior.getLongName() + ": " + this);
+		if (LOGGER.isTraceEnabled()) {
+			LOGGER.trace("insert finally " + behavior.getLongName() + ": " + this);
 		}
 		behavior.insertAfter(getInsertCode(getCode()), true);
 	}

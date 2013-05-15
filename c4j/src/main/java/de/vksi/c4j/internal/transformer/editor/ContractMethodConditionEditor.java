@@ -25,7 +25,7 @@ import de.vksi.c4j.internal.transformer.util.InvolvedTypeInspector;
 import de.vksi.c4j.internal.types.ListOrderedSet;
 
 public class ContractMethodConditionEditor extends ContractMethodEditor {
-	private Logger logger = Logger.getLogger(getClass());
+	private static final Logger LOGGER = Logger.getLogger(ContractMethodConditionEditor.class);
 	private InvolvedTypeInspector involvedTypeInspector = new InvolvedTypeInspector();
 	private boolean preConditionAvailable;
 	private boolean postConditionAvailable;
@@ -122,7 +122,7 @@ public class ContractMethodConditionEditor extends ContractMethodEditor {
 
 	private void preConditionStrengthening(MethodCall methodCall, CtBehavior method, CtClass definingClass)
 			throws CannotCompileException {
-		logger.error(("Found strengthening pre-condition in " + method.getLongName()
+		LOGGER.error(("Found strengthening pre-condition in " + method.getLongName()
 				+ " which is already defined from " + definingClass.getName())
 				+ " - ignoring the pre-condition.");
 		new AssignmentExp(NestedExp.RETURN_VALUE, BooleanExp.FALSE).replace(methodCall);

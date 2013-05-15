@@ -18,8 +18,8 @@ import de.vksi.c4j.internal.classfile.ClassFilePool;
 import de.vksi.c4j.internal.configuration.C4JPureRegistry.Type;
 
 public class PureRegistryImporter {
+	private static final Logger LOGGER = Logger.getLogger(PureRegistryImporter.class);
 	private final URL pureRegistryUrl;
-	private Logger logger = Logger.getLogger(PureRegistryImporter.class);
 	private Set<CtMethod> whitelistMethods = new HashSet<CtMethod>();
 	private Set<CtMethod> blacklistMethods = new HashSet<CtMethod>();
 
@@ -43,7 +43,7 @@ public class PureRegistryImporter {
 			CtClass typeClass = ClassFilePool.INSTANCE.getClass(type.getName());
 			importExistingType(type, typeClass);
 		} catch (NotFoundException e) {
-			logger.error("Could not find type " + type.getName() + " for pure-registry " + pureRegistryUrl);
+			LOGGER.error("Could not find type " + type.getName() + " for pure-registry " + pureRegistryUrl);
 			return;
 		}
 	}
@@ -66,7 +66,7 @@ public class PureRegistryImporter {
 	private void addMethodByName(CtClass typeClass, Set<CtMethod> list, String methodName) {
 		Set<CtMethod> matchingMethods = findMethodsWithName(typeClass, methodName);
 		if (matchingMethods.isEmpty()) {
-			logger.error("Could not find method " + methodName + " in type " + typeClass.getName()
+			LOGGER.error("Could not find method " + methodName + " in type " + typeClass.getName()
 					+ " for pure-registry " + pureRegistryUrl);
 			return;
 		}
@@ -93,7 +93,7 @@ public class PureRegistryImporter {
 		try {
 			list.add(getMethodBySignature(signature, typeClass));
 		} catch (NotFoundException e) {
-			logger.error("Could not find method " + signature + " in type " + typeClass.getName()
+			LOGGER.error("Could not find method " + signature + " in type " + typeClass.getName()
 					+ " for pure-registry " + pureRegistryUrl);
 		}
 	}

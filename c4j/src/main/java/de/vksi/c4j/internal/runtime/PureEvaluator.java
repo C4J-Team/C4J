@@ -54,7 +54,7 @@ public class PureEvaluator {
 			return Integer.valueOf(0);
 		}
 	};
-	private static Logger logger = Logger.getLogger(PureEvaluator.class);
+	private static Logger LOGGER = Logger.getLogger(PureEvaluator.class);
 
 	public static boolean isUnpureCacheEmpty() {
 		for (ObjectIdentitySet element : unpureCache.get()) {
@@ -98,7 +98,7 @@ public class PureEvaluator {
 		ErrorType errorType = getAccessErrorType(target);
 		if (errorType != ErrorType.NONE) {
 			AssertionError assertionError = new AssertionError("illegal access on " + errorType + " object");
-			logger.error(assertionError.getMessage(), assertionError);
+			LOGGER.error(assertionError.getMessage(), assertionError);
 			throw assertionError;
 		}
 	}
@@ -130,7 +130,7 @@ public class PureEvaluator {
 	}
 
 	public static void warnExternalAccess(String method, ErrorType errorType) {
-		logger.warn("Access on " + errorType + " object, method " + method
+		LOGGER.warn("Access on " + errorType + " object, method " + method
 				+ " outside the root-packages. Add it to the pure-registry in the configuration.");
 	}
 
@@ -139,7 +139,7 @@ public class PureEvaluator {
 		if (errorType != ErrorType.NONE) {
 			AssertionError assertionError = new AssertionError("illegal access on " + errorType + " object, method "
 					+ method + " outside the root-packages.");
-			logger.error(assertionError.getMessage(), assertionError);
+			LOGGER.error(assertionError.getMessage(), assertionError);
 			throw assertionError;
 		}
 	}
@@ -147,7 +147,7 @@ public class PureEvaluator {
 	public static void checkUnpureStatic() {
 		if (pureCallDepth.get().intValue() > 0) {
 			AssertionError assertionError = new AssertionError("illegal method access on unpure static method or field");
-			logger.error(assertionError.getMessage(), assertionError);
+			LOGGER.error(assertionError.getMessage(), assertionError);
 			throw assertionError;
 		}
 	}

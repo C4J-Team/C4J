@@ -3,11 +3,16 @@ package de.vksi.c4j.internal.transformer;
 import static de.vksi.c4j.internal.transformer.util.TransformationHelper.addClassAnnotation;
 import javassist.CannotCompileException;
 import javassist.CtClass;
+
+import org.apache.log4j.Logger;
+
 import de.vksi.c4j.internal.classfile.ClassFilePool;
 import de.vksi.c4j.internal.contracts.ContractInfo;
 import de.vksi.c4j.internal.contracts.Transformed;
 
 public class ContractClassTransformer extends AbstractContractClassTransformer {
+	private static final Logger LOGGER = Logger.getLogger(ContractClassTransformer.class);
+
 	private AbstractContractClassTransformer[] transformers = new AbstractContractClassTransformer[] {
 			// BEWARE: has to run in this exact order
 			new ContractBehaviorTransformer(), new ContractExpressionTransformer(), new PureContractTransformer(),
@@ -15,8 +20,8 @@ public class ContractClassTransformer extends AbstractContractClassTransformer {
 
 	@Override
 	public void transform(ContractInfo contractInfo, CtClass contractClass) throws Exception {
-		if (logger.isDebugEnabled()) {
-			logger.debug("transforming contract " + contractClass.getName());
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("transforming contract " + contractClass.getName());
 		}
 		for (AbstractContractClassTransformer transformer : transformers) {
 			transformer.transform(contractInfo, contractClass);

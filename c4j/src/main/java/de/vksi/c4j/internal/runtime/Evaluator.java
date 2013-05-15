@@ -26,7 +26,7 @@ public class Evaluator {
 	public static final StaticCall afterContractMethod = new StaticCall(Evaluator.class, "afterContractMethod");
 	public static final StaticCall setException = new StaticCall(Evaluator.class, "setException");
 
-	private static final Logger logger = Logger.getLogger(Evaluator.class);
+	private static final Logger LOGGER = Logger.getLogger(Evaluator.class);
 
 	private static final Map<Class<?>, Object> primitiveReturnValues = new HashMap<Class<?>, Object>() {
 		private static final long serialVersionUID = 5365905181961089260L;
@@ -64,15 +64,15 @@ public class Evaluator {
 	}
 
 	public static boolean isBefore() {
-		if (logger.isTraceEnabled()) {
-			logger.trace("isBefore returning " + (evaluationPhase.get() == EvaluationPhase.BEFORE));
+		if (LOGGER.isTraceEnabled()) {
+			LOGGER.trace("isBefore returning " + (evaluationPhase.get() == EvaluationPhase.BEFORE));
 		}
 		return evaluationPhase.get() == EvaluationPhase.BEFORE;
 	}
 
 	public static boolean isAfter() {
-		if (logger.isTraceEnabled()) {
-			logger.trace("isAfter returning " + (evaluationPhase.get() == EvaluationPhase.AFTER));
+		if (LOGGER.isTraceEnabled()) {
+			LOGGER.trace("isAfter returning " + (evaluationPhase.get() == EvaluationPhase.AFTER));
 		}
 		return evaluationPhase.get() == EvaluationPhase.AFTER;
 	}
@@ -86,7 +86,7 @@ public class Evaluator {
 			Class<?> callingClass, Class<?> returnType) throws InstantiationException, IllegalAccessException {
 		evaluationPhase.set(EvaluationPhase.BEFORE);
 		beforeContract(target, returnType);
-		logger.info("Calling pre-condition for " + methodName + " in contract " + getSimplerName(contractClass) + ".");
+		LOGGER.info("Calling pre-condition for " + methodName + " in contract " + getSimplerName(contractClass) + ".");
 		return ContractCache.getContractFromCache(target, contractClass, callingClass);
 	}
 
@@ -102,7 +102,7 @@ public class Evaluator {
 			throws InstantiationException, IllegalAccessException {
 		evaluationPhase.set(EvaluationPhase.INVARIANT);
 		beforeContract(target, void.class);
-		logger.info("Calling invariant for " + className + " in contract " + getSimplerName(contractClass) + ".");
+		LOGGER.info("Calling invariant for " + className + " in contract " + getSimplerName(contractClass) + ".");
 		return ContractCache.getContractFromCache(target, contractClass, callingClass);
 	}
 
@@ -125,20 +125,20 @@ public class Evaluator {
 		evaluationPhase.set(EvaluationPhase.AFTER);
 		beforeContract(target, returnType);
 		returnValue.set(actualReturnValue);
-		logger.info("Calling post-condition for " + methodName + " in contract " + getSimplerName(contractClass) + ".");
+		LOGGER.info("Calling post-condition for " + methodName + " in contract " + getSimplerName(contractClass) + ".");
 		return ContractCache.getContractFromCache(target, contractClass, callingClass);
 	}
 
 	public static Object getInitializationCall(Object target, String methodName, Class<?> contractClass,
 			Class<?> callingClass) throws InstantiationException, IllegalAccessException {
 		beforeContract(target, null);
-		logger.info("Calling initializer for " + methodName + " in contract " + getSimplerName(contractClass) + ".");
+		LOGGER.info("Calling initializer for " + methodName + " in contract " + getSimplerName(contractClass) + ".");
 		return ContractCache.getContractFromCache(target, contractClass, callingClass);
 	}
 
 	public static void afterContract() {
-		if (logger.isTraceEnabled()) {
-			logger.trace("afterContract");
+		if (LOGGER.isTraceEnabled()) {
+			LOGGER.trace("afterContract");
 		}
 		contractReturnType.set(null);
 		currentTarget.set(null);
@@ -149,8 +149,8 @@ public class Evaluator {
 
 	public static void afterContractMethod() {
 		if (evaluationPhase.get() == EvaluationPhase.NONE) {
-			if (logger.isTraceEnabled()) {
-				logger.trace("afterContractMethod");
+			if (LOGGER.isTraceEnabled()) {
+				LOGGER.trace("afterContractMethod");
 			}
 			returnValue.set(null);
 			exceptionValue.set(null);

@@ -25,7 +25,7 @@ import de.vksi.c4j.internal.types.ListOrderedSet;
 
 public class AffectedBehaviorLocator {
 	private InvolvedTypeInspector involvedTypeInspector = new InvolvedTypeInspector();
-	private Logger logger = Logger.getLogger(getClass());
+	private static final Logger LOGGER = Logger.getLogger(AffectedBehaviorLocator.class);
 
 	public CtMethod getContractMethod(ContractInfo contract, CtMethod affectedMethod) throws NotFoundException {
 		return getDeclaredMethod(contract.getContractClass(), affectedMethod.getName(), affectedMethod
@@ -61,7 +61,7 @@ public class AffectedBehaviorLocator {
 		CtClass currentClass = affectedClass;
 		CtMethod affectedMethod = getAffectedMethodFromExtendedClasses(contractBehavior, currentClass);
 		if (affectedMethod == null) {
-			logger.warn("could not find a matching method in affected class " + affectedClass.getName()
+			LOGGER.warn("could not find a matching method in affected class " + affectedClass.getName()
 					+ " for method '" + contractBehavior.getName() + "' in contract class "
 					+ contractInfo.getContractClass().getName());
 			return null;
@@ -73,12 +73,12 @@ public class AffectedBehaviorLocator {
 			return null;
 		}
 		if (Modifier.isFinal(affectedMethod.getModifiers())) {
-			logger.warn("could not find method " + contractBehavior.getName() + " in affected class "
+			LOGGER.warn("could not find method " + contractBehavior.getName() + " in affected class "
 					+ affectedClass.getName() + " for contract class " + contractInfo.getContractClass().getName()
 					+ " and cannot insert a delegate, as the overridden method is final");
 			return null;
 		}
-		logger.warn("could not find method " + contractBehavior.getName() + " in affected class "
+		LOGGER.warn("could not find method " + contractBehavior.getName() + " in affected class "
 				+ affectedClass.getName() + " for contract class " + contractInfo.getContractClass().getName()
 				+ " - inserting an empty method");
 		affectedMethod = CtNewMethod.delegator(affectedMethod, affectedClass);
@@ -115,7 +115,7 @@ public class AffectedBehaviorLocator {
 		CtConstructor affectedConstructor = getDeclaredConstructor(affectedClass, getConstructorParameterTypes(
 				affectedClass, contractBehavior));
 		if (affectedConstructor == null) {
-			logger.warn("could not find a matching constructor in affected class " + affectedClass.getName()
+			LOGGER.warn("could not find a matching constructor in affected class " + affectedClass.getName()
 					+ " for constructor " + contractBehavior.getLongName());
 			return null;
 		}

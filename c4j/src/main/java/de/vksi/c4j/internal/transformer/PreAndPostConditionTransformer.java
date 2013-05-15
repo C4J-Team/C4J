@@ -13,6 +13,9 @@ import javassist.CtClass;
 import javassist.CtConstructor;
 import javassist.CtMethod;
 import javassist.NotFoundException;
+
+import org.apache.log4j.Logger;
+
 import de.vksi.c4j.internal.classfile.ClassFilePool;
 import de.vksi.c4j.internal.compiler.EmptyExp;
 import de.vksi.c4j.internal.compiler.IfExp;
@@ -24,11 +27,13 @@ import de.vksi.c4j.internal.compiler.TryExp;
 import de.vksi.c4j.internal.compiler.ValueExp;
 import de.vksi.c4j.internal.contracts.ContractMethod;
 import de.vksi.c4j.internal.runtime.ContractErrorHandler;
-import de.vksi.c4j.internal.runtime.Evaluator;
 import de.vksi.c4j.internal.runtime.ContractErrorHandler.ContractErrorSource;
+import de.vksi.c4j.internal.runtime.Evaluator;
 import de.vksi.c4j.internal.transformer.util.ObjectConverter;
 
 public abstract class PreAndPostConditionTransformer extends ConditionTransformer {
+	private static final Logger LOGGER = Logger.getLogger(PreAndPostConditionTransformer.class);
+
 	protected interface BeforeConditionCallProvider {
 		StaticCallExp conditionCall(CtBehavior affectedBehavior, CtBehavior contractBehavior, NestedExp targetReference)
 				throws NotFoundException;
@@ -122,8 +127,8 @@ public abstract class PreAndPostConditionTransformer extends ConditionTransforme
 
 	protected void insertPreAndPostCondition(List<ContractMethod> contractList, CtClass affectedClass,
 			CtBehavior affectedBehavior) throws NotFoundException, CannotCompileException {
-		if (logger.isTraceEnabled()) {
-			logger.trace("transforming behavior " + affectedBehavior.getLongName()
+		if (LOGGER.isTraceEnabled()) {
+			LOGGER.trace("transforming behavior " + affectedBehavior.getLongName()
 					+ " for pre- and post-conditions with " + contractList.size() + " contract-method calls");
 		}
 

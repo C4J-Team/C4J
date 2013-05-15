@@ -12,6 +12,9 @@ import javassist.CtMethod;
 import javassist.CtNewConstructor;
 import javassist.Modifier;
 import javassist.NotFoundException;
+
+import org.apache.log4j.Logger;
+
 import de.vksi.c4j.InitializeContract;
 import de.vksi.c4j.error.UsageError;
 import de.vksi.c4j.internal.classfile.BehaviorFilter;
@@ -20,6 +23,8 @@ import de.vksi.c4j.internal.contracts.ContractInfo;
 import de.vksi.c4j.internal.transformer.util.ContractClassMemberHelper;
 
 public class ContractBehaviorTransformer extends AbstractContractClassTransformer {
+	private static final Logger LOGGER = Logger.getLogger(ContractBehaviorTransformer.class);
+
 	@Override
 	public void transform(ContractInfo contractInfo, CtClass contractClass) throws Exception {
 		if (contractClass.equals(contractInfo.getContractClass())) {
@@ -46,8 +51,8 @@ public class ContractBehaviorTransformer extends AbstractContractClassTransforme
 	private void renameStaticInitializer(CtClass contractClass, CtClass targetClass) throws CannotCompileException,
 			NotFoundException {
 		if (contractClass.getClassInitializer() != null && targetClass.getClassInitializer() != null) {
-			contractClass.addMethod(contractClass.getClassInitializer().toMethod(ContractClassMemberHelper.CLASS_INITIALIZER_REPLACEMENT_NAME,
-					contractClass));
+			contractClass.addMethod(contractClass.getClassInitializer().toMethod(
+					ContractClassMemberHelper.CLASS_INITIALIZER_REPLACEMENT_NAME, contractClass));
 			contractClass.removeConstructor(contractClass.getClassInitializer());
 		}
 	}
@@ -66,7 +71,7 @@ public class ContractBehaviorTransformer extends AbstractContractClassTransforme
 	private void appendInitializeContractMethod(CtConstructor contractConstructor, CtMethod method)
 			throws NotFoundException, CannotCompileException {
 		if (method.getParameterTypes().length > 0) {
-			logger.warn("Ignoring @InitializeContract method " + method.getLongName() + " as it expects parameters.");
+			LOGGER.warn("Ignoring @InitializeContract method " + method.getLongName() + " as it expects parameters.");
 		} else {
 			NestedExp.THIS.appendCall(method.getName()).toStandalone().insertAfter(contractConstructor);
 		}
@@ -81,7 +86,8 @@ public class ContractBehaviorTransformer extends AbstractContractClassTransforme
 	private void replaceConstructors(CtClass contractClass) throws CannotCompileException, NotFoundException {
 		// getConstructors() excludes the static initializer
 		for (CtConstructor constructor : contractClass.getConstructors()) {
-			contractClass.addMethod(constructor.toMethod(ContractClassMemberHelper.CONSTRUCTOR_REPLACEMENT_NAME, contractClass));
+			contractClass.addMethod(constructor.toMethod(ContractClassMemberHelper.CONSTRUCTOR_REPLACEMENT_NAME,
+					contractClass));
 		}
 		if (contractClass.getSuperclass() != null) {
 			CtClass oldSuperclass = contractClass.getSuperclass();

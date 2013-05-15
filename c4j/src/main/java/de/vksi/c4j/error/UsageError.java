@@ -16,14 +16,14 @@ import de.vksi.c4j.internal.compiler.ValueExp;
 public class UsageError extends Error {
 	private static final long serialVersionUID = 2689387273644009418L;
 
-	private Logger logger = Logger.getLogger(UsageError.class);
+	private static final Logger LOGGER = Logger.getLogger(UsageError.class);
 
 	private String message;
 
 	public UsageError(String msg) {
 		super(msg);
 		this.message = msg;
-		logger.error(msg, this);
+		LOGGER.error(msg, this);
 	}
 
 	public void insertThrowExp(CtBehavior behavior) throws CannotCompileException {

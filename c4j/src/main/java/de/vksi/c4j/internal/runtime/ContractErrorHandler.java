@@ -16,7 +16,7 @@ public class ContractErrorHandler {
 	public static final StaticCall handlePreConditionSuccess = new StaticCall(ContractErrorHandler.class,
 			"handlePreConditionSuccess");
 
-	private static final Logger logger = Logger.getLogger(ContractErrorHandler.class);
+	private static final Logger LOGGER = Logger.getLogger(ContractErrorHandler.class);
 
 	private static ThreadLocal<PreConditionResult> preconditionResult = new ThreadLocal<PreConditionResult>() {
 		@Override
@@ -80,7 +80,7 @@ public class ContractErrorHandler {
 		ContractViolationAction contractViolationActions = XmlConfigurationManager.INSTANCE
 				.getContractViolationAction(affectedClass);
 		if (contractViolationActions.isLog().booleanValue()) {
-			logger.error("Contract Violation in " + source.getName() + ".", error);
+			LOGGER.error("Contract Violation in " + source.getName() + ".", error);
 		}
 		if (contractViolationActions.isThrowError().booleanValue()) {
 			throw error;

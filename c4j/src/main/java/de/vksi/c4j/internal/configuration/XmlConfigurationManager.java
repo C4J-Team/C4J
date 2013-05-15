@@ -29,7 +29,7 @@ public class XmlConfigurationManager {
 	private URL globalConfigurationPath;
 
 	private JaxbUnmarshaller jaxbUnmarshaller = new JaxbUnmarshaller();
-	private Logger logger = Logger.getLogger(XmlConfigurationManager.class);
+	private static final Logger LOGGER = Logger.getLogger(XmlConfigurationManager.class);
 	private final Set<LocalConfigurationCallback> localConfigurationCallbacks = new HashSet<LocalConfigurationCallback>();
 
 	private XmlConfigurationManager() {
@@ -37,7 +37,7 @@ public class XmlConfigurationManager {
 			initDefaultLocalConfiguration();
 			initDefaultGlobalConfiguration();
 		} catch (Exception e) {
-			logger.fatal("Exception when building default configurations.", e);
+			LOGGER.fatal("Exception when building default configurations.", e);
 		}
 	}
 
@@ -86,13 +86,13 @@ public class XmlConfigurationManager {
 	private void registerExistingGlobalConfig(URL xmlUrl) throws Exception {
 		if (globalConfigurationPath != null) {
 			if (!globalConfigurationPath.equals(xmlUrl))
-				logger.error("Discovered duplicate " + C4J_GLOBAL_XML + " on classpath - ignoring: " + xmlUrl);
+				LOGGER.error("Discovered duplicate " + C4J_GLOBAL_XML + " on classpath - ignoring: " + xmlUrl);
 			return;
 		}
 		globalConfiguration = new XmlGlobalConfiguration(jaxbUnmarshaller.unmarshal(xmlUrl.openStream(),
 				C4JGlobal.class));
 		globalConfigurationPath = xmlUrl;
-		logger.info("Loaded global configuration from " + xmlUrl + ".");
+		LOGGER.info("Loaded global configuration from " + xmlUrl + ".");
 	}
 
 	private void registerLocalConfigs(ClassLoader classLoader) throws Exception {
@@ -116,7 +116,7 @@ public class XmlConfigurationManager {
 		C4JLocal localConfig = jaxbUnmarshaller.unmarshal(xmlStream, C4JLocal.class);
 		addConfigurations(localConfig, xmlUrl, classLoader);
 		localConfigurationsPaths.add(xmlUrl);
-		logger.info("Loaded local configuration from " + xmlUrl + ".");
+		LOGGER.info("Loaded local configuration from " + xmlUrl + ".");
 	}
 
 	private void addConfigurations(C4JLocal localConfig, URL xmlUrl, ClassLoader classLoader) throws Exception {
@@ -133,7 +133,7 @@ public class XmlConfigurationManager {
 
 	private void addUniqueConfiguration(XmlLocalConfiguration config, URL xmlUrl, String rootPackage) {
 		if (rootPackageToConfiguration.containsKey(rootPackage)) {
-			logger.error("Configuration for root-package " + rootPackage
+			LOGGER.error("Configuration for root-package " + rootPackage
 					+ " is already defined, ignoring the configuration in " + xmlUrl);
 			return;
 		}

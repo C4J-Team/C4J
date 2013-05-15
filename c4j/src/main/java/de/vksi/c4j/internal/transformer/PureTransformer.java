@@ -13,6 +13,9 @@ import javassist.CtClass;
 import javassist.CtConstructor;
 import javassist.CtMethod;
 import javassist.NotFoundException;
+
+import org.apache.log4j.Logger;
+
 import de.vksi.c4j.Pure;
 import de.vksi.c4j.internal.classfile.ClassFilePool;
 import de.vksi.c4j.internal.configuration.XmlConfigurationManager;
@@ -22,6 +25,8 @@ import de.vksi.c4j.internal.transformer.editor.PureInspector;
 import de.vksi.c4j.internal.types.ListOrderedSet;
 
 public class PureTransformer extends AbstractAffectedClassTransformer {
+	private static final Logger LOGGER = Logger.getLogger(PureTransformer.class);
+
 	private PureInspector pureInspector = new PureInspector();
 
 	@Override
@@ -54,8 +59,8 @@ public class PureTransformer extends AbstractAffectedClassTransformer {
 		CtMethod pureOrigin = pureInspector.getPureOrigin(involvedClasses, contracts, method);
 		if (pureOrigin != null) {
 			addBehaviorAnnotation(method, ClassFilePool.INSTANCE.getClass(Pure.class));
-			if (logger.isDebugEnabled()) {
-				logger.debug("added @Pure from " + pureOrigin.getLongName() + " to " + method.getLongName());
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("added @Pure from " + pureOrigin.getLongName() + " to " + method.getLongName());
 			}
 		}
 	}
