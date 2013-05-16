@@ -65,13 +65,7 @@
                 <allow>
                     <from>
                         <include pattern="c4j.main"/>
-                        <include pattern="internal"/>
-                        <include pattern="internal.classfile"/>
-                        <include pattern="internal.configuration"/>
-                        <include pattern="internal.contracts"/>
-                        <include pattern="internal.compiler"/>
-                        <include pattern="internal.runtime"/>
-                        <include pattern="internal.transformer"/>
+                        <include pattern="all-internal"/>
                     </from>
                 </allow>
             </deny>
