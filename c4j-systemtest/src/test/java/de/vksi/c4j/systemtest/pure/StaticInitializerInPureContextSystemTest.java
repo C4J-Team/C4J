@@ -25,7 +25,7 @@ public class StaticInitializerInPureContextSystemTest {
 		new DummyClass().methodCausingStaticInitializerCallInitializingExternalFields();
 	}
 
-	public static class DummyClass {
+	private static class DummyClass {
 		@Pure
 		public void methodReferencingEnum() {
 			doNothingWithEnumValue(SampleEnum.ENUM_VALUE);
@@ -50,7 +50,7 @@ public class StaticInitializerInPureContextSystemTest {
 		}
 	}
 
-	public static class StaticClassInitializingExternalFields {
+	private static class StaticClassInitializingExternalFields {
 		public static int ownValue;
 
 		static {
@@ -59,7 +59,7 @@ public class StaticInitializerInPureContextSystemTest {
 		}
 	}
 
-	public static class StaticClass {
+	private static class StaticClass {
 		public static int value;
 
 		static {

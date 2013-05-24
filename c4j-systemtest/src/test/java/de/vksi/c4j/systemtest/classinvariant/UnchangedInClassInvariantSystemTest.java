@@ -41,7 +41,7 @@ public class UnchangedInClassInvariantSystemTest {
 	}
 
 	@ContractReference(ContractClass.class)
-	public static class TargetClass {
+	private static class TargetClass {
 		protected int primitiveValue;
 		protected MutableString referenceValue;
 
@@ -69,7 +69,7 @@ public class UnchangedInClassInvariantSystemTest {
 		}
 	}
 
-	public static class ContractClass {
+	private static class ContractClass {
 		@Target
 		private TargetClass target;
 

@@ -26,7 +26,7 @@ public class OldInClassInvariantSystemTest {
 	}
 
 	@ContractReference(ContractClass.class)
-	public static class TargetClass {
+	private static class TargetClass {
 		protected int value;
 
 		public void incrementValue() {
@@ -38,7 +38,7 @@ public class OldInClassInvariantSystemTest {
 		}
 	}
 
-	public static class ContractClass {
+	private static class ContractClass {
 		@Target
 		private TargetClass target;
 

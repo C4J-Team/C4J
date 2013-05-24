@@ -169,7 +169,7 @@ public abstract class PreAndPostConditionTransformer extends ConditionTransforme
 		return tryPreCondition;
 	}
 
-	private void insertInitializersForConstructor(List<ContractMethod> contractList, CtClass affectedClass,
+	protected void insertInitializersForConstructor(List<ContractMethod> contractList, CtClass affectedClass,
 			CtBehavior affectedBehavior) throws NotFoundException, CannotCompileException {
 		if (affectedBehavior instanceof CtConstructor) {
 			List<CtMethod> initializers = getInitializers(contractList);

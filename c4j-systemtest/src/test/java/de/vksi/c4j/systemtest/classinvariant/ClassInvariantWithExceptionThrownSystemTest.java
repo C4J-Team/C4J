@@ -46,7 +46,7 @@ public class ClassInvariantWithExceptionThrownSystemTest {
 	}
 
 	@ContractReference(SampleClassContract.class)
-	public static class SampleClass {
+	private static class SampleClass {
 		public void methodThrowingException(boolean throwException) throws IOException {
 			if (throwException) {
 				throw new IOException();
@@ -54,7 +54,7 @@ public class ClassInvariantWithExceptionThrownSystemTest {
 		}
 	}
 
-	public static class SampleClassContract extends SampleClass {
+	private static class SampleClassContract extends SampleClass {
 		@ClassInvariant
 		public void invariant() {
 			invariantRan = true;

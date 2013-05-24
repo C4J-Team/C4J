@@ -15,7 +15,7 @@ public class ContractForNativeOrAbstractMethodSystemTest {
 		new TargetClass();
 	}
 
-	public static class TargetClass implements ObjectSpec {
+	private static class TargetClass implements ObjectSpec {
 	}
 
 	@ContractReference(ObjectSpecContract.class)
@@ -25,7 +25,7 @@ public class ContractForNativeOrAbstractMethodSystemTest {
 		public int hashCode();
 	}
 
-	public static class ObjectSpecContract implements ObjectSpec {
+	private static class ObjectSpecContract implements ObjectSpec {
 		@Override
 		public int hashCode() {
 			return 0;
@@ -37,7 +37,7 @@ public class ContractForNativeOrAbstractMethodSystemTest {
 		new TargetClassExtendingAbstract();
 	}
 
-	public static class TargetClassExtendingAbstract extends AbstractClassExtendingAbstract {
+	private static class TargetClassExtendingAbstract extends AbstractClassExtendingAbstract {
 		@Override
 		public void abstractMethod() {
 		}
@@ -47,7 +47,7 @@ public class ContractForNativeOrAbstractMethodSystemTest {
 	public static abstract class AbstractClassExtendingAbstract extends AbstractClass {
 	}
 
-	public static class AbstractClassExtendingAbstractContract extends AbstractClassExtendingAbstract {
+	private static class AbstractClassExtendingAbstractContract extends AbstractClassExtendingAbstract {
 		@Override
 		public void abstractMethod() {
 		}
@@ -58,7 +58,7 @@ public class ContractForNativeOrAbstractMethodSystemTest {
 		public abstract void abstractMethod();
 	}
 
-	public static class AbstractClassContract extends AbstractClass {
+	private static class AbstractClassContract extends AbstractClass {
 		@Override
 		public void abstractMethod() {
 		}

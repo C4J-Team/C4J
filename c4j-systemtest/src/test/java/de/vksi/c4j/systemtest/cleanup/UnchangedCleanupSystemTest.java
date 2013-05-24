@@ -35,7 +35,7 @@ public class UnchangedCleanupSystemTest {
 	}
 
 	@ContractReference(ContractClass.class)
-	public static class TargetClass {
+	private static class TargetClass {
 		public void method(int arg) {
 
 		}
@@ -46,7 +46,7 @@ public class UnchangedCleanupSystemTest {
 		}
 	}
 
-	public static class ContractClass extends TargetClass {
+	private static class ContractClass extends TargetClass {
 		@Target
 		private TargetClass target;
 

@@ -36,7 +36,7 @@ public class OldInSeparateMethodSystemTest {
 	}
 
 	@ContractReference(DummyContract.class)
-	public static class DummyClass {
+	private static class DummyClass {
 		protected int value;
 
 		public void setValue(int value) {
@@ -57,7 +57,7 @@ public class OldInSeparateMethodSystemTest {
 		}
 	}
 
-	public static class DummyContract extends DummyClass {
+	private static class DummyContract extends DummyClass {
 		@Target
 		private DummyClass target;
 

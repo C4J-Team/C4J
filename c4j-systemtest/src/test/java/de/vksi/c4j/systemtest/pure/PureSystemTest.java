@@ -53,7 +53,7 @@ public class PureSystemTest {
 		target.unpureMethodCallingUnpureMethodInOtherClass(new OtherClass());
 	}
 
-	public static class TargetClass {
+	private static class TargetClass {
 		private String field = "sample";
 
 		@Pure
@@ -98,7 +98,7 @@ public class PureSystemTest {
 		}
 	}
 
-	public static class OtherClass {
+	private static class OtherClass {
 		@Pure
 		public void pureMethodInOtherClass() {
 		}

@@ -51,7 +51,7 @@ public class ExceptionHandlingSystemTest {
 	}
 
 	@ContractReference(ContractClass.class)
-	public static class TargetClass {
+	private static class TargetClass {
 		public int value;
 
 		public int method(int arg) {
@@ -69,7 +69,7 @@ public class ExceptionHandlingSystemTest {
 		}
 	}
 
-	public static class ContractClass extends TargetClass {
+	private static class ContractClass extends TargetClass {
 		@Target
 		private TargetClass target;
 

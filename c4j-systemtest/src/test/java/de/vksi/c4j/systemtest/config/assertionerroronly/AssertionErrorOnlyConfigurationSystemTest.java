@@ -23,12 +23,12 @@ public class AssertionErrorOnlyConfigurationSystemTest {
 	}
 
 	@ContractReference(ContractClass.class)
-	public static class TargetClass {
+	private static class TargetClass {
 		public void method(int value) {
 		}
 	}
 
-	public static class ContractClass extends TargetClass {
+	private static class ContractClass extends TargetClass {
 		@Override
 		public void method(int value) {
 			if (preCondition()) {

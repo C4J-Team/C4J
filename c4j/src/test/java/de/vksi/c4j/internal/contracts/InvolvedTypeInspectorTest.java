@@ -8,8 +8,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.vksi.c4j.ContractReference;
-import de.vksi.c4j.internal.RootTransformerTest.SuperClass;
-import de.vksi.c4j.internal.contracts.InvolvedTypeInspector;
 
 public class InvolvedTypeInspectorTest {
 
@@ -27,20 +25,23 @@ public class InvolvedTypeInspectorTest {
 		CtClass noSuperClass = pool.get(NoSuperClass.class.getName());
 		assertEquals(2, inspector.inspect(noSuperClass).size());
 		CtClass subClass = pool.get(SubClass.class.getName());
-		assertEquals(6, inspector.inspect(subClass).size());
+		assertEquals(3, inspector.inspect(subClass).size());
 	}
 
 	@ContractReference(NoSuperClassContract.class)
-	public static class NoSuperClass {
+	private static class NoSuperClass {
 	}
 
-	public static class NoSuperClassContract {
+	private static class NoSuperClassContract {
+	}
+
+	private static class SuperClass {
 	}
 
 	@ContractReference(SubClassContract.class)
-	public static class SubClass extends SuperClass {
+	private static class SubClass extends SuperClass {
 	}
 
-	public static class SubClassContract extends SubClass {
+	private static class SubClassContract extends SubClass {
 	}
 }

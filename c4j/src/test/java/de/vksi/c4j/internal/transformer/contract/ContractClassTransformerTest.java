@@ -29,9 +29,9 @@ public class ContractClassTransformerTest {
 		}
 	}
 
-	public static class TargetClass {
+	private static class TargetClass {
 	}
 
-	public static class ContractClass {
+	private static class ContractClass {
 	}
 }

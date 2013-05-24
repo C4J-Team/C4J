@@ -32,7 +32,7 @@ public class ContractMethodCallingOtherContractMethodSystemTest {
 	}
 
 	@ContractReference(ContractClassCallingOtherTargetMethod.class)
-	public static class TargetClassCallingOtherTargetMethod {
+	private static class TargetClassCallingOtherTargetMethod {
 		public void method() {
 		}
 
@@ -41,7 +41,7 @@ public class ContractMethodCallingOtherContractMethodSystemTest {
 		}
 	}
 
-	public static class ContractClassCallingOtherTargetMethod extends TargetClassCallingOtherTargetMethod {
+	private static class ContractClassCallingOtherTargetMethod extends TargetClassCallingOtherTargetMethod {
 		@Override
 		public void method() {
 			if (preCondition()) {
@@ -51,12 +51,12 @@ public class ContractMethodCallingOtherContractMethodSystemTest {
 	}
 
 	@ContractReference(ContractClassCallingOtherContractMethod.class)
-	public static class TargetClassCallingOtherContractMethod {
+	private static class TargetClassCallingOtherContractMethod {
 		public void method() {
 		}
 	}
 
-	public static class ContractClassCallingOtherContractMethod extends TargetClassCallingOtherContractMethod {
+	private static class ContractClassCallingOtherContractMethod extends TargetClassCallingOtherContractMethod {
 		@Override
 		public void method() {
 			if (preCondition()) {
@@ -70,7 +70,7 @@ public class ContractMethodCallingOtherContractMethodSystemTest {
 	}
 
 	@ContractReference(ContractClassCallingOverriddenContractMethod.class)
-	public static class TargetClassCallingOverriddenContractMethod {
+	private static class TargetClassCallingOverriddenContractMethod {
 		public void method() {
 		}
 
@@ -79,7 +79,7 @@ public class ContractMethodCallingOtherContractMethodSystemTest {
 		}
 	}
 
-	public static class ContractClassCallingOverriddenContractMethod extends TargetClassCallingOverriddenContractMethod {
+	private static class ContractClassCallingOverriddenContractMethod extends TargetClassCallingOverriddenContractMethod {
 		@Override
 		public void method() {
 			if (preCondition()) {

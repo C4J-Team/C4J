@@ -19,14 +19,14 @@ public class StaticMemberAccessSystemTest {
 	}
 
 	@ContractReference(ContractClass.class)
-	public static class TargetClass {
+	private static class TargetClass {
 		public static final Boolean STATIC_VAR = Boolean.TRUE;
 
 		public void method() {
 		}
 	}
 
-	public static class ContractClass extends TargetClass {
+	private static class ContractClass extends TargetClass {
 		@Override
 		public void method() {
 			if (preCondition()) {
@@ -41,14 +41,14 @@ public class StaticMemberAccessSystemTest {
 	}
 
 	@ContractReference(ContractClassOverridden.class)
-	public static class TargetClassOverridden {
+	private static class TargetClassOverridden {
 		public static final Boolean STATIC_VAR = Boolean.TRUE;
 
 		public void method() {
 		}
 	}
 
-	public static class ContractClassOverridden extends TargetClassOverridden {
+	private static class ContractClassOverridden extends TargetClassOverridden {
 		private static final Boolean STATIC_VAR = Boolean.FALSE;
 
 		@Override
@@ -65,7 +65,7 @@ public class StaticMemberAccessSystemTest {
 	}
 
 	@ContractReference(ContractClassMethod.class)
-	public static class TargetClassMethod {
+	private static class TargetClassMethod {
 		public void method() {
 		}
 
@@ -75,7 +75,7 @@ public class StaticMemberAccessSystemTest {
 		}
 	}
 
-	public static class ContractClassMethod extends TargetClassMethod {
+	private static class ContractClassMethod extends TargetClassMethod {
 		@Override
 		public void method() {
 			if (preCondition()) {

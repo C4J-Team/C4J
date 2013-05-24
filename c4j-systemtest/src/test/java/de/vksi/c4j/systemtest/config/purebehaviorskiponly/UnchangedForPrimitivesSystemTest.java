@@ -39,7 +39,7 @@ public class UnchangedForPrimitivesSystemTest {
 	}
 
 	@ContractReference(ContractClass.class)
-	public static class TargetClass {
+	private static class TargetClass {
 		protected int hour;
 		protected int minute;
 		private int minuteForGetter;
@@ -66,7 +66,7 @@ public class UnchangedForPrimitivesSystemTest {
 		}
 	}
 
-	public static class ContractClass extends TargetClass {
+	private static class ContractClass extends TargetClass {
 		@Target
 		private TargetClass target;
 

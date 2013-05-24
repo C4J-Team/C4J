@@ -16,12 +16,12 @@ public class StaticContractMethodCallingUnpureMethodSystemTest {
 	}
 
 	@ContractReference(ContractClass.class)
-	public static class TargetClass {
+	private static class TargetClass {
 		public void method() {
 		}
 	}
 
-	public static class ContractClass extends TargetClass {
+	private static class ContractClass extends TargetClass {
 		protected TargetClass target;
 
 		static {
@@ -30,7 +30,7 @@ public class StaticContractMethodCallingUnpureMethodSystemTest {
 
 	}
 
-	public static class OtherClass {
+	private static class OtherClass {
 
 		public void unpureMethod() {
 		}

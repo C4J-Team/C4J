@@ -36,7 +36,7 @@ public class MultipleInheritanceSystemTest {
 		new TargetClass().method(1);
 	}
 
-	public static class TargetClass implements FirstInterface, SecondInterface {
+	private static class TargetClass implements FirstInterface, SecondInterface {
 		@Override
 		public void method(int arg) {
 		}
@@ -47,7 +47,7 @@ public class MultipleInheritanceSystemTest {
 		void method(int arg);
 	}
 
-	public static class FirstContract implements FirstInterface {
+	private static class FirstContract implements FirstInterface {
 		@Override
 		public void method(int arg) {
 			if (preCondition()) {
@@ -61,7 +61,7 @@ public class MultipleInheritanceSystemTest {
 		void method(int arg);
 	}
 
-	public static class SecondContract implements SecondInterface {
+	private static class SecondContract implements SecondInterface {
 		@Override
 		public void method(int arg) {
 			if (preCondition()) {

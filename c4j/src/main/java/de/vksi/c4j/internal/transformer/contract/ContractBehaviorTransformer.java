@@ -1,5 +1,6 @@
 package de.vksi.c4j.internal.transformer.contract;
 
+import static de.vksi.c4j.internal.classfile.ClassAnalyzer.constructorHasAdditionalParameter;
 import static de.vksi.c4j.internal.classfile.ClassAnalyzer.getDeclaredMethods;
 import static de.vksi.c4j.internal.classfile.ClassAnalyzer.getField;
 import static de.vksi.c4j.internal.classfile.ClassAnalyzer.getMethod;
@@ -12,68 +13,50 @@ import javassist.CtMethod;
 import javassist.CtNewConstructor;
 import javassist.Modifier;
 import javassist.NotFoundException;
-
-import org.apache.log4j.Logger;
-
-import de.vksi.c4j.InitializeContract;
+import javassist.expr.ConstructorCall;
+import javassist.expr.ExprEditor;
 import de.vksi.c4j.error.UsageError;
 import de.vksi.c4j.internal.classfile.BehaviorFilter;
-import de.vksi.c4j.internal.compiler.NestedExp;
 import de.vksi.c4j.internal.contracts.ContractInfo;
 import de.vksi.c4j.internal.transformer.util.ContractClassMemberHelper;
 
 public class ContractBehaviorTransformer extends AbstractContractClassTransformer {
-	private static final Logger LOGGER = Logger.getLogger(ContractBehaviorTransformer.class);
-
 	@Override
 	public void transform(ContractInfo contractInfo, CtClass contractClass) throws Exception {
 		if (contractClass.equals(contractInfo.getContractClass())) {
 			if (!(contractInfo.getTargetClass().isInterface())) {
-				replaceConstructors(contractClass);
-				contractClass.addConstructor(getContractConstructor(contractClass));
+				checkConstructors(contractInfo, contractClass);
+				removeSuperclass(contractClass);
+				removeConstructorSuperCall(contractClass);
 				checkMatchingStaticMethods(contractInfo);
 			}
+			makeClassAccessible(contractClass);
 			makeAllBehaviorsAccessible(contractClass);
-			renameStaticInitializer(contractClass, contractInfo.getTargetClass());
 		}
+	}
+
+	private void removeConstructorSuperCall(CtClass contractClass) throws CannotCompileException, NotFoundException {
+		CtConstructor constructor = contractClass.getDeclaredConstructors()[0];
+		constructor.instrument(new ExprEditor() {
+			@Override
+			public void edit(ConstructorCall constructorCall) throws CannotCompileException {
+				constructorCall.replace("super();");
+			}
+		});
+	}
+
+	private void makeClassAccessible(CtClass contractClass) {
+		contractClass.setModifiers(Modifier.setPublic(contractClass.getModifiers()));
 	}
 
 	private void checkMatchingStaticMethods(ContractInfo contractInfo) {
 		for (CtMethod contractMethod : getDeclaredMethods(contractInfo.getContractClass(), BehaviorFilter.STATIC,
 				BehaviorFilter.VISIBLE)) {
-			if (getMethod(contractInfo.getTargetClass(), contractMethod.getName(), contractMethod.getSignature()) == null) {
+			if (getMethod(contractInfo.getTargetClass(), contractMethod.getName(), contractMethod.getSignature()) == null
+					&& !ContractClassMemberHelper.isContractClassInitializer(contractMethod)) {
 				contractInfo.addError(new UsageError("Couldn't find matching target method for static contract method "
 						+ contractMethod.getLongName() + "."));
 			}
-		}
-	}
-
-	private void renameStaticInitializer(CtClass contractClass, CtClass targetClass) throws CannotCompileException,
-			NotFoundException {
-		if (contractClass.getClassInitializer() != null && targetClass.getClassInitializer() != null) {
-			contractClass.addMethod(contractClass.getClassInitializer().toMethod(
-					ContractClassMemberHelper.CLASS_INITIALIZER_REPLACEMENT_NAME, contractClass));
-			contractClass.removeConstructor(contractClass.getClassInitializer());
-		}
-	}
-
-	private CtConstructor getContractConstructor(CtClass contractClass) throws CannotCompileException,
-			NotFoundException {
-		CtConstructor contractConstructor = CtNewConstructor.defaultConstructor(contractClass);
-		for (CtMethod method : contractClass.getDeclaredMethods()) {
-			if (method.hasAnnotation(InitializeContract.class)) {
-				appendInitializeContractMethod(contractConstructor, method);
-			}
-		}
-		return contractConstructor;
-	}
-
-	private void appendInitializeContractMethod(CtConstructor contractConstructor, CtMethod method)
-			throws NotFoundException, CannotCompileException {
-		if (method.getParameterTypes().length > 0) {
-			LOGGER.warn("Ignoring @InitializeContract method " + method.getLongName() + " as it expects parameters.");
-		} else {
-			NestedExp.THIS.appendCall(method.getName()).toStandalone().insertAfter(contractConstructor);
 		}
 	}
 
@@ -83,19 +66,44 @@ public class ContractBehaviorTransformer extends AbstractContractClassTransforme
 		}
 	}
 
-	private void replaceConstructors(CtClass contractClass) throws CannotCompileException, NotFoundException {
-		// getConstructors() excludes the static initializer
-		for (CtConstructor constructor : contractClass.getConstructors()) {
-			contractClass.addMethod(constructor.toMethod(ContractClassMemberHelper.CONSTRUCTOR_REPLACEMENT_NAME,
-					contractClass));
+	private void checkConstructors(ContractInfo contractInfo, CtClass contractClass) throws CannotCompileException,
+			NotFoundException {
+		if (constructorHasAdditionalParameter(contractClass)) {
+			contractInfo.addError(new UsageError("Contract class " + contractClass.getName()
+					+ " cannot be a nested, non-static class."));
+			addNoArgConstructorToRaiseExceptionInStaticInitializer(contractClass);
+			return;
 		}
+		if (!contractHasNoArgConstructor(contractClass)) {
+			contractInfo.addError(new UsageError("Contract class " + contractClass.getName()
+					+ " must have a non-arg constructor."));
+			addNoArgConstructorToRaiseExceptionInStaticInitializer(contractClass);
+		}
+		if (contractClass.getDeclaredConstructors().length > 1) {
+			contractInfo.addError(new UsageError("Contract class " + contractClass.getName()
+					+ " may only have a single non-arg constructor."));
+		}
+	}
+
+	private void addNoArgConstructorToRaiseExceptionInStaticInitializer(CtClass contractClass)
+			throws CannotCompileException {
+		contractClass.addConstructor(CtNewConstructor.defaultConstructor(contractClass));
+	}
+
+	private boolean contractHasNoArgConstructor(CtClass contractClass) throws NotFoundException {
+		for (CtConstructor constructor : contractClass.getDeclaredConstructors()) {
+			if (constructor.getParameterTypes().length == 0) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private void removeSuperclass(CtClass contractClass) throws NotFoundException, CannotCompileException {
 		if (contractClass.getSuperclass() != null) {
 			CtClass oldSuperclass = contractClass.getSuperclass();
 			contractClass.getClassFile().setSuperclass(null);
 			addFieldsFromSuperclass(contractClass, oldSuperclass);
-		}
-		for (CtConstructor constructor : contractClass.getConstructors()) {
-			contractClass.removeConstructor(constructor);
 		}
 	}
 

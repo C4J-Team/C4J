@@ -47,7 +47,7 @@ public class ArrayExpTest {
 				.getCode());
 	}
 
-	public static class DummyClass {
+	private static class DummyClass {
 		public void dummyMethod(int arg1, String arg2) {
 		}
 	}

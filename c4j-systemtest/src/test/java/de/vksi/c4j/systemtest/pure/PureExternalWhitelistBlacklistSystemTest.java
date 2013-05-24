@@ -60,7 +60,7 @@ public class PureExternalWhitelistBlacklistSystemTest {
 		target.pureMethodCreatingAndCallingBlacklistExternal();
 	}
 
-	public static class TargetClass {
+	private static class TargetClass {
 		private ExternalClass external = new ExternalClass();
 
 		@Pure

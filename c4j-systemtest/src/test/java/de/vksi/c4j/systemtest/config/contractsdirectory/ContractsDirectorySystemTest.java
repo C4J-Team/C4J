@@ -17,13 +17,13 @@ public class ContractsDirectorySystemTest {
 		new TargetClass().method(0);
 	}
 
-	public static class TargetClass {
+	private static class TargetClass {
 		public void method(int arg) {
 		}
 	}
 
 	@Contract
-	public static class ContractClass extends TargetClass {
+	private static class ContractClass extends TargetClass {
 		@Override
 		public void method(int arg) {
 			if (preCondition()) {

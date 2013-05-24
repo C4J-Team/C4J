@@ -18,12 +18,12 @@ public class ContractIsInitializedSystemTest {
 	}
 
 	@ContractReference(ContractClass.class)
-	public static class TargetClass {
+	private static class TargetClass {
 		public void method() {
 		}
 	}
 
-	public static class ContractClass extends TargetClass {
+	private static class ContractClass extends TargetClass {
 		private String value = "sampleValue";
 
 		@Override
@@ -40,12 +40,12 @@ public class ContractIsInitializedSystemTest {
 	}
 
 	@ContractReference(ContractClass1.class)
-	public static class TargetClass1 extends TargetClass2 {
+	private static class TargetClass1 extends TargetClass2 {
 		public void method() {
 		}
 	}
 
-	public static class ContractClass1 extends TargetClass1 {
+	private static class ContractClass1 extends TargetClass1 {
 		private String value = "sampleValue";
 
 		@Override
@@ -57,10 +57,10 @@ public class ContractIsInitializedSystemTest {
 	}
 
 	@ContractReference(ContractClass2.class)
-	public static class TargetClass2 {
+	private static class TargetClass2 {
 	}
 
-	public static class ContractClass2 extends TargetClass2 {
+	private static class ContractClass2 extends TargetClass2 {
 		public ContractClass2() {
 			if (preCondition()) {
 			}
@@ -73,12 +73,12 @@ public class ContractIsInitializedSystemTest {
 	}
 
 	@ContractReference(StaticContractClass.class)
-	public static class StaticTargetClass {
+	private static class StaticTargetClass {
 		public void method() {
 		}
 	}
 
-	public static class StaticContractClass extends StaticTargetClass {
+	private static class StaticContractClass extends StaticTargetClass {
 		private static String value = "sampleValue";
 
 		@Override

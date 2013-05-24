@@ -55,7 +55,7 @@ public class PureTargetSystemTest {
 	}
 
 	@ContractReference(ContractClass.class)
-	public static class TargetClass {
+	private static class TargetClass {
 		private String field = "sample";
 
 		public void pureMethod() {
@@ -92,7 +92,7 @@ public class PureTargetSystemTest {
 		}
 	}
 
-	public static class ContractClass extends TargetClass {
+	private static class ContractClass extends TargetClass {
 		@Override
 		@PureTarget
 		public void pureMethod() {
@@ -136,7 +136,7 @@ public class PureTargetSystemTest {
 	}
 
 	@ContractReference(OtherClassContract.class)
-	public static class OtherClass {
+	private static class OtherClass {
 		public void pureMethodInOtherClass() {
 		}
 
@@ -144,7 +144,7 @@ public class PureTargetSystemTest {
 		}
 	}
 
-	public static class OtherClassContract extends OtherClass {
+	private static class OtherClassContract extends OtherClass {
 		@Override
 		@PureTarget
 		public void pureMethodInOtherClass() {

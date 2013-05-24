@@ -38,7 +38,7 @@ public class PurePassingParametersToUnpureMethodsSystemTest {
 		assertTrue(PureEvaluator.isUnpureCacheEmpty());
 	}
 
-	public static class TargetClass {
+	private static class TargetClass {
 		private Position position = new Position();
 		private static Position positionStatic = new Position();
 
@@ -70,7 +70,7 @@ public class PurePassingParametersToUnpureMethodsSystemTest {
 		}
 	}
 
-	public static class Position {
+	private static class Position {
 		private int value;
 
 		public int getValue() {
@@ -82,7 +82,7 @@ public class PurePassingParametersToUnpureMethodsSystemTest {
 		}
 	}
 
-	public static class PositionChanger {
+	private static class PositionChanger {
 		private Position position;
 
 		public PositionChanger(Position position) {

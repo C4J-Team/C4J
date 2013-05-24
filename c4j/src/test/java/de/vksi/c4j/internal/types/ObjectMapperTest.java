@@ -77,12 +77,11 @@ public class ObjectMapperTest {
 	public void testCleanup() throws Exception {
 		DummyObject dummy = new DummyObject(3, "abc");
 		ReferenceQueue<DummyObject> referenceQueue = new ReferenceQueue<DummyObject>();
-		@SuppressWarnings("unused")
 		WeakReference<DummyObject> dummyReference = new WeakReference<DummyObject>(dummy, referenceQueue);
 		DummyObject otherDummy = new DummyObject(4, "def");
 		mapper.put(dummy, "test", otherDummy);
 		dummy = null;
-		TestUtil.forceGarbageCollection();
+		TestUtil.waitForGarbageCollection(dummyReference);
 		// Second referenceQueue is necessary, as there is a slight delay before the released WeakReference can
 		// be pulled from the queue. This delay is simulated with an own referenceQueue in the test.
 		referenceQueue.remove();
@@ -94,12 +93,11 @@ public class ObjectMapperTest {
 	public void testCleanupBeforePut() throws Exception {
 		DummyObject dummy = new DummyObject(3, "abc");
 		ReferenceQueue<DummyObject> referenceQueue = new ReferenceQueue<DummyObject>();
-		@SuppressWarnings("unused")
 		WeakReference<DummyObject> dummyReference = new WeakReference<DummyObject>(dummy, referenceQueue);
 		DummyObject otherDummy = new DummyObject(4, "def");
 		mapper.put(dummy, "test", otherDummy);
 		dummy = null;
-		TestUtil.forceGarbageCollection();
+		TestUtil.waitForGarbageCollection(dummyReference);
 		referenceQueue.remove();
 		mapper.put(otherDummy, "test2", otherDummy);
 		assertEquals(1, mapper.size());

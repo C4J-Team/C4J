@@ -23,7 +23,7 @@ public class SeparateContractInstantiationSystemTest {
 		public String interfaceMethod();
 	}
 
-	public static class InterfaceContract implements Interface {
+	private static class InterfaceContract implements Interface {
 		private String fixedInstance;
 
 		@Override
@@ -39,7 +39,7 @@ public class SeparateContractInstantiationSystemTest {
 		}
 	}
 
-	public static class SubClass extends SuperClass {
+	private static class SubClass extends SuperClass {
 		@Override
 		public String interfaceMethod() {
 			super.interfaceMethod();
@@ -47,7 +47,7 @@ public class SeparateContractInstantiationSystemTest {
 		}
 	}
 
-	public static class SuperClass implements Interface {
+	private static class SuperClass implements Interface {
 		@Override
 		public String interfaceMethod() {
 			return "SuperClass";

@@ -23,7 +23,7 @@ public class AllowPureAccessSystemTest {
 	}
 
 	@ContractReference(TargetClassContract.class)
-	public static class TargetClass {
+	private static class TargetClass {
 		@AllowPureAccess
 		private int value;
 
@@ -40,7 +40,7 @@ public class AllowPureAccessSystemTest {
 		}
 	}
 
-	public static class TargetClassContract extends TargetClass {
+	private static class TargetClassContract extends TargetClass {
 		@Override
 		public void incrementValueInContract() {
 			TargetClass.staticValue++;

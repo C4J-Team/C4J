@@ -29,7 +29,7 @@ public class ContractForInheritedStaticMethodSystemTest {
 		TargetClass.main("test1", "test2");
 	}
 
-	public static class SuperClass {
+	private static class SuperClass {
 		protected static int numCalls = 0;
 
 		public static void main(String... args) {
@@ -42,10 +42,10 @@ public class ContractForInheritedStaticMethodSystemTest {
 	}
 
 	@ContractReference(ContractClass.class)
-	public static class TargetClass extends SuperClass {
+	private static class TargetClass extends SuperClass {
 	}
 
-	public static class ContractClass extends TargetClass {
+	private static class ContractClass extends TargetClass {
 		public static void main(String... args) {
 			if (preCondition()) {
 				assert args.length > 0;

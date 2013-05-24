@@ -44,7 +44,7 @@ public class PureStaticExternalWhitelistBlacklistSystemTest {
 		target.pureMethodCallingBlacklistExternal();
 	}
 
-	public static class TargetClass {
+	private static class TargetClass {
 		@Pure
 		public void pureMethodCallingUndefinedExternal() {
 			ExternalClass.staticMethodUndefinedInConfig();

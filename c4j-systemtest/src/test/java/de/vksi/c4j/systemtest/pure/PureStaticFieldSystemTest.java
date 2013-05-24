@@ -35,7 +35,7 @@ public class PureStaticFieldSystemTest {
 		target.pureMethodWritingStaticFieldAllowed();
 	}
 
-	public static class TargetClass {
+	private static class TargetClass {
 		protected static int STATIC_FIELD;
 
 		@AllowPureAccess

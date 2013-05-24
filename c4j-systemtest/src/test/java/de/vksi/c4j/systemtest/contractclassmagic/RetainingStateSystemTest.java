@@ -40,12 +40,12 @@ public class RetainingStateSystemTest {
 	}
 
 	@ContractReference(ContractClass.class)
-	public static class TargetClass {
+	private static class TargetClass {
 		public void method(int expectedNumCall) {
 		}
 	}
 
-	public static class ContractClass extends TargetClass {
+	private static class ContractClass extends TargetClass {
 		private int numCall;
 
 		@Override

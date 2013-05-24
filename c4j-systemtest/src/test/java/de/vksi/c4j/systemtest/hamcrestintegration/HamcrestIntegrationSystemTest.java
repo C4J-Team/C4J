@@ -25,12 +25,12 @@ public class HamcrestIntegrationSystemTest {
 	}
 
 	@ContractReference(DummyContract.class)
-	public static class DummyClass {
+	private static class DummyClass {
 		public void method(String arg) {
 		}
 	}
 
-	public static class DummyContract extends DummyClass {
+	private static class DummyContract extends DummyClass {
 		@Override
 		public void method(String arg) {
 			if (preCondition()) {

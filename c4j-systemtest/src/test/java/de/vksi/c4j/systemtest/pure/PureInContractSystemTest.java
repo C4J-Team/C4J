@@ -21,7 +21,7 @@ public class PureInContractSystemTest {
 	}
 
 	@ContractReference(ContractClassForPureMethod.class)
-	public static class TargetClassForPureMethod {
+	private static class TargetClassForPureMethod {
 		public void method() {
 		}
 
@@ -31,7 +31,7 @@ public class PureInContractSystemTest {
 		}
 	}
 
-	public static class ContractClassForPureMethod extends TargetClassForPureMethod {
+	private static class ContractClassForPureMethod extends TargetClassForPureMethod {
 		@Target
 		private TargetClassForPureMethod target;
 
@@ -52,7 +52,7 @@ public class PureInContractSystemTest {
 	}
 
 	@ContractReference(ContractClassForUnpureMethod.class)
-	public static class TargetClassForUnpureMethod {
+	private static class TargetClassForUnpureMethod {
 		public void method() {
 		}
 
@@ -61,7 +61,7 @@ public class PureInContractSystemTest {
 		}
 	}
 
-	public static class ContractClassForUnpureMethod extends TargetClassForUnpureMethod {
+	private static class ContractClassForUnpureMethod extends TargetClassForUnpureMethod {
 		@Target
 		private TargetClassForUnpureMethod target;
 
@@ -82,12 +82,12 @@ public class PureInContractSystemTest {
 	}
 
 	@ContractReference(ContractClassForChangingState.class)
-	public static class TargetClassForChangingState {
+	private static class TargetClassForChangingState {
 		public void method() {
 		}
 	}
 
-	public static class ContractClassForChangingState extends TargetClassForChangingState {
+	private static class ContractClassForChangingState extends TargetClassForChangingState {
 		private int numCall = 0;
 
 		@Override

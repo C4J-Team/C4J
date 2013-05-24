@@ -30,7 +30,7 @@ public class InterfaceSystemTest {
 		dummy.method(0);
 	}
 
-	public static class DummyClass implements ContractedInterface {
+	private static class DummyClass implements ContractedInterface {
 		@Override
 		public void method(int value) {
 		}
@@ -41,7 +41,7 @@ public class InterfaceSystemTest {
 		void method(int value);
 	}
 
-	public static class ContractedInterfaceContract implements ContractedInterface {
+	private static class ContractedInterfaceContract implements ContractedInterface {
 		@Override
 		public void method(int value) {
 			if (preCondition()) {

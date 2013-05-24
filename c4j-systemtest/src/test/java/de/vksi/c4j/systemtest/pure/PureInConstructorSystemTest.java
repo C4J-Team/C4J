@@ -20,11 +20,11 @@ public class PureInConstructorSystemTest {
 		new DummyClass().pureMethodCallingUnpureConstructor();
 	}
 
-	public static class ExternalClass {
+	private static class ExternalClass {
 		public static int VALUE;
 	}
 
-	public static class DummyClass {
+	private static class DummyClass {
 		@Pure
 		public void pureMethodCallingPureConstructor() {
 			new ClassWithPureConstructor(3);
@@ -36,7 +36,7 @@ public class PureInConstructorSystemTest {
 		}
 	}
 
-	public static class ClassWithPureConstructor {
+	private static class ClassWithPureConstructor {
 		protected int value;
 
 		public ClassWithPureConstructor(int value) {
@@ -49,7 +49,7 @@ public class PureInConstructorSystemTest {
 		}
 	}
 
-	public static class ClassWithUnpureConstructor {
+	private static class ClassWithUnpureConstructor {
 		public ClassWithUnpureConstructor(int value) {
 			ExternalClass.VALUE = 1;
 		}
@@ -60,7 +60,7 @@ public class PureInConstructorSystemTest {
 		new ClassWithPureConstructorCallingUnpureConstructor();
 	}
 
-	public static class ClassWithPureConstructorCallingUnpureConstructor {
+	private static class ClassWithPureConstructorCallingUnpureConstructor {
 		public ClassWithPureConstructorCallingUnpureConstructor() {
 			this(3);
 		}
@@ -75,13 +75,13 @@ public class PureInConstructorSystemTest {
 		new ClassWithPureConstructorCallingUnpureSuperConstructor();
 	}
 
-	public static class ClassWithPureConstructorCallingUnpureSuperConstructor extends ClassWithUnpureSuperConstructor {
+	private static class ClassWithPureConstructorCallingUnpureSuperConstructor extends ClassWithUnpureSuperConstructor {
 		public ClassWithPureConstructorCallingUnpureSuperConstructor() {
 			super(3);
 		}
 	}
 
-	public static class ClassWithUnpureSuperConstructor {
+	private static class ClassWithUnpureSuperConstructor {
 		public ClassWithUnpureSuperConstructor(int value) {
 			ExternalClass.VALUE = 1;
 		}

@@ -28,7 +28,7 @@ public class OldThrowingExceptionSystemTest {
 	}
 
 	@ContractReference(ContractClass.class)
-	public static class TargetClass {
+	private static class TargetClass {
 		private boolean throwException = true;
 		public static boolean contractsEnabled = false;
 
@@ -53,7 +53,7 @@ public class OldThrowingExceptionSystemTest {
 		}
 	}
 
-	public static class ContractClass extends TargetClass {
+	private static class ContractClass extends TargetClass {
 		@Target
 		private TargetClass target;
 

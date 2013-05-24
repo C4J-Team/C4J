@@ -35,7 +35,7 @@ public class PureBehaviorSkipOnlySystemTest {
 	}
 
 	@ContractReference(ContractClass.class)
-	public static class TargetClass {
+	private static class TargetClass {
 		protected int value;
 
 		@Pure
@@ -44,7 +44,7 @@ public class PureBehaviorSkipOnlySystemTest {
 		}
 	}
 
-	public static class ContractClass extends TargetClass {
+	private static class ContractClass extends TargetClass {
 		public static boolean invariantCalled;
 
 		@ClassInvariant
@@ -62,7 +62,7 @@ public class PureBehaviorSkipOnlySystemTest {
 	}
 
 	@ContractReference(ContractClassWithPureInContract.class)
-	public static class TargetClassWithPureInContract {
+	private static class TargetClassWithPureInContract {
 		protected int value;
 
 		public void pureMethod() {
@@ -70,7 +70,7 @@ public class PureBehaviorSkipOnlySystemTest {
 		}
 	}
 
-	public static class ContractClassWithPureInContract extends TargetClassWithPureInContract {
+	private static class ContractClassWithPureInContract extends TargetClassWithPureInContract {
 		public static boolean invariantCalled;
 
 		@ClassInvariant

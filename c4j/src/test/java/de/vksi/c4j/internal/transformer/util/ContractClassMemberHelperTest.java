@@ -1,8 +1,6 @@
 package de.vksi.c4j.internal.transformer.util;
 
-import static de.vksi.c4j.internal.transformer.util.ContractClassMemberHelper.getContractBehaviorName;
 import static de.vksi.c4j.internal.transformer.util.ContractClassMemberHelper.isContractConstructor;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import javassist.ClassPool;
@@ -12,7 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.vksi.c4j.ClassInvariant;
-import de.vksi.c4j.internal.transformer.util.ContractClassMemberHelper;
+import de.vksi.c4j.ConstructorContract;
 
 public class ContractClassMemberHelperTest {
 
@@ -26,40 +24,16 @@ public class ContractClassMemberHelperTest {
 	}
 
 	@Test
-	public void testGetContractBehaviorNameForMethod() throws Exception {
-		assertEquals(getContractBehaviorName(contractClass.getDeclaredMethod("contractMethod")), "contractMethod");
-	}
-
-	@Test
-	public void testGetContractBehaviorNameForConstructor() throws Exception {
-		assertEquals(getContractBehaviorName(contractClass.getDeclaredConstructor(new CtClass[0])),
-				ContractClassMemberHelper.CONSTRUCTOR_REPLACEMENT_NAME);
-	}
-
-	@Test
-	public void testGetContractBehaviorNameForTransformedConstructor() throws Exception {
-		assertEquals(getContractBehaviorName(contractClass
-				.getDeclaredMethod(ContractClassMemberHelper.CONSTRUCTOR_REPLACEMENT_NAME)),
-				ContractClassMemberHelper.CONSTRUCTOR_REPLACEMENT_NAME);
-	}
-
-	@Test
 	public void testIsConstructorForMethod() throws Exception {
 		assertFalse(isContractConstructor(contractClass.getDeclaredMethod("contractMethod")));
 	}
 
 	@Test
 	public void testIsConstructorForConstructor() throws Exception {
-		assertTrue(isContractConstructor(contractClass.getDeclaredConstructor(new CtClass[0])));
+		assertTrue(isContractConstructor(contractClass.getDeclaredMethod("constructor")));
 	}
 
-	@Test
-	public void testIsConstructorForTransformedConstructor() throws Exception {
-		assertTrue(isContractConstructor(contractClass
-				.getDeclaredMethod(ContractClassMemberHelper.CONSTRUCTOR_REPLACEMENT_NAME)));
-	}
-
-	public static class TargetClass {
+	private static class TargetClass {
 		public TargetClass() {
 		}
 
@@ -70,14 +44,20 @@ public class ContractClassMemberHelperTest {
 		}
 	}
 
-	public static class ContractClass extends TargetClass {
+	private static class ContractClass extends TargetClass {
 		public ContractClass() {
 		}
 
-		public ContractClass(int value) {
+		@ConstructorContract
+		public void constructor() {
 		}
 
-		public ContractClass(double value) {
+		@ConstructorContract
+		public void constructor(int value) {
+		}
+
+		@ConstructorContract
+		public void constructor(double value) {
 		}
 
 		@ClassInvariant

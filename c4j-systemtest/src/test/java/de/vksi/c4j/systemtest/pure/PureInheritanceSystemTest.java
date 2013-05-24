@@ -40,13 +40,13 @@ public class PureInheritanceSystemTest {
 		new ClassHavingIndirectUnpureMethod().pureMethod();
 	}
 
-	public static class PureSubClass extends SuperClass {
+	private static class PureSubClass extends SuperClass {
 		@Override
 		public void pureMethod() {
 		}
 	}
 
-	public static class UnpureSubClass extends SuperClass {
+	private static class UnpureSubClass extends SuperClass {
 		protected String field;
 
 		@Override
@@ -55,19 +55,19 @@ public class PureInheritanceSystemTest {
 		}
 	}
 
-	public static class SuperClass {
+	private static class SuperClass {
 		@Pure
 		public void pureMethod() {
 		}
 	}
 
-	public static class ClassHavingPureMethod implements HasPureMethod {
+	private static class ClassHavingPureMethod implements HasPureMethod {
 		@Override
 		public void pureMethod() {
 		}
 	}
 
-	public static class ClassHavingUnpureMethod implements HasPureMethod {
+	private static class ClassHavingUnpureMethod implements HasPureMethod {
 		@Override
 		public void pureMethod() {
 			unpureMethod();
@@ -82,19 +82,19 @@ public class PureInheritanceSystemTest {
 		void pureMethod();
 	}
 
-	public static class SuperClassWithInterface implements HasPureMethod {
+	private static class SuperClassWithInterface implements HasPureMethod {
 		@Override
 		public void pureMethod() {
 		}
 	}
 
-	public static class ClassHavingIndirectPureMethod extends SuperClassWithInterface {
+	private static class ClassHavingIndirectPureMethod extends SuperClassWithInterface {
 		@Override
 		public void pureMethod() {
 		}
 	}
 
-	public static class ClassHavingIndirectUnpureMethod extends SuperClassWithInterface {
+	private static class ClassHavingIndirectUnpureMethod extends SuperClassWithInterface {
 		private ClassHavingUnpureMethod otherObj = new ClassHavingUnpureMethod();
 
 		@Override

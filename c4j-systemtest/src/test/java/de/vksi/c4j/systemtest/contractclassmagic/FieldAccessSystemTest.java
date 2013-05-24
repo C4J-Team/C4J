@@ -28,7 +28,7 @@ public class FieldAccessSystemTest {
 	}
 
 	@ContractReference(DummyContract.class)
-	public static class DummyClass {
+	private static class DummyClass {
 		protected int value;
 
 		public void methodContractHasFieldAccess() {
@@ -39,7 +39,7 @@ public class FieldAccessSystemTest {
 		}
 	}
 
-	public static class DummyContract extends DummyClass {
+	private static class DummyContract extends DummyClass {
 		@Target
 		private DummyClass target;
 
@@ -57,13 +57,13 @@ public class FieldAccessSystemTest {
 	}
 
 	@ContractReference(TargetClassContract.class)
-	public static class TargetClass extends SuperClass {
+	private static class TargetClass extends SuperClass {
 		@Override
 		public void method() {
 		}
 	}
 
-	public static class TargetClassContract extends TargetClass {
+	private static class TargetClassContract extends TargetClass {
 		@Target
 		private TargetClass target;
 
@@ -76,14 +76,14 @@ public class FieldAccessSystemTest {
 	}
 
 	@ContractReference(SuperClassContract.class)
-	public static class SuperClass {
+	private static class SuperClass {
 		protected int field;
 
 		public void method() {
 		}
 	}
 
-	public static class SuperClassContract extends SuperClass {
+	private static class SuperClassContract extends SuperClass {
 		@Target
 		private SuperClass target;
 

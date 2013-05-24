@@ -32,7 +32,7 @@ public class NNUnchangedS2Test {
 	}
 
 	@ContractReference(WindowContract.class)
-	public class Window {
+	public static class Window {
 		public Vector upperLeftCorner;
 		public WindowStyle style;
 
@@ -48,12 +48,12 @@ public class NNUnchangedS2Test {
 		}
 	}
 
-	public class WindowContract extends Window {
+	public static class WindowContract extends Window {
 		@Target
 		private Window target;
 
-		public WindowContract(Vector upperLeftCorner) {
-			super(upperLeftCorner);
+		public WindowContract() {
+			super(null);
 		}
 
 		@Override

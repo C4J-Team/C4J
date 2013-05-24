@@ -20,7 +20,7 @@ public class ContractClassAccessingTargetClassFieldsSystemTest {
 	}
 
 	@ContractReference(ContractClass.class)
-	public static class TargetClass {
+	private static class TargetClass {
 		protected int value;
 
 		public void method(int value, int param) {
@@ -28,7 +28,7 @@ public class ContractClassAccessingTargetClassFieldsSystemTest {
 		}
 	}
 
-	public static class ContractClass extends TargetClass {
+	private static class ContractClass extends TargetClass {
 		@Target
 		private TargetClass target;
 
@@ -46,14 +46,14 @@ public class ContractClassAccessingTargetClassFieldsSystemTest {
 	}
 
 	@ContractReference(ContractClassOverridden.class)
-	public static class TargetClassOverridden {
+	private static class TargetClassOverridden {
 		protected Boolean value = Boolean.TRUE;
 
 		public void method() {
 		}
 	}
 
-	public static class ContractClassOverridden extends TargetClassOverridden {
+	private static class ContractClassOverridden extends TargetClassOverridden {
 		private Boolean value = Boolean.FALSE;
 
 		@Override

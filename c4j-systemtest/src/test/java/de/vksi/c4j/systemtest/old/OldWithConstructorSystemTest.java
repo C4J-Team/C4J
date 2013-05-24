@@ -19,12 +19,12 @@ public class OldWithConstructorSystemTest {
 	}
 
 	@ContractReference(DummyContract.class)
-	public static class DummyClass {
+	private static class DummyClass {
 		public void method() {
 		}
 	}
 
-	public static class DummyContract extends DummyClass {
+	private static class DummyContract extends DummyClass {
 		@Override
 		public void method() {
 			if (postCondition()) {

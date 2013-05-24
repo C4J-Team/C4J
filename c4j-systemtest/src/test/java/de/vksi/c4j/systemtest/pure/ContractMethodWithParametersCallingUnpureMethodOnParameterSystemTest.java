@@ -18,12 +18,12 @@ public class ContractMethodWithParametersCallingUnpureMethodOnParameterSystemTes
 	}
 
 	@ContractReference(ContractClass.class)
-	public static class TargetClass {
+	private static class TargetClass {
 		public void method(OtherClass other) {
 		}
 	}
 
-	public static class ContractClass extends TargetClass {
+	private static class ContractClass extends TargetClass {
 		@Override
 		public void method(OtherClass other) {
 			if (preCondition()) {
@@ -32,7 +32,7 @@ public class ContractMethodWithParametersCallingUnpureMethodOnParameterSystemTes
 		}
 	}
 
-	public static class OtherClass {
+	private static class OtherClass {
 		public void unpureMethod() {
 		}
 	}

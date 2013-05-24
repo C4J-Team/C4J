@@ -25,7 +25,7 @@ public class UnchangedParamOutOfBoundsSystemTest {
 		assertEquals(5, timeOfDay.getHour());
 	}
 
-	public static class ContractClass extends TargetClass {
+	private static class ContractClass extends TargetClass {
 		@Target
 		private TargetClass target;
 
@@ -42,7 +42,7 @@ public class UnchangedParamOutOfBoundsSystemTest {
 	}
 
 	@ContractReference(ContractClass.class)
-	public static class TargetClass {
+	private static class TargetClass {
 		private int hour;
 		private int minute;
 

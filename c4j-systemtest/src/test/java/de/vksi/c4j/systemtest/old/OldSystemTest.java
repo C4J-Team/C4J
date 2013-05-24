@@ -38,7 +38,7 @@ public class OldSystemTest {
 	}
 
 	@ContractReference(DummyContract.class)
-	public static class DummyClass {
+	private static class DummyClass {
 		protected int value;
 		protected OtherClass otherValue;
 
@@ -60,7 +60,7 @@ public class OldSystemTest {
 		}
 	}
 
-	public static class OtherClass {
+	private static class OtherClass {
 		public InputStream stream;
 
 		public int otherMethod() {
@@ -68,7 +68,7 @@ public class OldSystemTest {
 		}
 	}
 
-	public static class DummyContract extends DummyClass {
+	private static class DummyContract extends DummyClass {
 		@Target
 		private DummyClass target;
 
@@ -93,10 +93,10 @@ public class OldSystemTest {
 	}
 
 	@ContractReference(SubClassContract.class)
-	public static class SubClass extends SuperClass {
+	private static class SubClass extends SuperClass {
 	}
 
-	public static class SubClassContract extends SubClass {
+	private static class SubClassContract extends SubClass {
 		@Target
 		private SubClass target;
 
@@ -110,7 +110,7 @@ public class OldSystemTest {
 		}
 	}
 
-	public static class SuperClass {
+	private static class SuperClass {
 		protected int field;
 
 		@Pure
@@ -125,21 +125,21 @@ public class OldSystemTest {
 	}
 
 	@ContractReference(SubClassWithoutMethodContract.class)
-	public static class SubClassWithoutMethod extends SuperClassWithOld {
+	private static class SubClassWithoutMethod extends SuperClassWithOld {
 	}
 
-	public static class SubClassWithoutMethodContract extends SubClassWithoutMethod {
+	private static class SubClassWithoutMethodContract extends SubClassWithoutMethod {
 	}
 
 	@ContractReference(SuperClassWithOldContract.class)
-	public static class SuperClassWithOld {
+	private static class SuperClassWithOld {
 		@Pure
 		public int method() {
 			return 0;
 		}
 	}
 
-	public static class SuperClassWithOldContract extends SuperClassWithOld {
+	private static class SuperClassWithOldContract extends SuperClassWithOld {
 		@Target
 		private SuperClassWithOld target;
 

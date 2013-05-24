@@ -76,10 +76,10 @@ public class ContractRegistryTest {
 		assertTrue(contractInfo.getAllContractClasses().contains(contractClass));
 	}
 
-	public static class TargetClass {
+	private static class TargetClass {
 	}
 
-	public static class ContractClass extends TargetClass {
+	private static class ContractClass extends TargetClass {
 	}
 
 }

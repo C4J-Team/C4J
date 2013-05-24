@@ -11,18 +11,17 @@ import de.vksi.c4j.systemtest.TransformerAwareRule;
 public class ContractReferenceIsTargetTypeSystemTest {
 	@Rule
 	public TransformerAwareRule transformerAwareRule = new TransformerAwareRule();
-	private ClassAnalyzer reflectionHelper = new ClassAnalyzer();
 
 	@Test
 	public void testContractReferenceIsTargetType() {
 		new TargetClass();
 		transformerAwareRule.expectGlobalLog(Level.ERROR, "Ignoring contract "
-				+ reflectionHelper.getSimplerName(TargetClass.class) + " defined on "
-				+ reflectionHelper.getSimplerName(TargetClass.class)
+				+ ClassAnalyzer.getSimplerName(TargetClass.class) + " defined on "
+				+ ClassAnalyzer.getSimplerName(TargetClass.class)
 				+ " as the contract class is the same as the target class.");
 	}
 
 	@ContractReference(TargetClass.class)
-	public static class TargetClass {
+	private static class TargetClass {
 	}
 }

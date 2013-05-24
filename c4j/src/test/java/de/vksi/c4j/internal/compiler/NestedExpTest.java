@@ -54,7 +54,7 @@ public class NestedExpTest {
 				ClassPool.getDefault().get(NestedClass.class.getName())).getCode());
 	}
 
-	public static class NestedClass {
+	private static class NestedClass {
 	}
 
 	@Test

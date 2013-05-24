@@ -26,7 +26,7 @@ public class PureCallingStaticUnpureInNestedMethodSystemTest {
 		new TargetClass().methodCallingStaticUnpureInNestedMethodModifyingAccessibleStaticField();
 	}
 
-	public static class TargetClass {
+	private static class TargetClass {
 		public static int value;
 
 		@Pure
@@ -45,13 +45,13 @@ public class PureCallingStaticUnpureInNestedMethodSystemTest {
 		}
 	}
 
-	public static class UnpureClass {
+	private static class UnpureClass {
 		public UnpureClass() {
 			TargetClass.value = 3;
 		}
 	}
 
-	public static class OtherClass {
+	private static class OtherClass {
 		protected static int value;
 
 		public void methodModifyingOwnStaticField() {
@@ -59,7 +59,7 @@ public class PureCallingStaticUnpureInNestedMethodSystemTest {
 		}
 	}
 
-	public static class AllowingClass {
+	private static class AllowingClass {
 		@AllowPureAccess
 		protected static int value;
 

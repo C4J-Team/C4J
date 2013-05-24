@@ -22,7 +22,7 @@ public class ObjectContractSystemTest {
 		target1.equals(target2);
 	}
 
-	public static class TargetClassViolatingHashCodeConsistency {
+	private static class TargetClassViolatingHashCodeConsistency {
 		private int x;
 
 		public TargetClassViolatingHashCodeConsistency(int x) {
@@ -40,7 +40,7 @@ public class ObjectContractSystemTest {
 	}
 
 	@Contract(forTarget = Object.class)
-	public static class ObjectContract {
+	private static class ObjectContract {
 		@Target
 		private Object target;
 

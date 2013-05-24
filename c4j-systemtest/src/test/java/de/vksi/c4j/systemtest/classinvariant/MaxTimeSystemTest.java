@@ -26,7 +26,7 @@ public class MaxTimeSystemTest {
 	}
 
 	@ContractReference(ContractClass.class)
-	public static class TargetClass {
+	private static class TargetClass {
 		public void sleep(long milliSeconds) throws InterruptedException {
 			if (milliSeconds > 0) {
 				TestUtil.waitAtLeast((double) milliSeconds / 1000);
@@ -34,7 +34,7 @@ public class MaxTimeSystemTest {
 		}
 	}
 
-	public static class ContractClass extends TargetClass {
+	private static class ContractClass extends TargetClass {
 		@ClassInvariant
 		public void invariant() {
 			assert maxTime(0.2);

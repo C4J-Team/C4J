@@ -18,6 +18,7 @@ import de.vksi.c4j.internal.configuration.C4JLocal.Configuration;
 
 public class XmlConfigurationManager {
 	public static final XmlConfigurationManager INSTANCE = new XmlConfigurationManager();
+	private static final Logger LOGGER = Logger.getLogger(XmlConfigurationManager.class);
 
 	public static final String C4J_LOCAL_XML = "c4j-local.xml".toString();
 	public static final String C4J_GLOBAL_XML = "c4j-global.xml".toString();
@@ -29,10 +30,9 @@ public class XmlConfigurationManager {
 	private URL globalConfigurationPath;
 
 	private JaxbUnmarshaller jaxbUnmarshaller = new JaxbUnmarshaller();
-	private static final Logger LOGGER = Logger.getLogger(XmlConfigurationManager.class);
 	private final Set<LocalConfigurationCallback> localConfigurationCallbacks = new HashSet<LocalConfigurationCallback>();
 
-	private XmlConfigurationManager() {
+	XmlConfigurationManager() {
 		try {
 			initDefaultLocalConfiguration();
 			initDefaultGlobalConfiguration();

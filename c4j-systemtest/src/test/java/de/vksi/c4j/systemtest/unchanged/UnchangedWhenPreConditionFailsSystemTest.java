@@ -28,7 +28,7 @@ public class UnchangedWhenPreConditionFailsSystemTest {
 	}
 
 	@ContractReference(ContractClass.class)
-	public static class TargetClass {
+	private static class TargetClass {
 		protected static int field;
 
 		public static void staticMethod() {
@@ -44,7 +44,7 @@ public class UnchangedWhenPreConditionFailsSystemTest {
 		}
 	}
 
-	public static class ContractClass extends TargetClass {
+	private static class ContractClass extends TargetClass {
 		@Target
 		private TargetClass target;
 

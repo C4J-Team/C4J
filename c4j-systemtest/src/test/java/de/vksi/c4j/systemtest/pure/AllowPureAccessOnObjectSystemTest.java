@@ -36,7 +36,7 @@ public class AllowPureAccessOnObjectSystemTest {
 	}
 
 	@ContractReference(TargetClassContract.class)
-	public static class TargetClass {
+	private static class TargetClass {
 		@AllowPureAccess
 		private MutableString value = new MutableString();
 
@@ -62,7 +62,7 @@ public class AllowPureAccessOnObjectSystemTest {
 		}
 	}
 
-	public static class TargetClassContract extends TargetClass {
+	private static class TargetClassContract extends TargetClass {
 		@Override
 		public void modifyValueInContract() {
 			if (preCondition()) {

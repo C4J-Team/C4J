@@ -26,6 +26,12 @@ public enum BehaviorFilter {
 		public boolean filter(CtBehavior behavior) {
 			return !ClassAnalyzer.isPrivate(behavior);
 		}
+	},
+	PRIVATE {
+		@Override
+		public boolean filter(CtBehavior behavior) {
+			return ClassAnalyzer.isPrivate(behavior);
+		}
 	};
 
 	public abstract boolean filter(CtBehavior behavior);

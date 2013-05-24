@@ -25,7 +25,7 @@ public class RecursiveSystemTest {
 	}
 
 	@ContractReference(ContractClassWithCorrectEquals.class)
-	public static class TargetClassWithCorrectEquals {
+	private static class TargetClassWithCorrectEquals {
 		@Pure
 		@Override
 		public boolean equals(Object obj) {
@@ -33,7 +33,7 @@ public class RecursiveSystemTest {
 		}
 	}
 
-	public static class ContractClassWithCorrectEquals extends TargetClassWithCorrectEquals {
+	private static class ContractClassWithCorrectEquals extends TargetClassWithCorrectEquals {
 		@Target
 		private TargetClassWithCorrectEquals target;
 
@@ -56,14 +56,14 @@ public class RecursiveSystemTest {
 	}
 
 	@ContractReference(ContractClassWithUnreflexiveEquals.class)
-	public static class TargetClassWithUnreflexiveEquals {
+	private static class TargetClassWithUnreflexiveEquals {
 		@Override
 		public boolean equals(Object obj) {
 			return this != obj;
 		}
 	}
 
-	public static class ContractClassWithUnreflexiveEquals extends TargetClassWithUnreflexiveEquals {
+	private static class ContractClassWithUnreflexiveEquals extends TargetClassWithUnreflexiveEquals {
 		@Target
 		private TargetClassWithUnreflexiveEquals target;
 
@@ -85,7 +85,7 @@ public class RecursiveSystemTest {
 	}
 
 	@ContractReference(ContractClassWithUnsymmetricEquals.class)
-	public static class TargetClassWithUnsymmetricEquals {
+	private static class TargetClassWithUnsymmetricEquals {
 		private int value;
 
 		public TargetClassWithUnsymmetricEquals(int value) {
@@ -101,12 +101,12 @@ public class RecursiveSystemTest {
 		}
 	}
 
-	public static class ContractClassWithUnsymmetricEquals extends TargetClassWithUnsymmetricEquals {
+	private static class ContractClassWithUnsymmetricEquals extends TargetClassWithUnsymmetricEquals {
 		@Target
 		private TargetClassWithUnsymmetricEquals target;
 
-		public ContractClassWithUnsymmetricEquals(int value) {
-			super(value);
+		public ContractClassWithUnsymmetricEquals() {
+			super(0);
 		}
 
 		@Override

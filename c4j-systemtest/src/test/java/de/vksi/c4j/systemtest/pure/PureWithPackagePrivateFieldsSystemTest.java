@@ -16,7 +16,7 @@ public class PureWithPackagePrivateFieldsSystemTest {
 		new TargetClass().method();
 	}
 
-	public static class TargetClass extends SuperClass {
+	private static class TargetClass extends SuperClass {
 		@Pure
 		public void method() {
 		}

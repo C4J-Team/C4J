@@ -47,7 +47,7 @@ public class PostConditionWithExceptionThrownSystemTest {
 	}
 
 	@ContractReference(SampleClassContract.class)
-	public static class SampleClass {
+	private static class SampleClass {
 		public void methodThrowingException(boolean throwException) throws IOException {
 			if (throwException) {
 				throw new IOException();
@@ -55,7 +55,7 @@ public class PostConditionWithExceptionThrownSystemTest {
 		}
 	}
 
-	public static class SampleClassContract extends SampleClass {
+	private static class SampleClassContract extends SampleClass {
 		@Override
 		public void methodThrowingException(boolean throwException) throws IOException {
 			if (postCondition()) {

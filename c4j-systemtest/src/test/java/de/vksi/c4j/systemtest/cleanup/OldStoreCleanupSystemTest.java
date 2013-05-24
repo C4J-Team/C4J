@@ -42,7 +42,7 @@ public class OldStoreCleanupSystemTest {
 	}
 
 	@ContractReference(OldClassContract.class)
-	public static class OldClass {
+	private static class OldClass {
 		protected int value;
 
 		public void method(int incrementor) {
@@ -57,7 +57,7 @@ public class OldStoreCleanupSystemTest {
 		}
 	}
 
-	public static class OldClassContract extends OldClass {
+	private static class OldClassContract extends OldClass {
 		@Target
 		private OldClass target;
 
@@ -93,13 +93,13 @@ public class OldStoreCleanupSystemTest {
 	}
 
 	@ContractReference(TargetClassContract.class)
-	public static class TargetClass extends SuperClass {
+	private static class TargetClass extends SuperClass {
 		@Override
 		public void method() {
 		}
 	}
 
-	public static class TargetClassContract extends TargetClass {
+	private static class TargetClassContract extends TargetClass {
 		@Target
 		private TargetClass target;
 
@@ -112,14 +112,14 @@ public class OldStoreCleanupSystemTest {
 	}
 
 	@ContractReference(SuperClassContract.class)
-	public static class SuperClass {
+	private static class SuperClass {
 		protected int field = 1;
 
 		public void method() {
 		}
 	}
 
-	public static class SuperClassContract extends SuperClass {
+	private static class SuperClassContract extends SuperClass {
 		@Target
 		private SuperClass target;
 

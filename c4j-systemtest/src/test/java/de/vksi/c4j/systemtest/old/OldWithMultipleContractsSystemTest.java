@@ -22,7 +22,7 @@ public class OldWithMultipleContractsSystemTest {
 	}
 
 	@ContractReference(DummyContract.class)
-	public static class DummyClass extends SuperClass {
+	private static class DummyClass extends SuperClass {
 		@Override
 		public void method() {
 		}
@@ -33,7 +33,7 @@ public class OldWithMultipleContractsSystemTest {
 		}
 	}
 
-	public static class DummyContract extends DummyClass {
+	private static class DummyContract extends DummyClass {
 		@Target
 		private DummyClass target;
 
@@ -46,7 +46,7 @@ public class OldWithMultipleContractsSystemTest {
 	}
 
 	@ContractReference(SuperContract.class)
-	public static class SuperClass {
+	private static class SuperClass {
 		public void method() {
 		}
 
@@ -56,7 +56,7 @@ public class OldWithMultipleContractsSystemTest {
 		}
 	}
 
-	public static class SuperContract extends SuperClass {
+	private static class SuperContract extends SuperClass {
 		@Target
 		private SuperClass target;
 

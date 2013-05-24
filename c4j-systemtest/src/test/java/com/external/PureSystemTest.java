@@ -23,7 +23,7 @@ public class PureSystemTest {
 	}
 
 	@ContractReference(AContract.class)
-	public static class A {
+	private static class A {
 		private int z;
 
 		public int mA(int x, int y) {
@@ -38,7 +38,7 @@ public class PureSystemTest {
 
 	}
 
-	public static class AContract extends A {
+	private static class AContract extends A {
 		@Override
 		public int mA(int x, int y) {
 			if (preCondition()) {

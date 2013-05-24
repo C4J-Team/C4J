@@ -62,22 +62,22 @@ public class SuperclassSystemTest {
 	}
 
 	@ContractReference(NoWarningClassContract.class)
-	public static class NoWarningClass extends SuperClass {
+	private static class NoWarningClass extends SuperClass {
 	}
 
-	public static class NoWarningClassContract extends NoWarningClass {
+	private static class NoWarningClassContract extends NoWarningClass {
 	}
 
-	public static class FinalSuperClass {
+	private static class FinalSuperClass {
 		public final void method(int arg) {
 		}
 	}
 
 	@ContractReference(FinalMethodOverriddenContract.class)
-	public static class FinalMethodOverriddenClass extends FinalSuperClass {
+	private static class FinalMethodOverriddenClass extends FinalSuperClass {
 	}
 
-	public static class FinalMethodOverriddenContract {
+	private static class FinalMethodOverriddenContract {
 		public void method(int arg) {
 			if (postCondition()) {
 				assert arg < 5;
@@ -86,10 +86,10 @@ public class SuperclassSystemTest {
 	}
 
 	@ContractReference(DummyContract.class)
-	public static class DummyClass extends SuperClass {
+	private static class DummyClass extends SuperClass {
 	}
 
-	public static class DummyContract extends DummyClass {
+	private static class DummyContract extends DummyClass {
 		@Override
 		public void method(final int arg) {
 			if (postCondition()) {
@@ -99,13 +99,13 @@ public class SuperclassSystemTest {
 	}
 
 	@ContractReference(DummyContractDeclaringMethod.class)
-	public static class DummyClassDeclaringMethod extends SuperClass {
+	private static class DummyClassDeclaringMethod extends SuperClass {
 		@Override
 		public void method(int arg) {
 		}
 	}
 
-	public static class DummyContractDeclaringMethod extends DummyClassDeclaringMethod {
+	private static class DummyContractDeclaringMethod extends DummyClassDeclaringMethod {
 		@Override
 		public void method(final int arg) {
 			if (postCondition()) {
@@ -115,12 +115,12 @@ public class SuperclassSystemTest {
 	}
 
 	@ContractReference(SuperContract.class)
-	public static class SuperClass {
+	private static class SuperClass {
 		public void method(int arg) {
 		}
 	}
 
-	public static class SuperContract extends SuperClass {
+	private static class SuperContract extends SuperClass {
 		@Override
 		public void method(final int arg) {
 			if (postCondition()) {

@@ -1,7 +1,6 @@
 package de.vksi.c4j.internal.transformer.affected;
 
 import static de.vksi.c4j.internal.classfile.ClassAnalyzer.constructorHasAdditionalParameter;
-import static de.vksi.c4j.internal.transformer.util.ContractClassMemberHelper.getContractBehaviorName;
 
 import java.util.List;
 
@@ -58,7 +57,7 @@ public abstract class ConditionTransformer extends AbstractAffectedClassTransfor
 	protected StandaloneExp getContractCallExp(CtClass affectedClass, CtBehavior contractBehavior,
 			StaticCallExp conditionCall) throws NotFoundException {
 		CastExp getContractInstance = new CastExp(contractBehavior.getDeclaringClass(), conditionCall);
-		return getContractInstance.appendCall(getContractBehaviorName(contractBehavior),
-				getArgsList(affectedClass, contractBehavior)).toStandalone();
+		return getContractInstance.appendCall(contractBehavior.getName(), getArgsList(affectedClass, contractBehavior))
+				.toStandalone();
 	}
 }

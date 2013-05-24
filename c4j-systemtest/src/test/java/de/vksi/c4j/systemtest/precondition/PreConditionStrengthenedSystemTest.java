@@ -22,10 +22,10 @@ public class PreConditionStrengthenedSystemTest {
 	}
 
 	@ContractReference(ContractClass.class)
-	public static class TargetClass extends SuperClass {
+	private static class TargetClass extends SuperClass {
 	}
 
-	public static class ContractClass extends TargetClass {
+	private static class ContractClass extends TargetClass {
 		@Override
 		public void method(int arg) {
 			if (preCondition()) {
@@ -35,12 +35,12 @@ public class PreConditionStrengthenedSystemTest {
 	}
 
 	@ContractReference(SuperClassContract.class)
-	public static class SuperClass {
+	private static class SuperClass {
 		public void method(int arg) {
 		}
 	}
 
-	public static class SuperClassContract extends SuperClass {
+	private static class SuperClassContract extends SuperClass {
 		@Override
 		public void method(int arg) {
 			if (preCondition()) {

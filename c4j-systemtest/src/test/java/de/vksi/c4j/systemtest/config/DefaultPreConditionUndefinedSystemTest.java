@@ -18,10 +18,10 @@ public class DefaultPreConditionUndefinedSystemTest {
 	}
 
 	@ContractReference(ContractClass.class)
-	public static class TargetClass extends SuperClass {
+	private static class TargetClass extends SuperClass {
 	}
 
-	public static class ContractClass extends TargetClass {
+	private static class ContractClass extends TargetClass {
 		@Override
 		public void method(int arg) {
 			if (preCondition()) {
@@ -30,7 +30,7 @@ public class DefaultPreConditionUndefinedSystemTest {
 		}
 	}
 
-	public static class SuperClass {
+	private static class SuperClass {
 		public void method(int arg) {
 		}
 	}

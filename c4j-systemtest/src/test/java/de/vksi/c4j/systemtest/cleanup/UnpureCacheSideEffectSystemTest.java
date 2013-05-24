@@ -19,7 +19,7 @@ public class UnpureCacheSideEffectSystemTest {
 	}
 
 	@ContractReference(ContractClass.class)
-	public static class TargetClass {
+	private static class TargetClass {
 		private OtherClass other = new OtherClass();
 
 		@Pure
@@ -32,12 +32,12 @@ public class UnpureCacheSideEffectSystemTest {
 		}
 	}
 
-	public static class OtherClass {
+	private static class OtherClass {
 		public void unpureMethod() {
 		}
 	}
 
-	public static class ContractClass extends TargetClass {
+	private static class ContractClass extends TargetClass {
 		@Override
 		protected void unpureMethod() {
 			if (preCondition()) {

@@ -90,41 +90,41 @@ public class RootTransformerTest {
 	}
 
 	@ContractReference(ContractClass.class)
-	public static class TargetClass {
+	private static class TargetClass {
 	}
 
-	public static class ContractClass extends TargetClass {
+	private static class ContractClass extends TargetClass {
 	}
 
-	public static class UninvolvedClass {
+	private static class UninvolvedClass {
 	}
 
 	@ContractReference(SuperClassContract.class)
-	public static class SuperClass implements HasContract {
+	private static class SuperClass implements HasContract {
 	}
 
-	public static class SuperClassContract extends SuperClass {
+	private static class SuperClassContract extends SuperClass {
 	}
 
 	@ContractReference(HasContractContract.class)
-	public interface HasContract extends SuperInterface1, SuperInterface2 {
+	private interface HasContract extends SuperInterface1, SuperInterface2 {
 	}
 
-	public static class HasContractContract implements HasContract {
+	private static class HasContractContract implements HasContract {
 	}
 
 	@ContractReference(SuperInterface1Contract.class)
-	public interface SuperInterface1 {
+	private interface SuperInterface1 {
 	}
 
-	public static class SuperInterface1Contract implements SuperInterface1 {
+	private static class SuperInterface1Contract implements SuperInterface1 {
 	}
 
 	@ContractReference(SuperInterface2Contract.class)
-	public interface SuperInterface2 {
+	private interface SuperInterface2 {
 	}
 
-	public interface SuperInterface2Contract {
+	private interface SuperInterface2Contract {
 	}
 
 }

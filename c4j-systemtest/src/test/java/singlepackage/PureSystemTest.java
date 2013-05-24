@@ -28,7 +28,7 @@ public class PureSystemTest {
 		target.unpureMethodWritingField();
 	}
 
-	public static class TargetClass {
+	private static class TargetClass {
 		protected String field = "sample";
 
 		@Pure

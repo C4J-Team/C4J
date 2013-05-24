@@ -63,7 +63,7 @@ public class PureOnlyForOwnMethodsFieldsAndParametersSystemTest {
 		new NullClass().pureMethodCallingNullField();
 	}
 
-	public static class TargetClass {
+	private static class TargetClass {
 		private String field = "fieldValue";
 		private OtherClass otherTypeField = new OtherClass();
 
@@ -116,7 +116,7 @@ public class PureOnlyForOwnMethodsFieldsAndParametersSystemTest {
 		}
 	}
 
-	public static class OtherClass {
+	private static class OtherClass {
 		public static int staticField;
 
 		public static void staticUnpureMethod() {
@@ -126,7 +126,7 @@ public class PureOnlyForOwnMethodsFieldsAndParametersSystemTest {
 		}
 	}
 
-	public static class NullClass {
+	private static class NullClass {
 		private OtherClass nullField;
 
 		@Pure

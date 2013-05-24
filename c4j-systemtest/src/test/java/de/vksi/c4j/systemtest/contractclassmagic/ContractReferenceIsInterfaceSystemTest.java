@@ -23,7 +23,7 @@ public class ContractReferenceIsInterfaceSystemTest {
 	}
 
 	@ContractReference(ContractInterface.class)
-	public static class TargetClass {
+	private static class TargetClass {
 	}
 
 	public interface ContractInterface {

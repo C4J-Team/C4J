@@ -27,12 +27,12 @@ public class ManyLocalVariablesSystemTest {
 	}
 
 	@ContractReference(ContractClassInvalidLocalVariable.class)
-	public static class TargetClassInvalidLocalVariable {
+	private static class TargetClassInvalidLocalVariable {
 		public void invalidMethod() {
 		}
 	}
 
-	public static class ContractClassInvalidLocalVariable extends TargetClassInvalidLocalVariable {
+	private static class ContractClassInvalidLocalVariable extends TargetClassInvalidLocalVariable {
 		@SuppressWarnings("unused")
 		@Override
 		public void invalidMethod() {

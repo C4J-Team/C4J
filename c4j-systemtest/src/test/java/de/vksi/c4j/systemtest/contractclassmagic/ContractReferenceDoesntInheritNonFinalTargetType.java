@@ -42,23 +42,23 @@ public class ContractReferenceDoesntInheritNonFinalTargetType {
 	}
 
 	@ContractReference(ContractClassForTargetClass.class)
-	public static class TargetClass {
+	private static class TargetClass {
 	}
 
-	public static class ContractClassForTargetClass {
+	private static class ContractClassForTargetClass {
 	}
 
 	@ContractReference(ContractClassForFinalTargetClass.class)
 	public final static class FinalTargetClass {
 	}
 
-	public static class ContractClassForFinalTargetClass {
+	private static class ContractClassForFinalTargetClass {
 	}
 
 	@ContractReference(ContractClassForTargetInterface.class)
 	public interface TargetInterface {
 	}
 
-	public static class ContractClassForTargetInterface {
+	private static class ContractClassForTargetInterface {
 	}
 }

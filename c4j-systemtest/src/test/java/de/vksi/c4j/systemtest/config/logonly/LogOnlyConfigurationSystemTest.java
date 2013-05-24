@@ -28,7 +28,7 @@ public class LogOnlyConfigurationSystemTest {
 	}
 
 	@ContractReference(ContractClass.class)
-	public static class TargetClass {
+	private static class TargetClass {
 		protected int value;
 
 		public void method(int value) {
@@ -36,7 +36,7 @@ public class LogOnlyConfigurationSystemTest {
 		}
 	}
 
-	public static class ContractClass extends TargetClass {
+	private static class ContractClass extends TargetClass {
 		@Target
 		private TargetClass target;
 

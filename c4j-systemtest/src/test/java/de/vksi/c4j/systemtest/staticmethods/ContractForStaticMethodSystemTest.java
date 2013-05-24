@@ -30,7 +30,7 @@ public class ContractForStaticMethodSystemTest {
 	}
 
 	@ContractReference(ContractClass.class)
-	public static class TargetClass {
+	private static class TargetClass {
 		private static int numCalls = 0;
 
 		public static void main(String... args) {
@@ -42,7 +42,7 @@ public class ContractForStaticMethodSystemTest {
 		}
 	}
 
-	public static class ContractClass extends TargetClass {
+	private static class ContractClass extends TargetClass {
 		public static void main(String... args) {
 			if (preCondition()) {
 				assert args.length > 0;

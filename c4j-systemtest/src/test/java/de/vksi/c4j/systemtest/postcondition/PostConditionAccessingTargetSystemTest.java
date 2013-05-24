@@ -23,7 +23,7 @@ public class PostConditionAccessingTargetSystemTest {
 	}
 
 	@ContractReference(ContractClass.class)
-	public static class TargetClass {
+	private static class TargetClass {
 		private int z;
 
 		public Integer method(int x, int y) {
@@ -36,7 +36,7 @@ public class PostConditionAccessingTargetSystemTest {
 		}
 	}
 
-	public static class ContractClass extends TargetClass {
+	private static class ContractClass extends TargetClass {
 		@Target
 		private TargetClass target;
 

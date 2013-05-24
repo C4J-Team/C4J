@@ -31,12 +31,12 @@ public class PreConditionSystemTest {
 	}
 
 	@ContractReference(DummyContract.class)
-	public static class DummyClass {
+	private static class DummyClass {
 		public void method(int arg) {
 		}
 	}
 
-	public static class DummyContract extends DummyClass {
+	private static class DummyContract extends DummyClass {
 		@Override
 		public void method(int arg) {
 			if (preCondition()) {

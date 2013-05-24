@@ -29,7 +29,7 @@ public class ContractDeclaredBehaviorTransformerTest {
 		}
 	}
 
-	public static class ContractClass {
+	private static class ContractClass {
 		public ContractClass() {
 		}
 

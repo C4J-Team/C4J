@@ -18,7 +18,6 @@ import javassist.NotFoundException;
 import org.apache.log4j.Logger;
 
 import de.vksi.c4j.ClassInvariant;
-import de.vksi.c4j.InitializeContract;
 import de.vksi.c4j.internal.contracts.ContractInfo;
 import de.vksi.c4j.internal.contracts.ContractRegistry;
 import de.vksi.c4j.internal.contracts.InvolvedTypeInspector;
@@ -36,9 +35,6 @@ public class AffectedBehaviorLocator {
 	public CtBehavior getAffectedBehavior(ContractInfo contractInfo, CtClass affectedClass, CtBehavior contractBehavior)
 			throws NotFoundException, CannotCompileException {
 		if (contractBehavior.hasAnnotation(ClassInvariant.class)) {
-			return null;
-		}
-		if (contractBehavior.hasAnnotation(InitializeContract.class)) {
 			return null;
 		}
 		if (contractBehavior.getName().endsWith(BEFORE_INVARIANT_METHOD_SUFFIX)) {
@@ -113,18 +109,15 @@ public class AffectedBehaviorLocator {
 		if (contractInfo.getTargetClass().isInterface()) {
 			return null;
 		}
+		if (!affectedClass.equals(contractInfo.getTargetClass())) {
+			return null;
+		}
 		CtConstructor affectedConstructor = getDeclaredConstructor(affectedClass, getConstructorParameterTypes(
 				affectedClass, contractBehavior));
 		if (affectedConstructor == null) {
+			// TODO: error
 			LOGGER.warn("could not find a matching constructor in affected class " + affectedClass.getName()
 					+ " for constructor " + contractBehavior.getLongName());
-			return null;
-		}
-		if (contractBehavior instanceof CtMethod) {
-			return affectedConstructor;
-		}
-		if (getDeclaredMethod(contractInfo.getContractClass(), ContractClassMemberHelper.CONSTRUCTOR_REPLACEMENT_NAME,
-				contractBehavior.getParameterTypes()) != null) {
 			return null;
 		}
 		return affectedConstructor;

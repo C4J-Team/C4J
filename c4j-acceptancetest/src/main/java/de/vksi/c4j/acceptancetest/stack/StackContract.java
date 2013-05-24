@@ -3,6 +3,7 @@ package de.vksi.c4j.acceptancetest.stack;
 import static de.vksi.c4j.Condition.postCondition;
 import static de.vksi.c4j.Condition.preCondition;
 import de.vksi.c4j.ClassInvariant;
+import de.vksi.c4j.ConstructorContract;
 import de.vksi.c4j.Target;
 
 public class StackContract<T> extends Stack<T> {
@@ -10,8 +11,12 @@ public class StackContract<T> extends Stack<T> {
 	@Target
 	private Stack<T> target;
 
-	public StackContract(int capacity) {
-		super(capacity);
+	public StackContract() {
+		super(0);
+	}
+
+	@ConstructorContract
+	public void constructor(int capacity) {
 		if (preCondition()) {
 			assert capacity > 0 : "capacity > 0";
 		}

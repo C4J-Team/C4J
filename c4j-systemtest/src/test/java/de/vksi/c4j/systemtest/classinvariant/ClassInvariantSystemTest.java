@@ -38,7 +38,7 @@ public class ClassInvariantSystemTest {
 	}
 
 	@ContractReference(DummyClassContract.class)
-	public static class DummyClass {
+	private static class DummyClass {
 		private int hour;
 
 		public DummyClass(int hour) {
@@ -55,12 +55,12 @@ public class ClassInvariantSystemTest {
 		}
 	}
 
-	public static class DummyClassContract extends DummyClass {
+	private static class DummyClassContract extends DummyClass {
 		@Target
 		private DummyClass target;
 
-		public DummyClassContract(int hour) {
-			super(hour);
+		public DummyClassContract() {
+			super(0);
 		}
 
 		@ClassInvariant

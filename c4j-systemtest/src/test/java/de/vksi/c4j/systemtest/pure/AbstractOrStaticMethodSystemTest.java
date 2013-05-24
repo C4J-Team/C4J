@@ -20,7 +20,7 @@ public class AbstractOrStaticMethodSystemTest {
 		new TargetClass().pureMethod();
 	}
 
-	public static class TargetClass extends AbstractClass {
+	private static class TargetClass extends AbstractClass {
 		@Override
 		public void unpureMethod() {
 		}

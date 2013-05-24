@@ -7,6 +7,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Rule;
 import org.junit.Test;
 
+import de.vksi.c4j.ConstructorContract;
 import de.vksi.c4j.ContractReference;
 import de.vksi.c4j.systemtest.TransformerAwareRule;
 
@@ -41,7 +42,7 @@ public class ContractForStaticInitializerSystemTest {
 	}
 
 	@ContractReference(ContractClass.class)
-	public static class TargetClass {
+	private static class TargetClass {
 		private static int numCalls = 0;
 
 		static {
@@ -52,7 +53,7 @@ public class ContractForStaticInitializerSystemTest {
 		}
 	}
 
-	public static class ContractClass extends TargetClass {
+	private static class ContractClass extends TargetClass {
 		static {
 			if (preCondition()) {
 				assert TargetClass.numCalls == 0;
@@ -64,7 +65,7 @@ public class ContractForStaticInitializerSystemTest {
 	}
 
 	@ContractReference(ContractClassFailingPre.class)
-	public static class TargetClassFailingPre {
+	private static class TargetClassFailingPre {
 		private static int numCalls = 0;
 
 		static {
@@ -75,8 +76,9 @@ public class ContractForStaticInitializerSystemTest {
 		}
 	}
 
-	public static class ContractClassFailingPre extends TargetClassFailingPre {
-		static {
+	private static class ContractClassFailingPre extends TargetClassFailingPre {
+		@ConstructorContract
+		public static void staticInitializer() {
 			if (preCondition()) {
 				assert TargetClassFailingPre.numCalls == -1;
 			}
@@ -87,7 +89,7 @@ public class ContractForStaticInitializerSystemTest {
 	}
 
 	@ContractReference(ContractClassFailingPost.class)
-	public static class TargetClassFailingPost {
+	private static class TargetClassFailingPost {
 		private static int numCalls = 0;
 
 		static {
@@ -98,8 +100,9 @@ public class ContractForStaticInitializerSystemTest {
 		}
 	}
 
-	public static class ContractClassFailingPost extends TargetClassFailingPost {
-		static {
+	private static class ContractClassFailingPost extends TargetClassFailingPost {
+		@ConstructorContract
+		public static void staticInitializer() {
 			if (preCondition()) {
 				assert TargetClassFailingPost.numCalls == 0;
 			}
@@ -110,12 +113,12 @@ public class ContractForStaticInitializerSystemTest {
 	}
 
 	@ContractReference(ContractClassWithStaticInitializer.class)
-	public static class TargetClassWithoutStaticInitializer {
+	private static class TargetClassWithoutStaticInitializer {
 		public static void main(String... args) {
 		}
 	}
 
-	public static class ContractClassWithStaticInitializer extends TargetClassWithoutStaticInitializer {
+	private static class ContractClassWithStaticInitializer extends TargetClassWithoutStaticInitializer {
 		public static int STATIC_FIELD;
 
 		static {
@@ -130,7 +133,7 @@ public class ContractForStaticInitializerSystemTest {
 	}
 
 	@ContractReference(ContractClassWithoutStaticInitializer.class)
-	public static class TargetClassWithStaticInitializer {
+	private static class TargetClassWithStaticInitializer {
 		public static int STATIC_FIELD;
 
 		static {
@@ -141,7 +144,7 @@ public class ContractForStaticInitializerSystemTest {
 		}
 	}
 
-	public static class ContractClassWithoutStaticInitializer extends TargetClassWithStaticInitializer {
+	private static class ContractClassWithoutStaticInitializer extends TargetClassWithStaticInitializer {
 	}
 
 }

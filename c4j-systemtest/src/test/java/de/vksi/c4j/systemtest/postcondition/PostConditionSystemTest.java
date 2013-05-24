@@ -45,7 +45,7 @@ public class PostConditionSystemTest {
 	}
 
 	@ContractReference(DummyContract.class)
-	public static class DummyClass {
+	private static class DummyClass {
 		protected static int staticValue;
 
 		public void setStaticValue(int value) {
@@ -65,7 +65,7 @@ public class PostConditionSystemTest {
 		}
 	}
 
-	public static class DummyContract extends DummyClass {
+	private static class DummyContract extends DummyClass {
 		@Override
 		public void setStaticValue(int value) {
 			if (postCondition()) {

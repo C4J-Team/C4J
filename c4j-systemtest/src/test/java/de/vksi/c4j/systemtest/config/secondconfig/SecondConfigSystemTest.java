@@ -15,7 +15,7 @@ public class SecondConfigSystemTest {
 		new TargetClass().method();
 	}
 
-	public static class TargetClass {
+	private static class TargetClass {
 		@Pure
 		public int method() {
 			return getValue();

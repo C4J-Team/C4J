@@ -15,7 +15,7 @@ public class PureChangingFieldInNestedMethodSystemTest {
 		new TargetClass().method();
 	}
 
-	public static class TargetClass {
+	private static class TargetClass {
 		public int value;
 
 		@Pure
@@ -24,7 +24,7 @@ public class PureChangingFieldInNestedMethodSystemTest {
 		}
 	}
 
-	public static class OtherClass {
+	private static class OtherClass {
 		public void otherMethod(TargetClass target) {
 			target.value = 3;
 		}

@@ -9,7 +9,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.vksi.c4j.internal.runtime.Evaluator;
 import de.vksi.c4j.internal.runtime.Evaluator.EvaluationPhase;
 
 public class EvaluatorTest {
@@ -102,7 +101,7 @@ public class EvaluatorTest {
 		assertEquals(Boolean.FALSE, Evaluator.getConditionReturnValue());
 	}
 
-	public static class DummyClass {
+	private static class DummyClass {
 		protected String dummyField = "someValue";
 
 		public String dummyMethod() {

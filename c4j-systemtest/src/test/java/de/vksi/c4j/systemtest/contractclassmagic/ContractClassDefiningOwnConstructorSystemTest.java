@@ -21,7 +21,7 @@ public class ContractClassDefiningOwnConstructorSystemTest {
 	}
 
 	@ContractReference(ContractClass.class)
-	public static class TargetClass {
+	private static class TargetClass {
 		private int value;
 
 		public TargetClass(int value) {
@@ -34,9 +34,9 @@ public class ContractClassDefiningOwnConstructorSystemTest {
 		}
 	}
 
-	public static class ContractClass extends TargetClass {
-		public ContractClass(String value) {
-			super(3);
+	private static class ContractClass extends TargetClass {
+		public ContractClass() {
+			super(0);
 		}
 
 		@Override

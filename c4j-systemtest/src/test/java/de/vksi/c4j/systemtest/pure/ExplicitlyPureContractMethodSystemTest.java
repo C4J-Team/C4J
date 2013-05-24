@@ -20,12 +20,12 @@ public class ExplicitlyPureContractMethodSystemTest {
 	}
 
 	@ContractReference(ContractClass.class)
-	public static class TargetClass {
+	private static class TargetClass {
 		public void method(int arg) {
 		}
 	}
 
-	public static class ContractClass extends TargetClass {
+	private static class ContractClass extends TargetClass {
 		@Override
 		@Pure
 		public void method(int arg) {

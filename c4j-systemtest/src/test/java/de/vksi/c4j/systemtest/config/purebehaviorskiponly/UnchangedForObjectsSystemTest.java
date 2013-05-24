@@ -83,7 +83,7 @@ public class UnchangedForObjectsSystemTest {
 	}
 
 	@ContractReference(ContractClass.class)
-	public static class TargetClass {
+	private static class TargetClass {
 		protected MutableString field = new MutableString();
 
 		public MutableString method() {
@@ -136,7 +136,7 @@ public class UnchangedForObjectsSystemTest {
 		}
 	}
 
-	public static class ContractClass extends TargetClass {
+	private static class ContractClass extends TargetClass {
 		@Target
 		private TargetClass target;
 

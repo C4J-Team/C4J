@@ -5,6 +5,7 @@ import static de.vksi.c4j.Condition.preCondition;
 import org.junit.Rule;
 import org.junit.Test;
 
+import de.vksi.c4j.ConstructorContract;
 import de.vksi.c4j.ContractReference;
 import de.vksi.c4j.systemtest.TransformerAwareRule;
 
@@ -23,14 +24,18 @@ public class PreConditionInConstructorSystemTest {
 	}
 
 	@ContractReference(DummyContract.class)
-	public static class DummyClass {
+	private static class DummyClass {
 		public DummyClass(int arg) {
 		}
 	}
 
-	public static class DummyContract extends DummyClass {
-		public DummyContract(final int arg) {
-			super(arg);
+	private static class DummyContract extends DummyClass {
+		public DummyContract() {
+			super(0);
+		}
+
+		@ConstructorContract
+		public void constructor(int arg) {
 			if (preCondition()) {
 				assert arg > 0;
 			}

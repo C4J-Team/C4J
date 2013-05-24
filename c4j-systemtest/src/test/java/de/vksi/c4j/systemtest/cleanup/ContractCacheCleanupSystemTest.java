@@ -25,17 +25,17 @@ public class ContractCacheCleanupSystemTest {
 		WeakReference<TargetClass> targetWeakReference = new WeakReference<TargetClass>(target);
 		target.method(3);
 		target = null;
-		TestUtil.forceGarbageCollection();
+		TestUtil.waitForGarbageCollection(targetWeakReference);
 		assertNull(targetWeakReference.get());
 	}
 
 	@ContractReference(ContractClass.class)
-	public static class TargetClass {
+	private static class TargetClass {
 		public void method(int value) {
 		}
 	}
 
-	public static class ContractClass extends TargetClass {
+	private static class ContractClass extends TargetClass {
 		@Override
 		public void method(int value) {
 			if (preCondition()) {
@@ -50,12 +50,12 @@ public class ContractCacheCleanupSystemTest {
 		WeakReference<OldClass> targetWeakReference = new WeakReference<OldClass>(target);
 		target.method(3);
 		target = null;
-		TestUtil.forceGarbageCollection();
+		TestUtil.waitForGarbageCollection(targetWeakReference);
 		assertNull(targetWeakReference.get());
 	}
 
 	@ContractReference(OldClassContract.class)
-	public static class OldClass {
+	private static class OldClass {
 		protected int value;
 
 		public void method(int incrementor) {
@@ -66,7 +66,7 @@ public class ContractCacheCleanupSystemTest {
 		}
 	}
 
-	public static class OldClassContract extends OldClass {
+	private static class OldClassContract extends OldClass {
 		@Target
 		private OldClass target;
 

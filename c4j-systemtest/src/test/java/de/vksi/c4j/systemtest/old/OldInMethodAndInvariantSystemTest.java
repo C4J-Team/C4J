@@ -22,7 +22,7 @@ public class OldInMethodAndInvariantSystemTest {
 	}
 
 	@ContractReference(ContractClass.class)
-	public static class TargetClass {
+	private static class TargetClass {
 		public void method() {
 		}
 
@@ -37,7 +37,7 @@ public class OldInMethodAndInvariantSystemTest {
 		}
 	}
 
-	public static class ContractClass extends TargetClass {
+	private static class ContractClass extends TargetClass {
 		@Target
 		private TargetClass target;
 

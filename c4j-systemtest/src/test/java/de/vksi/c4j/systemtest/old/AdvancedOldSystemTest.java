@@ -34,7 +34,7 @@ public class AdvancedOldSystemTest {
 	}
 
 	@ContractReference(ContractClassValid.class)
-	public static class TargetClassValid {
+	private static class TargetClassValid {
 		public void method(String name, int value) {
 		}
 
@@ -44,7 +44,7 @@ public class AdvancedOldSystemTest {
 		}
 	}
 
-	public static class ContractClassValid extends TargetClassValid {
+	private static class ContractClassValid extends TargetClassValid {
 		@Target
 		private TargetClassValid target;
 
@@ -61,7 +61,7 @@ public class AdvancedOldSystemTest {
 
 	}
 
-	public static class OtherClass {
+	private static class OtherClass {
 		@Pure
 		public double otherMethod(double value) {
 			return value;
@@ -69,12 +69,12 @@ public class AdvancedOldSystemTest {
 	}
 
 	@ContractReference(ContractClassInvalidLocalVariable.class)
-	public static class TargetClassInvalidLocalVariable {
+	private static class TargetClassInvalidLocalVariable {
 		public void invalidMethod(String name, int value) {
 		}
 	}
 
-	public static class ContractClassInvalidLocalVariable extends TargetClassInvalidLocalVariable {
+	private static class ContractClassInvalidLocalVariable extends TargetClassInvalidLocalVariable {
 		@Override
 		public void invalidMethod(String name, int value) {
 			if (postCondition()) {

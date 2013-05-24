@@ -47,36 +47,36 @@ public class TargetReferenceSystemTest {
 	}
 
 	@ContractReference(ContractClassWithWeakerTarget.class)
-	public static class TargetClassWithWeakerTarget {
+	private static class TargetClassWithWeakerTarget {
 	}
 
-	public static class ContractClassWithWeakerTarget extends TargetClassWithWeakerTarget {
+	private static class ContractClassWithWeakerTarget extends TargetClassWithWeakerTarget {
 		@Target
 		protected Object targetWeakerType;
 	}
 
 	@ContractReference(ContractClassWithIncompatibleTarget.class)
-	public static class TargetClassWithIncompatibleTarget {
+	private static class TargetClassWithIncompatibleTarget {
 	}
 
-	public static class ContractClassWithIncompatibleTarget extends TargetClassWithIncompatibleTarget {
+	private static class ContractClassWithIncompatibleTarget extends TargetClassWithIncompatibleTarget {
 		@Target
 		protected ContractClassWithIncompatibleTarget targetIncompatibleType;
 	}
 
 	@ContractReference(ContractClassWithTargetMissingAnnotation.class)
-	public static class TargetClassWithTargetMissingAnnotation {
+	private static class TargetClassWithTargetMissingAnnotation {
 	}
 
-	public static class ContractClassWithTargetMissingAnnotation extends TargetClassWithTargetMissingAnnotation {
+	private static class ContractClassWithTargetMissingAnnotation extends TargetClassWithTargetMissingAnnotation {
 		protected TargetClassWithTargetMissingAnnotation target;
 	}
 
 	@ContractReference(ContractClassWithMultipleTargets.class)
-	public static class TargetClassWithMultipleTargets {
+	private static class TargetClassWithMultipleTargets {
 	}
 
-	public static class ContractClassWithMultipleTargets extends TargetClassWithMultipleTargets {
+	private static class ContractClassWithMultipleTargets extends TargetClassWithMultipleTargets {
 		@Target
 		protected TargetClassWithMultipleTargets target1;
 		@Target

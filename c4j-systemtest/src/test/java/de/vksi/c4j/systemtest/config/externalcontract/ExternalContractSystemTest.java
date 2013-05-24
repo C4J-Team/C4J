@@ -18,13 +18,13 @@ public class ExternalContractSystemTest {
 		new TargetClass().method(0);
 	}
 
-	public static class TargetClass {
+	private static class TargetClass {
 		public void method(int arg) {
 		}
 	}
 
 	@Contract
-	public static class ContractClass extends TargetClass {
+	private static class ContractClass extends TargetClass {
 		@Override
 		public void method(int arg) {
 			if (preCondition()) {
@@ -44,12 +44,12 @@ public class ExternalContractSystemTest {
 	}
 
 	@ContractReference(LocalContract.class)
-	public static class TargetClassWithLocalAndExternalContract {
+	private static class TargetClassWithLocalAndExternalContract {
 		public void method(int arg) {
 		}
 	}
 
-	public static class LocalContract extends TargetClassWithLocalAndExternalContract {
+	private static class LocalContract extends TargetClassWithLocalAndExternalContract {
 		@Override
 		public void method(int arg) {
 			if (preCondition()) {
@@ -58,7 +58,7 @@ public class ExternalContractSystemTest {
 		}
 	}
 
-	public static class ExternalContract extends TargetClassWithLocalAndExternalContract {
+	private static class ExternalContract extends TargetClassWithLocalAndExternalContract {
 		@Override
 		public void method(int arg) {
 			if (preCondition()) {

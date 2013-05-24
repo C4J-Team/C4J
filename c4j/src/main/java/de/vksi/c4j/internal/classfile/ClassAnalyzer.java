@@ -35,12 +35,20 @@ public class ClassAnalyzer {
 		return filterBehaviors(clazz.getDeclaredBehaviors(), filters);
 	}
 
+	public static List<CtConstructor> getDeclaredConstructors(CtClass clazz, BehaviorFilter... filters) {
+		return filterBehaviors(clazz.getDeclaredConstructors(), filters);
+	}
+
 	public static boolean isModifiable(CtBehavior behavior) {
 		return !Modifier.isNative(behavior.getModifiers()) && !Modifier.isAbstract(behavior.getModifiers());
 	}
 
 	public static boolean isDynamic(CtBehavior behavior) {
 		return !Modifier.isStatic(behavior.getModifiers());
+	}
+
+	public static boolean isStatic(CtBehavior behavior) {
+		return Modifier.isStatic(behavior.getModifiers());
 	}
 
 	public static boolean isPrivate(CtBehavior behavior) {

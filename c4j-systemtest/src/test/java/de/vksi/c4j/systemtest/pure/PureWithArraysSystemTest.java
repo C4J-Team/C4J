@@ -54,7 +54,7 @@ public class PureWithArraysSystemTest {
 		dummy.changeFirstString();
 	}
 
-	public static class DummyClass {
+	private static class DummyClass {
 		private int[] intArray = { 1, 2, 3 };
 		private MutableString[] stringArray = { new MutableString("A"), new MutableString("B"), new MutableString("C") };
 

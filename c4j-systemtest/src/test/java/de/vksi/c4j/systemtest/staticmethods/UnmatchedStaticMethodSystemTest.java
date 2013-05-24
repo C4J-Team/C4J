@@ -24,12 +24,12 @@ public class UnmatchedStaticMethodSystemTest {
 	}
 
 	@ContractReference(UnmatchedStaticMethodContractClass.class)
-	public static class UnmatchedStaticMethodTargetClass {
+	private static class UnmatchedStaticMethodTargetClass {
 		public void method(int arg) {
 		}
 	}
 
-	public static class UnmatchedStaticMethodContractClass extends UnmatchedStaticMethodTargetClass {
+	private static class UnmatchedStaticMethodContractClass extends UnmatchedStaticMethodTargetClass {
 		@Override
 		public void method(int arg) {
 			if (preCondition()) {
@@ -42,12 +42,12 @@ public class UnmatchedStaticMethodSystemTest {
 	}
 
 	@ContractReference(UnmatchedPrivateStaticMethodContractClass.class)
-	public static class UnmatchedPrivateStaticMethodTargetClass {
+	private static class UnmatchedPrivateStaticMethodTargetClass {
 		public void method(int arg) {
 		}
 	}
 
-	public static class UnmatchedPrivateStaticMethodContractClass extends UnmatchedPrivateStaticMethodTargetClass {
+	private static class UnmatchedPrivateStaticMethodContractClass extends UnmatchedPrivateStaticMethodTargetClass {
 		@Override
 		public void method(int arg) {
 			if (preCondition()) {

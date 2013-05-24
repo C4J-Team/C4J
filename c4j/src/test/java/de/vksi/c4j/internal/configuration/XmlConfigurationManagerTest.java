@@ -45,7 +45,7 @@ public class XmlConfigurationManagerTest {
 
 	@Before
 	public void before() {
-		manager = XmlConfigurationManager.INSTANCE;
+		manager = new XmlConfigurationManager();
 	}
 
 	@Test

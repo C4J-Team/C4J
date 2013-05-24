@@ -24,7 +24,7 @@ public class ConditionCheckAbortionSystemTest {
 	}
 
 	@ContractReference(ContractClass.class)
-	public static class TargetClass {
+	private static class TargetClass {
 		public void method1() {
 			method2();
 		}
@@ -33,7 +33,7 @@ public class ConditionCheckAbortionSystemTest {
 		}
 	}
 
-	public static class ContractClass extends TargetClass {
+	private static class ContractClass extends TargetClass {
 		@Override
 		public void method1() {
 			if (postCondition()) {

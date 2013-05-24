@@ -8,6 +8,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import de.vksi.c4j.AllowPureAccess;
+import de.vksi.c4j.ConstructorContract;
 import de.vksi.c4j.ContractReference;
 import de.vksi.c4j.systemtest.TransformerAwareRule;
 
@@ -26,20 +27,20 @@ public class ConstructorInInnerClassesSystemTest {
 	@Test
 	public void testConstructorInInnerClass() {
 		new InnerClass();
-		assertEquals(2, expectedNumCalls);
+		assertEquals(1, expectedNumCalls);
 	}
 
 	@Test
 	public void testConstructorInStaticInnerClass() {
 		new StaticInnerClass();
-		assertEquals(2, expectedNumCalls);
+		assertEquals(1, expectedNumCalls);
 	}
 
 	@Test
 	public void testConstructorInAnonymousClass() {
 		new SuperClass() {
 		};
-		assertEquals(2, expectedNumCalls);
+		assertEquals(1, expectedNumCalls);
 	}
 
 	@Test
@@ -47,13 +48,13 @@ public class ConstructorInInnerClassesSystemTest {
 		class LocalClass extends SuperClass {
 		}
 		new LocalClass();
-		assertEquals(2, expectedNumCalls);
+		assertEquals(1, expectedNumCalls);
 	}
 
 	@Test
 	public void testConstructorWithParameter() {
 		new InnerClassWithParameter(3);
-		assertEquals(2, expectedNumCalls);
+		assertEquals(1, expectedNumCalls);
 	}
 
 	public class InnerClassWithParameter extends SuperClassWithParameter {
@@ -63,32 +64,39 @@ public class ConstructorInInnerClassesSystemTest {
 	}
 
 	@ContractReference(SuperClassWithParameterContract.class)
-	public static class SuperClassWithParameter {
+	private static class SuperClassWithParameter {
 		public SuperClassWithParameter(int value) {
 		}
 	}
 
-	public static class SuperClassWithParameterContract extends SuperClassWithParameter {
-		public SuperClassWithParameterContract(int value) {
-			super(value);
+	private static class SuperClassWithParameterContract extends SuperClassWithParameter {
+		public SuperClassWithParameterContract() {
+			super(0);
+		}
+
+		@ConstructorContract
+		public void constructor(int value) {
 			if (preCondition()) {
 				expectedNumCalls++;
 			}
 		}
 	}
 
-	public static class StaticInnerClass extends SuperClass {
+	private static class StaticInnerClass extends SuperClass {
 	}
 
-	public class InnerClass extends SuperClass {
+	private class InnerClass extends SuperClass {
 	}
 
 	@ContractReference(SuperClassContract.class)
-	public static class SuperClass {
+	private static class SuperClass {
+		public SuperClass() {
+		}
 	}
 
-	public static class SuperClassContract extends SuperClass {
-		public SuperClassContract() {
+	private static class SuperClassContract extends SuperClass {
+		@ConstructorContract
+		public void constructor() {
 			if (preCondition()) {
 				expectedNumCalls++;
 			}

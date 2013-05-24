@@ -19,7 +19,7 @@ public class ClassInvariantInPrivateMethodSystemTest {
 	}
 
 	@ContractReference(ContractClass.class)
-	public static class TargetClass {
+	private static class TargetClass {
 		private int value = 0;
 
 		public TargetClass() {
@@ -37,7 +37,7 @@ public class ClassInvariantInPrivateMethodSystemTest {
 		}
 	}
 
-	public static class ContractClass {
+	private static class ContractClass {
 		@Target
 		private TargetClass target;
 

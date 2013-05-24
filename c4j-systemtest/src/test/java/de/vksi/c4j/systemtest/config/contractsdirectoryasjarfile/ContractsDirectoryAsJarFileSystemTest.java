@@ -14,7 +14,7 @@ public class ContractsDirectoryAsJarFileSystemTest {
 		new TargetClassUsingContractInJarFile().method(0);
 	}
 
-	public static class TargetClassUsingContractInJarFile {
+	private static class TargetClassUsingContractInJarFile {
 		public void method(int arg) {
 		}
 	}
