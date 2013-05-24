@@ -23,6 +23,7 @@ public class ExternalContractSystemTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	@Contract
 	private static class ContractClass extends TargetClass {
 		@Override
@@ -58,6 +59,7 @@ public class ExternalContractSystemTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static class ExternalContract extends TargetClassWithLocalAndExternalContract {
 		@Override
 		public void method(int arg) {

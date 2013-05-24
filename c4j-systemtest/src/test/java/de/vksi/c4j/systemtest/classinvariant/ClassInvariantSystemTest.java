@@ -55,6 +55,7 @@ public class ClassInvariantSystemTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static class DummyClassContract extends DummyClass {
 		@Target
 		private DummyClass target;

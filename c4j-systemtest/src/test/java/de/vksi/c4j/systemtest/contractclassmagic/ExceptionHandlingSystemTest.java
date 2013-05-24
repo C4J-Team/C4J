@@ -69,6 +69,7 @@ public class ExceptionHandlingSystemTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static class ContractClass extends TargetClass {
 		@Target
 		private TargetClass target;

@@ -35,6 +35,7 @@ public class PureStaticFieldSystemTest {
 		target.pureMethodWritingStaticFieldAllowed();
 	}
 
+	@SuppressWarnings("unused")
 	private static class TargetClass {
 		protected static int STATIC_FIELD;
 

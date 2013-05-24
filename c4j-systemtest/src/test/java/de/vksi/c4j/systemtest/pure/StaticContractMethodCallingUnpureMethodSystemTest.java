@@ -21,6 +21,7 @@ public class StaticContractMethodCallingUnpureMethodSystemTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static class ContractClass extends TargetClass {
 		protected TargetClass target;
 

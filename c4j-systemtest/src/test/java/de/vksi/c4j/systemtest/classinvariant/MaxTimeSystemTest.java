@@ -34,6 +34,7 @@ public class MaxTimeSystemTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static class ContractClass extends TargetClass {
 		@ClassInvariant
 		public void invariant() {

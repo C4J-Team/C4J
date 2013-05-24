@@ -36,6 +36,7 @@ public class OldInInvariantSystemTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static class ContractClass extends TargetClass {
 		@Target
 		private TargetClass target;

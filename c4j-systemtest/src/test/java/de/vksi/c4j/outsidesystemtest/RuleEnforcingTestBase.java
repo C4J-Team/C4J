@@ -4,7 +4,6 @@ import static org.junit.Assert.fail;
 
 import java.util.List;
 
-import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtField;
 import javassist.CtMethod;
@@ -19,12 +18,11 @@ import de.vksi.c4j.systemtest.TransformerAwareRule;
 
 public class RuleEnforcingTestBase {
 
-	private final ClassPool pool = new ClassPool(true);
 	private final Class<? extends TestRule> ruleClass = TransformerAwareRule.class;
 
 	public void enforceRuleInPackage(String packageName) throws Exception {
-		List<CtClass> classes = new ClasspathScanner(packageName, true, Thread.currentThread()
-				.getContextClassLoader()).getAllClasses();
+		List<CtClass> classes = new ClasspathScanner(packageName, true, Thread.currentThread().getContextClassLoader())
+				.getAllClasses();
 		for (CtClass clazz : classes) {
 			handleClassFileInPackage(clazz);
 		}

@@ -45,6 +45,7 @@ public class OldWithMultipleContractsSystemTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	@ContractReference(SuperContract.class)
 	private static class SuperClass {
 		public void method() {

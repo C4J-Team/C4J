@@ -40,6 +40,7 @@ public class StaticMemberAccessSystemTest {
 		new TargetClassOverridden().method();
 	}
 
+	@SuppressWarnings("unused")
 	@ContractReference(ContractClassOverridden.class)
 	private static class TargetClassOverridden {
 		public static final Boolean STATIC_VAR = Boolean.TRUE;

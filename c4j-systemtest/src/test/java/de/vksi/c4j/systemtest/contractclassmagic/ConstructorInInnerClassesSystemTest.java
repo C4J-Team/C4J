@@ -69,6 +69,7 @@ public class ConstructorInInnerClassesSystemTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static class SuperClassWithParameterContract extends SuperClassWithParameter {
 		public SuperClassWithParameterContract() {
 			super(0);
@@ -94,6 +95,7 @@ public class ConstructorInInnerClassesSystemTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static class SuperClassContract extends SuperClass {
 		@ConstructorContract
 		public void constructor() {

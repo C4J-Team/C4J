@@ -76,6 +76,7 @@ public class ContractForStaticInitializerSystemTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static class ContractClassFailingPre extends TargetClassFailingPre {
 		@ConstructorContract
 		public static void staticInitializer() {
@@ -100,6 +101,7 @@ public class ContractForStaticInitializerSystemTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static class ContractClassFailingPost extends TargetClassFailingPost {
 		@ConstructorContract
 		public static void staticInitializer() {
@@ -132,6 +134,7 @@ public class ContractForStaticInitializerSystemTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	@ContractReference(ContractClassWithoutStaticInitializer.class)
 	private static class TargetClassWithStaticInitializer {
 		public static int STATIC_FIELD;

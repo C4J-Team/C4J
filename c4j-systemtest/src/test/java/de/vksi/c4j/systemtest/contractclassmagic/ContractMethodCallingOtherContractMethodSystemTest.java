@@ -69,6 +69,7 @@ public class ContractMethodCallingOtherContractMethodSystemTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	@ContractReference(ContractClassCallingOverriddenContractMethod.class)
 	private static class TargetClassCallingOverriddenContractMethod {
 		public void method() {
@@ -79,7 +80,8 @@ public class ContractMethodCallingOtherContractMethodSystemTest {
 		}
 	}
 
-	private static class ContractClassCallingOverriddenContractMethod extends TargetClassCallingOverriddenContractMethod {
+	private static class ContractClassCallingOverriddenContractMethod extends
+			TargetClassCallingOverriddenContractMethod {
 		@Override
 		public void method() {
 			if (preCondition()) {

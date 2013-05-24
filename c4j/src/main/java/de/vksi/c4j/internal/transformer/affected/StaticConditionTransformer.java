@@ -20,7 +20,6 @@ import de.vksi.c4j.internal.compiler.StandaloneExp;
 import de.vksi.c4j.internal.compiler.StaticCallExp;
 import de.vksi.c4j.internal.contracts.ContractInfo;
 import de.vksi.c4j.internal.contracts.ContractMethod;
-import de.vksi.c4j.internal.transformer.affected.PreAndPostConditionTransformer.BeforeConditionCallProvider;
 import de.vksi.c4j.internal.types.ListOrderedSet;
 
 /*

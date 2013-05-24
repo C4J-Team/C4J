@@ -15,6 +15,7 @@ public class PureChangingFieldInNestedMethodSystemTest {
 		new TargetClass().method();
 	}
 
+	@SuppressWarnings("unused")
 	private static class TargetClass {
 		public int value;
 

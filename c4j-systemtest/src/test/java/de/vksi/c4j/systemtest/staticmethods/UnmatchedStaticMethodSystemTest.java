@@ -29,6 +29,7 @@ public class UnmatchedStaticMethodSystemTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static class UnmatchedStaticMethodContractClass extends UnmatchedStaticMethodTargetClass {
 		@Override
 		public void method(int arg) {

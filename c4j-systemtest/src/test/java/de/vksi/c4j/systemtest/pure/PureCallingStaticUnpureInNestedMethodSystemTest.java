@@ -26,6 +26,7 @@ public class PureCallingStaticUnpureInNestedMethodSystemTest {
 		new TargetClass().methodCallingStaticUnpureInNestedMethodModifyingAccessibleStaticField();
 	}
 
+	@SuppressWarnings("unused")
 	private static class TargetClass {
 		public static int value;
 
@@ -51,6 +52,7 @@ public class PureCallingStaticUnpureInNestedMethodSystemTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static class OtherClass {
 		protected static int value;
 
@@ -59,6 +61,7 @@ public class PureCallingStaticUnpureInNestedMethodSystemTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static class AllowingClass {
 		@AllowPureAccess
 		protected static int value;

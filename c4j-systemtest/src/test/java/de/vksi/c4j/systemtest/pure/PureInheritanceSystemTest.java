@@ -46,6 +46,7 @@ public class PureInheritanceSystemTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static class UnpureSubClass extends SuperClass {
 		protected String field;
 
@@ -55,6 +56,7 @@ public class PureInheritanceSystemTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static class SuperClass {
 		@Pure
 		public void pureMethod() {

@@ -22,6 +22,7 @@ public class ContractsDirectorySystemTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	@Contract
 	private static class ContractClass extends TargetClass {
 		@Override

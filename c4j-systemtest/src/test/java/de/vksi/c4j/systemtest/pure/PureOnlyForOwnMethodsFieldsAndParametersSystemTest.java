@@ -116,6 +116,7 @@ public class PureOnlyForOwnMethodsFieldsAndParametersSystemTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static class OtherClass {
 		public static int staticField;
 

@@ -77,6 +77,7 @@ public class SuperclassSystemTest {
 	private static class FinalMethodOverriddenClass extends FinalSuperClass {
 	}
 
+	@SuppressWarnings("unused")
 	private static class FinalMethodOverriddenContract {
 		public void method(int arg) {
 			if (postCondition()) {

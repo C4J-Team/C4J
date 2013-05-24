@@ -29,6 +29,7 @@ public class ContractForInheritedStaticMethodSystemTest {
 		TargetClass.main("test1", "test2");
 	}
 
+	@SuppressWarnings("unused")
 	private static class SuperClass {
 		protected static int numCalls = 0;
 

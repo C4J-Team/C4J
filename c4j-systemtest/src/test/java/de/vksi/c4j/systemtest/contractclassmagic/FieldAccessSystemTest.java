@@ -75,6 +75,7 @@ public class FieldAccessSystemTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	@ContractReference(SuperClassContract.class)
 	private static class SuperClass {
 		protected int field;

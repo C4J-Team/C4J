@@ -54,6 +54,7 @@ public class ContractCacheCleanupSystemTest {
 		assertNull(targetWeakReference.get());
 	}
 
+	@SuppressWarnings("unused")
 	@ContractReference(OldClassContract.class)
 	private static class OldClass {
 		protected int value;

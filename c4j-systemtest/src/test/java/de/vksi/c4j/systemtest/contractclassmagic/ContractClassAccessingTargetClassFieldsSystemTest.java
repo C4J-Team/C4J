@@ -45,6 +45,7 @@ public class ContractClassAccessingTargetClassFieldsSystemTest {
 		new TargetClassOverridden().method();
 	}
 
+	@SuppressWarnings("unused")
 	@ContractReference(ContractClassOverridden.class)
 	private static class TargetClassOverridden {
 		protected Boolean value = Boolean.TRUE;

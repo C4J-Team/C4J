@@ -20,6 +20,7 @@ public class PureInConstructorSystemTest {
 		new DummyClass().pureMethodCallingUnpureConstructor();
 	}
 
+	@SuppressWarnings("unused")
 	private static class ExternalClass {
 		public static int VALUE;
 	}
@@ -36,6 +37,7 @@ public class PureInConstructorSystemTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static class ClassWithPureConstructor {
 		protected int value;
 

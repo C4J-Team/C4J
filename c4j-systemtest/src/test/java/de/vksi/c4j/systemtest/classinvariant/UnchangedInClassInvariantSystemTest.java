@@ -69,6 +69,7 @@ public class UnchangedInClassInvariantSystemTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static class ContractClass {
 		@Target
 		private TargetClass target;

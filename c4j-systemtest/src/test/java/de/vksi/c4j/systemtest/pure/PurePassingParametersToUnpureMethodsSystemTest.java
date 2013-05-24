@@ -38,6 +38,7 @@ public class PurePassingParametersToUnpureMethodsSystemTest {
 		assertTrue(PureEvaluator.isUnpureCacheEmpty());
 	}
 
+	@SuppressWarnings("unused")
 	private static class TargetClass {
 		private Position position = new Position();
 		private static Position positionStatic = new Position();

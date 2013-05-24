@@ -33,6 +33,7 @@ public class ContractClassMemberHelperTest {
 		assertTrue(isContractConstructor(contractClass.getDeclaredMethod("constructor")));
 	}
 
+	@SuppressWarnings("unused")
 	private static class TargetClass {
 		public TargetClass() {
 		}
@@ -44,6 +45,7 @@ public class ContractClassMemberHelperTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static class ContractClass extends TargetClass {
 		public ContractClass() {
 		}

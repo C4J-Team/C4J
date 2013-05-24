@@ -47,6 +47,7 @@ public class ArrayExpTest {
 				.getCode());
 	}
 
+	@SuppressWarnings("unused")
 	private static class DummyClass {
 		public void dummyMethod(int arg1, String arg2) {
 		}

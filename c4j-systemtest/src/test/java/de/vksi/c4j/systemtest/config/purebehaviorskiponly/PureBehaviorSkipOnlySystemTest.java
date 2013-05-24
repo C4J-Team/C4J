@@ -34,6 +34,7 @@ public class PureBehaviorSkipOnlySystemTest {
 		assertFalse(ContractClass.invariantCalled);
 	}
 
+	@SuppressWarnings("unused")
 	@ContractReference(ContractClass.class)
 	private static class TargetClass {
 		protected int value;
@@ -44,6 +45,7 @@ public class PureBehaviorSkipOnlySystemTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static class ContractClass extends TargetClass {
 		public static boolean invariantCalled;
 
@@ -61,6 +63,7 @@ public class PureBehaviorSkipOnlySystemTest {
 		assertFalse(ContractClassWithPureInContract.invariantCalled);
 	}
 
+	@SuppressWarnings("unused")
 	@ContractReference(ContractClassWithPureInContract.class)
 	private static class TargetClassWithPureInContract {
 		protected int value;
@@ -70,6 +73,7 @@ public class PureBehaviorSkipOnlySystemTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static class ContractClassWithPureInContract extends TargetClassWithPureInContract {
 		public static boolean invariantCalled;
 

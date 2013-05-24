@@ -1,34 +1,32 @@
 package de.vksi.c4j.systemtest.contractclassmagic;
 
+import static de.vksi.c4j.internal.classfile.ClassAnalyzer.getSimplerName;
+
 import org.apache.log4j.Level;
 import org.junit.Rule;
 import org.junit.Test;
 
 import de.vksi.c4j.ContractReference;
-import de.vksi.c4j.internal.classfile.ClassAnalyzer;
 import de.vksi.c4j.systemtest.TransformerAwareRule;
 
 public class ContractReferenceDoesntInheritNonFinalTargetType {
 	@Rule
 	public TransformerAwareRule transformerAwareRule = new TransformerAwareRule();
-	private ClassAnalyzer reflectionHelper = new ClassAnalyzer();
 
 	@Test
 	public void testContractReferenceDoesntInheritNonFinalTargetClass() {
 		new TargetClass();
 		transformerAwareRule.expectGlobalLog(Level.WARN, "Contract type "
-				+ reflectionHelper.getSimplerName(ContractClassForTargetClass.class)
-				+ " does not inherit from its non-final target type "
-				+ reflectionHelper.getSimplerName(TargetClass.class) + ".");
+				+ getSimplerName(ContractClassForTargetClass.class)
+				+ " does not inherit from its non-final target type " + getSimplerName(TargetClass.class) + ".");
 	}
 
 	@Test
 	public void testContractReferenceDoesntInheritFinalTargetClass() {
 		new FinalTargetClass();
 		transformerAwareRule.banGlobalLog(Level.WARN, "Contract type "
-				+ reflectionHelper.getSimplerName(ContractClassForFinalTargetClass.class)
-				+ " does not inherit from its non-final target type "
-				+ reflectionHelper.getSimplerName(FinalTargetClass.class) + ".");
+				+ getSimplerName(ContractClassForFinalTargetClass.class)
+				+ " does not inherit from its non-final target type " + getSimplerName(FinalTargetClass.class) + ".");
 	}
 
 	@Test
@@ -36,9 +34,8 @@ public class ContractReferenceDoesntInheritNonFinalTargetType {
 		new TargetInterface() {
 		};
 		transformerAwareRule.expectGlobalLog(Level.WARN, "Contract type "
-				+ reflectionHelper.getSimplerName(ContractClassForTargetInterface.class)
-				+ " does not inherit from its non-final target type "
-				+ reflectionHelper.getSimplerName(TargetInterface.class) + ".");
+				+ getSimplerName(ContractClassForTargetInterface.class)
+				+ " does not inherit from its non-final target type " + getSimplerName(TargetInterface.class) + ".");
 	}
 
 	@ContractReference(ContractClassForTargetClass.class)

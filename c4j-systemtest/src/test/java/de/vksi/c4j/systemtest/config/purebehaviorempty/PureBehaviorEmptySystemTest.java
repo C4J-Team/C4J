@@ -33,6 +33,7 @@ public class PureBehaviorEmptySystemTest {
 		assertTrue(ContractClass.invariantCalled);
 	}
 
+	@SuppressWarnings("unused")
 	@ContractReference(ContractClass.class)
 	private static class TargetClass {
 		protected int value;
@@ -43,6 +44,7 @@ public class PureBehaviorEmptySystemTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static class ContractClass extends TargetClass {
 		public static boolean invariantCalled;
 

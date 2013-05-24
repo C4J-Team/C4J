@@ -40,6 +40,7 @@ public class ConstructorContractSystemTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static class ContractClass {
 		@ConstructorContract
 		public void construct(int value) {
@@ -55,6 +56,7 @@ public class ConstructorContractSystemTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static class ContractClassMissingNoArgConstructor extends TargetForContractClassMissingNoArgConstructor {
 		public ContractClassMissingNoArgConstructor(int arg) {
 		}

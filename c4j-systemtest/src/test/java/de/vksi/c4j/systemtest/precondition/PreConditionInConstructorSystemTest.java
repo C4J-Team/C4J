@@ -29,6 +29,7 @@ public class PreConditionInConstructorSystemTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static class DummyContract extends DummyClass {
 		public DummyContract() {
 			super(0);

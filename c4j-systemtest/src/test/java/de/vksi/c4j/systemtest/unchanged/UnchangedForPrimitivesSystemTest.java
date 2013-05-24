@@ -38,6 +38,7 @@ public class UnchangedForPrimitivesSystemTest {
 		target.setHourWrongForMethod(3);
 	}
 
+	@SuppressWarnings("unused")
 	@ContractReference(ContractClass.class)
 	private static class TargetClass {
 		protected int hour;

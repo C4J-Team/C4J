@@ -37,6 +37,7 @@ public class OldSystemTest {
 		dummy.incrementValueCheckMethod();
 	}
 
+	@SuppressWarnings("unused")
 	@ContractReference(DummyContract.class)
 	private static class DummyClass {
 		protected int value;
@@ -60,6 +61,7 @@ public class OldSystemTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static class OtherClass {
 		public InputStream stream;
 

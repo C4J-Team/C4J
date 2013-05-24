@@ -54,6 +54,7 @@ public class ClassInvariantWithExceptionThrownSystemTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static class SampleClassContract extends SampleClass {
 		@ClassInvariant
 		public void invariant() {

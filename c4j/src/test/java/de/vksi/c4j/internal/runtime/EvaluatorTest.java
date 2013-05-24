@@ -101,6 +101,7 @@ public class EvaluatorTest {
 		assertEquals(Boolean.FALSE, Evaluator.getConditionReturnValue());
 	}
 
+	@SuppressWarnings("unused")
 	private static class DummyClass {
 		protected String dummyField = "someValue";
 

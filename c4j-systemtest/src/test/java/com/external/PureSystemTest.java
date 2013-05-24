@@ -9,7 +9,6 @@ import org.junit.Test;
 
 import de.vksi.c4j.Condition;
 import de.vksi.c4j.ContractReference;
-import de.vksi.c4j.Pure;
 import de.vksi.c4j.systemtest.TransformerAwareRule;
 
 public class PureSystemTest {
@@ -30,12 +29,6 @@ public class PureSystemTest {
 			z = x + y;
 			return z;
 		}
-
-		@Pure
-		public int getZ() {
-			return z;
-		}
-
 	}
 
 	private static class AContract extends A {

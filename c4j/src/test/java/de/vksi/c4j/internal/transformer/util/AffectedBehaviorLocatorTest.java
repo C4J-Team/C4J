@@ -104,6 +104,7 @@ public class AffectedBehaviorLocatorTest {
 	private static class IndirectClass extends TargetClass {
 	}
 
+	@SuppressWarnings("unused")
 	private static class TargetClass {
 		public TargetClass() {
 		}
@@ -115,6 +116,7 @@ public class AffectedBehaviorLocatorTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static class ContractClass extends TargetClass {
 		public ContractClass() {
 		}

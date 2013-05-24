@@ -60,6 +60,7 @@ public class ContractIsInitializedSystemTest {
 	private static class TargetClass2 {
 	}
 
+	@SuppressWarnings("unused")
 	private static class ContractClass2 extends TargetClass2 {
 		public ContractClass2() {
 			if (preCondition()) {

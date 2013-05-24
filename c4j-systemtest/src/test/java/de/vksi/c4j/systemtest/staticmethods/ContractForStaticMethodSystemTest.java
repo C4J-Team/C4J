@@ -29,6 +29,7 @@ public class ContractForStaticMethodSystemTest {
 		TargetClass.main("test1", "test2");
 	}
 
+	@SuppressWarnings("unused")
 	@ContractReference(ContractClass.class)
 	private static class TargetClass {
 		private static int numCalls = 0;

@@ -27,6 +27,7 @@ public class UnchangedWhenPreConditionFailsSystemTest {
 		TargetClass.staticMethod();
 	}
 
+	@SuppressWarnings("unused")
 	@ContractReference(ContractClass.class)
 	private static class TargetClass {
 		protected static int field;

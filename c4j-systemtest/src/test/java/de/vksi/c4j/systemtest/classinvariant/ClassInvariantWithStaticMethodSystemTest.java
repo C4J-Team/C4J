@@ -27,6 +27,7 @@ public class ClassInvariantWithStaticMethodSystemTest {
 		dummy.setHour(-1);
 	}
 
+	@SuppressWarnings("unused")
 	@ContractReference(DummyClassContract.class)
 	private static class DummyClass {
 		private int hour;
@@ -44,6 +45,7 @@ public class ClassInvariantWithStaticMethodSystemTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static class DummyClassContract extends DummyClass {
 		@Target
 		private DummyClass target;

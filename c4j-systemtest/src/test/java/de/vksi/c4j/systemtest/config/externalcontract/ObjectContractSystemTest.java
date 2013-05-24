@@ -39,6 +39,7 @@ public class ObjectContractSystemTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	@Contract(forTarget = Object.class)
 	private static class ObjectContract {
 		@Target
