@@ -4,6 +4,7 @@ import static de.vksi.c4j.internal.classfile.ClassAnalyzer.constructorHasAdditio
 import static de.vksi.c4j.internal.classfile.ClassAnalyzer.getDeclaredMethods;
 import static de.vksi.c4j.internal.classfile.ClassAnalyzer.getField;
 import static de.vksi.c4j.internal.classfile.ClassAnalyzer.getMethod;
+import static de.vksi.c4j.internal.classfile.ClassAnalyzer.isSynthetic;
 import javassist.CannotCompileException;
 import javassist.CtBehavior;
 import javassist.CtClass;
@@ -53,7 +54,8 @@ public class ContractBehaviorTransformer extends AbstractContractClassTransforme
 		for (CtMethod contractMethod : getDeclaredMethods(contractInfo.getContractClass(), BehaviorFilter.STATIC,
 				BehaviorFilter.VISIBLE)) {
 			if (getMethod(contractInfo.getTargetClass(), contractMethod.getName(), contractMethod.getSignature()) == null
-					&& !ContractClassMemberHelper.isContractClassInitializer(contractMethod)) {
+					&& !ContractClassMemberHelper.isContractClassInitializer(contractMethod)
+					&& !isSynthetic(contractMethod)) {
 				contractInfo.addError(new UsageError("Couldn't find matching target method for static contract method "
 						+ contractMethod.getLongName() + "."));
 			}

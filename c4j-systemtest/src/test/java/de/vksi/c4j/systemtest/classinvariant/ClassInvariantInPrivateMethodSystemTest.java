@@ -1,5 +1,8 @@
 package de.vksi.c4j.systemtest.classinvariant;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -16,6 +19,7 @@ public class ClassInvariantInPrivateMethodSystemTest {
 	@Test
 	public void testClassInvariantInPrivateMethod() {
 		new TargetClass();
+		assertThat(ContractClass.invariantCalled, is(true));
 	}
 
 	@ContractReference(ContractClass.class)
@@ -37,12 +41,16 @@ public class ClassInvariantInPrivateMethodSystemTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static class ContractClass {
+		private static boolean invariantCalled;
+
 		@Target
 		private TargetClass target;
 
 		@ClassInvariant
 		public void invariant() {
+			invariantCalled = true;
 			assert target.getValue() > 0;
 		}
 	}

@@ -1,15 +1,15 @@
 package de.vksi.c4j.internal.transformer.editor;
 
+import static de.vksi.c4j.internal.classfile.ClassAnalyzer.isSynthetic;
+
 import java.lang.reflect.Modifier;
 
 import javassist.CannotCompileException;
-import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.CtField;
 import javassist.CtMember;
 import javassist.CtMethod;
 import javassist.NotFoundException;
-import javassist.bytecode.AccessFlag;
 import javassist.expr.ExprEditor;
 import javassist.expr.FieldAccess;
 import javassist.expr.MethodCall;
@@ -177,9 +177,5 @@ public class PureBehaviorExpressionEditor extends ExprEditor {
 			return;
 		}
 		PureEvaluator.warnExternalAccess(method.getLongName(), ErrorType.UNPURE);
-	}
-
-	private boolean isSynthetic(CtBehavior behavior) {
-		return (AccessFlag.of(behavior.getModifiers()) & AccessFlag.SYNTHETIC) > 0;
 	}
 }

@@ -10,6 +10,7 @@ import javassist.CtConstructor;
 import javassist.CtField;
 import javassist.CtMethod;
 import javassist.NotFoundException;
+import javassist.bytecode.AccessFlag;
 import javassist.bytecode.Descriptor;
 import javassist.bytecode.MethodInfo;
 
@@ -125,5 +126,9 @@ public class ClassAnalyzer {
 		} catch (NotFoundException e) {
 			return null;
 		}
+	}
+
+	public static boolean isSynthetic(CtBehavior behavior) {
+		return (AccessFlag.of(behavior.getModifiers()) & AccessFlag.SYNTHETIC) > 0;
 	}
 }
