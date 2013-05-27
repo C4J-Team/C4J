@@ -1,31 +1,11 @@
 package de.vksi.c4j.internal.transformer.util;
 
-import static javassist.bytecode.Opcode.ALOAD;
-import static javassist.bytecode.Opcode.ALOAD_1;
-import static javassist.bytecode.Opcode.ALOAD_2;
-import static javassist.bytecode.Opcode.ALOAD_3;
-import static javassist.bytecode.Opcode.DLOAD;
-import static javassist.bytecode.Opcode.DLOAD_1;
-import static javassist.bytecode.Opcode.DLOAD_2;
-import static javassist.bytecode.Opcode.DLOAD_3;
-import static javassist.bytecode.Opcode.FLOAD;
-import static javassist.bytecode.Opcode.FLOAD_1;
-import static javassist.bytecode.Opcode.FLOAD_2;
-import static javassist.bytecode.Opcode.FLOAD_3;
 import static javassist.bytecode.Opcode.GETFIELD;
 import static javassist.bytecode.Opcode.GETSTATIC;
-import static javassist.bytecode.Opcode.ILOAD;
-import static javassist.bytecode.Opcode.ILOAD_1;
-import static javassist.bytecode.Opcode.ILOAD_2;
-import static javassist.bytecode.Opcode.ILOAD_3;
 import static javassist.bytecode.Opcode.INVOKEINTERFACE;
 import static javassist.bytecode.Opcode.INVOKESPECIAL;
 import static javassist.bytecode.Opcode.INVOKESTATIC;
 import static javassist.bytecode.Opcode.INVOKEVIRTUAL;
-import static javassist.bytecode.Opcode.LLOAD;
-import static javassist.bytecode.Opcode.LLOAD_1;
-import static javassist.bytecode.Opcode.LLOAD_2;
-import static javassist.bytecode.Opcode.LLOAD_3;
 import static javassist.bytecode.Opcode.MULTIANEWARRAY;
 import static javassist.bytecode.Opcode.PUTFIELD;
 import static javassist.bytecode.Opcode.PUTSTATIC;
@@ -59,83 +39,36 @@ public class Stackalyzer {
 
 	public byte[] getDependenciesFor(CtBehavior contractBehavior, int indexOfDependentCall) throws BadBytecode,
 			NotFoundException, UsageError {
-		CodeAttribute ca = contractBehavior.getMethodInfo().getCodeAttribute();
-		CodeIterator ci = ca.iterator();
+		CodeAttribute codeAttribute = contractBehavior.getMethodInfo().getCodeAttribute();
+		CodeIterator codeIterator = codeAttribute.iterator();
+		int indexOfNestedExpression = getIndexOfNestedExpression(contractBehavior,
+				indexOfDependentCall, codeIterator);
+		VariableAccessVerifier verifier = new VariableAccessVerifier(codeIterator,
+				contractBehavior.getParameterTypes().length);
+		if (verifier.verify(indexOfNestedExpression, indexOfDependentCall)) {
+			throw new UsageError("Illegal access on local variable within old().");
+		}
+		return Arrays.copyOfRange(codeAttribute.getCode(), indexOfNestedExpression, indexOfDependentCall);
+	}
+
+	private int getIndexOfNestedExpression(CtBehavior contractBehavior, int indexOfDependentCall,
+			CodeIterator codeIterator) throws BadBytecode, NotFoundException, UsageError {
 		LinkedList<StackDepth> stackDepth = new LinkedList<StackDepth>();
 		int depth = 0;
-		while (ci.hasNext()) {
-			int index = ci.next();
+		while (codeIterator.hasNext()) {
+			int index = codeIterator.next();
 			if (index > indexOfDependentCall) {
 				break;
 			}
-			int op = ci.byteAt(index);
+			int op = codeIterator.byteAt(index);
 			stackDepth.add(new StackDepth(index, depth));
-			depth += getOpcodeDelta(op, index, ci, contractBehavior.getMethodInfo().getConstPool());
+			depth += getOpcodeDelta(op, index, codeIterator, contractBehavior.getMethodInfo().getConstPool());
 		}
 		int stackDepthForOldCall = depth;
 		while (stackDepth.getLast().getSecond().intValue() >= stackDepthForOldCall) {
 			stackDepth.removeLast();
 		}
-		checkLocalVarAccess(ci, stackDepth.getLast().getFirst().intValue(), indexOfDependentCall, contractBehavior
-				.getParameterTypes().length);
-		return Arrays.copyOfRange(ca.getCode(), stackDepth.getLast().getFirst().intValue(), indexOfDependentCall);
-	}
-
-	private void checkLocalVarAccess(CodeIterator ci, int beginIndex, int endIndex, int numParams) throws BadBytecode,
-			UsageError {
-		ci.move(beginIndex);
-		while (ci.hasNext()) {
-			int index = ci.next();
-			if (index > endIndex) {
-				return;
-			}
-			int op = ci.byteAt(index);
-			checkLoadOpcodes(ci, numParams, index, op, false);
-		}
-	}
-
-	private void checkLoadOpcodes(CodeIterator ci, int numParams, int index, int op, boolean wide) throws UsageError {
-		switch (op) {
-			case ALOAD_1:
-			case DLOAD_1:
-			case FLOAD_1:
-			case ILOAD_1:
-			case LLOAD_1:
-				verifyLocalVarAccess(1, numParams);
-				break;
-			case ALOAD_2:
-			case DLOAD_2:
-			case FLOAD_2:
-			case ILOAD_2:
-			case LLOAD_2:
-				verifyLocalVarAccess(2, numParams);
-				break;
-			case ALOAD_3:
-			case DLOAD_3:
-			case FLOAD_3:
-			case ILOAD_3:
-			case LLOAD_3:
-				verifyLocalVarAccess(3, numParams);
-				break;
-			case ALOAD:
-			case DLOAD:
-			case FLOAD:
-			case ILOAD:
-			case LLOAD:
-				int register = wide ? ci.u16bitAt(index + 1) : ci.byteAt(index + 1);
-				verifyLocalVarAccess(register, numParams);
-				break;
-			case WIDE:
-				int loadOp = ci.byteAt(index + 1);
-				checkLoadOpcodes(ci, numParams, index + 1, loadOp, true);
-				break;
-		}
-	}
-
-	private void verifyLocalVarAccess(int i, int numParams) throws UsageError {
-		if (i > numParams) {
-			throw new UsageError("Illegal access on local variable within old().");
-		}
+		return stackDepth.getLast().getFirst().intValue();
 	}
 
 	private int getOpcodeDelta(int op, int index, CodeIterator ci, ConstPool constPool) throws BadBytecode,
