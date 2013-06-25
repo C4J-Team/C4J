@@ -166,17 +166,10 @@
 			<plugin>
 				<groupId>de.andrena.tools.macker</groupId>
 				<artifactId>macker-maven-plugin</artifactId>
-				<version>1.0.0</version>
+				<version>1.0.2</version>
 				<configuration>
 					<rule>macker-rules.xml</rule>
 				</configuration>
-				<dependencies>
-					<dependency>
-						<groupId>de.andrena.tools.macker</groupId>
-						<artifactId>macker</artifactId>
-						<version>1.0.1-SNAPSHOT</version>
-					</dependency>
-				</dependencies>
 				<executions>
 					<execution>
 						<phase>compile</phase>
