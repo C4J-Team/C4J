@@ -1,11 +1,11 @@
 package de.vksi.c4j.internal.transformer.contract;
 
+import static de.vksi.c4j.internal.transformer.util.ContractClassMemberHelper.isClassInvariant;
+import static de.vksi.c4j.internal.transformer.util.ContractClassMemberHelper.makeBeforeInvariantHelperMethodName;
 import static de.vksi.c4j.internal.transformer.util.TransformationHelper.addBehaviorAnnotation;
-import static de.vksi.c4j.internal.transformer.util.TransformationHelper.setClassIndex;
 import static de.vksi.c4j.internal.transformer.util.TransformationHelper.setMethodIndex;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -22,20 +22,14 @@ import javassist.bytecode.Opcode;
 
 import org.apache.log4j.Logger;
 
-import de.vksi.c4j.ClassInvariant;
 import de.vksi.c4j.internal.classfile.ClassFilePool;
 import de.vksi.c4j.internal.compiler.IfExp;
-import de.vksi.c4j.internal.compiler.StaticCall;
 import de.vksi.c4j.internal.compiler.StaticCallExp;
 import de.vksi.c4j.internal.contracts.BeforeClassInvariant;
 import de.vksi.c4j.internal.contracts.ContractInfo;
 import de.vksi.c4j.internal.runtime.Evaluator;
-import de.vksi.c4j.internal.runtime.OldCache;
-import de.vksi.c4j.internal.runtime.PureEvaluator;
 import de.vksi.c4j.internal.transformer.editor.ContractMethodConditionEditor;
 import de.vksi.c4j.internal.transformer.editor.InitializationGatheringEditor;
-import de.vksi.c4j.internal.transformer.editor.StoreDependency;
-import de.vksi.c4j.internal.transformer.util.ContractClassMemberHelper;
 
 public class ContractExpressionTransformer extends AbstractContractClassTransformer {
 	private static final Logger LOGGER = Logger.getLogger(ContractExpressionTransformer.class);
@@ -82,7 +76,7 @@ public class ContractExpressionTransformer extends AbstractContractClassTransfor
 
 	private void insertStoreDependencies(CtMethod contractMethod, ContractMethodDependencies contractMethodDependencies)
 			throws BadBytecode, CannotCompileException, NotFoundException {
-		if (contractMethod.hasAnnotation(ClassInvariant.class)) {
+		if (isClassInvariant(contractMethod)) {
 			insertStoreDependenciesForClassInvariant(contractMethod, contractMethodDependencies);
 		} else {
 			insertStoreDependenciesForPostCondition(contractMethod, contractMethodDependencies);
@@ -92,9 +86,9 @@ public class ContractExpressionTransformer extends AbstractContractClassTransfor
 	private void insertStoreDependenciesForClassInvariant(CtMethod contractMethod,
 			ContractMethodDependencies contractMethodDependencies) throws BadBytecode, CannotCompileException,
 			NotFoundException {
-		CtMethod beforeInvariant = CtNewMethod.make(CtClass.voidType, contractMethod.getName()
-				+ ContractClassMemberHelper.BEFORE_INVARIANT_METHOD_SUFFIX, new CtClass[0], contractMethod
-				.getExceptionTypes(), null, contractMethod.getDeclaringClass());
+		CtMethod beforeInvariant = CtNewMethod.make(CtClass.voidType,
+				makeBeforeInvariantHelperMethodName(contractMethod), new CtClass[0],
+				contractMethod.getExceptionTypes(), null, contractMethod.getDeclaringClass());
 		contractMethod.getDeclaringClass().addMethod(beforeInvariant);
 		addBehaviorAnnotation(beforeInvariant, ClassFilePool.INSTANCE.getClass(BeforeClassInvariant.class));
 		insertIntoBeforeInvariant(contractMethodDependencies, beforeInvariant, contractMethod.getDeclaringClass());
@@ -108,7 +102,8 @@ public class ContractExpressionTransformer extends AbstractContractClassTransfor
 		if (contractMethodDependencies.hasStoreDependencies()) {
 			ConstPool constPool = beforeInvariant.getMethodInfo().getConstPool();
 			CodeAttribute attribute = beforeInvariant.getMethodInfo().getCodeAttribute();
-			insertOldStoreCalls(attribute, contractMethodDependencies.getStoreDependencies(), constPool, contractClass);
+			new OldStoreCallWriter(constPool, contractClass).insertOldStoreCalls(attribute, contractMethodDependencies
+					.getStoreDependencies());
 			attribute.computeMaxStack();
 		}
 	}
@@ -123,8 +118,8 @@ public class ContractExpressionTransformer extends AbstractContractClassTransfor
 		if (contractMethodDependencies.hasStoreDependencies()) {
 			ConstPool constPool = contractMethod.getMethodInfo().getConstPool();
 			CodeAttribute attribute = contractMethod.getMethodInfo().getCodeAttribute();
-			int ifBlockLength = insertOldStoreCalls(attribute, contractMethodDependencies.getStoreDependencies(),
-					constPool, contractMethod.getDeclaringClass());
+			int ifBlockLength = new OldStoreCallWriter(constPool, contractMethod.getDeclaringClass())
+					.insertOldStoreCalls(attribute, contractMethodDependencies.getStoreDependencies());
 			insertJump(attribute.iterator(), ifBlockLength, constPool);
 		}
 	}
@@ -138,70 +133,6 @@ public class ContractExpressionTransformer extends AbstractContractClassTransfor
 		ifBytes[4] = (byte) (jumpLength >> 8);
 		ifBytes[5] = (byte) jumpLength;
 		iterator.insertEx(0, ifBytes);
-	}
-
-	private int insertOldStoreCalls(CodeAttribute attribute, List<StoreDependency> storeDependencies,
-			ConstPool constPool, CtClass contractClass) throws BadBytecode {
-		CodeIterator iterator = attribute.iterator();
-		int ifBlockLength = 0;
-		byte[] oldStoreBytes = getOldStoreBytes(constPool, OldCache.oldStore);
-		byte[] oldStoreExceptionBytes = getOldStoreBytes(constPool, OldCache.oldStoreException);
-		byte[] contractClassBytes = getContractClassBytes(constPool, contractClass);
-		for (StoreDependency storeDependency : storeDependencies) {
-			int startIndex = iterator.insert(storeDependency.getDependency());
-			if (storeDependency.isUnchangeable()) {
-				byte[] registerUnchangeableBytes = getRegisterUnchangeableBytes(constPool);
-				iterator.insert(registerUnchangeableBytes);
-			}
-			byte[] iloadBytes = getIloadBytes(storeDependency.getIndex());
-			iterator.insert(contractClassBytes);
-			iterator.insert(iloadBytes);
-			iterator.insert(oldStoreBytes);
-			byte[] gotoBytes = new byte[3];
-			gotoBytes[0] = (byte) Opcode.GOTO;
-			int gotoTarget = gotoBytes.length + contractClassBytes.length + iloadBytes.length + oldStoreBytes.length;
-			int gotoIndex = iterator.insert(gotoBytes);
-			iterator.insert(contractClassBytes);
-			iterator.insert(iloadBytes);
-			iterator.insert(oldStoreExceptionBytes);
-			iterator.write(new byte[] { (byte) (gotoTarget >> 8), (byte) gotoTarget }, gotoIndex + 1);
-			int tryLength = gotoIndex - startIndex;
-			ifBlockLength += tryLength + gotoBytes.length + contractClassBytes.length + iloadBytes.length
-					+ oldStoreExceptionBytes.length;
-			int endIndex = startIndex + tryLength;
-			attribute.getExceptionTable().add(startIndex, endIndex, endIndex + gotoBytes.length, 0);
-		}
-		return ifBlockLength;
-	}
-
-	private byte[] getIloadBytes(int i) {
-		byte[] iloadBytes = new byte[2];
-		iloadBytes[0] = Opcode.BIPUSH;
-		iloadBytes[1] = (byte) i;
-		return iloadBytes;
-	}
-
-	private byte[] getRegisterUnchangeableBytes(ConstPool constPool) {
-		byte[] registerUnchangeableBytes = new byte[4];
-		registerUnchangeableBytes[0] = (byte) Opcode.DUP;
-		registerUnchangeableBytes[1] = (byte) Opcode.INVOKESTATIC;
-		setMethodIndex(constPool, registerUnchangeableBytes, 2, PureEvaluator.registerUnchangeable,
-				PureEvaluator.registerUnchangeableDescriptor);
-		return registerUnchangeableBytes;
-	}
-
-	private byte[] getContractClassBytes(ConstPool constPool, CtClass contractClass) {
-		byte[] contractClassBytes = new byte[3];
-		contractClassBytes[0] = (byte) Opcode.LDC_W;
-		setClassIndex(constPool, contractClassBytes, 1, contractClass);
-		return contractClassBytes;
-	}
-
-	private byte[] getOldStoreBytes(ConstPool constPool, StaticCall oldStoreCall) {
-		byte[] oldStoreBytes = new byte[3];
-		oldStoreBytes[0] = (byte) Opcode.INVOKESTATIC;
-		setMethodIndex(constPool, oldStoreBytes, 1, oldStoreCall, OldCache.oldStoreDescriptor);
-		return oldStoreBytes;
 	}
 
 }

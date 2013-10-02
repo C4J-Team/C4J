@@ -14,7 +14,6 @@ import javassist.NotFoundException;
 import org.apache.log4j.Logger;
 
 import de.vksi.c4j.Target;
-import de.vksi.c4j.internal.classfile.ClassFilePool;
 import de.vksi.c4j.internal.compiler.AssignmentExp;
 import de.vksi.c4j.internal.compiler.ConstructorExp;
 import de.vksi.c4j.internal.compiler.NestedExp;
@@ -69,13 +68,11 @@ public class TargetTransformer extends AbstractContractClassTransformer {
 	}
 
 	private WeakFieldMapping createWeakField(CtClass contractClass) throws NotFoundException, CannotCompileException {
-		CtClass weakReferenceClass = ClassFilePool.INSTANCE.getClass(WeakReference.class);
 		CtField targetField = getTargetField(contractClass);
 		if (targetField == null) {
 			return null;
 		}
-		CtField weakTargetField = new CtField(weakReferenceClass, ContractClassMemberHelper.TARGET_FIELD_NAME,
-				contractClass);
+		CtField weakTargetField = ContractClassMemberHelper.createWeakTargetField(contractClass);
 		contractClass.addField(weakTargetField);
 		return new WeakFieldMapping(targetField, weakTargetField);
 	}

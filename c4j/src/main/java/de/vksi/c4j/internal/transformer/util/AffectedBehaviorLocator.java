@@ -1,9 +1,9 @@
 package de.vksi.c4j.internal.transformer.util;
 
-import static de.vksi.c4j.internal.classfile.ClassAnalyzer.constructorHasAdditionalParameter;
 import static de.vksi.c4j.internal.classfile.ClassAnalyzer.getDeclaredConstructor;
 import static de.vksi.c4j.internal.classfile.ClassAnalyzer.getDeclaredMethod;
-import static de.vksi.c4j.internal.transformer.util.ContractClassMemberHelper.BEFORE_INVARIANT_METHOD_SUFFIX;
+import static de.vksi.c4j.internal.transformer.util.ContractClassMemberHelper.isBeforeInvariantHelperMethod;
+import static de.vksi.c4j.internal.transformer.util.ContractClassMemberHelper.isClassInvariant;
 import static de.vksi.c4j.internal.transformer.util.ContractClassMemberHelper.isContractClassInitializer;
 import static de.vksi.c4j.internal.transformer.util.ContractClassMemberHelper.isContractConstructor;
 import javassist.CannotCompileException;
@@ -17,7 +17,7 @@ import javassist.NotFoundException;
 
 import org.apache.log4j.Logger;
 
-import de.vksi.c4j.ClassInvariant;
+import de.vksi.c4j.internal.classfile.ClassAnalyzer;
 import de.vksi.c4j.internal.contracts.ContractInfo;
 import de.vksi.c4j.internal.contracts.ContractRegistry;
 import de.vksi.c4j.internal.contracts.InvolvedTypeInspector;
@@ -34,10 +34,7 @@ public class AffectedBehaviorLocator {
 
 	public CtBehavior getAffectedBehavior(ContractInfo contractInfo, CtClass affectedClass, CtBehavior contractBehavior)
 			throws NotFoundException, CannotCompileException {
-		if (contractBehavior.hasAnnotation(ClassInvariant.class)) {
-			return null;
-		}
-		if (contractBehavior.getName().endsWith(BEFORE_INVARIANT_METHOD_SUFFIX)) {
+		if (isClassInvariant(contractBehavior) || isBeforeInvariantHelperMethod(contractBehavior)) {
 			return null;
 		}
 		if (isContractConstructor(contractBehavior)) {
@@ -55,8 +52,7 @@ public class AffectedBehaviorLocator {
 
 	CtMethod getAffectedMethod(ContractInfo contractInfo, CtClass affectedClass, CtBehavior contractBehavior)
 			throws NotFoundException, CannotCompileException {
-		CtClass currentClass = affectedClass;
-		CtMethod affectedMethod = getAffectedMethodFromExtendedClasses(contractBehavior, currentClass);
+		CtMethod affectedMethod = getAffectedMethodFromExtendedClasses(contractBehavior, affectedClass);
 		if (affectedMethod == null) {
 			LOGGER.warn("could not find a matching method in affected class " + affectedClass.getName()
 					+ " for method '" + contractBehavior.getName() + "' in contract class "
@@ -69,20 +65,29 @@ public class AffectedBehaviorLocator {
 		if (hasContract(affectedMethod.getDeclaringClass(), contractInfo)) {
 			return null;
 		}
+		return getAffectedMethodAsDelegate(affectedClass, contractBehavior, affectedMethod);
+	}
+
+	private CtMethod getAffectedMethodAsDelegate(CtClass affectedClass, CtBehavior contractBehavior,
+			CtMethod affectedMethod) throws CannotCompileException {
 		if (Modifier.isFinal(affectedMethod.getModifiers())) {
 			LOGGER.warn("could not find method " + contractBehavior.getName() + " in affected class "
-					+ affectedClass.getName() + " for contract class " + contractInfo.getContractClass().getName()
+					+ affectedClass.getName() + " for contract class " + contractBehavior.getDeclaringClass().getName()
 					+ " and cannot insert a delegate, as the overridden method is final");
 			return null;
 		}
 		LOGGER.warn("could not find method " + contractBehavior.getName() + " in affected class "
-				+ affectedClass.getName() + " for contract class " + contractInfo.getContractClass().getName()
+				+ affectedClass.getName() + " for contract class " + contractBehavior.getDeclaringClass().getName()
 				+ " - inserting an empty method");
-		affectedMethod = CtNewMethod.delegator(affectedMethod, affectedClass);
-		affectedMethod.setModifiers(Modifier.clear(affectedMethod.getModifiers(), Modifier.NATIVE));
-		affectedMethod.setModifiers(Modifier.clear(affectedMethod.getModifiers(), Modifier.ABSTRACT));
-		affectedClass.addMethod(affectedMethod);
-		return affectedMethod;
+		return insertDelegateMethod(affectedClass, affectedMethod);
+	}
+
+	private CtMethod insertDelegateMethod(CtClass affectedClass, CtMethod affectedMethod) throws CannotCompileException {
+		CtMethod delegateMethod = CtNewMethod.delegator(affectedMethod, affectedClass);
+		delegateMethod.setModifiers(Modifier.clear(delegateMethod.getModifiers(), Modifier.NATIVE));
+		delegateMethod.setModifiers(Modifier.clear(delegateMethod.getModifiers(), Modifier.ABSTRACT));
+		affectedClass.addMethod(delegateMethod);
+		return delegateMethod;
 	}
 
 	private CtMethod getAffectedMethodFromExtendedClasses(CtBehavior contractBehavior, CtClass currentClass)
@@ -112,8 +117,8 @@ public class AffectedBehaviorLocator {
 		if (!affectedClass.equals(contractInfo.getTargetClass())) {
 			return null;
 		}
-		CtConstructor affectedConstructor = getDeclaredConstructor(affectedClass, getConstructorParameterTypes(
-				affectedClass, contractBehavior));
+		CtConstructor affectedConstructor = getDeclaredConstructor(affectedClass, ClassAnalyzer
+				.getConstructorParameterTypes(affectedClass, contractBehavior));
 		if (affectedConstructor == null) {
 			// TODO: error
 			LOGGER.warn("could not find a matching constructor in affected class " + affectedClass.getName()
@@ -121,19 +126,5 @@ public class AffectedBehaviorLocator {
 			return null;
 		}
 		return affectedConstructor;
-	}
-
-	private CtClass[] getConstructorParameterTypes(CtClass affectedClass, CtBehavior contractBehavior)
-			throws NotFoundException {
-		CtClass[] parameterTypes = contractBehavior.getParameterTypes();
-		if (constructorHasAdditionalParameter(affectedClass)) {
-			CtClass[] initialParameterTypes = parameterTypes;
-			parameterTypes = new CtClass[parameterTypes.length + 1];
-			parameterTypes[0] = affectedClass.getDeclaringClass();
-			for (int i = 0; i < initialParameterTypes.length; i++) {
-				parameterTypes[i + 1] = initialParameterTypes[i];
-			}
-		}
-		return parameterTypes;
 	}
 }

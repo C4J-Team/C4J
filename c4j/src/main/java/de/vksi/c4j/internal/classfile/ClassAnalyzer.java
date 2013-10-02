@@ -131,4 +131,18 @@ public class ClassAnalyzer {
 	public static boolean isSynthetic(CtBehavior behavior) {
 		return (AccessFlag.of(behavior.getModifiers()) & AccessFlag.SYNTHETIC) > 0;
 	}
+
+	public static CtClass[] getConstructorParameterTypes(CtClass affectedClass, CtBehavior contractBehavior)
+			throws NotFoundException {
+		CtClass[] parameterTypes = contractBehavior.getParameterTypes();
+		if (constructorHasAdditionalParameter(affectedClass)) {
+			CtClass[] initialParameterTypes = parameterTypes;
+			parameterTypes = new CtClass[parameterTypes.length + 1];
+			parameterTypes[0] = affectedClass.getDeclaringClass();
+			for (int i = 0; i < initialParameterTypes.length; i++) {
+				parameterTypes[i + 1] = initialParameterTypes[i];
+			}
+		}
+		return parameterTypes;
+	}
 }

@@ -8,7 +8,6 @@ import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.NotFoundException;
 import de.vksi.c4j.internal.compiler.CastExp;
-import de.vksi.c4j.internal.compiler.IfExp;
 import de.vksi.c4j.internal.compiler.NestedExp;
 import de.vksi.c4j.internal.compiler.StandaloneExp;
 import de.vksi.c4j.internal.compiler.StaticCallExp;
@@ -46,12 +45,6 @@ public abstract class ConditionTransformer extends AbstractAffectedClassTransfor
 
 	protected StandaloneExp getAfterContractCall() {
 		return new StaticCallExp(Evaluator.afterContract).toStandalone();
-	}
-
-	protected IfExp getCanExecuteConditionCall(StandaloneExp body) {
-		IfExp canExecuteConditionCall = new IfExp(new StaticCallExp(Evaluator.canExecuteCondition));
-		canExecuteConditionCall.addIfBody(body);
-		return canExecuteConditionCall;
 	}
 
 	protected StandaloneExp getContractCallExp(CtClass affectedClass, CtBehavior contractBehavior,

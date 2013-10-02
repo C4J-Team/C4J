@@ -35,6 +35,7 @@ import de.vksi.c4j.internal.contracts.ContractMethod;
 import de.vksi.c4j.internal.runtime.ContractErrorHandler.ContractErrorSource;
 import de.vksi.c4j.internal.runtime.Evaluator;
 import de.vksi.c4j.internal.runtime.UnchangedCache;
+import de.vksi.c4j.internal.transformer.util.ConditionExpression;
 import de.vksi.c4j.internal.types.ListOrderedSet;
 
 /**
@@ -125,7 +126,7 @@ public class InvariantTransformer extends ConditionTransformer {
 		TryExp tryInvariants = new TryExp(invariantCalls);
 		catchWithHandleContractException(affectedClass, tryInvariants, ContractErrorSource.CLASS_INVARIANT);
 		tryInvariants.addFinally(getAfterContractCall());
-		return getCanExecuteConditionCall(tryInvariants);
+		return ConditionExpression.getCanExecuteConditionCall(tryInvariants);
 	}
 
 	private StandaloneExp setConstructorCall(CtBehavior affectedBehavior) {
@@ -142,7 +143,7 @@ public class InvariantTransformer extends ConditionTransformer {
 		TryExp tryInvariants = new TryExp(setConstructorCall(affectedBehavior).append(invariantCalls));
 		catchWithHandleContractException(affectedClass, tryInvariants, ContractErrorSource.CLASS_INVARIANT);
 		tryInvariants.addFinally(getAfterContractCall());
-		TryExp tryWrapper = new TryExp(getCanExecuteConditionCall(tryInvariants));
+		TryExp tryWrapper = new TryExp(ConditionExpression.getCanExecuteConditionCall(tryInvariants));
 		tryWrapper.addFinally(getAfterContractMethodCall());
 		return tryWrapper;
 	}
