@@ -6,6 +6,7 @@ import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.annotation.Annotation;
 import javassist.bytecode.annotation.ArrayMemberValue;
 import javassist.bytecode.annotation.ClassMemberValue;
+import javassist.bytecode.annotation.ClassMemberValueReader;
 import javassist.bytecode.annotation.MemberValue;
 
 import org.apache.log4j.Logger;
@@ -15,8 +16,8 @@ public class BackdoorAnnotationLoader {
 	private static final Logger LOGGER = Logger.getLogger(BackdoorAnnotationLoader.class);
 
 	public BackdoorAnnotationLoader(CtClass clazz) {
-		annotationsAttribute = (AnnotationsAttribute) clazz.getClassFile2()
-				.getAttribute(AnnotationsAttribute.invisibleTag);
+		annotationsAttribute = (AnnotationsAttribute) clazz.getClassFile2().getAttribute(
+				AnnotationsAttribute.invisibleTag);
 	}
 
 	public BackdoorAnnotationLoader(CtBehavior behavior) {
@@ -44,7 +45,7 @@ public class BackdoorAnnotationLoader {
 			LOGGER.fatal(annotationClass.getName() + "." + key + " is not a value of type Class.");
 			return null;
 		}
-		return ((ClassMemberValue) memberValue).getValue();
+		return ClassMemberValueReader.readClassMemberValue((ClassMemberValue) memberValue);
 	}
 
 	public String[] getClassArrayValue(Class<? extends java.lang.annotation.Annotation> annotationClass, String key) {
