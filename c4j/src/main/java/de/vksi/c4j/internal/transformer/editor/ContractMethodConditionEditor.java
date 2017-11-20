@@ -2,10 +2,14 @@ package de.vksi.c4j.internal.transformer.editor;
 
 import static de.vksi.c4j.internal.classfile.ClassAnalyzer.getDeclaredMethod;
 import static de.vksi.c4j.internal.classfile.ClassAnalyzer.getField;
+
+import java.util.Set;
+
 import javassist.CannotCompileException;
 import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.CtField;
+import javassist.CtMethod;
 import javassist.NotFoundException;
 import javassist.expr.FieldAccess;
 import javassist.expr.MethodCall;
@@ -20,6 +24,7 @@ import de.vksi.c4j.internal.compiler.StaticCallExp;
 import de.vksi.c4j.internal.configuration.DefaultPreconditionType;
 import de.vksi.c4j.internal.configuration.XmlConfigurationManager;
 import de.vksi.c4j.internal.contracts.ContractInfo;
+import de.vksi.c4j.internal.contracts.ContractMethod;
 import de.vksi.c4j.internal.contracts.ContractRegistry;
 import de.vksi.c4j.internal.contracts.InvolvedTypeInspector;
 import de.vksi.c4j.internal.types.ListOrderedSet;
@@ -112,9 +117,21 @@ public class ContractMethodConditionEditor extends ContractMethodEditor {
 				getContract().getTargetClass());
 		contracts.remove(getContract());
 		for (ContractInfo otherContract : contracts) {
-			if (getDeclaredMethod(otherContract.getTargetClass(), method.getName(), method.getParameterTypes()) != null) {
-				preConditionStrengthening(methodCall, method, otherContract.getContractClass());
-				return;
+			CtMethod otherMethod = getDeclaredMethod(otherContract.getTargetClass(), method.getName(), method.getParameterTypes());
+			if (otherMethod != null) {
+				boolean superPreconditionDefined = false;
+				Set<ContractMethod> methods = otherContract.getMethods();
+				for (ContractMethod otherContractMethod : methods) {
+					if (otherContractMethod.getMethod().equals(otherMethod)) {
+						if (otherContractMethod.hasPreConditionOrDependencies()) {
+							superPreconditionDefined = true;
+						}
+					}
+				}
+				if (superPreconditionDefined) {
+					preConditionStrengthening(methodCall, method, otherContract.getContractClass());
+					return;
+				}
 			}
 		}
 		preConditionAvailable = true;
